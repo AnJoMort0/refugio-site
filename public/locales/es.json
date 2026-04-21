@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "htmlLang": "es",
+    "title": "Refugio Rural | Prototipo de la página de inicio",
+    "description": "Prototipo de página de inicio para un sitio premium de alojamiento rural."
+  },
+  "brand": {
+    "name": "Refugio Rural"
+  },
+  "languageSwitcher": {
+    "label": "Elegir idioma"
+  },
+  "nav": {
+    "toggleLabel": "Abrir menú",
+    "toggleText": "Abrir menú",
+    "accommodation": "Alojamiento",
+    "gallery": "Galería",
+    "booking": "Reservas",
+    "contact": "Contacto",
+    "guide": "Guía Local"
+  },
+  "home": {
+    "hero": {
+      "imageAlt": "Vista exterior de la casa de piedra",
+      "eyebrow": "Refugio de Montaña",
+      "title": "Título provisional para una escapada rural cálida y premium",
+      "text": "Párrafo provisional para describir el ambiente, la hospitalidad familiar, la calma de la montaña y la calidad de la estancia.",
+      "primaryCta": "Ver disponibilidad",
+      "secondaryCta": "Explorar fotos"
+    },
+    "features": {
+      "pool": "Piscina con vistas",
+      "privacy": "Privacidad premium",
+      "family": "Ambiente familiar"
+    },
+    "accommodation": {
+      "eyebrow": "El Alojamiento",
+      "title": "Sección provisional para presentar la propiedad en dos o tres frases potentes",
+      "text1": "Usa este bloque para explicar qué hace especial a la propiedad: arquitectura de piedra, interiores cálidos, silencio rural, vistas a la montaña y confort boutique.",
+      "text2prefix": "Imagen recomendada para esta sección:",
+      "text2middle": "o",
+      "link": "Descubrir el espacio",
+      "imageAlt": "Interior acogedor del alojamiento"
+    },
+    "gallery": {
+      "eyebrow": "Galería",
+      "title": "Mini vista previa de la experiencia visual",
+      "text": "Estas tarjetas son placeholders para tus imágenes más fuertes a nivel emocional.",
+      "card1": "Piscina con panorama",
+      "card1Alt": "Piscina con vistas a la montaña",
+      "card2": "Noche tranquila y premium",
+      "card2Alt": "Ambiente nocturno junto a la piscina",
+      "card3": "Paisajes y silencio",
+      "card3Alt": "Paisaje natural en los alrededores"
+    },
+    "booking": {
+      "eyebrow": "Reservas",
+      "title": "Bloque provisional de reservas con una urgencia serena",
+      "text": "Esta zona debe transmitir que comprobar fechas es fácil, directo y sin fricción.",
+      "cta": "Solicitar reserva"
+    },
+    "local": {
+      "eyebrow": "Alrededores",
+      "title": "Sección provisional de atractivos locales",
+      "text1": "Usa este bloque para restaurantes, paseos de montaña, miradores, zonas de río, pueblos y otras experiencias cercanas.",
+      "text2prefix": "Nombres alternativos de imagen recomendados:",
+      "link": "Ver guía local",
+      "imageAlt": "Mesa de un restaurante local"
+    },
+    "testimonials": {
+      "eyebrow": "Testimonios",
+      "title": "Placeholder de prueba social",
+      "quote1": "“Testimonio provisional sobre la calma, la acogida y la belleza del lugar.”",
+      "author1": "Nombre del huésped",
+      "quote2": "“Testimonio provisional sobre el confort, la piscina y las ganas de volver.”",
+      "author2": "Nombre del huésped"
+    },
+    "sponsors": {
+      "eyebrow": "Socios Locales",
+      "title": "Placeholder de patrocinadores",
+      "text": "Más adelante esta zona puede destacar restaurantes, productos locales, tours o recomendaciones de la familia."
+    }
+  },
+  "footer": {
+    "copyright": "© Refugio Rural — Página de inicio prototipo",
+    "admin": "Área de gestión"
+  },
+  "stickyBookingCta": "Reservar"
+}

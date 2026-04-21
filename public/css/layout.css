@@ -1,0 +1,29 @@
+.container {
+  width: min(calc(100% - 2rem), var(--container-width));
+  margin-inline: auto;
+}
+
+.container.narrow {
+  width: min(calc(100% - 2rem), 720px);
+}
+
+.section {
+  padding: var(--space-7) 0;
+}
+
+.section-alt {
+  background: linear-gradient(180deg, rgba(216,203,184,0.18), rgba(184,165,141,0.1));
+}
+
+.two-column {
+  display: grid;
+  gap: var(--space-5);
+  align-items: center;
+}
+
+.simple-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6) 0;
+}

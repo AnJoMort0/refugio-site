@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "htmlLang": "fr",
+    "title": "Refuge Rural | Prototype de la page d’accueil",
+    "description": "Prototype de page d’accueil pour un site premium d’hébergement rural."
+  },
+  "brand": {
+    "name": "Refuge Rural"
+  },
+  "languageSwitcher": {
+    "label": "Choisir la langue"
+  },
+  "nav": {
+    "toggleLabel": "Ouvrir le menu",
+    "toggleText": "Ouvrir le menu",
+    "accommodation": "Hébergement",
+    "gallery": "Galerie",
+    "booking": "Réservations",
+    "contact": "Contact",
+    "guide": "Guide Local"
+  },
+  "home": {
+    "hero": {
+      "imageAlt": "Vue extérieure de la maison en pierre",
+      "eyebrow": "Refuge de Montagne",
+      "title": "Titre provisoire pour une escapade rurale chaleureuse et premium",
+      "text": "Paragraphe provisoire pour décrire l’atmosphère, l’accueil familial, le calme de la montagne et la qualité du séjour.",
+      "primaryCta": "Voir les disponibilités",
+      "secondaryCta": "Explorer les photos"
+    },
+    "features": {
+      "pool": "Piscine avec vue",
+      "privacy": "Intimité premium",
+      "family": "Ambiance familiale"
+    },
+    "accommodation": {
+      "eyebrow": "L’Hébergement",
+      "title": "Section provisoire pour présenter la propriété en deux ou trois phrases fortes",
+      "text1": "Utilisez ce bloc pour expliquer ce qui rend la propriété spéciale : architecture en pierre, intérieurs chaleureux, silence rural, vues sur la montagne et confort boutique.",
+      "text2prefix": "Image recommandée pour cette section :",
+      "text2middle": "ou",
+      "link": "Découvrir le lieu",
+      "imageAlt": "Intérieur chaleureux de l’hébergement"
+    },
+    "gallery": {
+      "eyebrow": "Galerie",
+      "title": "Mini aperçu de l’expérience visuelle",
+      "text": "Ces cartes sont des placeholders pour vos images les plus fortes sur le plan émotionnel.",
+      "card1": "Piscine avec panorama",
+      "card1Alt": "Piscine avec vue sur la montagne",
+      "card2": "Nuit calme et premium",
+      "card2Alt": "Ambiance nocturne près de la piscine",
+      "card3": "Paysages et silence",
+      "card3Alt": "Paysage naturel aux alentours"
+    },
+    "booking": {
+      "eyebrow": "Réservations",
+      "title": "Bloc provisoire de réservation avec une urgence douce",
+      "text": "Cette zone doit rassurer les visiteurs : vérifier les dates est simple, direct et fluide.",
+      "cta": "Demander une réservation"
+    },
+    "local": {
+      "eyebrow": "Aux Alentours",
+      "title": "Section provisoire des points d’intérêt locaux",
+      "text1": "Utilisez ce bloc pour les restaurants, randonnées, belvédères, coins de rivière, villages et autres expériences proches.",
+      "text2prefix": "Noms alternatifs d’images recommandés :",
+      "link": "Voir le guide local",
+      "imageAlt": "Table dans un restaurant local"
+    },
+    "testimonials": {
+      "eyebrow": "Témoignages",
+      "title": "Placeholder de preuve sociale",
+      "quote1": "« Témoignage provisoire sur le calme, l’accueil et la beauté du lieu. »",
+      "author1": "Nom du client",
+      "quote2": "« Témoignage provisoire sur le confort, la piscine et l’envie de revenir. »",
+      "author2": "Nom du client"
+    },
+    "sponsors": {
+      "eyebrow": "Partenaires Locaux",
+      "title": "Placeholder partenaires",
+      "text": "Plus tard, cette zone pourra mettre en avant des restaurants, des produits locaux, des visites ou des recommandations de la famille."
+    }
+  },
+  "footer": {
+    "copyright": "© Refuge Rural — Prototype de la page d’accueil",
+    "admin": "Espace de gestion"
+  },
+  "stickyBookingCta": "Réserver"
+}

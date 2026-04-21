@@ -1,0 +1,18 @@
+@media (min-width: 768px) {
+  .site-nav {
+    display: flex;
+  }
+
+  .nav-toggle,
+  .sticky-booking-cta {
+    display: none;
+  }
+
+  .two-column {
+    grid-template-columns: 1.05fr 0.95fr;
+  }
+
+  .reverse-mobile {
+    grid-template-columns: 0.95fr 1.05fr;
+  }
+}

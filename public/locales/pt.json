@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "htmlLang": "pt-PT",
+    "title": "Refúgio | Página Inicial",
+    "description": "Página inicial para o website do alojamento local."
+  },
+  "brand": {
+    "name": "Refúgio"
+  },
+  "languageSwitcher": {
+    "label": "Escolher idioma"
+  },
+  "nav": {
+    "toggleLabel": "Abrir menu",
+    "toggleText": "Abrir menu",
+    "accommodation": "Alojamento",
+    "gallery": "Galeria",
+    "booking": "Reservas",
+    "contact": "Contacto",
+    "guide": "Guia Local"
+  },
+  "home": {
+    "hero": {
+      "imageAlt": "Vista exterior da casa em pedra",
+      "eyebrow": "O seu Refúgio rural",
+      "title": "A escapadinha perfeita.",
+      "text": "Entre a tranquilidade das montanhas de Castelo de Paiva e a vista aberta sobre o Douro, cada detalhe foi pensado para que só tenha de chegar, respirar e desfrutar. Um espaço íntimo, acolhedor e totalmente seu, ideal para dias a dois ou momentos especiais em família.",
+      "primaryCta": "Ver disponibilidade",
+      "secondaryCta": "Explorar fotos"
+    },
+    "accommodation": {
+      "eyebrow": "O Alojamento",
+      "title": "Só para si, entre conforto, natureza e total privacidade.",
+      "text1": "Pensado para receber até 6 pessoas, o Refúgio combina o charme rural da serra com interiores acolhedores, jardins tranquilos e espaços feitos para abrandar. Aqui, cada estadia é vivida em exclusivo, com toda a casa, piscina e zonas exteriores reservadas apenas para quem a escolhe.",
+      "text2": "Entre a sala de estar acolhedora, os quartos serenos, os recantos exteriores e os momentos à volta do churrasco, tudo convida a desfrutar sem pressa, em família, a dois ou entre amigos.",
+      "imageAlt": "Interior acolhedor do alojamento"
+    },
+    "gallery": {
+      "eyebrow": "Galeria",
+      "title": "Descubra os espaços, a luz e os detalhes do Refúgio.",
+      "card1": "Piscina com panorama",
+      "card1Alt": "Piscina com vista para a montanha",
+      "card2": "Noite calma",
+      "card2Alt": "Ambiente noturno junto à piscina",
+      "card3": "Paisagens e silêncio",
+      "card3Alt": "Paisagem natural nas redondezas"
+    },
+    "booking": {
+      "eyebrow": "Reservas",
+      "title": "Escolha as suas datas e garanta a sua escapadinha.",
+      "text": "Verifique a disponibilidade em poucos instantes e reserve o Refúgio em exclusivo para a sua estadia.",
+      "cta": "Pedir reserva"
+    },
+    "local": {
+      "eyebrow": "Arredores",
+      "title": "Entre rio, natureza e aldeias, há sempre mais para descobrir.",
+      "text1": "Dos passeios junto ao Douro às praias fluviais, restaurantes típicos, miradouros e trilhos na serra, o Refúgio está rodeado por experiências que tornam cada estadia ainda mais especial.",
+      "link": "Ver guia local",
+      "imageAlt": "Praia flúvial mais próxima"
+    },
+    "testimonials": {
+      "eyebrow": "Testemunhos",
+      "title": "Um lugar ao qual se quer sempre voltar.",
+
+      "quote1": "“Foram dois dias excelentes, realmente um refúgio para quem gosta de fugir à confusão. A casa é enorme, a vista é espetacular e a piscina, jardim... tudo excecional. A voltar certamente!”",
+      "author1": "Paulo — Portugal",
+
+      "quote2": "“Um lugar privado maravilhoso para relaxar no meio da natureza. O Refúgio foi ainda melhor do que esperávamos, com vistas incríveis, muita privacidade e anfitriãs sempre atentas. Esperamos repetir em breve :)”",
+      "author2": "Marta — Portugal",
+
+      "quote3": "“A nossa melhor experiência no Booking. A casa combina o rústico e o moderno na perfeição, com um conforto incrível, uma vista de cortar a respiração e uma piscina perfeita para relaxar. Tudo foi simplesmente perfeito. Esperamos voltar.”",
+      "author3": "Audrey — França",
+
+      "quote4": "“A vista, o acolhimento e todas as comodidades da casa. A anfitriã é extremamente atenciosa e cheia de pequenos detalhes que fazem a diferença.”",
+      "author4": "Alexandra — França",
+
+      "quote5": "“Procurávamos tranquilidade e encontrámos ainda mais. Tudo está perfeitamente equipado, com espaços maravilhosos e uma piscina muito bem cuidada. O melhor foi sem dúvida a simpatia e atenção dos anfitriões. Só apetece voltar.”",
+      "author5": "Miguel — Espanha",
+
+      "quote6": "“Perfeito para descansar. Vista fantástica! A casa tem tudo o que é necessário, incluindo piscina e um espaço exterior incrível. Proprietários muito simpáticos. Voltaremos com gosto 😊”",
+      "author6": "Ingrid — Suécia",
+
+      "quote7": "“A casa é impressionante: bonita, confortável e muito limpa. A nossa estadia foi de 10. Sem dúvida uma das melhores experiências — vamos voltar.”",
+      "author7": "Sonia — Espanha",
+
+      "quote8": "“Perfeita para uma escapadinha em família. Jardim amplo, piscina com sol todo o dia e excelente localização. Repetiremos sem dúvida.”",
+      "author8": "Raquel — Espanha"
+    },
+    "sponsors": {
+      "eyebrow": "Parceiros Locais",
+      "title": "Recomendações selecionadas para a sua estadia.",
+      "text": "Descubra restaurantes, experiências e espaços que conhecemos bem e que fazem parte do que torna esta região especial."
+    }
+  },
+  "footer": {
+    "copyright": "© Refúgio — Família Rodrigues",
+    "admin": "Área de gestão"
+  },
+  "stickyBookingCta": "Reservar"
+}

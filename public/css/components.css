@@ -1,0 +1,143 @@
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(250, 248, 244, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(90, 75, 63, 0.12);
+}
+
+.header-inner,
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 72px;
+}
+
+.brand {
+  font-family: var(--font-heading);
+  font-size: 1.55rem;
+  font-weight: 700;
+}
+
+.site-nav {
+  display: none;
+  gap: var(--space-3);
+}
+
+.site-nav.is-open {
+  display: grid;
+  position: absolute;
+  top: 72px;
+  left: 1rem;
+  right: 1rem;
+  background: var(--color-soft-ivory);
+  padding: var(--space-3);
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+}
+
+.nav-toggle {
+  border: 0;
+  background: transparent;
+  font-size: 1.5rem;
+}
+
+.eyebrow {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-pine-green);
+  margin-bottom: var(--space-2);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.85rem 1.35rem;
+  border-radius: var(--radius-button);
+  font-weight: 600;
+}
+
+.button-primary {
+  background: var(--color-sunset-gold);
+  color: var(--color-charcoal-earth);
+  box-shadow: var(--shadow-soft);
+}
+
+.button-secondary {
+  border: 1px solid rgba(250, 248, 244, 0.6);
+  color: var(--color-soft-ivory);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.text-link {
+  color: var(--color-mountain-forest);
+  font-weight: 600;
+}
+
+.card,
+.image-card,
+.gallery-card,
+.testimonial-card,
+.booking-card {
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  background: rgba(255,255,255,0.75);
+}
+
+.image-card img,
+.gallery-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.feature-pill {
+  padding: 1rem 1.1rem;
+  background: white;
+  border-radius: 999px;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+}
+
+.section-heading {
+  margin-bottom: var(--space-5);
+}
+
+.testimonial-card {
+  padding: var(--space-4);
+}
+
+.sponsor-logo {
+  min-height: 88px;
+  display: grid;
+  place-items: center;
+  padding: var(--space-3);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.7);
+  border: 1px dashed rgba(90, 75, 63, 0.24);
+}
+
+.site-footer {
+  background: var(--color-deep-schist);
+  color: var(--color-soft-ivory);
+}
+
+.sticky-booking-cta {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 25;
+  background: var(--color-sunset-gold);
+  color: var(--color-charcoal-earth);
+  border-radius: 999px;
+  padding: 0.9rem 1.2rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-strong);
+}

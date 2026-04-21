@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "htmlLang": "en",
+    "title": "Rural Retreat | Homepage Prototype",
+    "description": "Prototype homepage for a premium rural accommodation website."
+  },
+  "brand": {
+    "name": "Rural Retreat"
+  },
+  "languageSwitcher": {
+    "label": "Choose language"
+  },
+  "nav": {
+    "toggleLabel": "Open menu",
+    "toggleText": "Open menu",
+    "accommodation": "Accommodation",
+    "gallery": "Gallery",
+    "booking": "Booking",
+    "contact": "Contact",
+    "guide": "Local Guide"
+  },
+  "home": {
+    "hero": {
+      "imageAlt": "Exterior view of the stone house",
+      "eyebrow": "Mountain Retreat",
+      "title": "Placeholder headline for a warm and premium rural escape",
+      "text": "Placeholder paragraph describing the atmosphere, family hospitality, mountain calm, and overall quality of the stay.",
+      "primaryCta": "Check availability",
+      "secondaryCta": "Explore photos"
+    },
+    "features": {
+      "pool": "Pool with a view",
+      "privacy": "Premium privacy",
+      "family": "Family atmosphere"
+    },
+    "accommodation": {
+      "eyebrow": "The Property",
+      "title": "Placeholder section presenting the property in two or three strong sentences",
+      "text1": "Use this block to explain what makes the property feel special: stone architecture, warm interiors, rural silence, mountain views, and boutique comfort.",
+      "text2prefix": "Recommended image for this section:",
+      "text2middle": "or",
+      "link": "Discover the space",
+      "imageAlt": "Warm interior of the accommodation"
+    },
+    "gallery": {
+      "eyebrow": "Gallery",
+      "title": "Mini preview of the visual experience",
+      "text": "These cards are placeholders for your strongest emotional images.",
+      "card1": "Pool with a panorama",
+      "card1Alt": "Pool overlooking the mountain",
+      "card2": "Calm premium night",
+      "card2Alt": "Night atmosphere by the pool",
+      "card3": "Landscapes and silence",
+      "card3Alt": "Natural landscape nearby"
+    },
+    "booking": {
+      "eyebrow": "Booking",
+      "title": "Placeholder booking teaser with calm urgency",
+      "text": "This area should reassure visitors that checking dates is easy and direct.",
+      "cta": "Request booking"
+    },
+    "local": {
+      "eyebrow": "Nearby",
+      "title": "Placeholder local highlights section",
+      "text1": "Use this block for restaurants, mountain walks, viewpoints, river spots, villages, and other nearby experiences.",
+      "text2prefix": "Recommended alternate image names:",
+      "link": "View local guide",
+      "imageAlt": "Table at a local restaurant"
+    },
+    "testimonials": {
+      "eyebrow": "Testimonials",
+      "title": "Placeholder social proof",
+      "quote1": "“Placeholder testimonial about the calm, the welcome, and the beauty of the place.”",
+      "author1": "Guest name",
+      "quote2": "“Placeholder testimonial about comfort, the pool, and wanting to come back.”",
+      "author2": "Guest name"
+    },
+    "sponsors": {
+      "eyebrow": "Local Partners",
+      "title": "Placeholder sponsor teaser",
+      "text": "Later this area can feature restaurants, local products, tours, or family recommendations."
+    }
+  },
+  "footer": {
+    "copyright": "© Rural Retreat — Prototype homepage",
+    "admin": "Owner dashboard"
+  },
+  "stickyBookingCta": "Book now"
+}

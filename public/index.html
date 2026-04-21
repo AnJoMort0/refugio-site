@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Refúgio | Homepage </title>
+  <meta name="description" content="Página inicial para o website do alojamento local." />
+  <link rel="stylesheet" href="./css/reset.css" />
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/layout.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/mobile.css" />
+  <link rel="stylesheet" href="./css/pages/home.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="./index.html" data-i18n="brand.name">Refúgio</a>
+
+      <div class="header-actions">
+        <label class="sr-only" for="language-switcher" data-i18n="languageSwitcher.label">Escolher idioma</label>
+        <select id="language-switcher" class="language-switcher" aria-label="Escolher idioma">
+          <option value="pt">Português</option>
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="es">Español</option>
+        </select>
+
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="site-nav"
+          data-i18n-attr='{"aria-label":"nav.toggleLabel"}'
+        >
+          <span class="sr-only" data-i18n="nav.toggleText">Abrir menu</span>
+          ☰
+        </button>
+      </div>
+
+      <nav id="site-nav" class="site-nav">
+        <a href="./alojamento.html" data-i18n="nav.accommodation">Alojamento</a>
+        <a href="./galeria.html" data-i18n="nav.gallery">Galeria</a>
+        <a href="./reservas.html" data-i18n="nav.booking">Reservas</a>
+        <a href="./contacto.html" data-i18n="nav.contact">Contacto</a>
+        <a href="./guia-local.html" data-i18n="nav.guide">Guia Local</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-media">
+        <img
+          src="./assets/images/hero_exterior_stone_house.jpg"
+          alt="Vista exterior da casa em pedra"
+          data-i18n-attr='{"alt":"home.hero.imageAlt"}'
+        />
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="container hero-content">
+        <p class="eyebrow" data-i18n="home.hero.eyebrow">O seu Refúgio rural</p>
+        <h1 data-i18n="home.hero.title">A escapadinha perfeita.</h1>
+        <p class="hero-text" data-i18n="home.hero.text">Entre a tranquilidade das montanhas de Castelo de Paiva e a vista aberta sobre o Douro, cada detalhe foi pensado para que só tenha de chegar, respirar e desfrutar. Um espaço íntimo, acolhedor e totalmente seu, ideal para dias a dois ou momentos especiais em família.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="./reservas.html" data-i18n="home.hero.primaryCta">Ver disponibilidade</a>
+          <a class="button button-secondary" href="./galeria.html" data-i18n="home.hero.secondaryCta">Explorar fotos</a>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="section">
+      <div class="container two-column">
+        <div>
+          <p class="eyebrow" data-i18n="home.accommodation.eyebrow">O Alojamento</p>
+          <h2 data-i18n="home.accommodation.title">Só para si, entre conforto, natureza e total privacidade.</h2>
+          <p data-i18n="home.accommodation.text1">
+            Pensado para receber até 6 pessoas, o Refúgio combina o charme rural da serra com interiores acolhedores, jardins tranquilos e espaços feitos para abrandar. Aqui, cada estadia é vivida em exclusivo, com toda a casa, piscina e zonas exteriores reservadas apenas para quem a escolhe.
+          </p>
+          <p data-i18n="home.accommodation.text2">
+            Entre a sala de estar acolhedora, os quartos serenos, os recantos exteriores e os momentos à volta do churrasco, tudo convida a desfrutar sem pressa, em família, a dois ou entre amigos.
+          </p>
+          <a class="text-link" href="./alojamento.html" data-i18n="home.accommodation.link">Descobrir o espaço</a>
+        </div>
+        <div class="image-card">
+          <img
+            src="./assets/images/suite_warm_interior.jpg"
+            alt="Interior acolhedor do alojamento"
+            data-i18n-attr='{"alt":"home.accommodation.imageAlt"}'
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow" data-i18n="home.gallery.eyebrow">Galeria</p>
+          <h2 data-i18n="home.gallery.title">Descubra os espaços, a luz e os detalhes do Refúgio.</h2>
+        </div>
+        <div class="gallery-preview-grid">
+          <article class="gallery-card">
+            <img
+              src="./assets/images/pool_mountain_view.jpg"
+              alt="Piscina com vista para a montanha"
+              data-i18n-attr='{"alt":"home.gallery.card1Alt"}'
+            />
+            <p data-i18n="home.gallery.card1">Piscina com panorama</p>
+          </article>
+          <article class="gallery-card">
+            <img
+              src="./assets/images/night_pool_lighting.jpg"
+              alt="Ambiente noturno junto à piscina"
+              data-i18n-attr='{"alt":"home.gallery.card2Alt"}'
+            />
+            <p data-i18n="home.gallery.card2">Noite calma</p>
+          </article>
+          <article class="gallery-card">
+            <img
+              src="./assets/images/local_mountain_trail.jpg"
+              alt="Paisagem natural nas redondezas"
+              data-i18n-attr='{"alt":"home.gallery.card3Alt"}'
+            />
+            <p data-i18n="home.gallery.card3">Paisagens e silêncio</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section booking-teaser">
+      <div class="container card booking-card">
+        <div>
+          <p class="eyebrow" data-i18n="home.booking.eyebrow">Reservas</p>
+          <h2 data-i18n="home.booking.title">Escolha as suas datas e garanta a sua escapadinha.</h2>
+          <p data-i18n="home.booking.text">Verifique a disponibilidade em poucos instantes e reserve o Refúgio em exclusivo para a sua estadia.</p>
+        </div>
+        <a class="button button-primary" href="./reservas.html" data-i18n="home.booking.cta">Pedir reserva</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container two-column reverse-mobile">
+        <div>
+          <p class="eyebrow" data-i18n="home.local.eyebrow">Arredores</p>
+          <h2 data-i18n="home.local.title">Entre rio, natureza e aldeias, há sempre mais para descobrir.</h2>
+          <p data-i18n="home.local.text1">Dos passeios junto ao Douro às praias fluviais, restaurantes típicos, miradouros e trilhos na serra, o Refúgio está rodeado por experiências que tornam cada estadia ainda mais especial.</p>
+          <a class="text-link" href="./guia-local.html" data-i18n="home.local.link">Ver guia local</a>
+        </div>
+        <div class="image-card">
+          <img
+            src="./assets/images/river_spot.jpg"
+            alt="Mesa de restaurante local"
+            data-i18n-attr='{"alt":"home.local.imageAlt"}'
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow" data-i18n="home.testimonials.eyebrow">Testemunhos</p>
+          <h2 data-i18n="home.testimonials.title">Um lugar ao qual se quer sempre voltar.</h2>
+        </div>
+        <div class="testimonial-grid">
+          <article class="card testimonial-card">
+            <p data-i18n="home.testimonials.quote1">“Placeholder testimonial about the calm, the welcome, and the beauty of the place.”</p>
+            <span data-i18n="home.testimonials.author1">Nome do hóspede</span>
+          </article>
+          <article class="card testimonial-card">
+            <p data-i18n="home.testimonials.quote2">“Placeholder testimonial about comfort, the pool, and wanting to return.”</p>
+            <span data-i18n="home.testimonials.author2">Nome do hóspede</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section sponsor-teaser-section">
+      <div class="container sponsor-teaser">
+        <div>
+          <p class="eyebrow" data-i18n="home.sponsors.eyebrow">Parceiros Locais</p>
+          <h2 data-i18n="home.sponsors.title">Placeholder sponsor teaser</h2>
+          <p data-i18n="home.sponsors.text">Later this can feature restaurants, local products, tours, or family recommendations.</p>
+        </div>
+        <div class="sponsor-logos">
+          <div class="sponsor-logo">restaurant_logo_placeholder.png</div>
+          <div class="sponsor-logo">local_wines_logo_placeholder.png</div>
+          <div class="sponsor-logo">tour_logo_placeholder.png</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p data-i18n="footer.copyright">© Refúgio Rural — Prototype homepage</p>
+      <a href="./admin.html" data-i18n="footer.admin">Área de gestão</a>
+    </div>
+  </footer>
+
+  <a class="sticky-booking-cta" href="./reservas.html" data-i18n="stickyBookingCta">Reservar</a>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

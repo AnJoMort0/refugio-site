@@ -1,0 +1,9 @@
+{
+  "name": "alojamento-rural-site",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "npx serve public",
+    "preview": "npx serve public"
+  }
+}
