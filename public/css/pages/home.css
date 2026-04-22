@@ -19,7 +19,9 @@
 }
 
 .hero-overlay {
-  background: linear-gradient(180deg, rgba(43,38,34,0.18), rgba(43,38,34,0.72));
+  background:
+    linear-gradient(180deg, rgba(43,38,34,0.42), rgba(43,38,34,0.78)),
+    radial-gradient(circle at 30% 32%, rgba(43,38,34,0.24), transparent 42%);
 }
 
 .hero-content {
@@ -46,15 +48,56 @@
 }
 
 .intro-grid,
-.gallery-preview-grid,
-.testimonial-grid,
-.sponsor-logos {
+.sponsor-grid {
   display: grid;
   gap: var(--space-3);
 }
 
 .intro-grid {
   grid-template-columns: 1fr;
+}
+
+.accommodation-intro {
+  padding-bottom: var(--space-5);
+}
+
+.carousel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(76%, 1fr);
+  gap: var(--space-3);
+  margin-inline: calc((100vw - 100%) / -2);
+  padding: 0 max(1rem, calc((100vw - var(--container-width)) / 2 + 1rem)) 0.5rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-padding-inline: max(1rem, calc((100vw - var(--container-width)) / 2 + 1rem));
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.carousel > * {
+  scroll-snap-align: center;
+}
+
+.gallery-carousel {
+  grid-auto-columns: minmax(74%, 520px);
+}
+
+.testimonial-carousel {
+  grid-auto-columns: minmax(78%, 560px);
+  align-items: stretch;
+}
+
+.gallery-card {
+  min-height: 100%;
+}
+
+.gallery-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
 }
 
 .gallery-card p {
@@ -75,6 +118,39 @@
 
 .sponsor-teaser {
   grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.section-cta {
+  margin-top: var(--space-4);
+}
+
+.sponsor-copy {
+  display: grid;
+  align-content: start;
+}
+
+.sponsor-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sponsor-card {
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: rgba(255,255,255,0.78);
+  box-shadow: var(--shadow-soft);
+}
+
+.sponsor-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.sponsor-card p {
+  padding: 0.85rem;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 @media (min-width: 768px) {
@@ -82,21 +158,21 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .gallery-preview-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .carousel {
+    grid-auto-columns: minmax(34%, 440px);
   }
 
-  .testimonial-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .sponsor-logos {
-    grid-template-columns: repeat(3, 1fr);
+  .testimonial-carousel {
+    grid-auto-columns: minmax(42%, 540px);
   }
 
   .booking-card,
   .sponsor-teaser {
     grid-template-columns: 1.2fr auto;
+  }
+
+  .sponsor-teaser {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   }
 }
 
@@ -120,12 +196,27 @@
 .gallery-card p,
 .feature-pill,
 .testimonial-card span,
-.sponsor-logo,
+.sponsor-card p,
 .site-nav a,
 .button,
 .text-link,
 .sticky-booking-cta {
   overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .header-inner {
+    justify-content: flex-start;
+  }
+
+  .site-nav {
+    order: 2;
+  }
+
+  .header-actions {
+    order: 3;
+    margin-left: auto;
+  }
 }
 
 @media (max-width: 767px) {
@@ -140,5 +231,21 @@
   .language-switcher {
     max-width: 8.5rem;
     font-size: 0.95rem;
+  }
+
+  .carousel {
+    grid-auto-columns: minmax(82%, 1fr);
+  }
+
+  .testimonial-carousel {
+    grid-auto-columns: minmax(86%, 1fr);
+  }
+
+  .sponsor-grid {
+    gap: 0.85rem;
+  }
+
+  .sponsor-card p {
+    font-size: 0.92rem;
   }
 }

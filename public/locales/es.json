@@ -37,6 +37,7 @@
       "eyebrow": "El Alojamiento",
       "title": "Sección provisional para presentar la propiedad en dos o tres frases potentes",
       "text1": "Usa este bloque para explicar qué hace especial a la propiedad: arquitectura de piedra, interiores cálidos, silencio rural, vistas a la montaña y confort boutique.",
+      "text2": "Entre la sala acogedora, las habitaciones tranquilas, los rincones exteriores y los momentos alrededor de la barbacoa, todo invita a disfrutar sin prisa, en familia, en pareja o con amigos.",
       "text2prefix": "Imagen recomendada para esta sección:",
       "text2middle": "o",
       "link": "Descubrir el espacio",
@@ -51,7 +52,9 @@
       "card2": "Noche tranquila y premium",
       "card2Alt": "Ambiente nocturno junto a la piscina",
       "card3": "Paisajes y silencio",
-      "card3Alt": "Paisaje natural en los alrededores"
+      "card3Alt": "Paisaje natural en los alrededores",
+      "card4": "Interiores acogedores",
+      "link": "Ver galería completa"
     },
     "booking": {
       "eyebrow": "Reservas",
@@ -73,12 +76,33 @@
       "quote1": "“Testimonio provisional sobre la calma, la acogida y la belleza del lugar.”",
       "author1": "Nombre del huésped",
       "quote2": "“Testimonio provisional sobre el confort, la piscina y las ganas de volver.”",
-      "author2": "Nombre del huésped"
+      "author2": "Nombre del huésped",
+      "quote3": "“Testimonio provisional sobre las vistas, la casa y una estancia perfecta.”",
+      "author3": "Nombre del huésped",
+      "quote4": "“Testimonio provisional sobre la acogida y los pequeños detalles.”",
+      "author4": "Nombre del huésped",
+      "quote5": "“Testimonio provisional sobre la privacidad, la calma y los espacios exteriores.”",
+      "author5": "Nombre del huésped",
+      "quote6": "“Testimonio provisional sobre descansar bien y disfrutar de la piscina.”",
+      "author6": "Nombre del huésped",
+      "quote7": "“Testimonio provisional sobre limpieza, comodidad y ganas de volver.”",
+      "author7": "Nombre del huésped",
+      "quote8": "“Testimonio provisional sobre una escapada familiar y días de jardín.”",
+      "author8": "Nombre del huésped"
     },
     "sponsors": {
       "eyebrow": "Socios Locales",
       "title": "Placeholder de patrocinadores",
-      "text": "Más adelante esta zona puede destacar restaurantes, productos locales, tours o recomendaciones de la familia."
+      "text": "Más adelante esta zona puede destacar restaurantes, productos locales, tours o recomendaciones de la familia.",
+      "link": "Ver socios en la guía local",
+      "card1": "Restaurante Local - Especialidades regionales",
+      "card1Alt": "Restaurante local junto al río",
+      "card2": "Vinos de la Región - Catas y productos locales",
+      "card2Alt": "Vinos y productos regionales",
+      "card3": "Senderos & Naturaleza - Paseos por la montaña",
+      "card3Alt": "Sendero de montaña en la región",
+      "card4": "Río Duero - Experiencias y miradores",
+      "card4Alt": "Vista sobre el paisaje local"
     }
   },
   "footer": {

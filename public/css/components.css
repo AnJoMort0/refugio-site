@@ -76,8 +76,25 @@
 }
 
 .text-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(67, 99, 75, 0.28);
+  border-radius: var(--radius-button);
+  background: rgba(250, 248, 244, 0.78);
   color: var(--color-mountain-forest);
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(43, 38, 34, 0.08);
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.text-link:hover,
+.text-link:focus-visible {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(67, 99, 75, 0.46);
+  transform: translateY(-1px);
 }
 
 .card,

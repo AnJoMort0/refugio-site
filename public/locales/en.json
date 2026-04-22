@@ -37,6 +37,7 @@
       "eyebrow": "The Property",
       "title": "Placeholder section presenting the property in two or three strong sentences",
       "text1": "Use this block to explain what makes the property feel special: stone architecture, warm interiors, rural silence, mountain views, and boutique comfort.",
+      "text2": "Between the welcoming living room, quiet bedrooms, outdoor corners, and barbecue moments, everything invites slow days with family, as a couple, or with friends.",
       "text2prefix": "Recommended image for this section:",
       "text2middle": "or",
       "link": "Discover the space",
@@ -51,7 +52,9 @@
       "card2": "Calm premium night",
       "card2Alt": "Night atmosphere by the pool",
       "card3": "Landscapes and silence",
-      "card3Alt": "Natural landscape nearby"
+      "card3Alt": "Natural landscape nearby",
+      "card4": "Warm interiors",
+      "link": "View full gallery"
     },
     "booking": {
       "eyebrow": "Booking",
@@ -73,12 +76,33 @@
       "quote1": "“Placeholder testimonial about the calm, the welcome, and the beauty of the place.”",
       "author1": "Guest name",
       "quote2": "“Placeholder testimonial about comfort, the pool, and wanting to come back.”",
-      "author2": "Guest name"
+      "author2": "Guest name",
+      "quote3": "“Placeholder testimonial about the view, the house, and a perfect stay.”",
+      "author3": "Guest name",
+      "quote4": "“Placeholder testimonial about the welcome and thoughtful details.”",
+      "author4": "Guest name",
+      "quote5": "“Placeholder testimonial about privacy, quiet, and generous outdoor spaces.”",
+      "author5": "Guest name",
+      "quote6": "“Placeholder testimonial about resting well and enjoying the pool.”",
+      "author6": "Guest name",
+      "quote7": "“Placeholder testimonial about cleanliness, comfort, and returning soon.”",
+      "author7": "Guest name",
+      "quote8": "“Placeholder testimonial about a family escape and sunny garden days.”",
+      "author8": "Guest name"
     },
     "sponsors": {
       "eyebrow": "Local Partners",
       "title": "Placeholder sponsor teaser",
-      "text": "Later this area can feature restaurants, local products, tours, or family recommendations."
+      "text": "Later this area can feature restaurants, local products, tours, or family recommendations.",
+      "link": "View partners in the local guide",
+      "card1": "Local Restaurant - Regional specialties",
+      "card1Alt": "Local restaurant by the river",
+      "card2": "Regional Wines - Tastings and local products",
+      "card2Alt": "Regional wines and products",
+      "card3": "Trails & Nature - Mountain walks",
+      "card3Alt": "Mountain trail in the region",
+      "card4": "Douro River - Experiences and viewpoints",
+      "card4Alt": "View over the local landscape"
     }
   },
   "footer": {

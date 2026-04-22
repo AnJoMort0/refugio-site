@@ -37,6 +37,7 @@
       "eyebrow": "L’Hébergement",
       "title": "Section provisoire pour présenter la propriété en deux ou trois phrases fortes",
       "text1": "Utilisez ce bloc pour expliquer ce qui rend la propriété spéciale : architecture en pierre, intérieurs chaleureux, silence rural, vues sur la montagne et confort boutique.",
+      "text2": "Entre le salon accueillant, les chambres paisibles, les coins extérieurs et les moments autour du barbecue, tout invite à profiter sans hâte, en famille, à deux ou entre amis.",
       "text2prefix": "Image recommandée pour cette section :",
       "text2middle": "ou",
       "link": "Découvrir le lieu",
@@ -51,7 +52,9 @@
       "card2": "Nuit calme et premium",
       "card2Alt": "Ambiance nocturne près de la piscine",
       "card3": "Paysages et silence",
-      "card3Alt": "Paysage naturel aux alentours"
+      "card3Alt": "Paysage naturel aux alentours",
+      "card4": "Intérieurs chaleureux",
+      "link": "Voir toute la galerie"
     },
     "booking": {
       "eyebrow": "Réservations",
@@ -73,12 +76,33 @@
       "quote1": "« Témoignage provisoire sur le calme, l’accueil et la beauté du lieu. »",
       "author1": "Nom du client",
       "quote2": "« Témoignage provisoire sur le confort, la piscine et l’envie de revenir. »",
-      "author2": "Nom du client"
+      "author2": "Nom du client",
+      "quote3": "« Témoignage provisoire sur la vue, la maison et un séjour parfait. »",
+      "author3": "Nom du client",
+      "quote4": "« Témoignage provisoire sur l’accueil et les petites attentions. »",
+      "author4": "Nom du client",
+      "quote5": "« Témoignage provisoire sur l’intimité, le calme et les espaces extérieurs. »",
+      "author5": "Nom du client",
+      "quote6": "« Témoignage provisoire sur le repos et les moments à la piscine. »",
+      "author6": "Nom du client",
+      "quote7": "« Témoignage provisoire sur la propreté, le confort et l’envie de revenir. »",
+      "author7": "Nom du client",
+      "quote8": "« Témoignage provisoire sur une escapade en famille et le jardin ensoleillé. »",
+      "author8": "Nom du client"
     },
     "sponsors": {
       "eyebrow": "Partenaires Locaux",
       "title": "Placeholder partenaires",
-      "text": "Plus tard, cette zone pourra mettre en avant des restaurants, des produits locaux, des visites ou des recommandations de la famille."
+      "text": "Plus tard, cette zone pourra mettre en avant des restaurants, des produits locaux, des visites ou des recommandations de la famille.",
+      "link": "Voir les partenaires dans le guide local",
+      "card1": "Restaurant Local - Spécialités régionales",
+      "card1Alt": "Restaurant local au bord de la rivière",
+      "card2": "Vins de la Région - Dégustations et produits locaux",
+      "card2Alt": "Vins et produits régionaux",
+      "card3": "Sentiers & Nature - Balades en montagne",
+      "card3Alt": "Sentier de montagne dans la région",
+      "card4": "Fleuve Douro - Expériences et points de vue",
+      "card4Alt": "Vue sur le paysage local"
     }
   },
   "footer": {

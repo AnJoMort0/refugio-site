@@ -33,17 +33,20 @@
       "title": "Só para si, entre conforto, natureza e total privacidade.",
       "text1": "Pensado para receber até 6 pessoas, o Refúgio combina o charme rural da serra com interiores acolhedores, jardins tranquilos e espaços feitos para abrandar. Aqui, cada estadia é vivida em exclusivo, com toda a casa, piscina e zonas exteriores reservadas apenas para quem a escolhe.",
       "text2": "Entre a sala de estar acolhedora, os quartos serenos, os recantos exteriores e os momentos à volta do churrasco, tudo convida a desfrutar sem pressa, em família, a dois ou entre amigos.",
+      "link": "Descobrir o espaço",
       "imageAlt": "Interior acolhedor do alojamento"
     },
     "gallery": {
       "eyebrow": "Galeria",
-      "title": "Descubra os espaços, a luz e os detalhes do Refúgio.",
+      "title": "Descubra a luz e os detalhes do Refúgio.",
       "card1": "Piscina com panorama",
       "card1Alt": "Piscina com vista para a montanha",
       "card2": "Noite calma",
       "card2Alt": "Ambiente noturno junto à piscina",
       "card3": "Paisagens e silêncio",
-      "card3Alt": "Paisagem natural nas redondezas"
+      "card3Alt": "Paisagem natural nas redondezas",
+      "card4": "Interiores acolhedores",
+      "link": "Ver galeria completa"
     },
     "booking": {
       "eyebrow": "Reservas",
@@ -89,7 +92,16 @@
     "sponsors": {
       "eyebrow": "Parceiros Locais",
       "title": "Recomendações selecionadas para a sua estadia.",
-      "text": "Descubra restaurantes, experiências e espaços que conhecemos bem e que fazem parte do que torna esta região especial."
+      "text": "Descubra restaurantes, experiências e espaços que conhecemos bem e que fazem parte do que torna esta região especial.",
+      "link": "Ver parceiros no guia local",
+      "card1": "Adega Ramadinha - Especialidades locais",
+      "card1Alt": "Restaurante local junto ao rio",
+      "card2": "Corga - Provas e produtos locais",
+      "card2Alt": "Vinhos e produtos regionais",
+      "card3": "Café Cruzeiro - Pastelaria Local",
+      "card3Alt": "Pastelaria local",
+      "card4": "Aquapura Terrace - Bar à beira rio",
+      "card4Alt": "Bar local junto ao rio"
     }
   },
   "footer": {
