@@ -37,12 +37,20 @@
   padding: var(--space-3);
   border-radius: 20px;
   box-shadow: var(--shadow-soft);
+  animation: menu-reveal 220ms ease-out both;
+  transform-origin: top right;
 }
 
 .nav-toggle {
   border: 0;
   background: transparent;
   font-size: 1.5rem;
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.nav-toggle.is-open {
+  color: var(--color-mountain-forest);
+  transform: rotate(90deg);
 }
 
 .eyebrow {
@@ -61,6 +69,12 @@
   padding: 0.85rem 1.35rem;
   border-radius: var(--radius-button);
   font-weight: 600;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.button:hover,
+.button:focus-visible {
+  transform: translateY(-1px);
 }
 
 .button-primary {
@@ -76,10 +90,12 @@
 }
 
 .text-link {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
+  width: fit-content;
   min-height: 44px;
+  margin-top: 1.35rem;
   padding: 0.7rem 1rem;
   border: 1px solid rgba(67, 99, 75, 0.28);
   border-radius: var(--radius-button);
@@ -113,6 +129,13 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 700ms ease;
+}
+
+.image-card:hover img,
+.gallery-card:hover img,
+.sponsor-card:hover img {
+  transform: scale(1.025);
 }
 
 .feature-pill {
@@ -157,4 +180,54 @@
   padding: 0.9rem 1.2rem;
   font-weight: 700;
   box-shadow: var(--shadow-strong);
+}
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 700ms ease, transform 700ms ease;
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes menu-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-lift {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+
+  .reveal-on-scroll {
+    opacity: 1;
+    transform: none;
+  }
 }

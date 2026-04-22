@@ -6,6 +6,7 @@ export function initMobileNav() {
 
   toggle.addEventListener('click', () => {
     const isOpen = nav.classList.toggle('is-open');
+    toggle.classList.toggle('is-open', isOpen);
     toggle.setAttribute('aria-expanded', String(isOpen));
   });
 }

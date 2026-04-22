@@ -30,6 +30,27 @@
   padding-bottom: 5rem;
 }
 
+.hero .eyebrow {
+  color: var(--color-sunset-gold);
+  text-shadow: 0 2px 12px rgba(43, 38, 34, 0.58);
+}
+
+.hero-content > * {
+  animation: fade-lift 760ms ease both;
+}
+
+.hero-content > *:nth-child(2) {
+  animation-delay: 90ms;
+}
+
+.hero-content > *:nth-child(3) {
+  animation-delay: 180ms;
+}
+
+.hero-content > *:nth-child(4) {
+  animation-delay: 270ms;
+}
+
 .hero-text {
   max-width: 42rem;
   margin: 1rem 0 1.5rem;
@@ -145,6 +166,7 @@
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
+  transition: transform 700ms ease;
 }
 
 .sponsor-card p {
@@ -247,5 +269,11 @@
 
   .sponsor-card p {
     font-size: 0.92rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-content > * {
+    animation: none;
   }
 }
