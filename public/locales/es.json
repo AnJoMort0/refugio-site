@@ -105,6 +105,26 @@
       "card4Alt": "Vista sobre el paisaje local"
     }
   },
+  "galleryPage": {
+    "meta": {
+      "title": "Refugio Rural | Galería",
+      "description": "Galería completa de Refugio Rural con los espacios interiores, exteriores y el ambiente de la estancia."
+    },
+    "hero": {
+      "eyebrow": "Galería",
+      "title": "Todos los espacios del Refugio, sin filtros.",
+      "text": "Explora la casa, los exteriores, la piscina y los detalles de la estancia. Toca una imagen para abrirla en grande y hacer zoom."
+    },
+    "empty": "No se pudieron cargar las imágenes de la galería.",
+    "lightbox": {
+      "close": "Cerrar galería",
+      "previous": "Imagen anterior",
+      "next": "Imagen siguiente",
+      "zoomIn": "Ampliar imagen",
+      "zoomOut": "Reducir imagen",
+      "zoomReset": "Restablecer zoom"
+    }
+  },
   "footer": {
     "copyright": "© Refugio Rural — Página de inicio prototipo",
     "admin": "Área de gestión"

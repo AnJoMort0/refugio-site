@@ -3,7 +3,8 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "npx serve public",
-    "preview": "npx serve public"
+    "gallery:manifest": "node ./scripts/generate-gallery-manifest.mjs",
+    "dev": "node ./scripts/generate-gallery-manifest.mjs && npx serve public",
+    "preview": "node ./scripts/generate-gallery-manifest.mjs && npx serve public"
   }
 }

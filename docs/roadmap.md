@@ -4,17 +4,12 @@
 Prototype first.
 
 ## Current step
-[x]Homepage scaffold.
-[] Alojamento page scaffold
+[x] Homepage scaffold.
+[x] Alojamento page scaffold
+[x] Galeria page scaffold
 
 ## Small changes to implement next
-The dropdown for languages still looks native, so need to change it from the native select.
-In wide screens the layout is very unconsistent : titles can be huge, certain things are centered, others are aligned to the left, places where it is cards don't stay in pairs or triplets so there's just gaps. I like the center alignement, although the occasional image for example for the hero that goes from side to side of the page fits well, carroussels could also be half fade-out when going too far away from the center of the page.
-In alojamento.html I want the rules to pop out, so maybe some bold words or even some red words to make sure they are read. 
- 
 
-Create galeria.html:
-Very simple, it just lays down every single image in the assets/images (no subfolders) (I don't know if it's possible to do it automatically, so not every time an image is added its name needs to be added manually). The layout takes the images shape and lays it down automatically filling all the gaps, and the entire page, almost puzzle like, if any image is clicked it opens a sort of caroussel pop-up, where the images can be zoomed in. There's the Reservar floating button as well when not in caroussel mode
 
 ## Small additions to not forget
 Change default language based on browser defaults

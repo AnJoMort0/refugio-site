@@ -105,6 +105,26 @@
       "card4Alt": "View over the local landscape"
     }
   },
+  "galleryPage": {
+    "meta": {
+      "title": "Rural Retreat | Gallery",
+      "description": "Full gallery of Rural Retreat with interiors, exteriors, and the atmosphere of the stay."
+    },
+    "hero": {
+      "eyebrow": "Gallery",
+      "title": "Every part of Rural Retreat, unfiltered.",
+      "text": "Explore the house, outdoor spaces, pool, and stay details. Tap an image to open it large and zoom in."
+    },
+    "empty": "Could not load the gallery images.",
+    "lightbox": {
+      "close": "Close gallery",
+      "previous": "Previous image",
+      "next": "Next image",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "zoomReset": "Reset zoom"
+    }
+  },
   "footer": {
     "copyright": "© Rural Retreat — Prototype homepage",
     "admin": "Owner dashboard"

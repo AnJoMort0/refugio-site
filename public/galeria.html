@@ -3,26 +3,69 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>galeria | Refúgio Rural</title>
+  <title data-i18n="galleryPage.meta.title">Refúgio | Galeria</title>
+  <meta
+    name="description"
+    content="Galeria completa do Refúgio com os espaços interiores, exteriores e ambiente da estadia."
+    data-i18n-attr='{"content":"galleryPage.meta.description"}'
+  />
   <link rel="stylesheet" href="./css/reset.css" />
   <link rel="stylesheet" href="./css/variables.css" />
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/layout.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/mobile.css" />
+  <link rel="stylesheet" href="./css/pages/galeria.css" />
 </head>
 <body data-page="gallery">
   <div data-site-header></div>
-  <main class="simple-page">
-    <div class="container narrow">
-      <p class="eyebrow">Placeholder</p>
-      <h1>galeria</h1>
-      <p>Esta página será construída numa etapa seguinte.</p>
-      <a class="button button-primary" href="./index.html">Voltar à homepage</a>
-    </div>
+
+  <main class="gallery-page">
+    <section class="section gallery-page-intro">
+      <div class="container content-column">
+        <p class="eyebrow" data-i18n="galleryPage.hero.eyebrow">Galeria</p>
+        <h1 data-i18n="galleryPage.hero.title">Todos os espaços do Refúgio</h1>
+        <p data-i18n="galleryPage.hero.text">Explore a casa, os exteriores, a piscina e os detalhes da estadia. Toque numa imagem para a abrir em grande e aproximar.</p>
+      </div>
+    </section>
+
+    <section class="gallery-board-section">
+      <div class="container">
+        <div id="gallery-grid" class="gallery-grid" aria-live="polite"></div>
+        <p id="gallery-empty" class="gallery-empty" data-i18n="galleryPage.empty" hidden>Não foi possível carregar as imagens da galeria.</p>
+      </div>
+    </section>
   </main>
+
+  <div id="gallery-lightbox" class="gallery-lightbox" hidden>
+    <div class="gallery-lightbox-backdrop" data-lightbox-close></div>
+    <div class="gallery-lightbox-panel" role="dialog" aria-modal="true" aria-label="Galeria em ecrã inteiro">
+      <div class="gallery-lightbox-toolbar">
+        <div class="gallery-lightbox-meta">
+          <span id="gallery-lightbox-label" class="gallery-lightbox-label">Imagem da galeria</span>
+          <span id="gallery-lightbox-count" class="gallery-lightbox-count">1 / 1</span>
+        </div>
+        <div class="gallery-lightbox-actions">
+          <button type="button" class="lightbox-icon-button" id="lightbox-zoom-out" aria-label="Reduzir imagem" data-i18n-attr='{"aria-label":"galleryPage.lightbox.zoomOut"}'>−</button>
+          <button type="button" class="lightbox-icon-button" id="lightbox-zoom-reset" aria-label="Repor zoom" data-i18n-attr='{"aria-label":"galleryPage.lightbox.zoomReset"}'>100%</button>
+          <button type="button" class="lightbox-icon-button" id="lightbox-zoom-in" aria-label="Ampliar imagem" data-i18n-attr='{"aria-label":"galleryPage.lightbox.zoomIn"}'>+</button>
+          <button type="button" class="lightbox-icon-button" id="lightbox-close" aria-label="Fechar galeria" data-i18n-attr='{"aria-label":"galleryPage.lightbox.close"}'>×</button>
+        </div>
+      </div>
+
+      <div class="gallery-lightbox-stage">
+        <button type="button" class="gallery-nav-button gallery-nav-prev" id="lightbox-prev" aria-label="Imagem anterior" data-i18n-attr='{"aria-label":"galleryPage.lightbox.previous"}'>‹</button>
+        <div class="gallery-lightbox-viewport">
+          <img id="gallery-lightbox-image" src="" alt="Imagem da galeria Refúgio" />
+        </div>
+        <button type="button" class="gallery-nav-button gallery-nav-next" id="lightbox-next" aria-label="Imagem seguinte" data-i18n-attr='{"aria-label":"galleryPage.lightbox.next"}'>›</button>
+      </div>
+    </div>
+  </div>
+
   <div data-site-footer></div>
   <div data-sticky-booking></div>
+
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>

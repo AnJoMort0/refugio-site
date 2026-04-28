@@ -96,6 +96,26 @@
       "card4Alt": "Bar local junto ao rio"
     }
   },
+  "galleryPage": {
+    "meta": {
+      "title": "Refúgio | Galeria",
+      "description": "Galeria completa do Refúgio com os espaços interiores, exteriores e ambiente da estadia."
+    },
+    "hero": {
+      "eyebrow": "Galeria",
+      "title": "Todos os espaços do Refúgio",
+      "text": "Explore a casa, os exteriores, a piscina e os detalhes da estadia. Toque numa imagem para a abrir em grande e aproximar."
+    },
+    "empty": "Não foi possível carregar as imagens da galeria.",
+    "lightbox": {
+      "close": "Fechar galeria",
+      "previous": "Imagem anterior",
+      "next": "Imagem seguinte",
+      "zoomIn": "Ampliar imagem",
+      "zoomOut": "Reduzir imagem",
+      "zoomReset": "Repor zoom"
+    }
+  },
   "footer": {
     "copyright": "© Refúgio — Família Rodrigues",
     "admin": "Área de gestão"

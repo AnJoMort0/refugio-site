@@ -1,0 +1,58 @@
+[
+  {
+    "src": "./assets/images/bunk_bedroom.jpg",
+    "label": "bunk bedroom"
+  },
+  {
+    "src": "./assets/images/dining_room.jpg",
+    "label": "dining room"
+  },
+  {
+    "src": "./assets/images/exterior_resting_area.jpg",
+    "label": "exterior resting area"
+  },
+  {
+    "src": "./assets/images/hero_exterior_stone_house.jpg",
+    "label": "hero exterior stone house"
+  },
+  {
+    "src": "./assets/images/hero_pool_mountain_house.jpg",
+    "label": "hero pool mountain house"
+  },
+  {
+    "src": "./assets/images/kitchen.jpg",
+    "label": "kitchen"
+  },
+  {
+    "src": "./assets/images/living_room.jpg",
+    "label": "living room"
+  },
+  {
+    "src": "./assets/images/local_mountain_trail.jpg",
+    "label": "local mountain trail"
+  },
+  {
+    "src": "./assets/images/master_bedroom.jpg",
+    "label": "master bedroom"
+  },
+  {
+    "src": "./assets/images/night_pool_lighting.jpg",
+    "label": "night pool lighting"
+  },
+  {
+    "src": "./assets/images/outdoor_grill.jpg",
+    "label": "outdoor grill"
+  },
+  {
+    "src": "./assets/images/pool_chill.jpg",
+    "label": "pool chill"
+  },
+  {
+    "src": "./assets/images/pool_mountain_view.jpg",
+    "label": "pool mountain view"
+  },
+  {
+    "src": "./assets/images/single_bedroom.jpg",
+    "label": "single bedroom"
+  }
+]

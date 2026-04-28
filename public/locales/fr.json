@@ -105,6 +105,26 @@
       "card4Alt": "Vue sur le paysage local"
     }
   },
+  "galleryPage": {
+    "meta": {
+      "title": "Refuge Rural | Galerie",
+      "description": "Galerie complète du Refuge Rural avec les espaces intérieurs, extérieurs et l’ambiance du séjour."
+    },
+    "hero": {
+      "eyebrow": "Galerie",
+      "title": "Tous les espaces du Refuge, sans filtre.",
+      "text": "Explorez la maison, les extérieurs, la piscine et les détails du séjour. Touchez une image pour l’ouvrir en grand et zoomer."
+    },
+    "empty": "Impossible de charger les images de la galerie.",
+    "lightbox": {
+      "close": "Fermer la galerie",
+      "previous": "Image précédente",
+      "next": "Image suivante",
+      "zoomIn": "Agrandir l’image",
+      "zoomOut": "Réduire l’image",
+      "zoomReset": "Réinitialiser le zoom"
+    }
+  },
   "footer": {
     "copyright": "© Refuge Rural — Prototype de la page d’accueil",
     "admin": "Espace de gestion"
