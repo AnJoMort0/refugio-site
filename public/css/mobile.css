@@ -1,9 +1,4 @@
 @media (min-width: 768px) {
-  .site-nav {
-    display: flex;
-  }
-
-  .nav-toggle,
   .sticky-booking-cta {
     display: none;
   }
@@ -14,5 +9,11 @@
 
   .reverse-mobile {
     grid-template-columns: 0.95fr 1.05fr;
+  }
+}
+
+@media (min-width: 1120px) {
+  .nav-toggle {
+    display: none;
   }
 }

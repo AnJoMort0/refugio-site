@@ -18,20 +18,31 @@ function buildHeader(activePage) {
         <a class="brand" href="./index.html" data-i18n="brand.name">Refúgio</a>
 
         <div class="header-actions">
-          <a class="header-contact" href="./contacto.html" data-i18n="nav.contact">
-            <span class="header-contact-icon" aria-hidden="true">@</span>
-            <span class="header-contact-label">Contacto</span>
+          <a class="header-contact" href="./contacto.html">
+            <span class="header-contact-icon" aria-hidden="true">✉</span>
+            <span class="header-contact-label" data-i18n="nav.contact">Contacto</span>
           </a>
 
-          <label class="sr-only" for="language-switcher" data-i18n="languageSwitcher.label">Escolher idioma</label>
-          <div class="language-switcher-wrap">
-            <select id="language-switcher" class="language-switcher" aria-label="Escolher idioma">
-              <option value="pt">Português</option>
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="es">Español</option>
-            </select>
-            <span class="language-switcher-caret" aria-hidden="true"></span>
+          <label class="sr-only" for="language-menu-button" data-i18n="languageSwitcher.label">Escolher idioma</label>
+          <div class="language-menu" data-language-menu>
+            <button
+              id="language-menu-button"
+              class="language-menu-button"
+              type="button"
+              aria-label="Escolher idioma"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              data-i18n-attr='{"aria-label":"languageSwitcher.label"}'
+            >
+              <span class="language-menu-current">Português</span>
+              <span class="language-menu-caret" aria-hidden="true"></span>
+            </button>
+            <div class="language-menu-popover" role="listbox" aria-label="Escolher idioma">
+              <button class="language-menu-option" type="button" data-language-option="pt">Português</button>
+              <button class="language-menu-option" type="button" data-language-option="en">English</button>
+              <button class="language-menu-option" type="button" data-language-option="fr">Français</button>
+              <button class="language-menu-option" type="button" data-language-option="es">Español</button>
+            </div>
           </div>
 
           <button

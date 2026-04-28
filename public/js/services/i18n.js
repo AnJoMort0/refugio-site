@@ -1,6 +1,12 @@
 const DEFAULT_LANGUAGE = 'pt';
 const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
 const STORAGE_KEY = 'refugio-language';
+const LANGUAGE_LABELS = {
+  pt: 'Português',
+  en: 'English',
+  fr: 'Français',
+  es: 'Español'
+};
 
 function getNestedValue(object, path) {
   return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
@@ -77,10 +83,24 @@ export async function setLanguage(language) {
 
   localStorage.setItem(STORAGE_KEY, safeLanguage);
 
-  const switcher = document.querySelector('#language-switcher');
-  if (switcher) {
-    switcher.value = safeLanguage;
-    switcher.setAttribute('aria-label', dictionary.languageSwitcher?.label || 'Choose language');
+  const menuButton = document.querySelector('#language-menu-button');
+  const currentLabel = document.querySelector('.language-menu-current');
+  const options = document.querySelectorAll('[data-language-option]');
+
+  if (menuButton) {
+    menuButton.setAttribute('aria-label', dictionary.languageSwitcher?.label || 'Choose language');
+  }
+
+  if (currentLabel) {
+    currentLabel.textContent = LANGUAGE_LABELS[safeLanguage] || LANGUAGE_LABELS[DEFAULT_LANGUAGE];
+  }
+
+  if (options.length) {
+    options.forEach((option) => {
+      const isActive = option.dataset.languageOption === safeLanguage;
+      option.classList.toggle('is-active', isActive);
+      option.setAttribute('aria-selected', String(isActive));
+    });
   }
 
   document.dispatchEvent(
@@ -97,10 +117,28 @@ export async function initI18n() {
     SUPPORTED_LANGUAGES.includes(lang)
   ) || DEFAULT_LANGUAGE;
 
-  const switcher = document.querySelector('#language-switcher');
-  if (switcher) {
-    switcher.addEventListener('change', async (event) => {
-      await setLanguage(event.target.value);
+  const languageMenu = document.querySelector('[data-language-menu]');
+  const menuButton = document.querySelector('#language-menu-button');
+  const options = document.querySelectorAll('[data-language-option]');
+
+  if (languageMenu && menuButton && options.length) {
+    menuButton.addEventListener('click', () => {
+      const isOpen = languageMenu.classList.toggle('is-open');
+      menuButton.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    options.forEach((option) => {
+      option.addEventListener('click', async () => {
+        await setLanguage(option.dataset.languageOption);
+        languageMenu.classList.remove('is-open');
+        menuButton.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      if (languageMenu.contains(event.target)) return;
+      languageMenu.classList.remove('is-open');
+      menuButton.setAttribute('aria-expanded', 'false');
     });
   }
 
