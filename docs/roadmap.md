@@ -8,32 +8,16 @@ Prototype first.
 [] Alojamento page scaffold
 
 ## Small changes to implement next
-index.html fixes:
-The space between the titles and the paragraphs should be the same everywhere, I like the spacing in the hero, so make that the standard
-The caroussels should not have a vertical scrollbar and scroll option
-Clicking on any sponsor partners should for now open the Guia Local, later it will open directly on the part of the Guia Local that talks about said partner
-
-Everywhere:
-The language dropdown menu doesn't follow the same style as the menu dropdown.
-Since the header and footer are in every page, shouldn't there be a centralised way to calling it, instead of copy pasting it each page and need to change it in each page every time a change is made?
-Images that are not buttons should not have a scale up animation like buttons do.
-
-Alojamento.js:
-The css style should remain consistent between multiple pages (make sure the alojamento.js uses the same rules as the index.html homepage, that should be in a general file. Right now I feel like the spaces between elements, the hero, and the title styling is not the same, it's ok to have differences (like the Resevar box here), but simple stuff like the title small text combo should be consistent)
-Make sure the pt.json file is well organised, as in general stuff that appears multiple time could be it's own thing, and then each page's text should be clearly separated to easier readability and changes to be done. Make sure the content of the pt.json are also as the default fallback in the alojamento.html page (and fix any changes with this in index.html as well), the correct/updated text is the one in pt.json --> there's text in the pt.json that was added to it and not the page, make sure all the text from pt.json is in the html page
-The image under casa privdad is too big, it should be more alongated, less tall
-The cards under the Spaces should be a caroussel instead, so the people have an image and a description of everything described above. Maybe we can make two carroussels since there's lots of stuff, we can separate it between interior and exterior, properly titeled or even separated by the paragraphs that mention it if it makes for a better UI. Fix the card numbers too, depending on how you make the carroussels. Add a "Ver galeria completa" button after that.
-The amanities section could be more compact, it's more of a list type thing, the fonts could be smaller, the spaces reduced, still feel luxurious and mobile-friendly, but don't need to be readable from a distance and catchy
-
-
+The dropdown for languages still looks native, so need to change it from the native select.
+In wide screens the layout is very unconsistent : titles can be huge, certain things are centered, others are aligned to the left, places where it is cards don't stay in pairs or triplets so there's just gaps. I like the center alignement, although the occasional image for example for the hero that goes from side to side of the page fits well, carroussels could also be half fade-out when going too far away from the center of the page.
+In alojamento.html I want the rules to pop out, so maybe some bold words or even some red words to make sure they are read. 
+ 
 
 Create galeria.html:
 Very simple, it just lays down every single image in the assets/images (no subfolders) (I don't know if it's possible to do it automatically, so not every time an image is added its name needs to be added manually). The layout takes the images shape and lays it down automatically filling all the gaps, and the entire page, almost puzzle like, if any image is clicked it opens a sort of caroussel pop-up, where the images can be zoomed in. There's the Reservar floating button as well when not in caroussel mode
 
 ## Small additions to not forget
 Change default language based on browser defaults
-
-The contract button should be easily findable, visible in all pages, maybe in the header and the footer permenently (reduced to a cell or email icon if not enough space?)
 
 ## RULES
 "rules_full": {

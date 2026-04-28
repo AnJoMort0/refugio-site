@@ -13,42 +13,8 @@
   <link rel="stylesheet" href="./css/mobile.css" />
   <link rel="stylesheet" href="./css/pages/alojamento.css" />
 </head>
-<body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="./index.html" data-i18n="brand.name">Refúgio</a>
-
-      <div class="header-actions">
-        <label class="sr-only" for="language-switcher" data-i18n="languageSwitcher.label">Escolher idioma</label>
-        <select id="language-switcher" class="language-switcher" aria-label="Escolher idioma">
-          <option value="pt">Português</option>
-          <option value="en">English</option>
-          <option value="fr">Français</option>
-          <option value="es">Español</option>
-        </select>
-
-        <button
-          class="nav-toggle"
-          type="button"
-          aria-label="Abrir menu"
-          aria-expanded="false"
-          aria-controls="site-nav"
-          data-i18n-attr='{"aria-label":"nav.toggleLabel"}'
-        >
-          <span class="sr-only" data-i18n="nav.toggleText">Abrir menu</span>
-          ☰
-        </button>
-      </div>
-
-      <nav id="site-nav" class="site-nav">
-        <a class="is-active" href="./alojamento.html" data-i18n="nav.accommodation">Alojamento</a>
-        <a href="./galeria.html" data-i18n="nav.gallery">Galeria</a>
-        <a href="./reservas.html" data-i18n="nav.booking">Reservas</a>
-        <a href="./contacto.html" data-i18n="nav.contact">Contacto</a>
-        <a href="./guia-local.html" data-i18n="nav.guide">Guia Local</a>
-      </nav>
-    </div>
-  </header>
+<body data-page="accommodation">
+  <div data-site-header></div>
 
   <main>
     <section class="hero accommodation-hero">
@@ -76,7 +42,7 @@
           <p class="eyebrow" data-i18n="accommodation.overview.eyebrow">Casa privada</p>
           <h2 data-i18n="accommodation.overview.title">Um refúgio privado para dias sem pressa.</h2>
           <p data-i18n="accommodation.overview.text1">O Refúgio é uma casa independente, totalmente reservada para quem a escolhe. Com capacidade até 6 pessoas, é o lugar ideal para uma escapadinha em família, a dois ou entre amigos, longe da confusão e rodeado pela natureza.</p>
-          <p data-i18n="accommodation.overview.text2">Aqui, o ambiente combina o charme rural com o conforto moderno, criando um espaço acolhedor, tranquilo e pensado para ser vivido com calma — dentro e fora de casa.</p>
+          <p data-i18n="accommodation.overview.text2">Aqui, o ambiente combina o charme rural com o conforto moderno, criando um espaço acolhedor, tranquilo e pensado para ser vivido com calma, dentro e fora de casa.</p>
         </div>
         <div class="image-card feature-image-card">
           <img
@@ -99,7 +65,7 @@
           <article class="highlight-card"><span aria-hidden="true">≈</span><p data-i18n="accommodation.highlights.item2">Piscina privada com vista para a natureza</p></article>
           <article class="highlight-card"><span aria-hidden="true">◐</span><p data-i18n="accommodation.highlights.item3">3 quartos até 6 pessoas</p></article>
           <article class="highlight-card"><span aria-hidden="true">♨</span><p data-i18n="accommodation.highlights.item4">Churrasqueira fechada exterior</p></article>
-          <article class="highlight-card"><span aria-hidden="true">P</span><p data-i18n="accommodation.highlights.item5">Estacionamento gratuito no local</p></article>
+          <article class="highlight-card"><span aria-hidden="true">P</span><p data-i18n="accommodation.highlights.item5">Estacionamento gratuito e vigiado no local</p></article>
           <article class="highlight-card"><span aria-hidden="true">⌁</span><p data-i18n="accommodation.highlights.item6">Wi-Fi gratuito (inclui hotspot portátil)</p></article>
         </div>
       </div>
@@ -109,42 +75,95 @@
       <div class="container narrow section-intro">
         <p class="eyebrow" data-i18n="accommodation.spaces.eyebrow">Espaços</p>
         <h2 data-i18n="accommodation.spaces.title">Espaços pensados para viver e descansar.</h2>
-        <p data-i18n="accommodation.spaces.text1">A casa dispõe de três quartos confortáveis, pensados para acolher diferentes tipos de estadia: um quarto de casal, um quarto com beliche e um quarto individual.</p>
-        <p data-i18n="accommodation.spaces.text2">No interior, encontrará uma sala de estar acolhedora, uma sala de refeições com caráter rural e uma cozinha totalmente equipada para o dia a dia.</p>
-        <p data-i18n="accommodation.spaces.text3">No exterior, o Refúgio abre-se em vários ambientes: jardins, zonas de descanso, área de refeições ao ar livre e uma churrasqueira com espaço fechado tipo varanda, onde o interior e o exterior se encontram.</p>
-        <p data-i18n="accommodation.spaces.text4">A piscina privada completa a experiência, oferecendo um espaço perfeito para relaxar ao longo do dia.</p>
-        <p data-i18n="accommodation.spaces.text5">A piscina privada completa a experiência, oferecendo um espaço perfeito para relaxar ao longo do dia.</p>
       </div>
 
-      <div class="container spaces-grid">
-        <article class="space-card card">
-          <img src="./assets/images/master_bedroom.jpg" alt="Quarto de casal acolhedor" data-i18n-attr='{"alt":"accommodation.spaces.card1Alt"}' />
-          <div>
-            <h3 data-i18n="accommodation.spaces.card1Title">Quarto de casal</h3>
-            <p data-i18n="accommodation.spaces.card1Text">Um espaço calmo e confortável para descansar depois de um dia entre piscina, serra e refeições ao ar livre.</p>
+      <div class="container spaces-stack">
+        <section class="spaces-group">
+          <div class="spaces-group-copy">
+            <p class="eyebrow spaces-mini-eyebrow" data-i18n="accommodation.spaces.interiorEyebrow">Interiores</p>
+            <h3 data-i18n="accommodation.spaces.interiorTitle">Quartos e zonas de estar</h3>
+            <p data-i18n="accommodation.spaces.text1">A casa dispõe de três quartos confortáveis, pensados para acolher diferentes tipos de estadia: um quarto de casal, um quarto com beliche e um quarto individual.</p>
+            <p data-i18n="accommodation.spaces.text2">No interior, encontrará também uma sala de estar acolhedora, com um sofá-cama, uma sala de refeições com caráter rural e uma cozinha totalmente equipada para o dia a dia.</p>
           </div>
-        </article>
-        <article class="space-card card">
-          <img src="./assets/images/bunk_bedroom.jpg" alt="Quarto com beliche" data-i18n-attr='{"alt":"accommodation.spaces.card2Alt"}' />
-          <div>
-            <h3 data-i18n="accommodation.spaces.card2Title">Quarto com beliche</h3>
-            <p data-i18n="accommodation.spaces.card2Text">Ideal para crianças, amigos ou estadias em família, mantendo a casa prática e flexível.</p>
+          <div class="carousel accommodation-carousel" data-carousel>
+            <article class="space-card card carousel-card">
+              <img src="./assets/images/master_bedroom.jpg" alt="Quarto de casal acolhedor" data-i18n-attr='{"alt":"accommodation.spaces.card1Alt"}' />
+              <div>
+                <h3 data-i18n="accommodation.spaces.card1Title">Quarto de casal</h3>
+                <p data-i18n="accommodation.spaces.card1Text">Um espaço calmo e confortável para descansar depois de um dia entre piscina, serra e refeições ao ar livre.</p>
+              </div>
+            </article>
+            <article class="space-card card carousel-card">
+              <img src="./assets/images/bunk_bedroom.jpg" alt="Quarto com beliche" data-i18n-attr='{"alt":"accommodation.spaces.card11Alt"}' />
+              <div>
+                <h3 data-i18n="accommodation.spaces.card11Title">Quarto com beliche</h3>
+                <p data-i18n="accommodation.spaces.card11Text">Ideal para crianças, amigos ou estadias em família - prático e flexível.</p>
+              </div>
+            </article>
+            <article class="space-card card carousel-card">
+              <img src="./assets/images/single_bedroom.jpg" alt="Quarto individual" data-i18n-attr='{"alt":"accommodation.spaces.card2Alt"}' />
+              <div>
+                <h3 data-i18n="accommodation.spaces.card2Title">Quarto individual</h3>
+                <p data-i18n="accommodation.spaces.card2Text">Pequeno mas confortável.</p>
+              </div>
+            </article>
+            <article class="space-card card carousel-card">
+              <img src="./assets/images/living_room.jpg" alt="Sala de estar do Refúgio" data-i18n-attr='{"alt":"accommodation.spaces.card3Alt"}' />
+              <div>
+                <h3 data-i18n="accommodation.spaces.card3Title">Sala de estar com sofá-cama</h3>
+                <p data-i18n="accommodation.spaces.card3Text">Interior acolhedor para estar, conversar e ou ver televisão no conforto de uma casa vivida com calma.</p>
+              </div>
+            </article>
+            <article class="space-card card carousel-card">
+              <img src="./assets/images/dining_room.jpg" alt="Sala de refeições do Refúgio" data-i18n-attr='{"alt":"accommodation.spaces.card4Alt"}' />
+              <div>
+                <h3 data-i18n="accommodation.spaces.card4Title">Sala de refeições rural</h3>
+                <p data-i18n="accommodation.spaces.card4Text">O espaço mais tradicional da casa, cheio de história, onde várias gerações da família se reuniram à mesa.</p>
+              </div>
+            </article>
+            <article class="space-card card carousel-card">
+              <img src="./assets/images/kitchen.jpg" alt="Cozinha do Refúgio" data-i18n-attr='{"alt":"accommodation.spaces.card5Alt"}' />
+              <div>
+                <h3 data-i18n="accommodation.spaces.card5Title">Cozinha equipada</h3>
+                <p data-i18n="accommodation.spaces.card5Text">Cozinha completa com fogão, forno, micro-ondas e todos os utensílios necessários para o dia a dia.</p>
+              </div>
+            </article>
           </div>
-        </article>
-        <article class="space-card card">
-          <img src="./assets/images/living_room.jpg" alt="Sala de estar do Refúgio" data-i18n-attr='{"alt":"accommodation.spaces.card3Alt"}' />
-          <div>
-            <h3 data-i18n="accommodation.spaces.card3Title">Sala e refeições</h3>
-            <p data-i18n="accommodation.spaces.card3Text">Interiores acolhedores para estar, conversar e partilhar refeições com o conforto de uma casa vivida com calma.</p>
+        </section>
+
+        <section class="spaces-group">
+          <div class="spaces-group-copy">
+            <p class="eyebrow spaces-mini-eyebrow" data-i18n="accommodation.spaces.exteriorEyebrow">Exterior</p>
+            <h3 data-i18n="accommodation.spaces.exteriorTitle">Jardins, churrasqueira e piscina</h3>
+            <p data-i18n="accommodation.spaces.text3">No exterior, o Refúgio abre-se em vários ambientes: jardins, zonas de descanso, grelhador ao ar livre e uma churrasqueira com espaço fechado tipo varanda, onde o interior e o exterior se encontram.</p>
+            <p data-i18n="accommodation.spaces.text4">A piscina privada completa a experiência, oferecendo um espaço perfeito para relaxar ao longo do dia.</p>
           </div>
-        </article>
-        <article class="space-card card">
-          <img src="./assets/images/outdoor_grill.jpg" alt="Churrasqueira e zona exterior de refeições" data-i18n-attr='{"alt":"accommodation.spaces.card4Alt"}' />
-          <div>
-            <h3 data-i18n="accommodation.spaces.card4Title">Exterior e churrasqueira</h3>
-            <p data-i18n="accommodation.spaces.card4Text">Jardins, zonas de descanso e uma área de refeições ao ar livre para aproveitar o exterior durante toda a estadia.</p>
+          <div class="carousel accommodation-carousel" data-carousel>
+            <article class="space-card card carousel-card">
+              <img src="./assets/images/exterior_resting_area.jpg" alt="Zona de lazer exterior" data-i18n-attr='{"alt":"accommodation.spaces.card6Alt"}' />
+              <div>
+                <h3 data-i18n="accommodation.spaces.card6Title">Zonas de descanso exteriores</h3>
+                <p data-i18n="accommodation.spaces.card6Text">Jardins e vários recantos com cadeiras, mesas e espreguiçadeiras para aproveitar o exterior com calma.</p>
+              </div>
+            </article>
+            <article class="space-card card carousel-card">
+              <img src="./assets/images/outdoor_grill.jpg" alt="Churrasqueira fechada" data-i18n-attr='{"alt":"accommodation.spaces.card7Alt"}' />
+              <div>
+                <h3 data-i18n="accommodation.spaces.card7Title">Churrasqueira exterior fechada</h3>
+                <p data-i18n="accommodation.spaces.card7Text">Espaço de churrasqueira com paredes de vidro amovíveis, cozinha equipada e área ideal para refeições em família.</p>
+              </div>
+            </article>
+            <article class="space-card card carousel-card">
+              <img src="./assets/images/pool_chill.jpg" alt="Piscina do Refúgio" data-i18n-attr='{"alt":"accommodation.spaces.card8Alt"}' />
+              <div>
+                <h3 data-i18n="accommodation.spaces.card8Title">Piscina privada</h3>
+                <p data-i18n="accommodation.spaces.card8Text">Piscina no jardim, perfeita para relaxar ou aproveitar em família ao longo do dia.</p>
+              </div>
+            </article>
           </div>
-        </article>
+        </section>
+
+        <a class="text-link section-cta" href="./galeria.html" data-i18n="accommodation.spaces.galleryLink">Ver galeria completa</a>
       </div>
     </section>
 
@@ -152,43 +171,78 @@
       <div class="container">
         <div class="section-heading">
           <p class="eyebrow" data-i18n="accommodation.amenities.eyebrow">Comodidades</p>
-          <h2 data-i18n="accommodation.amenities.title">Tudo organizado para uma estadia simples e confortável.</h2>
+          <h2 data-i18n="accommodation.amenities.title">Tudo o que precisa para uma estadia confortável e sem preocupações.</h2>
         </div>
         <div class="amenities-grid">
           <article class="amenity-group card">
             <h3 data-i18n="accommodation.amenities.comfort.title">Conforto</h3>
             <ul>
-              <li data-i18n="accommodation.amenities.comfort.item1">3 quartos (até 6 hóspedes)</li>
-              <li data-i18n="accommodation.amenities.comfort.item2">Sala de estar acolhedora</li>
-              <li data-i18n="accommodation.amenities.comfort.item3">Roupa de cama e toalhas incluídas</li>
-              <li data-i18n="accommodation.amenities.comfort.item4">Máquina de lavar e secar roupa</li>
+              <li data-i18n="accommodation.amenities.comfort.item1">Casa com 179 m² totalmente privada</li>
+              <li data-i18n="accommodation.amenities.comfort.item2">3 quartos (até 6 hóspedes)</li>
+              <li data-i18n="accommodation.amenities.comfort.item3">Sala de estar acolhedora com sofá-cama</li>
+              <li data-i18n="accommodation.amenities.comfort.item4">Aquecimento</li>
+              <li data-i18n="accommodation.amenities.comfort.item5">Roupa de cama e toalhas incluídas</li>
             </ul>
           </article>
           <article class="amenity-group card">
             <h3 data-i18n="accommodation.amenities.kitchen.title">Cozinha e refeições</h3>
             <ul>
-              <li data-i18n="accommodation.amenities.kitchen.item1">Cozinha totalmente equipada</li>
-              <li data-i18n="accommodation.amenities.kitchen.item2">Máquina de café, forno, micro-ondas e utensílios</li>
-              <li data-i18n="accommodation.amenities.kitchen.item3">Zona de refeições interior</li>
-              <li data-i18n="accommodation.amenities.kitchen.item4">Churrasqueira e espaço exterior para refeições</li>
+              <li data-i18n="accommodation.amenities.kitchen.item1">Cozinha totalmente equipada para o dia a dia</li>
+              <li data-i18n="accommodation.amenities.kitchen.item2">Forno, fogão, micro-ondas, frigorífico e congelador</li>
+              <li data-i18n="accommodation.amenities.kitchen.item3">Máquina de café, chaleira, torradeira e máquina de raclette</li>
+              <li data-i18n="accommodation.amenities.kitchen.item4">Utensílios completos: pratos, talheres, copos e panelas</li>
+              <li data-i18n="accommodation.amenities.kitchen.item5">Churrasqueira com cozinha equipada e espaço para refeições</li>
+            </ul>
+          </article>
+          <article class="amenity-group card">
+            <h3 data-i18n="accommodation.amenities.bathroom.title">Casas de banho</h3>
+            <ul>
+              <li data-i18n="accommodation.amenities.bathroom.item1">2 casas de banho com duche e bidet</li>
+              <li data-i18n="accommodation.amenities.bathroom.item2">1 lavabo adicional</li>
+              <li data-i18n="accommodation.amenities.bathroom.item3">Secador de cabelo disponível</li>
+              <li data-i18n="accommodation.amenities.bathroom.item4">Máquina de lavar e máquina de secar</li>
             </ul>
           </article>
           <article class="amenity-group card">
             <h3 data-i18n="accommodation.amenities.exterior.title">Exterior</h3>
             <ul>
-              <li data-i18n="accommodation.amenities.exterior.item1">Piscina privada exterior (sazonal)</li>
-              <li data-i18n="accommodation.amenities.exterior.item2">Jardins e zonas de descanso</li>
-              <li data-i18n="accommodation.amenities.exterior.item3">Terraço, varanda e áreas sombreadas</li>
-              <li data-i18n="accommodation.amenities.exterior.item4">Vista para a serra e envolvente natural</li>
+              <li data-i18n="accommodation.amenities.exterior.item1">Piscina privada (disponível na estação quente)</li>
+              <li data-i18n="accommodation.amenities.exterior.item2">Espreguiçadeiras e guarda-sóis</li>
+              <li data-i18n="accommodation.amenities.exterior.item3">Jardins e várias zonas de descanso</li>
+              <li data-i18n="accommodation.amenities.exterior.item4">Grelhador exterior</li>
+              <li data-i18n="accommodation.amenities.exterior.item5">Vista para a serra e envolvente natural</li>
             </ul>
           </article>
           <article class="amenity-group card">
-            <h3 data-i18n="accommodation.amenities.practical.title">Prático</h3>
+            <h3 data-i18n="accommodation.amenities.technology.title">Tecnologia e entretenimento</h3>
             <ul>
-              <li data-i18n="accommodation.amenities.practical.item1">Wi-Fi gratuito (com hotspot portátil)</li>
-              <li data-i18n="accommodation.amenities.practical.item2">Estacionamento privado gratuito</li>
-              <li data-i18n="accommodation.amenities.practical.item3">Casa totalmente no rés-do-chão</li>
-              <li data-i18n="accommodation.amenities.practical.item4">Acesso facilitado</li>
+              <li data-i18n="accommodation.amenities.technology.item1">Wi-Fi gratuito com hotspot portátil</li>
+              <li data-i18n="accommodation.amenities.technology.item2">Televisões na sala, churrasqueira e quarto de beliche</li>
+              <li data-i18n="accommodation.amenities.technology.item3">Canais nacionais por cabo</li>
+            </ul>
+          </article>
+          <article class="amenity-group card">
+            <h3 data-i18n="accommodation.amenities.family.title">Família</h3>
+            <ul>
+              <li data-i18n="accommodation.amenities.family.item1">Alguns equipamentos para bebés disponíveis (cadeira e proteções de tomadas)</li>
+              <li data-i18n="accommodation.amenities.family.item2">Piscina com boias e acessórios para lazer</li>
+              <li data-i18n="accommodation.amenities.family.item3">Espaços amplos ideais para famílias</li>
+            </ul>
+          </article>
+          <article class="amenity-group card">
+            <h3 data-i18n="accommodation.amenities.accessibility.title">Acessibilidade</h3>
+            <ul>
+              <li data-i18n="accommodation.amenities.accessibility.item1">Casa maioritariamente ao nível do rés-do-chão</li>
+              <li data-i18n="accommodation.amenities.accessibility.item2">Acesso relativamente fácil para pessoas com mobilidade reduzida</li>
+              <li data-i18n="accommodation.amenities.accessibility.item3">Ambiente rural não totalmente adaptado a cadeiras de rodas</li>
+            </ul>
+          </article>
+          <article class="amenity-group card">
+            <h3 data-i18n="accommodation.amenities.services.title">Serviços</h3>
+            <ul>
+              <li data-i18n="accommodation.amenities.services.item1">Estacionamento privado gratuito e vigiado</li>
+              <li data-i18n="accommodation.amenities.services.item2">Possibilidade de emissão de fatura com NIF</li>
+              <li data-i18n="accommodation.amenities.services.item3">Aluguer de bicicletas disponível</li>
             </ul>
           </article>
         </div>
@@ -199,44 +253,49 @@
       <div class="container">
         <div class="section-heading">
           <p class="eyebrow" data-i18n="accommodation.practical.eyebrow">Antes de reservar</p>
-          <h2 data-i18n="accommodation.practical.title">Informações da estadia</h2>
+          <h2 data-i18n="accommodation.practical.title">Informações essenciais da estadia</h2>
         </div>
         <div class="practical-grid">
           <article class="info-card card">
-            <h3 data-i18n="accommodation.practical.capacity.title">Capacidade</h3>
-            <p data-i18n="accommodation.practical.capacity.text">Até 6 hóspedes</p>
-          </article>
-          <article class="info-card card">
-            <h3 data-i18n="accommodation.practical.checkin.title">Check-in / Check-out</h3>
-            <p data-i18n="accommodation.practical.checkin.text1">Check-in: 15h00 – 19h00</p>
-            <p data-i18n="accommodation.practical.checkin.text2">Check-out: 08h00 – 10h00</p>
-          </article>
-          <article class="info-card card">
-            <h3 data-i18n="accommodation.practical.minimum.title">Estadia mínima</h3>
-            <p data-i18n="accommodation.practical.minimum.text">Mínimo de 2 noites</p>
-          </article>
-          <article class="info-card card wide-card">
-            <h3 data-i18n="accommodation.practical.privacy.title">Privacidade</h3>
-            <p data-i18n="accommodation.practical.privacy.text">A casa é totalmente privada e não partilhada. Todos os espaços, incluindo piscina e exteriores, são reservados exclusivamente para os hóspedes.</p>
-          </article>
-          <article class="info-card card wide-card">
-            <h3 data-i18n="accommodation.practical.deposit.title">Depósito de segurança</h3>
-            <p data-i18n="accommodation.practical.deposit.text">Poderá ser solicitado um depósito de segurança no check-in, reembolsado no final da estadia após verificação do espaço.</p>
-          </article>
-          <article class="info-card card rules-card">
-            <h3 data-i18n="accommodation.practical.rules.title">Regras importantes</h3>
+            <h3 data-i18n="accommodation.practical.stay.title">Estadia</h3>
             <ul>
-              <li data-i18n="accommodation.practical.rules.item1">Não é permitido exceder o número de hóspedes reservados</li>
-              <li data-i18n="accommodation.practical.rules.item2">Não são permitidas festas ou eventos</li>
-              <li data-i18n="accommodation.practical.rules.item3">Não são permitidos animais de estimação</li>
-              <li data-i18n="accommodation.practical.rules.item4">Não é permitido fumar em toda a propriedade (interior e exterior)</li>
+              <li data-i18n="accommodation.practical.stay.item1">Capacidade máxima: 6 hóspedes</li>
+              <li data-i18n="accommodation.practical.stay.item2">Estadia mínima: 2 noites</li>
+              <li data-i18n="accommodation.practical.stay.item3">Casa totalmente privada (não partilhada)</li>
             </ul>
           </article>
-          <article class="info-card card rules-card">
-            <h3 data-i18n="accommodation.practical.other.title">Outras informações</h3>
+          <article class="info-card card">
+            <h3 data-i18n="accommodation.practical.checkin.title">Check-in e check-out</h3>
             <ul>
-              <li data-i18n="accommodation.practical.other.item1">Pode ser solicitado documento de identificação no check-in</li>
-              <li data-i18n="accommodation.practical.other.item2">A propriedade dispõe de sistema de videovigilância no exterior para segurança</li>
+              <li data-i18n="accommodation.practical.checkin.item1">Check-in: 15h00 – 19h00</li>
+              <li data-i18n="accommodation.practical.checkin.item2">Check-out: 08h00 – 10h00</li>
+              <li data-i18n="accommodation.practical.checkin.item3">Horários diferentes sujeitos a confirmação prévia</li>
+            </ul>
+            <p data-i18n="accommodation.practical.checkin.note">Pedimos que indique a hora de chegada e saída com antecedência.</p>
+          </article>
+          <article class="info-card card">
+            <h3 data-i18n="accommodation.practical.booking.title">Reserva e cancelamento</h3>
+            <ul>
+              <li data-i18n="accommodation.practical.booking.item1">Cancelamento gratuito até 48h antes do check-in</li>
+              <li data-i18n="accommodation.practical.booking.item2">Após esse prazo, poderá ser cobrado o valor total da estadia</li>
+            </ul>
+          </article>
+          <article class="info-card card">
+            <h3 data-i18n="accommodation.practical.rules.title">Regras principais</h3>
+            <ul>
+              <li data-i18n="accommodation.practical.rules.item1">Proibidas festas ou eventos</li>
+              <li data-i18n="accommodation.practical.rules.item2">Número de hóspedes não pode ser excedido</li>
+              <li data-i18n="accommodation.practical.rules.item3">Não são permitidos animais</li>
+              <li data-i18n="accommodation.practical.rules.item4">Não é permitido fumar no interior</li>
+            </ul>
+          </article>
+          <article class="info-card card wide-card">
+            <h3 data-i18n="accommodation.practical.practical.title">Informações úteis</h3>
+            <ul>
+              <li data-i18n="accommodation.practical.practical.item1">Depósito de segurança de 200€ solicitado no check-in</li>
+              <li data-i18n="accommodation.practical.practical.item2">Documento de identificação obrigatório</li>
+              <li data-i18n="accommodation.practical.practical.item3">Estacionamento gratuito disponível no local</li>
+              <li data-i18n="accommodation.practical.practical.item4">Idiomas: Português, Francês, Inglês e Espanhol</li>
             </ul>
           </article>
         </div>
@@ -255,14 +314,8 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <p data-i18n="footer.copyright">© Refúgio — Família Rodrigues</p>
-      <a href="./admin.html" data-i18n="footer.admin">Área de gestão</a>
-    </div>
-  </footer>
-
-  <a class="sticky-booking-cta" href="./reservas.html" data-i18n="stickyBookingCta">Reservar</a>
+  <div data-site-footer></div>
+  <div data-sticky-booking></div>
 
   <script type="module" src="./js/main.js"></script>
 </body>

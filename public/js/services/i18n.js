@@ -47,11 +47,22 @@ function applyAttributeTranslations(dictionary) {
 }
 
 function updateDocumentLanguage(language, dictionary) {
+  const currentPage = document.body.dataset.page || '';
+  const shouldUseDefaultMeta = currentPage === 'home' || currentPage === '';
   document.documentElement.lang = dictionary.meta?.htmlLang || language;
-  document.title = dictionary.meta?.title || document.title;
+  const titleElement = document.querySelector('title');
+  const hasPageSpecificTitle = Boolean(titleElement?.dataset.i18n);
+
+  if (!hasPageSpecificTitle && shouldUseDefaultMeta && dictionary.meta?.title) {
+    document.title = dictionary.meta.title;
+  } else if (titleElement?.textContent) {
+    document.title = titleElement.textContent;
+  }
 
   const description = document.querySelector('meta[name="description"]');
-  if (description && dictionary.meta?.description) {
+  const hasPageSpecificDescription = Boolean(description?.dataset.i18nAttr);
+
+  if (description && !hasPageSpecificDescription && shouldUseDefaultMeta && dictionary.meta?.description) {
     description.setAttribute('content', dictionary.meta.description);
   }
 }

@@ -13,42 +13,8 @@
   <link rel="stylesheet" href="./css/mobile.css" />
   <link rel="stylesheet" href="./css/pages/home.css" />
 </head>
-<body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="./index.html" data-i18n="brand.name">Refúgio</a>
-
-      <div class="header-actions">
-        <label class="sr-only" for="language-switcher" data-i18n="languageSwitcher.label">Escolher idioma</label>
-        <select id="language-switcher" class="language-switcher" aria-label="Escolher idioma">
-          <option value="pt">Português</option>
-          <option value="en">English</option>
-          <option value="fr">Français</option>
-          <option value="es">Español</option>
-        </select>
-
-        <button
-          class="nav-toggle"
-          type="button"
-          aria-label="Abrir menu"
-          aria-expanded="false"
-          aria-controls="site-nav"
-          data-i18n-attr='{"aria-label":"nav.toggleLabel"}'
-        >
-          <span class="sr-only" data-i18n="nav.toggleText">Abrir menu</span>
-          ☰
-        </button>
-      </div>
-
-      <nav id="site-nav" class="site-nav">
-        <a href="./alojamento.html" data-i18n="nav.accommodation">Alojamento</a>
-        <a href="./galeria.html" data-i18n="nav.gallery">Galeria</a>
-        <a href="./reservas.html" data-i18n="nav.booking">Reservas</a>
-        <a href="./contacto.html" data-i18n="nav.contact">Contacto</a>
-        <a href="./guia-local.html" data-i18n="nav.guide">Guia Local</a>
-      </nav>
-    </div>
-  </header>
+<body data-page="home">
+  <div data-site-header></div>
 
   <main>
     <section class="hero">
@@ -213,51 +179,45 @@
           <a class="text-link section-cta" href="./guia-local.html#parceiros" data-i18n="home.sponsors.link">Ver parceiros no guia local</a>
         </div>
         <div class="sponsor-grid">
-          <article class="sponsor-card">
+          <a class="sponsor-card" href="./guia-local.html">
             <img
               src="./assets/images/partners/ramadinha_1.jpg"
               alt="Restaurante local junto ao rio"
               data-i18n-attr='{"alt":"home.sponsors.card1Alt"}'
             />
             <p data-i18n="home.sponsors.card1">Adega Ramadinha - Especialidades locais</p>
-          </article>
-          <article class="sponsor-card">
+          </a>
+          <a class="sponsor-card" href="./guia-local.html">
             <img
               src="./assets/images/partners/corga_1.jpg"
               alt="Vinhos e produtos regionais"
               data-i18n-attr='{"alt":"home.sponsors.card2Alt"}'
             />
             <p data-i18n="home.sponsors.card2">Corga - Provas e produtos locais</p>
-          </article>
-          <article class="sponsor-card">
+          </a>
+          <a class="sponsor-card" href="./guia-local.html">
             <img
               src="./assets/images/partners/cruzeiro_1.jpg"
               alt="Pastelaria local"
               data-i18n-attr='{"alt":"home.sponsors.card3Alt"}'
             />
             <p data-i18n="home.sponsors.card3">Café Cruzeiro - Pastelaria Local</p>
-          </article>
-          <article class="sponsor-card">
+          </a>
+          <a class="sponsor-card" href="./guia-local.html">
             <img
               src="./assets/images/partners/aquapura_1.jpg"
               alt="Bar local junto ao rio"
               data-i18n-attr='{"alt":"home.sponsors.card4Alt"}'
             />
             <p data-i18n="home.sponsors.card4">Aquapura Terrace - Bar à beira rio</p>
-          </article>
+          </a>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <p data-i18n="footer.copyright">© Refúgio — Família Rodrigues</p>
-      <a href="./admin.html" data-i18n="footer.admin">Área de gestão</a>
-    </div>
-  </footer>
-
-  <a class="sticky-booking-cta" href="./reservas.html" data-i18n="stickyBookingCta">Reservar</a>
+  <div data-site-footer></div>
+  <div data-sticky-booking></div>
 
   <script type="module" src="./js/main.js"></script>
 </body>

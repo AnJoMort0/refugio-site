@@ -133,11 +133,14 @@
     "spaces": {
       "eyebrow": "Espaços",
       "title": "Espaços pensados para viver e descansar.",
+      "interiorEyebrow": "Interiores",
+      "interiorTitle": "Quartos e zonas de estar",
       "text1": "A casa dispõe de três quartos confortáveis, pensados para acolher diferentes tipos de estadia: um quarto de casal, um quarto com beliche e um quarto individual.",
-      "text2": "No interior, encontrará uma sala de estar acolhedora, com um sofá-cama, uma sala de refeições com caráter rural e uma cozinha totalmente equipada para o dia a dia.",
+      "text2": "No interior, encontrará também uma sala de estar acolhedora, com um sofá-cama, uma sala de refeições com caráter rural e uma cozinha totalmente equipada para o dia a dia.",
+      "exteriorEyebrow": "Exterior",
+      "exteriorTitle": "Jardins, churrasqueira e piscina",
       "text3": "No exterior, o Refúgio abre-se em vários ambientes: jardins, zonas de descanso, grelhador ao ar livre e uma churrasqueira com espaço fechado tipo varanda, onde o interior e o exterior se encontram.",
       "text4": "A piscina privada completa a experiência, oferecendo um espaço perfeito para relaxar ao longo do dia.",
-      "text5": "Para o vosso conforto, encontra também duas casas de banho (uma junto aos quartos e uma entre a piscina e a churrasqueira), e um lavabo onde encontra também uma máquina de lavar e de secar.",
       "card1Title": "Quarto de casal",
       "card1Text": "Um espaço calmo e confortável para descansar depois de um dia entre piscina, serra e refeições ao ar livre.",
       "card1Alt": "Quarto de casal acolhedor",
@@ -164,7 +167,8 @@
       "card7Alt": "Churrasqueira fechada",
       "card8Title": "Piscina privada",
       "card8Text": "Piscina no jardim, perfeita para relaxar ou aproveitar em família ao longo do dia.",
-      "card8Alt": "Piscina do Refúgio"
+      "card8Alt": "Piscina do Refúgio",
+      "galleryLink": "Ver galeria completa"
     },
     "amenities": {
       "eyebrow": "Comodidades",
@@ -174,8 +178,8 @@
         "title": "Conforto",
         "item1": "Casa com 179 m² totalmente privada",
         "item2": "3 quartos (até 6 hóspedes)",
-        "item3": "Sala de estar acolhedora com televisão",
-        "item4": "Aquecimento em toda a casa",
+        "item3": "Sala de estar acolhedora com sofá-cama",
+        "item4": "Aquecimento",
         "item5": "Roupa de cama e toalhas incluídas"
       },
 
@@ -185,15 +189,15 @@
         "item2": "Forno, fogão, micro-ondas, frigorífico e congelador",
         "item3": "Máquina de café, chaleira, torradeira e máquina de raclette",
         "item4": "Utensílios completos: pratos, talheres, copos e panelas",
-        "item5": "Zona de refeições interior e exterior",
-        "item6": "Churrasqueira com cozinha equipada e espaço para refeições"
+        "item5": "Churrasqueira com cozinha equipada e espaço para refeições"
       },
 
       "bathroom": {
         "title": "Casas de banho",
         "item1": "2 casas de banho com duche e bidet",
         "item2": "1 lavabo adicional",
-        "item3": "Secador de cabelo disponível"
+        "item3": "Secador de cabelo disponível",
+        "item4": "Máquina de lavar e máquina de secar"
       },
 
       "exterior": {
@@ -231,13 +235,6 @@
         "item1": "Estacionamento privado gratuito e vigiado",
         "item2": "Possibilidade de emissão de fatura com NIF",
         "item3": "Aluguer de bicicletas disponível"
-      },
-
-      "rules": {
-        "title": "Informações importantes",
-        "item1": "Alojamento não fumador (com áreas exteriores dedicadas)",
-        "item2": "Equipado com extintores, detetores de fumo e sistema de segurança",
-        "item3": "Câmaras de vigilância no exterior para maior segurança"
       }
     },
     "practical": {
@@ -275,7 +272,7 @@
 
       "practical": {
         "title": "Informações úteis",
-        "item1": "Depósito de segurança solicitado no check-in",
+        "item1": "Depósito de segurança de 200€ solicitado no check-in",
         "item2": "Documento de identificação obrigatório",
         "item3": "Estacionamento gratuito disponível no local",
         "item4": "Idiomas: Português, Francês, Inglês e Espanhol"

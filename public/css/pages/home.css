@@ -1,35 +1,3 @@
-.hero {
-  position: relative;
-  min-height: 86svh;
-  display: grid;
-  align-items: end;
-  color: var(--color-soft-ivory);
-}
-
-.hero-media,
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-}
-
-.hero-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.hero-overlay {
-  background:
-    linear-gradient(180deg, rgba(43,38,34,0.42), rgba(43,38,34,0.78)),
-    radial-gradient(circle at 30% 32%, rgba(43,38,34,0.24), transparent 42%);
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  padding-bottom: 5rem;
-}
-
 .hero .eyebrow {
   color: var(--color-sunset-gold);
   text-shadow: 0 2px 12px rgba(43, 38, 34, 0.58);
@@ -51,17 +19,6 @@
   animation-delay: 270ms;
 }
 
-.hero-text {
-  max-width: 42rem;
-  margin: 1rem 0 1.5rem;
-}
-
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.9rem;
-}
-
 .intro-strip {
   margin-top: -2rem;
   position: relative;
@@ -80,24 +37,6 @@
 
 .accommodation-intro {
   padding-bottom: var(--space-5);
-}
-
-.carousel {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(76%, 1fr);
-  gap: var(--space-3);
-  margin-inline: calc((100vw - 100%) / -2);
-  padding: 0 max(1rem, calc((100vw - var(--container-width)) / 2 + 1rem)) 0.5rem;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  scroll-padding-inline: max(1rem, calc((100vw - var(--container-width)) / 2 + 1rem));
-  scroll-snap-type: x mandatory;
-  scrollbar-width: thin;
-}
-
-.carousel > * {
-  scroll-snap-align: center;
 }
 
 .gallery-carousel {
@@ -156,17 +95,19 @@
 }
 
 .sponsor-card {
+  display: block;
   overflow: hidden;
   border-radius: var(--radius-card);
   background: rgba(255,255,255,0.78);
   box-shadow: var(--shadow-soft);
+  color: inherit;
+  text-decoration: none;
 }
 
 .sponsor-card img {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
-  transition: transform 700ms ease;
 }
 
 .sponsor-card p {
@@ -199,22 +140,6 @@
 }
 
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.language-switcher {
-  min-height: 2.75rem;
-  padding: 0.65rem 0.9rem;
-  border: 1px solid rgba(43, 38, 34, 0.15);
-  border-radius: 999px;
-  background: rgba(250, 248, 244, 0.92);
-  color: var(--color-charcoal-earth);
-  max-width: 10rem;
-}
-
 .gallery-card p,
 .feature-pill,
 .testimonial-card span,
@@ -226,39 +151,7 @@
   overflow-wrap: anywhere;
 }
 
-@media (min-width: 768px) {
-  .header-inner {
-    justify-content: flex-start;
-  }
-
-  .site-nav {
-    order: 2;
-  }
-
-  .header-actions {
-    order: 3;
-    margin-left: auto;
-  }
-}
-
 @media (max-width: 767px) {
-  .header-inner {
-    gap: 0.75rem;
-  }
-
-  .header-actions {
-    margin-left: auto;
-  }
-
-  .language-switcher {
-    max-width: 8.5rem;
-    font-size: 0.95rem;
-  }
-
-  .carousel {
-    grid-auto-columns: minmax(82%, 1fr);
-  }
-
   .testimonial-carousel {
     grid-auto-columns: minmax(86%, 1fr);
   }
