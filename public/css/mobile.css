@@ -1,8 +1,4 @@
 @media (min-width: 768px) {
-  .sticky-booking-cta {
-    display: none;
-  }
-
   .two-column {
     grid-template-columns: 1.05fr 0.95fr;
   }

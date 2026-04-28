@@ -383,6 +383,12 @@
   box-shadow: var(--shadow-strong);
 }
 
+@media (min-width: 768px) {
+  .footer-inner {
+    padding-right: 7.5rem;
+  }
+}
+
 .site-nav a.is-active {
   color: var(--color-mountain-forest);
   font-weight: 800;
