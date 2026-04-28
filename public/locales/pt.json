@@ -64,28 +64,20 @@
     "testimonials": {
       "eyebrow": "Testemunhos",
       "title": "Um lugar ao qual se quer sempre voltar.",
-
       "quote1": "“Foram dois dias excelentes, realmente um refúgio para quem gosta de fugir à confusão. A casa é enorme, a vista é espetacular e a piscina, jardim... tudo excecional. A voltar certamente!”",
       "author1": "Paulo — Portugal",
-
       "quote2": "“Um lugar privado maravilhoso para relaxar no meio da natureza. O Refúgio foi ainda melhor do que esperávamos, com vistas incríveis, muita privacidade e anfitriãs sempre atentas. Esperamos repetir em breve :)”",
       "author2": "Marta — Portugal",
-
       "quote3": "“A nossa melhor experiência no Booking. A casa combina o rústico e o moderno na perfeição, com um conforto incrível, uma vista de cortar a respiração e uma piscina perfeita para relaxar. Tudo foi simplesmente perfeito. Esperamos voltar.”",
       "author3": "Audrey — França",
-
       "quote4": "“A vista, o acolhimento e todas as comodidades da casa. A anfitriã é extremamente atenciosa e cheia de pequenos detalhes que fazem a diferença.”",
       "author4": "Alexandra — França",
-
       "quote5": "“Procurávamos tranquilidade e encontrámos ainda mais. Tudo está perfeitamente equipado, com espaços maravilhosos e uma piscina muito bem cuidada. O melhor foi sem dúvida a simpatia e atenção dos anfitriões. Só apetece voltar.”",
       "author5": "Miguel — Espanha",
-
       "quote6": "“Perfeito para descansar. Vista fantástica! A casa tem tudo o que é necessário, incluindo piscina e um espaço exterior incrível. Proprietários muito simpáticos. Voltaremos com gosto 😊”",
       "author6": "Ingrid — Suécia",
-
       "quote7": "“A casa é impressionante: bonita, confortável e muito limpa. A nossa estadia foi de 10. Sem dúvida uma das melhores experiências — vamos voltar.”",
       "author7": "Sonia — Espanha",
-
       "quote8": "“Perfeita para uma escapadinha em família. Jardim amplo, piscina com sol todo o dia e excelente localização. Repetiremos sem dúvida.”",
       "author8": "Raquel — Espanha"
     },
@@ -108,5 +100,192 @@
     "copyright": "© Refúgio — Família Rodrigues",
     "admin": "Área de gestão"
   },
-  "stickyBookingCta": "Reservar"
+  "stickyBookingCta": "Reservar",
+  "accommodation": {
+    "meta": {
+      "title": "Refúgio | Alojamento",
+      "description": "Conheça o alojamento Refúgio: uma casa privada em Castelo de Paiva com piscina, jardins, churrasqueira e vista para a serra."
+    },
+    "hero": {
+      "imageAlt": "Casa rural Refúgio com piscina e vista para a serra",
+      "eyebrow": "O Alojamento",
+      "title": "Uma casa inteira, só para si, no coração da serra.",
+      "text": "Entre a tranquilidade das montanhas de Castelo de Paiva e a vista aberta sobre o Douro, o Refúgio foi pensado para quem procura privacidade, conforto e tempo para abrandar.",
+      "cta": "Ver disponibilidade"
+    },
+    "overview": {
+      "eyebrow": "Casa privada",
+      "title": "Um refúgio privado para dias sem pressa.",
+      "text1": "O Refúgio é uma casa independente, totalmente reservada para quem a escolhe. Com capacidade até 6 pessoas, é o lugar ideal para uma escapadinha em família, a dois ou entre amigos, longe da confusão e rodeado pela natureza.",
+      "text2": "Aqui, o ambiente combina o charme rural com o conforto moderno, criando um espaço acolhedor, tranquilo e pensado para ser vivido com calma, dentro e fora de casa.",
+      "imageAlt": "Fachada em pedra do alojamento Refúgio"
+    },
+    "highlights": {
+      "eyebrow": "Destaques",
+      "title": "Tudo o que precisa para uma estadia em exclusivo.",
+      "item1": "Casa inteira em exclusivo (não partilhada)",
+      "item2": "Piscina privada com vista para a natureza",
+      "item3": "3 quartos até 6 pessoas",
+      "item4": "Churrasqueira fechada exterior",
+      "item5": "Estacionamento gratuito e vigiado no local",
+      "item6": "Wi-Fi gratuito (inclui hotspot portátil)"
+    },
+    "spaces": {
+      "eyebrow": "Espaços",
+      "title": "Espaços pensados para viver e descansar.",
+      "text1": "A casa dispõe de três quartos confortáveis, pensados para acolher diferentes tipos de estadia: um quarto de casal, um quarto com beliche e um quarto individual.",
+      "text2": "No interior, encontrará uma sala de estar acolhedora, com um sofá-cama, uma sala de refeições com caráter rural e uma cozinha totalmente equipada para o dia a dia.",
+      "text3": "No exterior, o Refúgio abre-se em vários ambientes: jardins, zonas de descanso, grelhador ao ar livre e uma churrasqueira com espaço fechado tipo varanda, onde o interior e o exterior se encontram.",
+      "text4": "A piscina privada completa a experiência, oferecendo um espaço perfeito para relaxar ao longo do dia.",
+      "text5": "Para o vosso conforto, encontra também duas casas de banho (uma junto aos quartos e uma entre a piscina e a churrasqueira), e um lavabo onde encontra também uma máquina de lavar e de secar.",
+      "card1Title": "Quarto de casal",
+      "card1Text": "Um espaço calmo e confortável para descansar depois de um dia entre piscina, serra e refeições ao ar livre.",
+      "card1Alt": "Quarto de casal acolhedor",
+      "card11Title": "Quarto com beliche",
+      "card11Text": "Ideal para crianças, amigos ou estadias em família - prático e flexível.",
+      "card11Alt": "Quarto com beliche",
+      "card2Title": "Quarto individual",
+      "card2Text": "Pequeno mas confortável.",
+      "card2Alt": "Quarto individual",
+      "card3Title": "Sala de estar com sofá-cama",
+      "card3Text": "Interior acolhedor para estar, conversar e ou ver televisão no conforto de uma casa vivida com calma.",
+      "card3Alt": "Sala de estar do Refúgio",
+      "card4Title": "Sala de refeições rural",
+      "card4Text": "O espaço mais tradicional da casa, cheio de história, onde várias gerações da família se reuniram à mesa.",
+      "card4Alt": "Sala de refeições do Refúgio",
+      "card5Title": "Cozinha equipada",
+      "card5Text": "Cozinha completa com fogão, forno, micro-ondas e todos os utensílios necessários para o dia a dia.",
+      "card5Alt": "Cozinha do Refúgio",
+      "card6Title": "Zonas de descanso exteriores",
+      "card6Text": "Jardins e vários recantos com cadeiras, mesas e espreguiçadeiras para aproveitar o exterior com calma.",
+      "card6Alt": "Zona de lazer exterior",
+      "card7Title": "Churrasqueira exterior fechada",
+      "card7Text": "Espaço de churrasqueira com paredes de vidro amovíveis, cozinha equipada e área ideal para refeições em família.",
+      "card7Alt": "Churrasqueira fechada",
+      "card8Title": "Piscina privada",
+      "card8Text": "Piscina no jardim, perfeita para relaxar ou aproveitar em família ao longo do dia.",
+      "card8Alt": "Piscina do Refúgio"
+    },
+    "amenities": {
+      "eyebrow": "Comodidades",
+      "title": "Tudo o que precisa para uma estadia confortável e sem preocupações.",
+
+      "comfort": {
+        "title": "Conforto",
+        "item1": "Casa com 179 m² totalmente privada",
+        "item2": "3 quartos (até 6 hóspedes)",
+        "item3": "Sala de estar acolhedora com televisão",
+        "item4": "Aquecimento em toda a casa",
+        "item5": "Roupa de cama e toalhas incluídas"
+      },
+
+      "kitchen": {
+        "title": "Cozinha e refeições",
+        "item1": "Cozinha totalmente equipada para o dia a dia",
+        "item2": "Forno, fogão, micro-ondas, frigorífico e congelador",
+        "item3": "Máquina de café, chaleira, torradeira e máquina de raclette",
+        "item4": "Utensílios completos: pratos, talheres, copos e panelas",
+        "item5": "Zona de refeições interior e exterior",
+        "item6": "Churrasqueira com cozinha equipada e espaço para refeições"
+      },
+
+      "bathroom": {
+        "title": "Casas de banho",
+        "item1": "2 casas de banho com duche e bidet",
+        "item2": "1 lavabo adicional",
+        "item3": "Secador de cabelo disponível"
+      },
+
+      "exterior": {
+        "title": "Exterior",
+        "item1": "Piscina privada (disponível na estação quente)",
+        "item2": "Espreguiçadeiras e guarda-sóis",
+        "item3": "Jardins e várias zonas de descanso",
+        "item4": "Grelhador exterior",
+        "item5": "Vista para a serra e envolvente natural"
+      },
+
+      "technology": {
+        "title": "Tecnologia e entretenimento",
+        "item1": "Wi-Fi gratuito com hotspot portátil",
+        "item2": "Televisões na sala, churrasqueira e quarto de beliche",
+        "item3": "Canais nacionais por cabo"
+      },
+
+      "family": {
+        "title": "Família",
+        "item1": "Alguns equipamentos para bebés disponíveis (cadeira e proteções de tomadas)",
+        "item2": "Piscina com boias e acessórios para lazer",
+        "item3": "Espaços amplos ideais para famílias"
+      },
+
+      "accessibility": {
+        "title": "Acessibilidade",
+        "item1": "Casa maioritariamente ao nível do rés-do-chão",
+        "item2": "Acesso relativamente fácil para pessoas com mobilidade reduzida",
+        "item3": "Ambiente rural não totalmente adaptado a cadeiras de rodas"
+      },
+
+      "services": {
+        "title": "Serviços",
+        "item1": "Estacionamento privado gratuito e vigiado",
+        "item2": "Possibilidade de emissão de fatura com NIF",
+        "item3": "Aluguer de bicicletas disponível"
+      },
+
+      "rules": {
+        "title": "Informações importantes",
+        "item1": "Alojamento não fumador (com áreas exteriores dedicadas)",
+        "item2": "Equipado com extintores, detetores de fumo e sistema de segurança",
+        "item3": "Câmaras de vigilância no exterior para maior segurança"
+      }
+    },
+    "practical": {
+      "eyebrow": "Antes de reservar",
+      "title": "Informações essenciais da estadia",
+
+      "stay": {
+        "title": "Estadia",
+        "item1": "Capacidade máxima: 6 hóspedes",
+        "item2": "Estadia mínima: 2 noites",
+        "item3": "Casa totalmente privada (não partilhada)"
+      },
+
+      "checkin": {
+        "title": "Check-in e check-out",
+        "item1": "Check-in: 15h00 – 19h00",
+        "item2": "Check-out: 08h00 – 10h00",
+        "item3": "Horários diferentes sujeitos a confirmação prévia",
+        "note": "Pedimos que indique a hora de chegada e saída com antecedência."
+      },
+
+      "booking": {
+        "title": "Reserva e cancelamento",
+        "item1": "Cancelamento gratuito até 48h antes do check-in",
+        "item2": "Após esse prazo, poderá ser cobrado o valor total da estadia"
+      },
+
+      "rules": {
+        "title": "Regras principais",
+        "item1": "Proibidas festas ou eventos",
+        "item2": "Número de hóspedes não pode ser excedido",
+        "item3": "Não são permitidos animais",
+        "item4": "Não é permitido fumar no interior"
+      },
+
+      "practical": {
+        "title": "Informações úteis",
+        "item1": "Depósito de segurança solicitado no check-in",
+        "item2": "Documento de identificação obrigatório",
+        "item3": "Estacionamento gratuito disponível no local",
+        "item4": "Idiomas: Português, Francês, Inglês e Espanhol"
+      }
+    },
+    "finalCta": {
+      "eyebrow": "Reservas",
+      "title": "Pronto para a sua escapadinha?",
+      "text": "Escolha as suas datas e reserve o Refúgio para uma estadia tranquila, privada e sem complicações.",
+      "cta": "Ver disponibilidade"
+    }
+  }
 }
