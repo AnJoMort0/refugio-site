@@ -3,26 +3,427 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>reservas | Refúgio Rural</title>
+  <title data-i18n="bookingPage.meta.title">Refúgio | Reservas</title>
+  <meta
+    name="description"
+    content="Consulte a disponibilidade do Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
+    data-i18n-attr='{"content":"bookingPage.meta.description"}'
+  />
   <link rel="stylesheet" href="./css/reset.css" />
   <link rel="stylesheet" href="./css/variables.css" />
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/layout.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/mobile.css" />
+  <link rel="stylesheet" href="./css/pages/reservas.css" />
 </head>
 <body data-page="booking">
   <div data-site-header></div>
-  <main class="simple-page">
-    <div class="container narrow">
-      <p class="eyebrow">Placeholder</p>
-      <h1>reservas</h1>
-      <p>Esta página será construída numa etapa seguinte.</p>
-      <a class="button button-primary" href="./index.html">Voltar à homepage</a>
-    </div>
+
+  <main class="booking-page">
+    <section class="section booking-page-intro">
+      <div class="container content-column">
+        <p class="eyebrow" data-i18n="bookingPage.hero.eyebrow">Reservas</p>
+        <h1 data-i18n="bookingPage.hero.title">Escolha as datas e prepare a sua estadia.</h1>
+        <p data-i18n="bookingPage.hero.text">Consulte a disponibilidade do Refúgio, escolha as datas da estadia e envie o seu pedido de reserva.</p>
+      </div>
+    </section>
+
+    <section class="section booking-workspace-section">
+      <div class="container booking-layout">
+        <form id="booking-form" class="booking-form" action="./reserva-enviada.html" method="get" novalidate>
+          <article class="booking-card booking-card-primary">
+            <div class="booking-card-header">
+              <p class="eyebrow" data-i18n="bookingPage.availability.eyebrow">Disponibilidade</p>
+              <h2 data-i18n="bookingPage.availability.title">Escolha as datas da sua estadia.</h2>
+              <p data-i18n="bookingPage.availability.text">As datas assinaladas como ocupadas não podem ser reservadas. A estadia mínima é de 2 noites.</p>
+            </div>
+
+            <div class="booking-date-fields">
+              <label class="field">
+                <span><span data-i18n="bookingPage.form.checkinLabel">Check-in</span><span class="required-mark" aria-hidden="true">*</span></span>
+                <input id="checkin-date" name="checkin" type="date" required />
+              </label>
+              <label class="field">
+                <span><span data-i18n="bookingPage.form.checkoutLabel">Check-out</span><span class="required-mark" aria-hidden="true">*</span></span>
+                <input id="checkout-date" name="checkout" type="date" required />
+              </label>
+            </div>
+
+            <p class="field-hint" data-i18n="bookingPage.form.dateHelp">Selecione datas livres. Amanhã só pode ser reservado antes das 15h00 (hora de Portugal continental).</p>
+
+            <div class="calendar-legend" aria-label="Legenda do calendário">
+              <span><i class="legend-swatch is-available"></i><span data-i18n="bookingPage.availability.legendAvailable">Disponível</span></span>
+              <span><i class="legend-swatch is-occupied"></i><span data-i18n="bookingPage.availability.legendOccupied">Ocupado</span></span>
+              <span><i class="legend-swatch is-selected"></i><span data-i18n="bookingPage.availability.legendSelected">Seleção</span></span>
+            </div>
+
+            <div id="availability-calendar" class="availability-calendar" aria-live="polite"></div>
+          </article>
+
+          <article class="booking-card">
+            <div class="booking-card-header">
+              <p class="eyebrow" data-i18n="bookingPage.guests.eyebrow">Hóspedes</p>
+              <h2 data-i18n="bookingPage.guests.title">Quem vai ficar no Refúgio?</h2>
+            </div>
+
+            <div class="guest-count-grid">
+              <label class="field">
+                <span><span data-i18n="bookingPage.form.adultsLabel">Adultos</span><span class="required-mark" aria-hidden="true">*</span></span>
+                <input id="adult-count" name="adults" type="number" min="1" max="6" step="1" value="2" required />
+              </label>
+              <label class="field">
+                <span data-i18n="bookingPage.form.kidsLabel">Crianças</span>
+                <input id="child-count" name="children" type="number" min="0" max="5" step="1" value="0" />
+              </label>
+            </div>
+
+            <p class="field-hint" data-i18n="bookingPage.form.guestCountHelp">Máximo de 6 hóspedes no total. As crianças correspondem a idades entre 0 e 12 anos.</p>
+
+            <div id="bed-preference-group" class="dynamic-group" hidden>
+              <div class="dynamic-group-header">
+                <h3><span data-i18n="bookingPage.form.bedPreferenceTitle">Configuração das camas</span><span class="required-mark" aria-hidden="true">*</span></h3>
+              </div>
+              <div class="booking-choice-grid" role="radiogroup" aria-label="Configuração das camas">
+                <label class="booking-choice-card">
+                  <input type="radio" name="bed_preference" value="double" />
+                  <span class="booking-choice-copy">
+                    <strong data-i18n="bookingPage.form.bedPreferenceDouble">Preferimos cama de casal</strong>
+                    <small data-i18n="bookingPage.form.bedPreferenceDoubleHelp">Usar a única cama de casal disponível na propriedade.</small>
+                  </span>
+                </label>
+                <label class="booking-choice-card">
+                  <input type="radio" name="bed_preference" value="single" />
+                  <span class="booking-choice-copy">
+                    <strong data-i18n="bookingPage.form.bedPreferenceSingle">Preferimos camas individuais</strong>
+                    <small data-i18n="bookingPage.form.bedPreferenceSingleHelp">Organizar a estadia sem utilizar a cama de casal.</small>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div id="child-ages-group" class="dynamic-group" hidden>
+              <div class="dynamic-group-header">
+                <h3 data-i18n="bookingPage.form.childAgesTitle">Idade das crianças</h3>
+                <p data-i18n="bookingPage.form.childAgesText">Indique a idade de cada criança no momento da estadia.</p>
+              </div>
+              <div id="child-ages-fields" class="dynamic-grid compact-age-grid"></div>
+            </div>
+
+            <div class="dynamic-group">
+              <div class="dynamic-group-header">
+                <h3 data-i18n="bookingPage.form.guestNamesTitle">Nome dos hóspedes</h3>
+                <p data-i18n="bookingPage.form.guestNamesText">Indique o nome completo de cada hóspede exatamente como consta no documento de identificação.</p>
+              </div>
+              <div id="guest-name-fields" class="dynamic-grid"></div>
+            </div>
+          </article>
+
+          <article class="booking-card">
+            <div class="booking-card-header">
+              <p class="eyebrow" data-i18n="bookingPage.details.eyebrow">Detalhes</p>
+              <h2 data-i18n="bookingPage.details.title">Preferências e informações adicionais.</h2>
+            </div>
+
+            <div class="dynamic-group">
+              <div class="dynamic-group-header">
+                <h3 data-i18n="bookingPage.form.contactTitle">Contacto e confirmação</h3>
+              </div>
+
+              <div class="booking-contact-grid">
+                <label class="field">
+                  <span><span data-i18n="bookingPage.form.emailLabel">Email do responsável pela reserva</span><span class="required-mark" aria-hidden="true">*</span></span>
+                  <input
+                    id="contact-email"
+                    name="contact_email"
+                    type="email"
+                    autocomplete="email"
+                    required
+                    placeholder="nome@exemplo.com"
+                    data-i18n-attr='{"placeholder":"bookingPage.form.emailPlaceholder"}'
+                  />
+                </label>
+                <label class="field">
+                  <span data-i18n="bookingPage.form.phoneLabel">Telefone com indicativo internacional</span>
+                  <input
+                    id="contact-phone"
+                    name="contact_phone"
+                    type="tel"
+                    autocomplete="tel"
+                    placeholder="+351 912 345 678"
+                    data-i18n-attr='{"placeholder":"bookingPage.form.phonePlaceholder"}'
+                  />
+                </label>
+              </div>
+
+              <p class="field-hint field-warning" data-i18n="bookingPage.form.confirmationWarning">A reserva será tratada por email. É por aí que seguirá a confirmação, os esclarecimentos pedidos e a conta para a transferência. Sem transferência concluída, a reserva não fica confirmada.</p>
+            </div>
+
+            <div class="booking-time-grid">
+              <label class="field">
+                <span data-i18n="bookingPage.form.checkinTimeLabel">Hora prevista de check-in</span>
+                <input id="checkin-time" name="checkin_time" type="time" min="15:00" max="19:00" />
+              </label>
+              <label class="field">
+                <span data-i18n="bookingPage.form.checkoutTimeLabel">Hora prevista de check-out</span>
+                <input id="checkout-time" name="checkout_time" type="time" min="08:00" max="10:00" />
+              </label>
+            </div>
+
+            <p class="field-hint" data-i18n="bookingPage.form.timeHelp">Se não for possível indicar agora, terá que nos informar das horas com pelo menos 48h de antecedência, para podermos preapar a vossa estadia.</p>
+            <p class="field-hint" data-i18n="bookingPage.form.timeRangeHelp">Check-in entre as 15h00 e as 19h00. Check-out entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.</p>
+            <p class="field-hint field-warning" data-i18n="bookingPage.form.timezoneWarning">Atenção ao fuso horário de Portugal continental (1h mais cedo do que Espanha, França, Suíça e Suécia).</p>
+
+            <label class="booking-toggle">
+              <input id="deposit-prepay" name="deposit_prepay" type="checkbox" />
+              <span class="booking-toggle-control" aria-hidden="true"></span>
+              <span class="booking-toggle-copy">
+                <strong data-i18n="bookingPage.form.depositToggleLabel">Pretendo adiantar o depósito de segurança com a reserva</strong>
+                <small data-i18n="bookingPage.form.depositToggleHelp">Por defeito, o depósito de 200€ é entregue em numerário no check-in. Se selecionar esta opção, poderá indicar que prefere incluí-lo logo na transferência para a reserva.</small>
+              </span>
+            </label>
+
+            <label class="field field-textarea">
+              <span data-i18n="bookingPage.form.commentsLabel">Comentários ou pedidos especiais</span>
+              <textarea
+                id="reservation-comments"
+                name="comments"
+                rows="5"
+                placeholder="Ex.: horário extraordinários de chegada, pedidos, dúvida sobre acessos,..."
+                data-i18n-attr='{"placeholder":"bookingPage.form.commentsPlaceholder"}'
+              ></textarea>
+            </label>
+
+            <div id="booking-form-status" class="booking-form-status" role="alert" hidden></div>
+
+            <label class="booking-confirmation">
+              <input id="rules-confirmation" name="rules_confirmation" type="checkbox" required />
+              <span class="booking-confirmation-control" aria-hidden="true"></span>
+              <span class="booking-confirmation-copy">
+                <strong><span data-i18n="bookingPage.form.rulesConfirmLabel">Confirmo que li e aceito as regras da casa</span><span class="required-mark" aria-hidden="true">*</span></strong>
+                <small>
+                  <span data-i18n="bookingPage.form.rulesConfirmHelp">Leia as condições completas antes de enviar o pedido.</span>
+                  <a class="text-link inline-text-link" href="#booking-rules" data-i18n="bookingPage.form.rulesLink">Ver regras</a>
+                </small>
+              </span>
+            </label>
+
+            <div class="booking-form-actions">
+              <button class="button booking-submit-button" type="submit" data-i18n="bookingPage.form.submit">Enviar pedido de reserva</button>
+              <button class="button booking-reset-button" type="button" id="booking-reset" data-i18n="bookingPage.form.reset">Limpar seleção</button>
+            </div>
+          </article>
+        </form>
+
+        <aside class="booking-sidebar">
+          <article class="booking-card booking-summary-card">
+            <div class="booking-card-header">
+              <p class="eyebrow" data-i18n="bookingPage.summary.eyebrow">Resumo</p>
+              <h2 data-i18n="bookingPage.summary.title">Estimativa atual da estadia.</h2>
+              <p data-i18n="bookingPage.summary.text">Valores de referência para o desenho da página. Pode substituir estes montantes mais tarde.</p>
+            </div>
+
+            <dl class="summary-rates">
+              <div>
+                <dt data-i18n="bookingPage.summary.rateAdultLabel">Adulto / noite</dt>
+                <dd data-price-adult>48€</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingPage.summary.rateChildLabel">Criança / noite</dt>
+                <dd data-price-child>28€</dd>
+              </div>
+              <div id="summary-deposit-rate" hidden>
+                <dt data-i18n="bookingPage.summary.depositLabel">Depósito de segurança</dt>
+                <dd data-price-deposit>200€</dd>
+              </div>
+            </dl>
+
+            <dl class="summary-breakdown">
+              <div>
+                <dt data-i18n="bookingPage.summary.nightsLabel">Noites</dt>
+                <dd id="summary-nights">0</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingPage.summary.guestsLabel">Hóspedes</dt>
+                <dd id="summary-guests">2</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingPage.summary.adultsLabel">Adultos</dt>
+                <dd id="summary-adults">2</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingPage.summary.kidsLabel">Crianças</dt>
+                <dd id="summary-kids">0</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingPage.summary.depositChoiceLabel">Depósito com a reserva</dt>
+                <dd id="summary-deposit-choice">Não</dd>
+              </div>
+              <div id="summary-bed-preference-row" hidden>
+                <dt data-i18n="bookingPage.summary.bedPreferenceLabel">Camas</dt>
+                <dd id="summary-bed-preference">-</dd>
+              </div>
+            </dl>
+
+            <div class="summary-total">
+              <span data-i18n="bookingPage.summary.estimatedTotalLabel">Total estimado</span>
+              <strong id="summary-total">0€</strong>
+            </div>
+
+            <p class="summary-note" data-i18n="bookingPage.summary.note">O valor final poderá variar consoante as datas, o número de hóspedes e eventuais condições adicionais.</p>
+            <p id="summary-deposit-note" class="summary-note" data-i18n="bookingPage.summary.depositNote" hidden>Se adiantar o depósito de segurança, os 200€ serão devolvidos no check-out após verificação do espaço.</p>
+          </article>
+
+          <article class="booking-card booking-contact-card">
+            <div class="booking-card-header">
+              <p class="eyebrow" data-i18n="bookingPage.contact.eyebrow">Contacto</p>
+              <h2 data-i18n="bookingPage.contact.title">Prefere confirmar detalhes primeiro?</h2>
+              <p data-i18n="bookingPage.contact.text">Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode abrir a página de contacto antes de enviar a reserva.</p>
+            </div>
+            <a class="button booking-contact-button" href="./contacto.html" data-i18n="bookingPage.contact.button">Abrir página de contacto</a>
+          </article>
+
+          <article class="booking-card booking-highlights-card">
+            <div class="booking-card-header">
+              <p class="eyebrow" data-i18n="bookingPage.highlights.eyebrow">Antes de enviar</p>
+              <h2 data-i18n="bookingPage.highlights.title">Pontos essenciais da reserva.</h2>
+            </div>
+            <ul class="booking-highlight-list">
+              <li data-i18n="bookingPage.highlights.item1">Estadia mínima de 2 noites</li>
+              <li data-i18n="bookingPage.highlights.item2">Máximo de 6 hóspedes</li>
+              <li data-i18n="bookingPage.highlights.item3">Documento de identificação obrigatório</li>
+              <li data-i18n="bookingPage.highlights.item4">Cancelamento gratuito até 48h antes do check-in</li>
+            </ul>
+          </article>
+        </aside>
+      </div>
+    </section>
+
+    <section id="booking-rules" class="section section-alt booking-rules-section">
+      <div class="container">
+        <div class="section-heading content-column">
+          <p class="eyebrow" data-i18n="rulesFull.eyebrow">Regras e condições</p>
+          <h2 data-i18n="rulesFull.title">Condições da estadia</h2>
+        </div>
+
+        <div class="rules-grid">
+          <article class="rule-card">
+            <h3 data-i18n="rulesFull.capacity.title">Capacidade e ocupação</h3>
+            <ul>
+              <li data-i18n="rulesFull.capacity.item1">Capacidade máxima: 6 hóspedes</li>
+              <li data-i18n="rulesFull.capacity.item2">Não é permitido exceder o número de hóspedes reservados</li>
+              <li data-i18n="rulesFull.capacity.item3">O cumprimento poderá ser verificado através de câmaras exteriores</li>
+            </ul>
+            <p class="rule-note rule-note-warning" data-i18n="rulesFull.capacity.note">O incumprimento poderá resultar na intervenção das autoridades e numa coima entre 500€ e 2500€.</p>
+          </article>
+
+          <article class="rule-card">
+            <h3 data-i18n="rulesFull.checkin.title">Check-in e check-out</h3>
+            <ul>
+              <li data-i18n="rulesFull.checkin.item1">Check-in: 15h00 – 19h00</li>
+              <li data-i18n="rulesFull.checkin.item2">Check-out: 08h00 – 10h00</li>
+              <li data-i18n="rulesFull.checkin.item3">Deve indicar a hora de chegada e saída com pelo menos 48h de antecedência</li>
+              <li data-i18n="rulesFull.checkin.item4">Horários fora destes períodos podem ser possíveis mediante contacto prévio</li>
+            </ul>
+            <p class="rule-note" data-i18n="rulesFull.checkin.note">Poderão ser aplicadas taxas adicionais fora do horário definido.</p>
+          </article>
+
+          <article class="rule-card">
+            <h3 data-i18n="rulesFull.reservation.title">Reserva e cancelamento</h3>
+            <ul>
+              <li data-i18n="rulesFull.reservation.item1">Cancelamento gratuito até 48h antes do horário de check-in</li>
+              <li data-i18n="rulesFull.reservation.item2">Após esse prazo, será cobrado o valor total da estadia</li>
+              <li data-i18n="rulesFull.reservation.item3">A reserva implica a aceitação de todas as condições</li>
+            </ul>
+          </article>
+
+          <article class="rule-card">
+            <h3 data-i18n="rulesFull.deposit.title">Depósito de segurança</h3>
+            <ul>
+              <li data-i18n="rulesFull.deposit.item1">Depósito a partir de 200€ pago em numerário no check-in</li>
+              <li data-i18n="rulesFull.deposit.item2">O valor pode variar consoante o número de hóspedes ou circunstâncias</li>
+              <li data-i18n="rulesFull.deposit.item3">Reembolsado no check-out após verificação do espaço</li>
+            </ul>
+          </article>
+
+          <article class="rule-card">
+            <h3 data-i18n="rulesFull.identification.title">Identificação</h3>
+            <ul>
+              <li data-i18n="rulesFull.identification.item1">Documento de identificação obrigatório para todos os hóspedes</li>
+              <li data-i18n="rulesFull.identification.item2">Os dados poderão ser registados para fins legais e de segurança</li>
+            </ul>
+          </article>
+
+          <article class="rule-card">
+            <h3 data-i18n="rulesFull.parking.title">Estacionamento</h3>
+            <ul>
+              <li data-i18n="rulesFull.parking.item1">Estacionamento gratuito e vigiado disponível</li>
+              <li data-i18n="rulesFull.parking.item2">Não é permitido estacionar dentro da propriedade (apenas cargas e descargas)</li>
+            </ul>
+            <p class="rule-note" data-i18n="rulesFull.parking.note">Danos ou resíduos causados por veículos dentro da propriedade poderão ser descontados no depósito</p>
+          </article>
+
+          <article class="rule-card rule-card-alert">
+            <h3 data-i18n="rulesFull.rules.title">Regras de utilização</h3>
+            <ul>
+              <li data-i18n="rulesFull.rules.item1">PROIBIDAS festas ou eventos de qualquer tipo</li>
+              <li data-i18n="rulesFull.rules.item2">Especialmente proibidas despedidas de solteiro(a) e festas de aniversário</li>
+              <li data-i18n="rulesFull.rules.item3">A propriedade destina-se a descanso e tranquilidade</li>
+              <li data-i18n="rulesFull.rules.item4">Não são permitidos animais de estimação</li>
+            </ul>
+          </article>
+
+          <article class="rule-card">
+            <h3 data-i18n="rulesFull.smoking.title">Política de fumadores</h3>
+            <ul>
+              <li data-i18n="rulesFull.smoking.item1">Proibido fumar no interior de todos os edifícios</li>
+              <li data-i18n="rulesFull.smoking.item2">Permitido apenas nas zonas exteriores indicadas por cinzeiros</li>
+            </ul>
+            <p class="rule-note rule-note-warning" data-i18n="rulesFull.smoking.note">O incumprimento pode implicar custos adicionais e riscos de incêndio.</p>
+          </article>
+
+          <article class="rule-card">
+            <h3 data-i18n="rulesFull.cleaning.title">Utilização e limpeza</h3>
+            <ul>
+              <li data-i18n="rulesFull.cleaning.item1">Todos os utensílios devem ser lavados após utilização</li>
+              <li data-i18n="rulesFull.cleaning.item2">Devem ser colocados novamente no seu local</li>
+            </ul>
+            <p class="rule-note" data-i18n="rulesFull.cleaning.note">O não cumprimento poderá implicar custos adicionais de limpeza.</p>
+          </article>
+
+          <article class="rule-card">
+            <h3 data-i18n="rulesFull.pool.title">Piscina</h3>
+            <ul>
+              <li data-i18n="rulesFull.pool.item1">Piscina disponível na estação quente</li>
+              <li data-i18n="rulesFull.pool.item2">Inclui boias e acessórios de lazer</li>
+            </ul>
+            <p class="rule-note" data-i18n="rulesFull.pool.note">A utilização é da inteira responsabilidade dos hóspedes.</p>
+          </article>
+
+          <article class="rule-card">
+            <h3 data-i18n="rulesFull.security.title">Segurança e videovigilância</h3>
+            <ul>
+              <li data-i18n="rulesFull.security.item1">A propriedade dispõe de câmaras de segurança</li>
+              <li data-i18n="rulesFull.security.item2">Durante a estadia, apenas as câmaras interiores encontram-se desativadas</li>
+            </ul>
+            <p class="rule-note" data-i18n="rulesFull.security.note">As câmaras existem exclusivamente para segurança da propriedade.</p>
+          </article>
+
+          <article class="rule-card">
+            <h3 data-i18n="rulesFull.legal.title">Informação legal</h3>
+            <ul>
+              <li data-i18n="rulesFull.legal.item1">Licença de Alojamento Local: 132647/AL</li>
+              <li data-i18n="rulesFull.legal.item2">Faturas com NIF disponíveis mediante pedido</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
   </main>
+
   <div data-site-footer></div>
   <div data-sticky-booking></div>
+
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>

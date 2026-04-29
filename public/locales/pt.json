@@ -116,6 +116,210 @@
       "zoomReset": "Repor zoom"
     }
   },
+  "bookingPage": {
+    "meta": {
+      "title": "Refúgio | Reservas",
+      "description": "Consulte a disponibilidade do Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
+    },
+    "hero": {
+      "eyebrow": "Reservas",
+      "title": "Escolha as datas e prepare a sua estadia.",
+      "text": "Consulte a disponibilidade do Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
+    },
+    "availability": {
+      "eyebrow": "Disponibilidade",
+      "title": "Escolha as datas da sua estadia.",
+      "text": "As datas assinaladas como ocupadas não podem ser reservadas. A estadia mínima é de 2 noites.",
+      "legendAvailable": "Disponível",
+      "legendOccupied": "Ocupado",
+      "legendSelected": "Seleção",
+      "todayButton": "Hoje",
+      "previousMonths": "Ver meses anteriores",
+      "nextMonths": "Ver meses seguintes"
+    },
+    "guests": {
+      "eyebrow": "Hóspedes",
+      "title": "Quem vai ficar no Refúgio?"
+    },
+    "details": {
+      "eyebrow": "Detalhes",
+      "title": "Preferências e informações adicionais."
+    },
+    "form": {
+      "checkinLabel": "Check-in",
+      "checkoutLabel": "Check-out",
+      "dateHelp": "Selecione datas livres. Amanhã só pode ser reservado antes das 15h00 (hora de Portugal continental).",
+      "adultsLabel": "Adultos",
+      "kidsLabel": "Crianças",
+      "guestCountHelp": "Máximo de 6 hóspedes no total. As crianças correspondem a idades entre 0 e 12 anos.",
+      "bedPreferenceTitle": "Configuração das camas",
+      "bedPreferenceDouble": "Preferimos cama de casal",
+      "bedPreferenceDoubleHelp": "Usar a única cama de casal disponível na propriedade.",
+      "bedPreferenceSingle": "Preferimos camas individuais",
+      "bedPreferenceSingleHelp": "Organizar a estadia sem utilizar a cama de casal.",
+      "childAgesTitle": "Idade das crianças",
+      "childAgesText": "Indique a idade de cada criança no momento da estadia.",
+      "childAgeLabel": "Idade da criança",
+      "guestNamesTitle": "Nome dos hóspedes",
+      "guestNamesText": "Indique o nome completo de cada hóspede exatamente como consta no documento de identificação.",
+      "guestNameLabel": "Nome do hóspede",
+      "contactTitle": "Contacto e confirmação",
+      "emailLabel": "Email do responsável pela reserva",
+      "emailPlaceholder": "nome@exemplo.com",
+      "phoneLabel": "Telefone com indicativo internacional",
+      "phonePlaceholder": "+351 912 345 678",
+      "confirmationWarning": "A reserva será tratada por email. É por aí que seguirá a confirmação, os esclarecimentos pedidos e a conta para a transferência. Sem transferência concluída, a reserva não fica confirmada.",
+      "checkinTimeLabel": "Hora prevista de check-in",
+      "checkoutTimeLabel": "Hora prevista de check-out",
+      "timeHelp": "Se não for possível indicar agora, terá que nos informar das horas com pelo menos 48h de antecedência, para podermos preapar a vossa estadia.",
+      "timeRangeHelp": "Check-in entre as 15h00 e as 19h00. Check-out entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.",
+      "timezoneWarning": "Atenção ao fuso horário de Portugal continental (1h mais cedo do que Espanha, França, Suíça e Suécia).",
+      "depositToggleLabel": "Pretendo adiantar o depósito de segurança com a reserva",
+      "depositToggleHelp": "Por defeito, o depósito de 200€ é entregue em numerário no check-in. Se selecionar esta opção, poderá indicar que prefere incluí-lo logo na transferência para a reserva.",
+      "commentsLabel": "Comentários ou pedidos especiais",
+      "commentsPlaceholder": "Ex.: horário extraordinários de chegada, pedidos, dúvida sobre acessos,...",
+      "rulesConfirmLabel": "Confirmo que li e aceito as regras da casa",
+      "rulesConfirmHelp": "Leia as condições completas antes de enviar o pedido.",
+      "rulesLink": "Ver regras",
+      "submit": "Enviar pedido de reserva",
+      "reset": "Limpar seleção"
+    },
+    "summary": {
+      "eyebrow": "Resumo",
+      "title": "Estimativa atual da estadia.",
+      "text": "Valores de referência para o desenho da página. Pode substituir estes montantes mais tarde.",
+      "rateAdultLabel": "Adulto / noite",
+      "rateChildLabel": "Criança / noite",
+      "depositLabel": "Depósito de segurança",
+      "nightsLabel": "Noites",
+      "guestsLabel": "Hóspedes",
+      "adultsLabel": "Adultos",
+      "kidsLabel": "Crianças",
+      "bedPreferenceLabel": "Camas",
+      "bedPreferenceDouble": "Cama de casal",
+      "bedPreferenceSingle": "Camas individuais",
+      "bedPreferencePending": "Por indicar",
+      "depositChoiceLabel": "Depósito com a reserva",
+      "depositChoiceYes": "Sim",
+      "depositChoiceNo": "Não",
+      "estimatedTotalLabel": "Total estimado",
+      "note": "O valor final poderá variar consoante as datas, o número de hóspedes e eventuais condições adicionais.",
+      "depositNote": "Se adiantar o depósito de segurança, os 200€ serão devolvidos no check-out após verificação do espaço."
+    },
+    "contact": {
+      "eyebrow": "Contacto",
+      "title": "Prefere confirmar detalhes primeiro?",
+      "text": "Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode abrir a página de contacto antes de enviar a reserva.",
+      "button": "Abrir página de contacto"
+    },
+    "highlights": {
+      "eyebrow": "Antes de enviar",
+      "title": "Pontos essenciais da reserva.",
+      "item1": "Estadia mínima de 2 noites",
+      "item2": "Máximo de 6 hóspedes",
+      "item3": "Documento de identificação obrigatório",
+      "item4": "Cancelamento gratuito até 48h antes do check-in"
+    },
+    "validation": {
+      "chooseCheckout": "Agora escolha a data de check-out.",
+      "chooseLaterCheckout": "Escolha um check-out pelo menos 2 noites depois.",
+      "datesRequired": "Selecione as datas de check-in e check-out.",
+      "dateUnavailable": "A data escolhida não está disponível.",
+      "checkinTooSoon": "A primeira data disponível para chegada já teve em conta a regra de hoje / amanhã em hora de Portugal.",
+      "checkoutTooSoon": "Escolha uma data de check-out válida para uma estadia mínima de 2 noites.",
+      "minStay": "A estadia mínima é de 2 noites.",
+      "occupiedRange": "O intervalo escolhido inclui datas ocupadas.",
+      "minimumAdults": "É necessário pelo menos 1 adulto.",
+      "maxGuests": "O máximo permitido é 6 hóspedes no total.",
+      "bedPreferenceRequired": "Escolha se preferem cama de casal ou camas individuais.",
+      "emailRequired": "Indique o email do responsável pela reserva.",
+      "emailInvalid": "Indique um endereço de email válido.",
+      "phoneInvalid": "Indique um telefone válido com indicativo internacional, começando por + ou 00.",
+      "checkinTimeInvalid": "O check-in deve estar entre as 15h00 e as 19h00. Se precisar de outro horário, indique esse pedido nos comentários.",
+      "checkoutTimeInvalid": "O check-out deve estar entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.",
+      "childAgeRequired": "Indique a idade de cada criança.",
+      "guestNamesRequired": "Indique o nome completo de todos os hóspedes.",
+      "rulesConfirmationRequired": "Confirme que leu e aceita as regras da casa."
+    }
+  },
+  "rulesFull": {
+    "eyebrow": "Regras e condições",
+    "title": "Condições da estadia",
+    "capacity": {
+      "title": "Capacidade e ocupação",
+      "item1": "Capacidade máxima: 6 hóspedes",
+      "item2": "Não é permitido exceder o número de hóspedes reservados",
+      "item3": "O cumprimento poderá ser verificado através de câmaras exteriores",
+      "note": "O incumprimento poderá resultar na intervenção das autoridades e numa coima entre 500€ e 2500€."
+    },
+    "checkin": {
+      "title": "Check-in e check-out",
+      "item1": "Check-in: 15h00 – 19h00",
+      "item2": "Check-out: 08h00 – 10h00",
+      "item3": "Deve indicar a hora de chegada e saída com pelo menos 48h de antecedência",
+      "item4": "Horários fora destes períodos podem ser possíveis mediante contacto prévio",
+      "note": "Poderão ser aplicadas taxas adicionais fora do horário definido."
+    },
+    "reservation": {
+      "title": "Reserva e cancelamento",
+      "item1": "Cancelamento gratuito até 48h antes do horário de check-in",
+      "item2": "Após esse prazo, será cobrado o valor total da estadia",
+      "item3": "A reserva implica a aceitação de todas as condições"
+    },
+    "deposit": {
+      "title": "Depósito de segurança",
+      "item1": "Depósito a partir de 200€ pago em numerário no check-in",
+      "item2": "O valor pode variar consoante o número de hóspedes ou circunstâncias",
+      "item3": "Reembolsado no check-out após verificação do espaço"
+    },
+    "identification": {
+      "title": "Identificação",
+      "item1": "Documento de identificação obrigatório para todos os hóspedes",
+      "item2": "Os dados poderão ser registados para fins legais e de segurança"
+    },
+    "parking": {
+      "title": "Estacionamento",
+      "item1": "Estacionamento gratuito e vigiado disponível",
+      "item2": "Não é permitido estacionar dentro da propriedade (apenas cargas e descargas)",
+      "note": "Danos ou resíduos causados por veículos dentro da propriedade poderão ser descontados no depósito"
+    },
+    "rules": {
+      "title": "Regras de utilização",
+      "item1": "PROIBIDAS festas ou eventos de qualquer tipo",
+      "item2": "Especialmente proibidas despedidas de solteiro(a) e festas de aniversário",
+      "item3": "A propriedade destina-se a descanso e tranquilidade",
+      "item4": "Não são permitidos animais de estimação"
+    },
+    "smoking": {
+      "title": "Política de fumadores",
+      "item1": "Proibido fumar no interior de todos os edifícios",
+      "item2": "Permitido apenas nas zonas exteriores indicadas por cinzeiros",
+      "note": "O incumprimento pode implicar custos adicionais e riscos de incêndio."
+    },
+    "cleaning": {
+      "title": "Utilização e limpeza",
+      "item1": "Todos os utensílios devem ser lavados após utilização",
+      "item2": "Devem ser colocados novamente no seu local",
+      "note": "O não cumprimento poderá implicar custos adicionais de limpeza."
+    },
+    "pool": {
+      "title": "Piscina",
+      "item1": "Piscina disponível na estação quente",
+      "item2": "Inclui boias e acessórios de lazer",
+      "note": "A utilização é da inteira responsabilidade dos hóspedes."
+    },
+    "security": {
+      "title": "Segurança e videovigilância",
+      "item1": "A propriedade dispõe de câmaras de segurança",
+      "item2": "Durante a estadia, apenas as câmaras interiores encontram-se desativadas",
+      "note": "As câmaras interiores existem exclusivamente para segurança da propriedade fora de estação."
+    },
+    "legal": {
+      "title": "Informação legal",
+      "item1": "Licença de Alojamento Local: 132647/AL",
+      "item2": "Faturas com NIF disponíveis mediante pedido"
+    }
+  },
   "footer": {
     "copyright": "© Refúgio — Família Rodrigues",
     "admin": "Área de gestão"

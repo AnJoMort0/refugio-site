@@ -5,6 +5,7 @@ import { initCarousels } from './ui/carousels.js';
 import { initHomePage } from './pages/home.js';
 import { initAccommodationPage } from './pages/accommodation.js';
 import { initGalleryPage } from './pages/gallery.js';
+import { initBookingPage } from './pages/booking.js';
 
 renderSiteShell();
 await initI18n();
@@ -13,3 +14,4 @@ initCarousels();
 initHomePage();
 initAccommodationPage();
 await initGalleryPage();
+await initBookingPage();
