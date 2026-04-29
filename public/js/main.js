@@ -6,6 +6,7 @@ import { initHomePage } from './pages/home.js';
 import { initAccommodationPage } from './pages/accommodation.js';
 import { initGalleryPage } from './pages/gallery.js';
 import { initBookingPage } from './pages/booking.js';
+import { initBookingSentPage } from './pages/booking-sent.js';
 
 renderSiteShell();
 await initI18n();
@@ -15,3 +16,4 @@ initHomePage();
 initAccommodationPage();
 await initGalleryPage();
 await initBookingPage();
+await initBookingSentPage();

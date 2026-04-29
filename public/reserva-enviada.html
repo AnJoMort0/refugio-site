@@ -3,26 +3,159 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>reserva-enviada | Refúgio Rural</title>
+  <title data-i18n="bookingSentPage.meta.title">Refúgio | Pedido de reserva enviado</title>
+  <meta
+    name="description"
+    content="Resumo do pedido de reserva enviado para o Refúgio e próximos passos de confirmação por email."
+    data-i18n-attr='{"content":"bookingSentPage.meta.description"}'
+  />
   <link rel="stylesheet" href="./css/reset.css" />
   <link rel="stylesheet" href="./css/variables.css" />
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/layout.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/mobile.css" />
+  <link rel="stylesheet" href="./css/pages/reservas.css" />
+  <link rel="stylesheet" href="./css/pages/reserva-enviada.css" />
 </head>
-<body>
+<body data-page="booking-sent">
   <div data-site-header></div>
-  <main class="simple-page">
-    <div class="container narrow">
-      <p class="eyebrow">Placeholder</p>
-      <h1>reserva-enviada</h1>
-      <p>Esta página será construída numa etapa seguinte.</p>
-      <a class="button button-primary" href="./index.html">Voltar à homepage</a>
-    </div>
+
+  <main class="booking-sent-page">
+    <section class="section booking-sent-hero">
+      <div class="container content-column">
+        <p class="eyebrow" data-i18n="bookingSentPage.hero.eyebrow">Pedido enviado</p>
+        <h1 data-i18n="bookingSentPage.hero.title">Obrigado. Recebemos o seu pedido de reserva.</h1>
+        <p data-i18n="bookingSentPage.hero.text">Vamos responder por email com a confirmação, eventuais esclarecimentos e os dados para a transferência. A estadia só fica confirmada depois do pagamento.</p>
+      </div>
+    </section>
+
+    <section class="section booking-sent-section">
+      <div class="container booking-sent-layout">
+        <section class="booking-card booking-card-primary booking-sent-summary-card">
+          <div class="booking-card-header">
+            <p class="eyebrow" data-i18n="bookingSentPage.summary.eyebrow">Resumo</p>
+            <h2 data-i18n="bookingSentPage.summary.title">Pedido de reserva planeado.</h2>
+            <p data-i18n="bookingSentPage.summary.text">Confira abaixo os principais detalhes que recebemos com o seu pedido.</p>
+          </div>
+
+          <div id="booking-sent-empty" class="field-warning" hidden>
+            <strong data-i18n="bookingSentPage.summary.emptyTitle">Sem dados de reserva neste momento.</strong>
+            <p data-i18n="bookingSentPage.summary.emptyText">Se chegou aqui diretamente, ainda não recebemos detalhes para resumir. Pode voltar à página de reservas e preencher o pedido.</p>
+          </div>
+
+          <div id="booking-sent-content">
+            <dl class="summary-breakdown booking-sent-breakdown">
+              <div>
+                <dt data-i18n="bookingSentPage.summary.checkinLabel">Check-in</dt>
+                <dd id="sent-checkin">-</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingSentPage.summary.checkoutLabel">Check-out</dt>
+                <dd id="sent-checkout">-</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingSentPage.summary.nightsLabel">Noites</dt>
+                <dd id="sent-nights">0</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingSentPage.summary.guestsLabel">Hóspedes</dt>
+                <dd id="sent-guests">0</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingSentPage.summary.adultsLabel">Adultos</dt>
+                <dd id="sent-adults">0</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingSentPage.summary.kidsLabel">Crianças</dt>
+                <dd id="sent-kids">0</dd>
+              </div>
+              <div id="sent-bed-row" hidden>
+                <dt data-i18n="bookingSentPage.summary.bedPreferenceLabel">Camas</dt>
+                <dd id="sent-bed">-</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingSentPage.summary.depositLabel">Depósito com a reserva</dt>
+                <dd id="sent-deposit">Não</dd>
+              </div>
+              <div>
+                <dt data-i18n="bookingSentPage.summary.emailLabel">Email de contacto</dt>
+                <dd id="sent-email">-</dd>
+              </div>
+              <div id="sent-phone-row" hidden>
+                <dt data-i18n="bookingSentPage.summary.phoneLabel">Telefone</dt>
+                <dd id="sent-phone">-</dd>
+              </div>
+              <div id="sent-checkin-time-row" hidden>
+                <dt data-i18n="bookingSentPage.summary.checkinTimeLabel">Hora prevista de check-in</dt>
+                <dd id="sent-checkin-time">-</dd>
+              </div>
+              <div id="sent-checkout-time-row" hidden>
+                <dt data-i18n="bookingSentPage.summary.checkoutTimeLabel">Hora prevista de check-out</dt>
+                <dd id="sent-checkout-time">-</dd>
+              </div>
+            </dl>
+
+            <div class="summary-total booking-sent-total">
+              <span data-i18n="bookingSentPage.summary.estimatedTotalLabel">Total estimado</span>
+              <strong id="sent-total">0€</strong>
+            </div>
+
+            <p id="sent-deposit-note" class="summary-note" data-i18n="bookingSentPage.summary.depositNote" hidden>Se optou por adiantar o depósito, os 200€ serão devolvidos no check-out após verificação do espaço.</p>
+
+            <div class="booking-sent-detail-grid">
+              <section class="booking-sent-detail-card">
+                <h3 data-i18n="bookingSentPage.summary.guestNamesTitle">Nomes dos hóspedes</h3>
+                <ul id="sent-guest-names" class="booking-sent-list"></ul>
+              </section>
+
+              <section id="sent-child-ages-card" class="booking-sent-detail-card" hidden>
+                <h3 data-i18n="bookingSentPage.summary.childAgesTitle">Idades das crianças</h3>
+                <ul id="sent-child-ages" class="booking-sent-list"></ul>
+              </section>
+            </div>
+
+            <section id="sent-comments-card" class="booking-sent-detail-card" hidden>
+              <h3 data-i18n="bookingSentPage.summary.commentsTitle">Comentários enviados</h3>
+              <p id="sent-comments">-</p>
+            </section>
+          </div>
+        </section>
+
+        <aside class="booking-sent-sidebar">
+          <section class="booking-card booking-sent-notice-card">
+            <div class="booking-card-header">
+              <p class="eyebrow" data-i18n="bookingSentPage.notice.eyebrow">Próximos passos</p>
+              <h2 data-i18n="bookingSentPage.notice.title">A confirmação segue sempre por email.</h2>
+            </div>
+            <div class="field-warning booking-sent-warning">
+              <strong data-i18n="bookingSentPage.notice.warningTitle">A reserva ainda não está confirmada.</strong>
+              <p data-i18n="bookingSentPage.notice.warningText">Responderemos por email com eventuais respostas, validação do pedido e os dados da conta para a transferência. Só depois do pagamento é que a reserva fica confirmada.</p>
+            </div>
+            <ul class="booking-highlight-list">
+              <li data-i18n="bookingSentPage.notice.item1">Acompanhe o email indicado no pedido</li>
+              <li data-i18n="bookingSentPage.notice.item2">As respostas e instruções seguem por esse mesmo canal</li>
+              <li data-i18n="bookingSentPage.notice.item3">O pagamento é necessário para confirmar a estadia</li>
+            </ul>
+          </section>
+
+          <section class="booking-card booking-sent-actions-card">
+            <div class="booking-card-header">
+              <p class="eyebrow" data-i18n="bookingSentPage.actions.eyebrow">Contacto</p>
+              <h2 data-i18n="bookingSentPage.actions.title">Quer acrescentar alguma informação?</h2>
+              <p data-i18n="bookingSentPage.actions.text">Se precisar de completar o pedido, esclarecer um detalhe ou antecipar uma questão, pode usar a página de contacto.</p>
+            </div>
+            <div class="booking-sent-actions">
+              <a class="button booking-contact-button" href="./contacto.html" data-i18n="bookingSentPage.actions.contact">Abrir página de contacto</a>
+              <a class="button booking-reset-button" href="./reservas.html" data-i18n="bookingSentPage.actions.back">Voltar às reservas</a>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </section>
   </main>
+
   <div data-site-footer></div>
-  <div data-sticky-booking></div>
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>

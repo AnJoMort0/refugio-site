@@ -50,6 +50,12 @@ function formatCurrency(value) {
   return `${Math.round(value)}€`;
 }
 
+function buildReservationTotal({ nights, adults, children, includeDeposit }) {
+  const stayValue =
+    nights > 0 ? nights * (adults * PRICE_CONFIG.adultPerNight + children * PRICE_CONFIG.childPerNight) : 0;
+  return stayValue + (includeDeposit ? PRICE_CONFIG.securityDeposit : 0);
+}
+
 function buildOccupiedRanges(today) {
   return [
     { start: formatDateKey(addDays(today, 9)), end: formatDateKey(addDays(today, 12)) },
@@ -293,9 +299,7 @@ export async function initBookingPage() {
     const nights = diffNights(checkinInput.value, checkoutInput.value);
     const includeDeposit = Boolean(depositPrepayInput?.checked);
     const selectedBedPreference = bedPreferenceInputs.find((input) => input.checked)?.value || '';
-    const stayValue =
-      nights > 0 ? nights * (adults * PRICE_CONFIG.adultPerNight + children * PRICE_CONFIG.childPerNight) : 0;
-    const totalValue = stayValue + (includeDeposit ? PRICE_CONFIG.securityDeposit : 0);
+    const totalValue = buildReservationTotal({ nights, adults, children, includeDeposit });
 
     priceAdult.textContent = formatCurrency(PRICE_CONFIG.adultPerNight);
     priceChild.textContent = formatCurrency(PRICE_CONFIG.childPerNight);
@@ -781,11 +785,69 @@ export async function initBookingPage() {
 
   form?.addEventListener('submit', (event) => {
     const message = validateBooking(true);
-    setStatus(message);
     if (message) {
       event.preventDefault();
+      setStatus(message);
       return;
     }
+
+    event.preventDefault();
+
+    const { adults, children, total } = getGuestCounts();
+    const nights = Math.max(diffNights(checkinInput.value, checkoutInput.value), 0);
+    const includeDeposit = Boolean(depositPrepayInput?.checked);
+    const totalEstimate = buildReservationTotal({ nights, adults, children, includeDeposit });
+    const params = new URLSearchParams();
+    const action = form.getAttribute('action') || './reserva-enviada.html';
+    const commentsInput = form.querySelector('#reservation-comments');
+
+    params.set('checkin', checkinInput.value);
+    params.set('checkout', checkoutInput.value);
+    params.set('nights', String(nights));
+    params.set('adults', String(adults));
+    params.set('children', String(children));
+    params.set('total_guests', String(total));
+    params.set('contact_email', contactEmailInput?.value.trim() || '');
+
+    if (contactPhoneInput?.value.trim()) {
+      params.set('contact_phone', contactPhoneInput.value.trim());
+    }
+
+    if (checkinTimeInput?.value) {
+      params.set('checkin_time', checkinTimeInput.value);
+    }
+
+    if (checkoutTimeInput?.value) {
+      params.set('checkout_time', checkoutTimeInput.value);
+    }
+
+    const selectedBedPreference = bedPreferenceInputs.find((input) => input.checked)?.value || '';
+    if (selectedBedPreference) {
+      params.set('bed_preference', selectedBedPreference);
+    }
+
+    if (includeDeposit) {
+      params.set('deposit_prepay', 'true');
+    }
+
+    const comments = commentsInput instanceof HTMLTextAreaElement ? commentsInput.value.trim() : '';
+    if (comments) {
+      params.set('comments', comments);
+    }
+
+    guestNameFields.querySelectorAll('input').forEach((input) => {
+      const value = input.value.trim();
+      if (value) params.append('guest_name', value);
+    });
+
+    childAgeFields.querySelectorAll('input').forEach((input) => {
+      const value = input.value.trim();
+      if (value) params.append('child_age', value);
+    });
+
+    params.set('reservation_total', String(totalEstimate));
+
+    window.location.href = `${action}?${params.toString()}`;
   });
 
   document.addEventListener('language:changed', async () => {

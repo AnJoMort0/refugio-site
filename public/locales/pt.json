@@ -242,6 +242,57 @@
       "rulesConfirmationRequired": "Confirme que leu e aceita as regras da casa."
     }
   },
+  "bookingSentPage": {
+    "meta": {
+      "title": "Refúgio | Pedido de reserva enviado",
+      "description": "Resumo do pedido de reserva enviado para o Refúgio e próximos passos de confirmação por email."
+    },
+    "hero": {
+      "eyebrow": "Pedido enviado",
+      "title": "Obrigado. Recebemos o seu pedido de reserva.",
+      "text": "Vamos responder por email com a confirmação, eventuais esclarecimentos e os dados para a transferência. A estadia só fica confirmada depois do pagamento."
+    },
+    "summary": {
+      "eyebrow": "Resumo",
+      "title": "Pedido de reserva planeado.",
+      "text": "Confira abaixo os principais detalhes que recebemos com o seu pedido.",
+      "emptyTitle": "Sem dados de reserva neste momento.",
+      "emptyText": "Se chegou aqui diretamente, ainda não recebemos detalhes para resumir. Pode voltar à página de reservas e preencher o pedido.",
+      "checkinLabel": "Check-in",
+      "checkoutLabel": "Check-out",
+      "nightsLabel": "Noites",
+      "guestsLabel": "Hóspedes",
+      "adultsLabel": "Adultos",
+      "kidsLabel": "Crianças",
+      "bedPreferenceLabel": "Camas",
+      "depositLabel": "Depósito com a reserva",
+      "emailLabel": "Email de contacto",
+      "phoneLabel": "Telefone",
+      "checkinTimeLabel": "Hora prevista de check-in",
+      "checkoutTimeLabel": "Hora prevista de check-out",
+      "estimatedTotalLabel": "Total estimado",
+      "depositNote": "Se optou por adiantar o depósito, os 200€ serão devolvidos no check-out após verificação do espaço.",
+      "guestNamesTitle": "Nomes dos hóspedes",
+      "childAgesTitle": "Idades das crianças",
+      "commentsTitle": "Comentários enviados"
+    },
+    "notice": {
+      "eyebrow": "Próximos passos",
+      "title": "A confirmação segue sempre por email.",
+      "warningTitle": "A reserva ainda não está confirmada.",
+      "warningText": "Responderemos por email com eventuais respostas, validação do pedido e os dados da conta para a transferência. Só depois do pagamento é que a reserva fica confirmada.",
+      "item1": "Acompanhe o email indicado no pedido",
+      "item2": "As respostas e instruções seguem por esse mesmo canal",
+      "item3": "O pagamento é necessário para confirmar a estadia"
+    },
+    "actions": {
+      "eyebrow": "Contacto",
+      "title": "Quer acrescentar alguma informação?",
+      "text": "Se precisar de completar o pedido, esclarecer um detalhe ou antecipar uma questão, pode usar a página de contacto.",
+      "contact": "Abrir página de contacto",
+      "back": "Voltar às reservas"
+    }
+  },
   "rulesFull": {
     "eyebrow": "Regras e condições",
     "title": "Condições da estadia",
