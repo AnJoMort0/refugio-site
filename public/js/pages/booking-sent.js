@@ -69,6 +69,7 @@ export async function initBookingSentPage() {
   const children = Math.max(0, Number(params.get('children') || 0));
   const totalGuests = Math.max(0, Number(params.get('total_guests') || adults + children));
   const nights = Math.max(Number(params.get('nights') || diffNights(checkin, checkout)), 0);
+  const contactName = params.get('contact_name') || '';
   const email = params.get('contact_email') || '';
   const phone = params.get('contact_phone') || '';
   const checkinTime = params.get('checkin_time') || '';
@@ -94,7 +95,7 @@ export async function initBookingSentPage() {
     }
   }
 
-  const hasBookingData = Boolean(checkin || checkout || email || guestNames.length);
+  const hasBookingData = Boolean(checkin || checkout || email || contactName || guestNames.length);
   const emptyState = document.querySelector('#booking-sent-empty');
   const content = document.querySelector('#booking-sent-content');
 
@@ -121,6 +122,7 @@ export async function initBookingSentPage() {
   setText('#sent-guests', String(totalGuests));
   setText('#sent-adults', String(adults));
   setText('#sent-kids', String(children));
+  setText('#sent-contact-name', contactName || guestNames[0] || '-');
   setText(
     '#sent-deposit',
     depositPrepay
@@ -151,17 +153,6 @@ export async function initBookingSentPage() {
 
   const depositNote = document.querySelector('#sent-deposit-note');
   if (depositNote) depositNote.hidden = !depositPrepay;
-
-  const guestList = document.querySelector('#sent-guest-names');
-  if (guestList) {
-    guestList.replaceChildren(
-      ...guestNames.map((name) => {
-        const item = document.createElement('li');
-        item.textContent = name;
-        return item;
-      })
-    );
-  }
 
   const childAgesCard = document.querySelector('#sent-child-ages-card');
   const childAgesList = document.querySelector('#sent-child-ages');

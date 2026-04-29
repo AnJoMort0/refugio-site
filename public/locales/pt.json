@@ -160,27 +160,27 @@
       "childAgesTitle": "Idade das crianças",
       "childAgesText": "Indique a idade de cada criança no momento da estadia.",
       "childAgeLabel": "Idade da criança",
-      "guestNamesTitle": "Nome dos hóspedes",
-      "guestNamesText": "Indique o nome completo de cada hóspede exatamente como consta no documento de identificação.",
-      "guestNameLabel": "Nome do hóspede",
       "contactTitle": "Contacto e confirmação",
+      "contactNameLabel": "Nome do responsável pela reserva",
+      "contactNamePlaceholder": "Nome completo",
       "emailLabel": "Email do responsável pela reserva",
       "emailPlaceholder": "nome@exemplo.com",
       "phoneLabel": "Telefone com indicativo internacional",
       "phonePlaceholder": "+351 912 345 678",
-      "confirmationWarning": "A reserva será tratada por email. É por aí que seguirá a confirmação, os esclarecimentos pedidos e a conta para a transferência. Sem transferência concluída, a reserva não fica confirmada.",
+      "confirmationWarning": "A reserva será tratada por email. É por aí que seguirá a confirmação, os esclarecimentos pedidos e os dados para transferência. Sem transferência concluída, a reserva não fica confirmada.",
       "checkinTimeLabel": "Hora prevista de check-in",
       "checkoutTimeLabel": "Hora prevista de check-out",
-      "timeHelp": "Se não for possível indicar agora, terá que nos informar das horas com pelo menos 48h de antecedência, para podermos preapar a vossa estadia.",
+      "timeHelp": "Se não for possível indicar agora, terá que nos informar das horas com pelo menos 48h de antecedência, para podermos preparar a vossa estadia.",
       "timeRangeHelp": "Check-in entre as 15h00 e as 19h00. Check-out entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.",
       "timezoneWarning": "Atenção ao fuso horário de Portugal continental (1h mais cedo do que Espanha, França, Suíça e Suécia).",
       "depositToggleLabel": "Pretendo adiantar o depósito de segurança com a reserva",
       "depositToggleHelp": "Por defeito, o depósito de 200€ é entregue em numerário no check-in. Se selecionar esta opção, poderá indicar que prefere incluí-lo logo na transferência para a reserva.",
       "commentsLabel": "Comentários ou pedidos especiais",
-      "commentsPlaceholder": "Ex.: horário extraordinários de chegada, pedidos, dúvida sobre acessos,...",
+      "commentsPlaceholder": "Ex.: horários extraordinários de chegada, pedidos, dúvida sobre acessos...",
       "rulesConfirmLabel": "Confirmo que li e aceito as regras da casa",
-      "rulesConfirmHelp": "Leia as condições completas antes de enviar o pedido.",
+      "rulesConfirmHelp": "Antes de enviar o pedido, pedimos apenas que confirme alguns pontos importantes para garantir uma estadia tranquila.",
       "rulesLink": "Ver regras",
+      "submitNotice": "Este pedido não confirma automaticamente a reserva. A confirmação será enviada por email após validação da disponibilidade.",
       "submit": "Enviar pedido de reserva",
       "reset": "Limpar seleção"
     },
@@ -209,7 +209,7 @@
     "contact": {
       "eyebrow": "Contacto",
       "title": "Prefere confirmar detalhes primeiro?",
-      "text": "Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode abrir a página de contacto antes de enviar a reserva.",
+      "text": "Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode abrir a página de contacto. Lá poderá também escolher falar por WhatsApp, ou  pedir chamada.",
       "button": "Abrir página de contacto"
     },
     "highlights": {
@@ -232,13 +232,13 @@
       "minimumAdults": "É necessário pelo menos 1 adulto.",
       "maxGuests": "O máximo permitido é 6 hóspedes no total.",
       "bedPreferenceRequired": "Escolha se preferem cama de casal ou camas individuais.",
+      "contactNameRequired": "Indique o nome do responsável pela reserva.",
       "emailRequired": "Indique o email do responsável pela reserva.",
       "emailInvalid": "Indique um endereço de email válido.",
       "phoneInvalid": "Indique um telefone válido com indicativo internacional, começando por + ou 00.",
       "checkinTimeInvalid": "O check-in deve estar entre as 15h00 e as 19h00. Se precisar de outro horário, indique esse pedido nos comentários.",
       "checkoutTimeInvalid": "O check-out deve estar entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.",
       "childAgeRequired": "Indique a idade de cada criança.",
-      "guestNamesRequired": "Indique o nome completo de todos os hóspedes.",
       "rulesConfirmationRequired": "Confirme que leu e aceita as regras da casa."
     }
   },
@@ -266,13 +266,13 @@
       "kidsLabel": "Crianças",
       "bedPreferenceLabel": "Camas",
       "depositLabel": "Depósito com a reserva",
+      "contactNameLabel": "Responsável",
       "emailLabel": "Email de contacto",
       "phoneLabel": "Telefone",
       "checkinTimeLabel": "Hora prevista de check-in",
       "checkoutTimeLabel": "Hora prevista de check-out",
       "estimatedTotalLabel": "Total estimado",
       "depositNote": "Se optou por adiantar o depósito, os 200€ serão devolvidos no check-out após verificação do espaço.",
-      "guestNamesTitle": "Nomes dos hóspedes",
       "childAgesTitle": "Idades das crianças",
       "commentsTitle": "Comentários enviados"
     },
@@ -280,7 +280,7 @@
       "eyebrow": "Próximos passos",
       "title": "A confirmação segue sempre por email.",
       "warningTitle": "A reserva ainda não está confirmada.",
-      "warningText": "Responderemos por email com eventuais respostas, validação do pedido e os dados da conta para a transferência. Só depois do pagamento é que a reserva fica confirmada.",
+      "warningText": "Responderemos por email com eventuais respostas, validação do pedido e os dados para transferência. Só depois do pagamento é que a reserva fica confirmada.",
       "item1": "Acompanhe o email indicado no pedido",
       "item2": "As respostas e instruções seguem por esse mesmo canal",
       "item3": "O pagamento é necessário para confirmar a estadia"
@@ -288,7 +288,7 @@
     "actions": {
       "eyebrow": "Contacto",
       "title": "Quer acrescentar alguma informação?",
-      "text": "Se precisar de completar o pedido, esclarecer um detalhe ou antecipar uma questão, pode usar a página de contacto.",
+      "text": "Se precisar de completar o pedido, esclarecer um detalhe ou antecipar uma questão, pode usar a página de contacto e escolher WhatsApp, chamada ou email.",
       "contact": "Abrir página de contacto",
       "back": "Voltar às reservas"
     }
@@ -296,6 +296,7 @@
   "rulesFull": {
     "eyebrow": "Regras e condições",
     "title": "Condições da estadia",
+    "intro": "Antes de enviar o pedido, pedimos apenas que confirme alguns pontos importantes para garantir uma estadia tranquila.",
     "capacity": {
       "title": "Capacidade e ocupação",
       "item1": "Capacidade máxima: 6 hóspedes",

@@ -110,12 +110,9 @@
               <div id="child-ages-fields" class="dynamic-grid compact-age-grid"></div>
             </div>
 
-            <div class="dynamic-group">
+            <div class="dynamic-group booking-identity-note">
               <div class="dynamic-group-header">
-                <h3 data-i18n="bookingPage.form.guestNamesTitle">Nome dos hóspedes</h3>
-                <p data-i18n="bookingPage.form.guestNamesText">Indique o nome completo de cada hóspede exatamente como consta no documento de identificação.</p>
               </div>
-              <div id="guest-name-fields" class="dynamic-grid"></div>
             </div>
           </article>
 
@@ -130,7 +127,19 @@
                 <h3 data-i18n="bookingPage.form.contactTitle">Contacto e confirmação</h3>
               </div>
 
-              <div class="booking-contact-grid">
+              <div class="booking-contact-grid booking-contact-grid-wide">
+                <label class="field">
+                  <span><span data-i18n="bookingPage.form.contactNameLabel">Nome do responsável pela reserva</span><span class="required-mark" aria-hidden="true">*</span></span>
+                  <input
+                    id="contact-name"
+                    name="contact_name"
+                    type="text"
+                    autocomplete="name"
+                    required
+                    placeholder="Nome completo"
+                    data-i18n-attr='{"placeholder":"bookingPage.form.contactNamePlaceholder"}'
+                  />
+                </label>
                 <label class="field">
                   <span><span data-i18n="bookingPage.form.emailLabel">Email do responsável pela reserva</span><span class="required-mark" aria-hidden="true">*</span></span>
                   <input
@@ -156,7 +165,7 @@
                 </label>
               </div>
 
-              <p class="field-hint field-warning" data-i18n="bookingPage.form.confirmationWarning">A reserva será tratada por email. É por aí que seguirá a confirmação, os esclarecimentos pedidos e a conta para a transferência. Sem transferência concluída, a reserva não fica confirmada.</p>
+              <p class="field-hint field-warning" data-i18n="bookingPage.form.confirmationWarning">A reserva será tratada por email. É por aí que seguirá a confirmação, os esclarecimentos pedidos e os dados para transferência. Sem transferência concluída, a reserva não fica confirmada.</p>
             </div>
 
             <div class="booking-time-grid">
@@ -170,7 +179,7 @@
               </label>
             </div>
 
-            <p class="field-hint" data-i18n="bookingPage.form.timeHelp">Se não for possível indicar agora, terá que nos informar das horas com pelo menos 48h de antecedência, para podermos preapar a vossa estadia.</p>
+            <p class="field-hint" data-i18n="bookingPage.form.timeHelp">Se não for possível indicar agora, terá que nos informar das horas com pelo menos 48h de antecedência, para podermos preparar a vossa estadia.</p>
             <p class="field-hint" data-i18n="bookingPage.form.timeRangeHelp">Check-in entre as 15h00 e as 19h00. Check-out entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.</p>
             <p class="field-hint field-warning" data-i18n="bookingPage.form.timezoneWarning">Atenção ao fuso horário de Portugal continental (1h mais cedo do que Espanha, França, Suíça e Suécia).</p>
 
@@ -189,7 +198,7 @@
                 id="reservation-comments"
                 name="comments"
                 rows="5"
-                placeholder="Ex.: horário extraordinários de chegada, pedidos, dúvida sobre acessos,..."
+                placeholder="Ex.: horários extraordinários de chegada, pedidos, dúvida sobre acessos..."
                 data-i18n-attr='{"placeholder":"bookingPage.form.commentsPlaceholder"}'
               ></textarea>
             </label>
@@ -202,11 +211,13 @@
               <span class="booking-confirmation-copy">
                 <strong><span data-i18n="bookingPage.form.rulesConfirmLabel">Confirmo que li e aceito as regras da casa</span><span class="required-mark" aria-hidden="true">*</span></strong>
                 <small>
-                  <span data-i18n="bookingPage.form.rulesConfirmHelp">Leia as condições completas antes de enviar o pedido.</span>
+                  <span data-i18n="bookingPage.form.rulesConfirmHelp">Antes de enviar o pedido, pedimos apenas que confirme alguns pontos importantes para garantir uma estadia tranquila.</span>
                   <a class="text-link inline-text-link" href="#booking-rules" data-i18n="bookingPage.form.rulesLink">Ver regras</a>
                 </small>
               </span>
             </label>
+
+            <p class="field-hint field-warning booking-submit-notice" data-i18n="bookingPage.form.submitNotice">Este pedido não confirma automaticamente a reserva. A confirmação será enviada por email após validação da disponibilidade.</p>
 
             <div class="booking-form-actions">
               <button class="button booking-submit-button" type="submit" data-i18n="bookingPage.form.submit">Enviar pedido de reserva</button>
@@ -278,9 +289,11 @@
             <div class="booking-card-header">
               <p class="eyebrow" data-i18n="bookingPage.contact.eyebrow">Contacto</p>
               <h2 data-i18n="bookingPage.contact.title">Prefere confirmar detalhes primeiro?</h2>
-              <p data-i18n="bookingPage.contact.text">Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode abrir a página de contacto antes de enviar a reserva.</p>
+              <p data-i18n="bookingPage.contact.text">Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode abrir a página de contacto. Lá poderá também escolher falar por WhatsApp, ou  pedir chamada.</p>
             </div>
-            <a class="button booking-contact-button" href="./contacto.html" data-i18n="bookingPage.contact.button">Abrir página de contacto</a>
+            <div class="booking-contact-methods">
+              <a class="button booking-contact-button" href="./contacto.html" data-i18n="bookingPage.contact.button">Abrir página de contacto</a>
+            </div>
           </article>
 
           <article class="booking-card booking-highlights-card">
@@ -304,6 +317,7 @@
         <div class="section-heading content-column">
           <p class="eyebrow" data-i18n="rulesFull.eyebrow">Regras e condições</p>
           <h2 data-i18n="rulesFull.title">Condições da estadia</h2>
+          <p data-i18n="rulesFull.intro">Antes de enviar o pedido, pedimos apenas que confirme alguns pontos importantes para garantir uma estadia tranquila.</p>
         </div>
 
         <div class="rules-grid">

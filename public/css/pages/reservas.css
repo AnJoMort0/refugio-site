@@ -183,6 +183,10 @@
   gap: 1rem;
 }
 
+.booking-contact-grid-wide {
+  align-items: start;
+}
+
 .guest-count-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -476,6 +480,12 @@
   text-align: center;
 }
 
+.booking-identity-note {
+  padding: 1rem 1.05rem;
+  border-radius: 16px;
+  background: rgba(250, 248, 244, 0.78);
+}
+
 .inline-text-link {
   min-height: auto;
   margin-top: 0;
@@ -570,6 +580,10 @@
   align-items: stretch;
 }
 
+.booking-submit-notice {
+  margin-top: 0.15rem;
+}
+
 .booking-submit-button {
   background:
     linear-gradient(135deg, rgba(57, 69, 52, 0.96), rgba(90, 75, 63, 0.94)),
@@ -590,6 +604,11 @@
   border: 1px solid rgba(67, 99, 75, 0.26);
   background: rgba(250, 248, 244, 0.84);
   color: var(--color-mountain-forest);
+}
+
+.booking-contact-methods {
+  display: grid;
+  gap: 0.85rem;
 }
 
 body[data-page="booking"] .sticky-booking-cta {
@@ -686,9 +705,12 @@ body[data-page="booking"] .sticky-booking-cta {
 
 @media (min-width: 720px) {
   .booking-date-fields,
-  .booking-contact-grid,
   .guest-count-grid,
   .booking-time-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .booking-contact-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -709,6 +731,10 @@ body[data-page="booking"] .sticky-booking-cta {
 
   .calendar-months {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .booking-contact-grid-wide {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

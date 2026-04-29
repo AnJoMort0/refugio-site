@@ -104,6 +104,7 @@ export async function initBookingPage() {
   const adultInput = document.querySelector('#adult-count');
   const childInput = document.querySelector('#child-count');
   const bedPreferenceGroup = document.querySelector('#bed-preference-group');
+  const contactNameInput = document.querySelector('#contact-name');
   const contactEmailInput = document.querySelector('#contact-email');
   const contactPhoneInput = document.querySelector('#contact-phone');
   const checkinTimeInput = document.querySelector('#checkin-time');
@@ -111,7 +112,6 @@ export async function initBookingPage() {
   const depositPrepayInput = document.querySelector('#deposit-prepay');
   const rulesConfirmationInput = document.querySelector('#rules-confirmation');
   const bedPreferenceInputs = Array.from(document.querySelectorAll('input[name="bed_preference"]'));
-  const guestNameFields = document.querySelector('#guest-name-fields');
   const childAgesGroup = document.querySelector('#child-ages-group');
   const childAgeFields = document.querySelector('#child-ages-fields');
   const calendar = document.querySelector('#availability-calendar');
@@ -247,24 +247,6 @@ export async function initBookingPage() {
     }
 
     childAgeFields.replaceChildren(fragment);
-  }
-
-  function renderGuestNameFields() {
-    const { total } = getGuestCounts();
-    const existingValues = Array.from(guestNameFields.querySelectorAll('input')).map((input) => input.value);
-    const fragment = document.createDocumentFragment();
-
-    for (let index = 0; index < total; index += 1) {
-      const label = document.createElement('label');
-      label.className = 'field';
-      label.innerHTML = `
-        <span>${requiredLabel(`${getText('bookingPage.form.guestNameLabel', 'Nome do hóspede')} ${index + 1}`)}</span>
-        <input type="text" name="guest_${index + 1}" autocomplete="name" required value="${existingValues[index] || ''}" />
-      `;
-      fragment.append(label);
-    }
-
-    guestNameFields.replaceChildren(fragment);
   }
 
   function datesOverlapOccupied(checkIn, checkOut) {
@@ -567,14 +549,13 @@ export async function initBookingPage() {
 
   function validateBooking(showBrowserMessages = true) {
     const { adults, total } = getGuestCounts();
-    const guestInputs = Array.from(guestNameFields.querySelectorAll('input'));
     const childAgeInputs = Array.from(childAgeFields.querySelectorAll('input'));
 
-    guestInputs.forEach((input) => clearFieldValidity(input));
     childAgeInputs.forEach((input) => clearFieldValidity(input));
     clearFieldValidity(adultInput);
     clearFieldValidity(childInput);
     bedPreferenceInputs.forEach((input) => clearFieldValidity(input));
+    clearFieldValidity(contactNameInput);
     clearFieldValidity(contactEmailInput);
     clearFieldValidity(contactPhoneInput);
     clearFieldValidity(rulesConfirmationInput);
@@ -582,6 +563,13 @@ export async function initBookingPage() {
     const dateMessage = validateDateSelection(showBrowserMessages);
     if (dateMessage) {
       return dateMessage;
+    }
+
+    if (!contactNameInput?.value.trim()) {
+      const message = getText('bookingPage.validation.contactNameRequired', 'Indique o nome do responsável pela reserva.');
+      setFieldValidity(contactNameInput, message);
+      if (showBrowserMessages) contactNameInput?.reportValidity();
+      return message;
     }
 
     if (!contactEmailInput?.value.trim()) {
@@ -649,15 +637,6 @@ export async function initBookingPage() {
       }
     }
 
-    for (const input of guestInputs) {
-      if (!input.value.trim()) {
-        const message = getText('bookingPage.validation.guestNamesRequired', 'Indique o nome completo de todos os hóspedes.');
-        setFieldValidity(input, message);
-        if (showBrowserMessages) input.reportValidity();
-        return message;
-      }
-    }
-
     if (rulesConfirmationInput && !rulesConfirmationInput.checked) {
       const message = getText('bookingPage.validation.rulesConfirmationRequired', 'Confirme que leu e aceita as regras da casa.');
       setFieldValidity(rulesConfirmationInput, message);
@@ -671,7 +650,6 @@ export async function initBookingPage() {
   function rerenderDynamicContent() {
     renderBedPreference();
     renderChildAgeFields();
-    renderGuestNameFields();
     renderSummary();
     renderCalendar();
   }
@@ -732,7 +710,7 @@ export async function initBookingPage() {
     })
   );
 
-  [contactEmailInput, contactPhoneInput].forEach((input) =>
+  [contactNameInput, contactEmailInput, contactPhoneInput].forEach((input) =>
     input?.addEventListener('input', () => {
       clearFieldValidity(input);
       setStatus('');
@@ -807,6 +785,7 @@ export async function initBookingPage() {
     params.set('adults', String(adults));
     params.set('children', String(children));
     params.set('total_guests', String(total));
+    params.set('contact_name', contactNameInput?.value.trim() || '');
     params.set('contact_email', contactEmailInput?.value.trim() || '');
 
     if (contactPhoneInput?.value.trim()) {
@@ -834,11 +813,6 @@ export async function initBookingPage() {
     if (comments) {
       params.set('comments', comments);
     }
-
-    guestNameFields.querySelectorAll('input').forEach((input) => {
-      const value = input.value.trim();
-      if (value) params.append('guest_name', value);
-    });
 
     childAgeFields.querySelectorAll('input').forEach((input) => {
       const value = input.value.trim();
