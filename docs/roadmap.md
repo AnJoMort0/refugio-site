@@ -10,6 +10,8 @@ Prototype first.
 [x] Reservas page scaffold
 [x] Reserva enviada page scaffold
 [] Contacto page scaffold
+[] Guia-local
+   []
 
 ## Small changes to implement next
 
@@ -17,3 +19,8 @@ Prototype first.
 Change default language based on browser defaults
 
 404.thml
+
+Tick for promotions, deals, news, ... 
+
+Mud-Wasp warning
+
