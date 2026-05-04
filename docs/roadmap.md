@@ -15,9 +15,13 @@ Prototype first.
 
 ## Small changes to implement next
 
+Change Refúgio to O Refúgio
+
 Add imbed Google maps (with pins for the different rooms?) in the Alojamento page and the address in the Homepage
 
 Add bike reservations to the booking page
+
+Add Google Maps review button
 
 ## Small additions to not forget
 Change default language based on browser defaults
