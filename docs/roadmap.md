@@ -23,8 +23,13 @@ Add bike reservations to the booking page
 
 Add Google Maps review button
 
+TVs in all rooms
+
+
 ## Small additions to not forget
 Change default language based on browser defaults
+
+Emergency contacts in the Guia Local 
 
 404.thml
 
