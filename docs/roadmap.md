@@ -15,6 +15,8 @@ Prototype first.
 
 ## Small changes to implement next
 
+Add imbed Google maps (with pins for the different rooms?) in the Alojamento page and the address in the Homepage
+
 ## Small additions to not forget
 Change default language based on browser defaults
 
