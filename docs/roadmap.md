@@ -17,6 +17,8 @@ Prototype first.
 
 Add imbed Google maps (with pins for the different rooms?) in the Alojamento page and the address in the Homepage
 
+Add bike reservations to the booking page
+
 ## Small additions to not forget
 Change default language based on browser defaults
 
