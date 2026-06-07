@@ -2,6 +2,7 @@ const DEFAULT_LANGUAGE = 'pt';
 const PRICE_CONFIG = {
   adultPerNight: 48,
   childPerNight: 28,
+  bikePerDay: 5,
   securityDeposit: 200
 };
 
@@ -39,10 +40,10 @@ function textToBoolean(value) {
   return ['on', 'true', '1', 'yes', 'sim'].includes((value || '').toLowerCase());
 }
 
-function buildReservationTotal({ nights, adults, children, includeDeposit }) {
+function buildReservationTotal({ nights, adults, children, includeDeposit, bikeDays = 0 }) {
   const stayValue =
     nights > 0 ? nights * (adults * PRICE_CONFIG.adultPerNight + children * PRICE_CONFIG.childPerNight) : 0;
-  return stayValue + (includeDeposit ? PRICE_CONFIG.securityDeposit : 0);
+  return stayValue + bikeDays * PRICE_CONFIG.bikePerDay + (includeDeposit ? PRICE_CONFIG.securityDeposit : 0);
 }
 
 export async function initBookingSentPage() {
@@ -77,6 +78,12 @@ export async function initBookingSentPage() {
   const comments = params.get('comments') || '';
   const depositPrepay = textToBoolean(params.get('deposit_prepay') || '');
   const bedPreference = params.get('bed_preference') || '';
+  const bikeCount = Math.max(0, Number(params.get('bike_count') || 0));
+  const bikeRentalDays = Math.max(0, Number(params.get('bike_rental_days') || 0));
+  const bikeDays = Math.max(
+    Number(params.get('bike_days_total') || 0),
+    bikeCount * bikeRentalDays
+  );
   const guestNames = params.getAll('guest_name').map((value) => value.trim()).filter(Boolean);
   const childAges = params.getAll('child_age').map((value) => value.trim()).filter(Boolean);
 
@@ -103,7 +110,7 @@ export async function initBookingSentPage() {
   if (content) content.hidden = !hasBookingData;
   if (!hasBookingData) return;
 
-  const fallbackTotal = buildReservationTotal({ nights, adults, children, includeDeposit: depositPrepay });
+  const fallbackTotal = buildReservationTotal({ nights, adults, children, includeDeposit: depositPrepay, bikeDays });
   const totalWithDeposit = Math.max(Number(params.get('reservation_total') || fallbackTotal), 0);
 
   const setText = (selector, value) => {
@@ -131,6 +138,14 @@ export async function initBookingSentPage() {
   );
   setText('#sent-email', email || '-');
   setText('#sent-total', formatCurrency(totalWithDeposit));
+
+  toggleRow('#sent-bikes-row', bikeDays > 0);
+  setText(
+    '#sent-bikes',
+    bikeDays === 1
+      ? getText('bookingPage.summary.bikesSingle', '1 bicicleta-dia')
+      : getText('bookingPage.summary.bikesMultiple', '{count} bicicleta-dias').replace('{count}', String(bikeDays))
+  );
 
   toggleRow('#sent-phone-row', Boolean(phone));
   setText('#sent-phone', phone || '-');
@@ -166,6 +181,17 @@ export async function initBookingSentPage() {
         return item;
       })
     );
+  }
+
+  const bikeDaysCard = document.querySelector('#sent-bike-days-card');
+  const bikeDaysList = document.querySelector('#sent-bike-days');
+  if (bikeDaysCard) bikeDaysCard.hidden = bikeDays === 0;
+  if (bikeDaysList && bikeDays > 0) {
+    const bikesItem = document.createElement('li');
+    const daysItem = document.createElement('li');
+    bikesItem.textContent = `${getText('bookingPage.form.bikeCountLabel', 'Número de bicicletas')}: ${bikeCount}`;
+    daysItem.textContent = `${getText('bookingPage.form.bikeRentalDaysLabel', 'Dias de aluguer')}: ${bikeRentalDays}`;
+    bikeDaysList.replaceChildren(bikesItem, daysItem);
   }
 
   toggleRow('#sent-comments-card', Boolean(comments.trim()));

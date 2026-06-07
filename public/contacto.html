@@ -3,23 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>contacto | Refúgio Rural</title>
+  <title>O Refúgio | Contacto</title>
+  <meta name="description" content="Envie uma mensagem a O Refúgio para reservas, dúvidas, alterações e feedback da estadia." />
   <link rel="stylesheet" href="./css/reset.css" />
   <link rel="stylesheet" href="./css/variables.css" />
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/layout.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/mobile.css" />
+  <link rel="stylesheet" href="./css/pages/contacto.css" />
 </head>
 <body data-page="contact">
   <div data-site-header></div>
-  <main class="simple-page">
-    <div class="container narrow">
-      <p class="eyebrow">Placeholder</p>
-      <h1>contacto</h1>
-      <p>Esta página será construída numa etapa seguinte.</p>
-      <a class="button button-primary" href="./index.html">Voltar à homepage</a>
-    </div>
+  <main class="contact-page">
+    <section class="section contact-page-intro">
+      <div class="container content-column">
+        <p class="eyebrow">Contacto</p>
+        <h1>Fale connosco antes, durante ou depois da estadia.</h1>
+        <p>Envie uma mensagem com o contexto certo e indique como prefere ser contactado de volta.</p>
+        <div class="contact-hero-actions">
+          <a class="button button-primary" href="#mensagem">Enviar mensagem</a>
+          <a class="button contact-secondary-button" href="https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">Adicionar avaliação no Google Maps</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="mensagem" class="section section-alt contact-message-section">
+      <div class="container contact-layout">
+        <form class="contact-card contact-form" action="./obrigado.html" method="get" novalidate>
+          <div class="contact-card-header">
+            <p class="eyebrow">Mensagem</p>
+            <h2>Conte-nos o que precisa.</h2>
+            <p>Quanto mais contexto enviar, mais fácil é respondermos pela pessoa certa e no canal certo.</p>
+          </div>
+
+          <div class="contact-field-grid">
+            <label class="field">
+              <span>Nome<span class="required-mark" aria-hidden="true">*</span></span>
+              <input name="name" type="text" autocomplete="name" required placeholder="Nome completo" />
+            </label>
+            <label class="field">
+              <span>Email<span class="required-mark" aria-hidden="true">*</span></span>
+              <input name="email" type="email" autocomplete="email" required placeholder="nome@exemplo.com" />
+            </label>
+            <label class="field">
+              <span>Telefone</span>
+              <input name="phone" type="tel" autocomplete="tel" placeholder="+351 912 345 678" />
+            </label>
+          </div>
+
+          <div class="contact-field-grid">
+            <label class="field">
+              <span>Idioma de contacto<span class="required-mark" aria-hidden="true">*</span></span>
+              <select id="contact-language" name="contact_language" required>
+                <option value="Português">Português</option>
+                <option value="Français">Français</option>
+                <option value="English">English</option>
+                <option value="Deutsch">Deutsch</option>
+                <option value="Español">Español</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Prefiro ser contactado por<span class="required-mark" aria-hidden="true">*</span></span>
+              <select id="preferred-contact" name="preferred_contact" required>
+                <option value="Email">Email</option>
+                <option value="Pedido de contacto por WhatsApp" data-requires-phone disabled>Pedido de contacto por WhatsApp</option>
+                <option value="Pedido de chamada de retorno" data-requires-phone disabled>Pedido de chamada de retorno</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Contexto do contacto<span class="required-mark" aria-hidden="true">*</span></span>
+              <select id="contact-context" name="context" required>
+                <option value="">Escolha uma opção</option>
+                <option value="Já tenho uma reserva">Já tenho uma reserva</option>
+                <option value="Fiz um pedido de reserva">Fiz um pedido de reserva</option>
+                <option value="Não tenho reserva">Não tenho reserva</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Assunto<span class="required-mark" aria-hidden="true">*</span></span>
+              <select id="contact-topic" name="topic" required disabled>
+                <option value="">Escolha primeiro o contexto</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="field field-textarea">
+            <span>Mensagem<span class="required-mark" aria-hidden="true">*</span></span>
+            <textarea name="message" rows="7" required placeholder="Escreva aqui a sua pergunta, pedido ou feedback. Se já tiver datas ou número de reserva, inclua também."></textarea>
+          </label>
+
+          <div id="contact-form-status" class="contact-form-status" role="alert" hidden></div>
+
+          <div class="contact-form-actions">
+            <button class="button button-primary" type="submit">Enviar mensagem</button>
+          </div>
+        </form>
+
+        <aside class="contact-side">
+          <section class="contact-card contact-stay-card">
+            <p class="eyebrow">Resposta rápida</p>
+            <h2>Já está hospedado?</h2>
+            <p>Use o formulário para pedir contacto de retorno. Daremos prioridade a mensagens de hóspedes que já estejam no alojamento.</p>
+          </section>
+
+          <section class="contact-card contact-social-card">
+            <p class="eyebrow">Social</p>
+            <h2>Encontre O Refúgio online</h2>
+            <div class="contact-social-links">
+              <a class="button contact-secondary-button" href="https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">Google Maps</a>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </section>
   </main>
   <div data-site-footer></div>
   <div data-sticky-booking></div>

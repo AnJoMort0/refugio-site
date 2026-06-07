@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title data-i18n="bookingSentPage.meta.title">Refúgio | Pedido de reserva enviado</title>
+  <title data-i18n="bookingSentPage.meta.title">O Refúgio | Pedido de reserva enviado</title>
   <meta
     name="description"
-    content="Resumo do pedido de reserva enviado para o Refúgio e próximos passos de confirmação por email."
+    content="Resumo do pedido de reserva enviado para O Refúgio e próximos passos de confirmação por email."
     data-i18n-attr='{"content":"bookingSentPage.meta.description"}'
   />
   <link rel="stylesheet" href="./css/reset.css" />
@@ -78,6 +78,10 @@
                 <dt data-i18n="bookingSentPage.summary.depositLabel">Depósito com a reserva</dt>
                 <dd id="sent-deposit">Não</dd>
               </div>
+              <div id="sent-bikes-row" hidden>
+                <dt data-i18n="bookingSentPage.summary.bikesLabel">Bicicletas</dt>
+                <dd id="sent-bikes">-</dd>
+              </div>
               <div>
                 <dt data-i18n="bookingSentPage.summary.contactNameLabel">Responsável</dt>
                 <dd id="sent-contact-name">-</dd>
@@ -115,6 +119,11 @@
                 <h3 data-i18n="bookingSentPage.summary.childAgesTitle">Idades das crianças</h3>
                 <ul id="sent-child-ages" class="booking-sent-list"></ul>
               </section>
+
+              <section id="sent-bike-days-card" class="booking-sent-detail-card" hidden>
+                <h3 data-i18n="bookingSentPage.summary.bikeDaysTitle">Bicicletas pedidas</h3>
+                <ul id="sent-bike-days" class="booking-sent-list"></ul>
+              </section>
             </div>
 
             <section id="sent-comments-card" class="booking-sent-detail-card" hidden>
@@ -145,10 +154,10 @@
             <div class="booking-card-header">
               <p class="eyebrow" data-i18n="bookingSentPage.actions.eyebrow">Contacto</p>
               <h2 data-i18n="bookingSentPage.actions.title">Quer acrescentar alguma informação?</h2>
-              <p data-i18n="bookingSentPage.actions.text">Se precisar de completar o pedido, esclarecer um detalhe ou antecipar uma questão, pode usar a página de contacto e escolher WhatsApp, chamada ou email.</p>
+              <p data-i18n="bookingSentPage.actions.text">Se precisar de completar o pedido, esclarecer um detalhe ou antecipar uma questão, pode usar a página de contacto e indicar como prefere receber resposta.</p>
             </div>
             <div class="booking-sent-actions">
-              <a class="button booking-contact-button" href="./contacto.html" data-i18n="bookingSentPage.actions.whatsapp">Abrir página de contacto</a>
+              <a class="button booking-contact-button" href="./contacto.html" data-i18n="bookingSentPage.actions.contact">Abrir página de contacto</a>
               <a class="button booking-reset-button" href="./reservas.html" data-i18n="bookingSentPage.actions.back">Voltar às reservas</a>
             </div>
           </section>

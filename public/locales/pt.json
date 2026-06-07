@@ -1,11 +1,11 @@
 {
   "meta": {
     "htmlLang": "pt-PT",
-    "title": "Refúgio | Página Inicial",
+    "title": "O Refúgio | Página Inicial",
     "description": "Página inicial para o website do alojamento local."
   },
   "brand": {
-    "name": "Refúgio"
+    "name": "O Refúgio"
   },
   "languageSwitcher": {
     "label": "Escolher idioma"
@@ -31,7 +31,7 @@
     "accommodation": {
       "eyebrow": "O Alojamento",
       "title": "Só para si, entre conforto, natureza e total privacidade.",
-      "text1": "Pensado para receber até 6 pessoas, o Refúgio combina o charme rural da serra com interiores acolhedores, jardins tranquilos e espaços feitos para abrandar. Aqui, cada estadia é vivida em exclusivo, com toda a casa, piscina e zonas exteriores reservadas apenas para quem a escolhe.",
+      "text1": "Pensado para receber até 6 pessoas, O Refúgio combina o charme rural da serra com interiores acolhedores, jardins tranquilos e espaços feitos para abrandar. Aqui, cada estadia é vivida em exclusivo, com toda a casa, piscina e zonas exteriores reservadas apenas para quem a escolhe.",
       "text2": "Entre a sala de estar acolhedora, os quartos serenos, os recantos exteriores e os momentos à volta do churrasco, tudo convida a desfrutar sem pressa, em família, a dois ou entre amigos.",
       "link": "Descobrir o espaço",
       "imageAlt": "Interior acolhedor do alojamento"
@@ -79,7 +79,8 @@
       "quote7": "“A casa é impressionante: bonita, confortável e muito limpa. A nossa estadia foi de 10. Sem dúvida uma das melhores experiências — vamos voltar.”",
       "author7": "Sonia — Espanha",
       "quote8": "“Perfeita para uma escapadinha em família. Jardim amplo, piscina com sol todo o dia e excelente localização. Repetiremos sem dúvida.”",
-      "author8": "Raquel — Espanha"
+      "author8": "Raquel — Espanha",
+      "reviewCta": "Adicionar avaliação no Google Maps"
     },
     "sponsors": {
       "eyebrow": "Parceiros Locais",
@@ -98,7 +99,7 @@
   },
   "galleryPage": {
     "meta": {
-      "title": "Refúgio | Galeria",
+      "title": "O Refúgio | Galeria",
       "description": "Galeria completa do Refúgio com os espaços interiores, exteriores e ambiente da estadia."
     },
     "hero": {
@@ -118,13 +119,13 @@
   },
   "bookingPage": {
     "meta": {
-      "title": "Refúgio | Reservas",
-      "description": "Consulte a disponibilidade do Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
+      "title": "O Refúgio | Reservas",
+      "description": "Consulte a disponibilidade d'O Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
     },
     "hero": {
       "eyebrow": "Reservas",
       "title": "Escolha as datas e prepare a sua estadia.",
-      "text": "Consulte a disponibilidade do Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
+      "text": "Consulte a disponibilidade d'O Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
     },
     "availability": {
       "eyebrow": "Disponibilidade",
@@ -139,7 +140,12 @@
     },
     "guests": {
       "eyebrow": "Hóspedes",
-      "title": "Quem vai ficar no Refúgio?"
+      "title": "Quem vai ficar n'O Refúgio?"
+    },
+    "bikes": {
+      "eyebrow": "Bicicletas",
+      "title": "Quer reservar bicicletas?",
+      "text": "Pode pedir até uma bicicleta por pessoa, por dia. Não precisa de reservar para todos os dias da estadia."
     },
     "details": {
       "eyebrow": "Detalhes",
@@ -175,6 +181,12 @@
       "timezoneWarning": "Atenção ao fuso horário de Portugal continental (1h mais cedo do que Espanha, França, Suíça e Suécia).",
       "depositToggleLabel": "Pretendo adiantar o depósito de segurança com a reserva",
       "depositToggleHelp": "Por defeito, o depósito de 200€ é entregue em numerário no check-in. Se selecionar esta opção, poderá indicar que prefere incluí-lo logo na transferência para a reserva.",
+      "bikeToggleLabel": "Gostaria de alugar bicicletas durante a estadia?",
+      "bikeToggleHelp": "Pode adicionar este pedido agora ou tratar connosco mais tarde.",
+      "bikeDaysTitle": "Pedido de bicicletas",
+      "bikeDaysText": "O aluguer custa 5€ por bicicleta por dia. Pode pedir até uma bicicleta por hóspede, e escolher apenas alguns dias da estadia.",
+      "bikeCountLabel": "Número de bicicletas",
+      "bikeRentalDaysLabel": "Dias de aluguer",
       "commentsLabel": "Comentários ou pedidos especiais",
       "commentsPlaceholder": "Ex.: horários extraordinários de chegada, pedidos, dúvida sobre acessos...",
       "rulesConfirmLabel": "Confirmo que li e aceito as regras da casa",
@@ -190,6 +202,7 @@
       "text": "Valores de referência para o desenho da página. Pode substituir estes montantes mais tarde.",
       "rateAdultLabel": "Adulto / noite",
       "rateChildLabel": "Criança / noite",
+      "rateBikeLabel": "Bicicleta / dia",
       "depositLabel": "Depósito de segurança",
       "nightsLabel": "Noites",
       "guestsLabel": "Hóspedes",
@@ -202,6 +215,9 @@
       "depositChoiceLabel": "Depósito com a reserva",
       "depositChoiceYes": "Sim",
       "depositChoiceNo": "Não",
+      "bikesLabel": "Bicicletas",
+      "bikesSingle": "1 bicicleta-dia",
+      "bikesMultiple": "{count} bicicleta-dias",
       "estimatedTotalLabel": "Total estimado",
       "note": "O valor final poderá variar consoante as datas, o número de hóspedes e eventuais condições adicionais.",
       "depositNote": "Se adiantar o depósito de segurança, os 200€ serão devolvidos no check-out após verificação do espaço."
@@ -209,7 +225,7 @@
     "contact": {
       "eyebrow": "Contacto",
       "title": "Prefere confirmar detalhes primeiro?",
-      "text": "Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode abrir a página de contacto. Lá poderá também escolher falar por WhatsApp, ou  pedir chamada.",
+      "text": "Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode abrir a página de contacto e indicar como prefere receber resposta.",
       "button": "Abrir página de contacto"
     },
     "highlights": {
@@ -231,6 +247,10 @@
       "occupiedRange": "O intervalo escolhido inclui datas ocupadas.",
       "minimumAdults": "É necessário pelo menos 1 adulto.",
       "maxGuests": "O máximo permitido é 6 hóspedes no total.",
+      "bikeDatesRequired": "Escolha as datas da estadia antes de reservar bicicletas.",
+      "bikesRequired": "Indique pelo menos uma bicicleta, ou desative esta opção.",
+      "bikesMax": "Só é possível pedir uma bicicleta por hóspede, por dia.",
+      "bikeDaysMax": "Os dias de aluguer devem estar dentro da duração da estadia.",
       "bedPreferenceRequired": "Escolha se preferem cama de casal ou camas individuais.",
       "contactNameRequired": "Indique o nome do responsável pela reserva.",
       "emailRequired": "Indique o email do responsável pela reserva.",
@@ -244,8 +264,8 @@
   },
   "bookingSentPage": {
     "meta": {
-      "title": "Refúgio | Pedido de reserva enviado",
-      "description": "Resumo do pedido de reserva enviado para o Refúgio e próximos passos de confirmação por email."
+      "title": "O Refúgio | Pedido de reserva enviado",
+      "description": "Resumo do pedido de reserva enviado para O Refúgio e próximos passos de confirmação por email."
     },
     "hero": {
       "eyebrow": "Pedido enviado",
@@ -265,6 +285,7 @@
       "adultsLabel": "Adultos",
       "kidsLabel": "Crianças",
       "bedPreferenceLabel": "Camas",
+      "bikesLabel": "Bicicletas",
       "depositLabel": "Depósito com a reserva",
       "contactNameLabel": "Responsável",
       "emailLabel": "Email de contacto",
@@ -274,6 +295,7 @@
       "estimatedTotalLabel": "Total estimado",
       "depositNote": "Se optou por adiantar o depósito, os 200€ serão devolvidos no check-out após verificação do espaço.",
       "childAgesTitle": "Idades das crianças",
+      "bikeDaysTitle": "Bicicletas pedidas",
       "commentsTitle": "Comentários enviados"
     },
     "notice": {
@@ -288,7 +310,7 @@
     "actions": {
       "eyebrow": "Contacto",
       "title": "Quer acrescentar alguma informação?",
-      "text": "Se precisar de completar o pedido, esclarecer um detalhe ou antecipar uma questão, pode usar a página de contacto e escolher WhatsApp, chamada ou email.",
+      "text": "Se precisar de completar o pedido, esclarecer um detalhe ou antecipar uma questão, pode usar a página de contacto e indicar como prefere receber resposta.",
       "contact": "Abrir página de contacto",
       "back": "Voltar às reservas"
     }
@@ -373,20 +395,21 @@
     }
   },
   "footer": {
-    "copyright": "© Refúgio — Família Rodrigues",
+    "copyright": "© O Refúgio — Família Rodrigues",
+    "googleReview": "Adicionar avaliação no Google Maps",
     "admin": "Área de gestão"
   },
   "stickyBookingCta": "Reservar",
   "accommodation": {
     "meta": {
-      "title": "Refúgio | Alojamento",
-      "description": "Conheça o alojamento Refúgio: uma casa privada em Castelo de Paiva com piscina, jardins, churrasqueira e vista para a serra."
+      "title": "O Refúgio | Alojamento",
+      "description": "Conheça O Refúgio: uma casa privada em Castelo de Paiva com piscina, jardins, churrasqueira e vista para a serra."
     },
     "hero": {
       "imageAlt": "Casa rural Refúgio com piscina e vista para a serra",
       "eyebrow": "O Alojamento",
       "title": "Uma casa inteira, só para si, no coração da serra.",
-      "text": "Entre a tranquilidade das montanhas de Castelo de Paiva e a vista aberta sobre o Douro, o Refúgio foi pensado para quem procura privacidade, conforto e tempo para abrandar.",
+      "text": "Entre a tranquilidade das montanhas de Castelo de Paiva e a vista aberta sobre o Douro, O Refúgio foi pensado para quem procura privacidade, conforto e tempo para abrandar.",
       "cta": "Ver disponibilidade"
     },
     "overview": {
@@ -488,7 +511,7 @@
       "technology": {
         "title": "Tecnologia e entretenimento",
         "item1": "Wi-Fi gratuito com hotspot portátil",
-        "item2": "Televisões na sala, churrasqueira e quarto de beliche",
+        "item2": "Televisões na sala, churrasqueira e em todos os quartos",
         "item3": "Canais nacionais por cabo"
       },
 

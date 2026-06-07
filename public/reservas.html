@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title data-i18n="bookingPage.meta.title">Refúgio | Reservas</title>
+  <title data-i18n="bookingPage.meta.title">O Refúgio | Reservas</title>
   <meta
     name="description"
-    content="Consulte a disponibilidade do Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
+    content="Consulte a disponibilidade d'O Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
     data-i18n-attr='{"content":"bookingPage.meta.description"}'
   />
   <link rel="stylesheet" href="./css/reset.css" />
@@ -25,7 +25,7 @@
       <div class="container content-column">
         <p class="eyebrow" data-i18n="bookingPage.hero.eyebrow">Reservas</p>
         <h1 data-i18n="bookingPage.hero.title">Escolha as datas e prepare a sua estadia.</h1>
-        <p data-i18n="bookingPage.hero.text">Consulte a disponibilidade do Refúgio, escolha as datas da estadia e envie o seu pedido de reserva.</p>
+        <p data-i18n="bookingPage.hero.text">Consulte a disponibilidade d'O Refúgio, escolha as datas da estadia e envie o seu pedido de reserva.</p>
       </div>
     </section>
 
@@ -64,7 +64,7 @@
           <article class="booking-card">
             <div class="booking-card-header">
               <p class="eyebrow" data-i18n="bookingPage.guests.eyebrow">Hóspedes</p>
-              <h2 data-i18n="bookingPage.guests.title">Quem vai ficar no Refúgio?</h2>
+              <h2 data-i18n="bookingPage.guests.title">Quem vai ficar n'O Refúgio?</h2>
             </div>
 
             <div class="guest-count-grid">
@@ -112,6 +112,34 @@
 
             <div class="dynamic-group booking-identity-note">
               <div class="dynamic-group-header">
+              </div>
+            </div>
+          </article>
+
+          <article class="booking-card">
+            <label class="booking-toggle">
+              <input id="bike-reservation-toggle" name="bike_reservation" type="checkbox" />
+              <span class="booking-toggle-control" aria-hidden="true"></span>
+              <span class="booking-toggle-copy">
+                <strong data-i18n="bookingPage.form.bikeToggleLabel">Gostaria de alugar bicicletas durante a estadia?</strong>
+                <small data-i18n="bookingPage.form.bikeToggleHelp">Pode adicionar este pedido agora ou tratar connosco mais tarde.</small>
+              </span>
+            </label>
+
+            <div id="bike-days-group" class="dynamic-group" hidden>
+              <div class="dynamic-group-header">
+                <h3 data-i18n="bookingPage.form.bikeDaysTitle">Pedido de bicicletas</h3>
+                <p data-i18n="bookingPage.form.bikeDaysText">O aluguer custa 5€ por bicicleta por dia. Pode pedir até uma bicicleta por hóspede, e escolher apenas alguns dias da estadia.</p>
+              </div>
+              <div class="booking-date-fields">
+                <label class="field">
+                  <span data-i18n="bookingPage.form.bikeCountLabel">Número de bicicletas</span>
+                  <input id="bike-count" name="bike_count" type="number" min="1" max="2" step="1" value="1" />
+                </label>
+                <label class="field">
+                  <span data-i18n="bookingPage.form.bikeRentalDaysLabel">Dias de aluguer</span>
+                  <input id="bike-rental-days" name="bike_rental_days" type="number" min="1" max="1" step="1" value="1" />
+                </label>
               </div>
             </div>
           </article>
@@ -179,8 +207,8 @@
               </label>
             </div>
 
-            <p class="field-hint" data-i18n="bookingPage.form.timeHelp">Se não for possível indicar agora, terá que nos informar das horas com pelo menos 48h de antecedência, para podermos preparar a vossa estadia.</p>
             <p class="field-hint" data-i18n="bookingPage.form.timeRangeHelp">Check-in entre as 15h00 e as 19h00. Check-out entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.</p>
+            <p class="field-hint" data-i18n="bookingPage.form.timeHelp">Se não for possível indicar agora, terá que nos informar das horas com pelo menos 48h de antecedência, para podermos preparar a vossa estadia.</p>
             <p class="field-hint field-warning" data-i18n="bookingPage.form.timezoneWarning">Atenção ao fuso horário de Portugal continental (1h mais cedo do que Espanha, França, Suíça e Suécia).</p>
 
             <label class="booking-toggle">
@@ -243,6 +271,10 @@
                 <dt data-i18n="bookingPage.summary.rateChildLabel">Criança / noite</dt>
                 <dd data-price-child>28€</dd>
               </div>
+              <div id="summary-bike-rate" hidden>
+                <dt data-i18n="bookingPage.summary.rateBikeLabel">Bicicleta / dia</dt>
+                <dd data-price-bike>5€</dd>
+              </div>
               <div id="summary-deposit-rate" hidden>
                 <dt data-i18n="bookingPage.summary.depositLabel">Depósito de segurança</dt>
                 <dd data-price-deposit>200€</dd>
@@ -270,6 +302,10 @@
                 <dt data-i18n="bookingPage.summary.depositChoiceLabel">Depósito com a reserva</dt>
                 <dd id="summary-deposit-choice">Não</dd>
               </div>
+              <div id="summary-bikes-row" hidden>
+                <dt data-i18n="bookingPage.summary.bikesLabel">Bicicletas</dt>
+                <dd id="summary-bikes">0 dias</dd>
+              </div>
               <div id="summary-bed-preference-row" hidden>
                 <dt data-i18n="bookingPage.summary.bedPreferenceLabel">Camas</dt>
                 <dd id="summary-bed-preference">-</dd>
@@ -289,7 +325,7 @@
             <div class="booking-card-header">
               <p class="eyebrow" data-i18n="bookingPage.contact.eyebrow">Contacto</p>
               <h2 data-i18n="bookingPage.contact.title">Prefere confirmar detalhes primeiro?</h2>
-              <p data-i18n="bookingPage.contact.text">Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode abrir a página de contacto. Lá poderá também escolher falar por WhatsApp, ou  pedir chamada.</p>
+              <p data-i18n="bookingPage.contact.text">Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode abrir a página de contacto e indicar como prefere receber resposta.</p>
             </div>
             <div class="booking-contact-methods">
               <a class="button booking-contact-button" href="./contacto.html" data-i18n="bookingPage.contact.button">Abrir página de contacto</a>

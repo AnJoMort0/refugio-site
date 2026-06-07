@@ -1,11 +1,11 @@
 {
   "meta": {
     "htmlLang": "fr",
-    "title": "Refuge Rural | Prototype de la page d’accueil",
+    "title": "O Refúgio | Accueil",
     "description": "Prototype de page d’accueil pour un site premium d’hébergement rural."
   },
   "brand": {
-    "name": "Refuge Rural"
+    "name": "O Refúgio"
   },
   "languageSwitcher": {
     "label": "Choisir la langue"
@@ -88,7 +88,8 @@
       "quote7": "« Témoignage provisoire sur la propreté, le confort et l’envie de revenir. »",
       "author7": "Nom du client",
       "quote8": "« Témoignage provisoire sur une escapade en famille et le jardin ensoleillé. »",
-      "author8": "Nom du client"
+      "author8": "Nom du client",
+      "reviewCta": "Ajouter un avis sur Google Maps"
     },
     "sponsors": {
       "eyebrow": "Partenaires Locaux",
@@ -107,8 +108,8 @@
   },
   "galleryPage": {
     "meta": {
-      "title": "Refuge Rural | Galerie",
-      "description": "Galerie complète du Refuge Rural avec les espaces intérieurs, extérieurs et l’ambiance du séjour."
+      "title": "O Refúgio | Galerie",
+      "description": "Galerie complète d’O Refúgio avec les espaces intérieurs, extérieurs et l’ambiance du séjour."
     },
     "hero": {
       "eyebrow": "Galerie",
@@ -126,7 +127,8 @@
     }
   },
   "footer": {
-    "copyright": "© Refuge Rural — Prototype de la page d’accueil",
+    "copyright": "© O Refúgio — Famille Rodrigues",
+    "googleReview": "Ajouter un avis sur Google Maps",
     "admin": "Espace de gestion"
   },
   "stickyBookingCta": "Réserver"

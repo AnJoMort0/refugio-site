@@ -5,6 +5,8 @@ const NAV_ITEMS = [
   { key: 'contact', href: './contacto.html', labelKey: 'nav.contact' },
   { key: 'guide', href: './guia-local.html', labelKey: 'nav.guide' }
 ];
+const GOOGLE_REVIEW_URL =
+  'https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D';
 
 function buildHeader(activePage) {
   const navLinks = NAV_ITEMS.map(({ key, href, labelKey }) => {
@@ -15,7 +17,7 @@ function buildHeader(activePage) {
   return `
     <header class="site-header">
       <div class="container header-inner">
-        <a class="brand" href="./index.html" data-i18n="brand.name">Refúgio</a>
+        <a class="brand" href="./index.html" data-i18n="brand.name">O Refúgio</a>
 
         <div class="header-actions">
           <a class="header-contact" href="./contacto.html">
@@ -70,9 +72,10 @@ function buildFooter() {
   return `
     <footer class="site-footer">
       <div class="container footer-inner">
-        <p data-i18n="footer.copyright">© Refúgio — Família Rodrigues</p>
+        <p data-i18n="footer.copyright">© O Refúgio — Família Rodrigues</p>
         <div class="footer-links">
           <a href="./contacto.html" data-i18n="nav.contact">Contacto</a>
+          <a href="${GOOGLE_REVIEW_URL}" target="_blank" rel="noopener" data-i18n="footer.googleReview">Adicionar avaliação no Google Maps</a>
           <a href="./admin.html" data-i18n="footer.admin">Área de gestão</a>
         </div>
       </div>

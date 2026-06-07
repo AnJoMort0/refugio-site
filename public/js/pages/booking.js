@@ -2,6 +2,7 @@ const DEFAULT_LANGUAGE = 'pt';
 const PRICE_CONFIG = {
   adultPerNight: 48,
   childPerNight: 28,
+  bikePerDay: 5,
   securityDeposit: 200
 };
 
@@ -50,10 +51,11 @@ function formatCurrency(value) {
   return `${Math.round(value)}€`;
 }
 
-function buildReservationTotal({ nights, adults, children, includeDeposit }) {
+function buildReservationTotal({ nights, adults, children, includeDeposit, bikeDays = 0 }) {
   const stayValue =
     nights > 0 ? nights * (adults * PRICE_CONFIG.adultPerNight + children * PRICE_CONFIG.childPerNight) : 0;
-  return stayValue + (includeDeposit ? PRICE_CONFIG.securityDeposit : 0);
+  const bikeValue = bikeDays * PRICE_CONFIG.bikePerDay;
+  return stayValue + bikeValue + (includeDeposit ? PRICE_CONFIG.securityDeposit : 0);
 }
 
 function buildOccupiedRanges(today) {
@@ -110,6 +112,10 @@ export async function initBookingPage() {
   const checkinTimeInput = document.querySelector('#checkin-time');
   const checkoutTimeInput = document.querySelector('#checkout-time');
   const depositPrepayInput = document.querySelector('#deposit-prepay');
+  const bikeReservationToggle = document.querySelector('#bike-reservation-toggle');
+  const bikeDaysGroup = document.querySelector('#bike-days-group');
+  const bikeCountInput = document.querySelector('#bike-count');
+  const bikeRentalDaysInput = document.querySelector('#bike-rental-days');
   const rulesConfirmationInput = document.querySelector('#rules-confirmation');
   const bedPreferenceInputs = Array.from(document.querySelectorAll('input[name="bed_preference"]'));
   const childAgesGroup = document.querySelector('#child-ages-group');
@@ -122,6 +128,9 @@ export async function initBookingPage() {
   const summaryAdults = document.querySelector('#summary-adults');
   const summaryKids = document.querySelector('#summary-kids');
   const summaryDepositChoice = document.querySelector('#summary-deposit-choice');
+  const summaryBikesRow = document.querySelector('#summary-bikes-row');
+  const summaryBikes = document.querySelector('#summary-bikes');
+  const summaryBikeRate = document.querySelector('#summary-bike-rate');
   const summaryBedPreferenceRow = document.querySelector('#summary-bed-preference-row');
   const summaryBedPreference = document.querySelector('#summary-bed-preference');
   const summaryTotal = document.querySelector('#summary-total');
@@ -129,6 +138,7 @@ export async function initBookingPage() {
   const summaryDepositNote = document.querySelector('#summary-deposit-note');
   const priceAdult = document.querySelector('[data-price-adult]');
   const priceChild = document.querySelector('[data-price-child]');
+  const priceBike = document.querySelector('[data-price-bike]');
   const priceDeposit = document.querySelector('[data-price-deposit]');
 
   const portugalNow = getPortugalNow();
@@ -249,6 +259,44 @@ export async function initBookingPage() {
     childAgeFields.replaceChildren(fragment);
   }
 
+  function getBikeDayTotal() {
+    if (!bikeReservationToggle?.checked) return 0;
+    const bikes = Math.max(0, Number(bikeCountInput?.value || 0));
+    const days = Math.max(0, Number(bikeRentalDaysInput?.value || 0));
+    return bikes * days;
+  }
+
+  function clampBikeInput(input) {
+    if (!input) return;
+    const max = Math.max(1, Number(input.max || 1));
+    const value = Number(input.value || 0);
+
+    if (!input.value) return;
+    input.value = String(Math.max(1, Math.min(max, value)));
+  }
+
+  function renderBikeDayFields({ forceDefaults = false } = {}) {
+    if (!bikeDaysGroup || !bikeReservationToggle) return;
+    const isEnabled = bikeReservationToggle.checked;
+    const { total } = getGuestCounts();
+    const nights = diffNights(checkinInput.value, checkoutInput.value);
+    const maxDays = Math.max(1, nights || 1);
+
+    bikeDaysGroup.hidden = !isEnabled;
+
+    if (bikeCountInput) {
+      bikeCountInput.max = String(total);
+      if (forceDefaults && !bikeCountInput.value) bikeCountInput.value = '1';
+      clampBikeInput(bikeCountInput);
+    }
+
+    if (bikeRentalDaysInput) {
+      bikeRentalDaysInput.max = String(maxDays);
+      if (forceDefaults && !bikeRentalDaysInput.value) bikeRentalDaysInput.value = '1';
+      clampBikeInput(bikeRentalDaysInput);
+    }
+  }
+
   function datesOverlapOccupied(checkIn, checkOut) {
     if (!checkIn || !checkOut) return false;
     return eachDate(parseDateKey(checkIn), parseDateKey(checkOut)).some((date) =>
@@ -281,13 +329,20 @@ export async function initBookingPage() {
     const nights = diffNights(checkinInput.value, checkoutInput.value);
     const includeDeposit = Boolean(depositPrepayInput?.checked);
     const selectedBedPreference = bedPreferenceInputs.find((input) => input.checked)?.value || '';
-    const totalValue = buildReservationTotal({ nights, adults, children, includeDeposit });
+    const bikeDays = getBikeDayTotal();
+    const totalValue = buildReservationTotal({ nights, adults, children, includeDeposit, bikeDays });
 
     priceAdult.textContent = formatCurrency(PRICE_CONFIG.adultPerNight);
     priceChild.textContent = formatCurrency(PRICE_CONFIG.childPerNight);
+    if (priceBike) {
+      priceBike.textContent = formatCurrency(PRICE_CONFIG.bikePerDay);
+    }
     priceDeposit.textContent = formatCurrency(PRICE_CONFIG.securityDeposit);
     if (summaryDepositRate) {
       summaryDepositRate.hidden = !includeDeposit;
+    }
+    if (summaryBikeRate) {
+      summaryBikeRate.hidden = bikeDays === 0;
     }
     if (summaryDepositNote) {
       summaryDepositNote.hidden = !includeDeposit;
@@ -300,6 +355,13 @@ export async function initBookingPage() {
       summaryDepositChoice.textContent = includeDeposit
         ? getText('bookingPage.summary.depositChoiceYes', 'Sim')
         : getText('bookingPage.summary.depositChoiceNo', 'Não');
+    }
+    if (summaryBikesRow && summaryBikes) {
+      summaryBikesRow.hidden = bikeDays === 0;
+      summaryBikes.textContent =
+        bikeDays === 1
+          ? getText('bookingPage.summary.bikesSingle', '1 bicicleta-dia')
+          : getText('bookingPage.summary.bikesMultiple', '{count} bicicleta-dias').replace('{count}', String(bikeDays));
     }
     if (summaryBedPreferenceRow && summaryBedPreference) {
       const showBedPreference = needsBedPreference();
@@ -454,8 +516,9 @@ export async function initBookingPage() {
             }
           }
 
-          renderCalendar();
+          renderBikeDayFields();
           renderSummary();
+          renderCalendar();
         });
 
         daysGrid.append(button);
@@ -552,6 +615,7 @@ export async function initBookingPage() {
     const childAgeInputs = Array.from(childAgeFields.querySelectorAll('input'));
 
     childAgeInputs.forEach((input) => clearFieldValidity(input));
+    [bikeCountInput, bikeRentalDaysInput].forEach((input) => clearFieldValidity(input));
     clearFieldValidity(adultInput);
     clearFieldValidity(childInput);
     bedPreferenceInputs.forEach((input) => clearFieldValidity(input));
@@ -621,6 +685,40 @@ export async function initBookingPage() {
       return message;
     }
 
+    if (bikeReservationToggle?.checked) {
+      const bikeCount = Math.max(0, Number(bikeCountInput?.value || 0));
+      const rentalDays = Math.max(0, Number(bikeRentalDaysInput?.value || 0));
+      const nights = Math.max(diffNights(checkinInput.value, checkoutInput.value), 0);
+
+      if (!checkinInput.value || !checkoutInput.value) {
+        const message = getText('bookingPage.validation.bikeDatesRequired', 'Escolha as datas da estadia antes de reservar bicicletas.');
+        setFieldValidity(bikeReservationToggle, message);
+        if (showBrowserMessages) bikeReservationToggle.reportValidity();
+        return message;
+      }
+
+      if (bikeCount < 1) {
+        const message = getText('bookingPage.validation.bikesRequired', 'Indique pelo menos uma bicicleta, ou desative esta opção.');
+        setFieldValidity(bikeCountInput, message);
+        if (showBrowserMessages) bikeCountInput?.reportValidity();
+        return message;
+      }
+
+      if (bikeCount > total) {
+        const message = getText('bookingPage.validation.bikesMax', 'Só é possível pedir uma bicicleta por hóspede, por dia.');
+        setFieldValidity(bikeCountInput, message);
+        if (showBrowserMessages) bikeCountInput?.reportValidity();
+        return message;
+      }
+
+      if (rentalDays < 1 || rentalDays > nights) {
+        const message = getText('bookingPage.validation.bikeDaysMax', 'Os dias de aluguer devem estar dentro da duração da estadia.');
+        setFieldValidity(bikeRentalDaysInput, message);
+        if (showBrowserMessages) bikeRentalDaysInput?.reportValidity();
+        return message;
+      }
+    }
+
     if (needsBedPreference() && !bedPreferenceInputs.some((input) => input.checked)) {
       const message = getText('bookingPage.validation.bedPreferenceRequired', 'Escolha se preferem cama de casal ou camas individuais.');
       bedPreferenceInputs.forEach((input) => setFieldValidity(input, message));
@@ -650,6 +748,7 @@ export async function initBookingPage() {
   function rerenderDynamicContent() {
     renderBedPreference();
     renderChildAgeFields();
+    renderBikeDayFields();
     renderSummary();
     renderCalendar();
   }
@@ -664,12 +763,14 @@ export async function initBookingPage() {
       checkoutInput.value = '';
     }
     setStatus('');
+    renderBikeDayFields();
     renderSummary();
     renderCalendar();
   });
 
   checkoutInput.addEventListener('change', () => {
     setStatus(validateDateSelection(false));
+    renderBikeDayFields();
     renderSummary();
     renderCalendar();
   });
@@ -734,6 +835,26 @@ export async function initBookingPage() {
     renderSummary();
   });
 
+  bikeReservationToggle?.addEventListener('change', () => {
+    clearFieldValidity(bikeReservationToggle);
+    renderBikeDayFields({ forceDefaults: bikeReservationToggle.checked });
+    renderSummary();
+  });
+
+  [bikeCountInput, bikeRentalDaysInput].forEach((input) =>
+    input?.addEventListener('input', () => {
+      clearFieldValidity(input);
+      renderSummary();
+    })
+  );
+
+  [bikeCountInput, bikeRentalDaysInput].forEach((input) =>
+    input?.addEventListener('change', () => {
+      clampBikeInput(input);
+      renderSummary();
+    })
+  );
+
   rulesConfirmationInput?.addEventListener('change', () => {
     clearFieldValidity(rulesConfirmationInput);
     setStatus('');
@@ -774,7 +895,10 @@ export async function initBookingPage() {
     const { adults, children, total } = getGuestCounts();
     const nights = Math.max(diffNights(checkinInput.value, checkoutInput.value), 0);
     const includeDeposit = Boolean(depositPrepayInput?.checked);
-    const totalEstimate = buildReservationTotal({ nights, adults, children, includeDeposit });
+    const bikeCount = bikeReservationToggle?.checked ? Math.max(0, Number(bikeCountInput?.value || 0)) : 0;
+    const bikeRentalDays = bikeReservationToggle?.checked ? Math.max(0, Number(bikeRentalDaysInput?.value || 0)) : 0;
+    const bikeDays = bikeCount * bikeRentalDays;
+    const totalEstimate = buildReservationTotal({ nights, adults, children, includeDeposit, bikeDays });
     const params = new URLSearchParams();
     const action = form.getAttribute('action') || './reserva-enviada.html';
     const commentsInput = form.querySelector('#reservation-comments');
@@ -807,6 +931,12 @@ export async function initBookingPage() {
 
     if (includeDeposit) {
       params.set('deposit_prepay', 'true');
+    }
+
+    if (bikeDays > 0) {
+      params.set('bike_count', String(bikeCount));
+      params.set('bike_rental_days', String(bikeRentalDays));
+      params.set('bike_days_total', String(bikeDays));
     }
 
     const comments = commentsInput instanceof HTMLTextAreaElement ? commentsInput.value.trim() : '';

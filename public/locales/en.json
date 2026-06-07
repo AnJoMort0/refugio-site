@@ -1,11 +1,11 @@
 {
   "meta": {
     "htmlLang": "en",
-    "title": "Rural Retreat | Homepage Prototype",
+    "title": "O Refúgio | Homepage",
     "description": "Prototype homepage for a premium rural accommodation website."
   },
   "brand": {
-    "name": "Rural Retreat"
+    "name": "O Refúgio"
   },
   "languageSwitcher": {
     "label": "Choose language"
@@ -88,7 +88,8 @@
       "quote7": "“Placeholder testimonial about cleanliness, comfort, and returning soon.”",
       "author7": "Guest name",
       "quote8": "“Placeholder testimonial about a family escape and sunny garden days.”",
-      "author8": "Guest name"
+      "author8": "Guest name",
+      "reviewCta": "Add a Google Maps review"
     },
     "sponsors": {
       "eyebrow": "Local Partners",
@@ -107,12 +108,12 @@
   },
   "galleryPage": {
     "meta": {
-      "title": "Rural Retreat | Gallery",
-      "description": "Full gallery of Rural Retreat with interiors, exteriors, and the atmosphere of the stay."
+      "title": "O Refúgio | Gallery",
+      "description": "Full gallery of O Refúgio with interiors, exteriors, and the atmosphere of the stay."
     },
     "hero": {
       "eyebrow": "Gallery",
-      "title": "Every part of Rural Retreat, unfiltered.",
+      "title": "Every part of O Refúgio, unfiltered.",
       "text": "Explore the house, outdoor spaces, pool, and stay details. Tap an image to open it large and zoom in."
     },
     "empty": "Could not load the gallery images.",
@@ -126,7 +127,8 @@
     }
   },
   "footer": {
-    "copyright": "© Rural Retreat — Prototype homepage",
+    "copyright": "© O Refúgio — Rodrigues Family",
+    "googleReview": "Add a Google Maps review",
     "admin": "Owner dashboard"
   },
   "stickyBookingCta": "Book now"
