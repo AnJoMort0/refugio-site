@@ -2,7 +2,7 @@
   "meta": {
     "htmlLang": "pt-PT",
     "title": "O Refúgio | Página Inicial",
-    "description": "Página inicial para o website do alojamento local."
+    "description": "Página inicial do alojamento local."
   },
   "brand": {
     "name": "O Refúgio"
@@ -19,6 +19,8 @@
     "contact": "Contacto",
     "guide": "Guia Local"
   },
+
+
   "home": {
     "hero": {
       "imageAlt": "Vista exterior da casa em pedra",
@@ -31,10 +33,9 @@
     "accommodation": {
       "eyebrow": "O Alojamento",
       "title": "Só para si, entre conforto, natureza e total privacidade.",
-      "text1": "Pensado para receber até 6 pessoas, O Refúgio combina o charme rural da serra com interiores acolhedores, jardins tranquilos e espaços feitos para abrandar. Aqui, cada estadia é vivida em exclusivo, com toda a casa, piscina e zonas exteriores reservadas apenas para quem a escolhe.",
+      "text1": "Pensado para receber até 6 pessoas, O Refúgio combina o charme rural da serra com interiores acolhedores, jardins feitos para abrandar. Aqui, cada estadia é vivida em exclusivo, com toda a casa, piscina e zonas exteriores reservadas apenas para quem a escolhe.",
       "text2": "Entre a sala de estar acolhedora, os quartos serenos, os recantos exteriores e os momentos à volta do churrasco, tudo convida a desfrutar sem pressa, em família, a dois ou entre amigos.",
-      "link": "Descobrir o espaço",
-      "imageAlt": "Interior acolhedor do alojamento"
+      "link": "Descobrir o espaço"
     },
     "gallery": {
       "eyebrow": "Galeria",
@@ -51,7 +52,7 @@
     "booking": {
       "eyebrow": "Reservas",
       "title": "Escolha as suas datas e garanta a sua escapadinha.",
-      "text": "Verifique a disponibilidade em poucos instantes e reserve o Refúgio em exclusivo para a sua estadia.",
+      "text": "Verifique a disponibilidade em poucos instantes e reserve o Refúgio para a sua estadia.",
       "cta": "Pedir reserva"
     },
     "local": {
@@ -64,6 +65,8 @@
     "testimonials": {
       "eyebrow": "Testemunhos",
       "title": "Um lugar ao qual se quer sempre voltar.",
+      "reviewCta": "Adicionar avaliação no Google Maps",
+      "reviewCta2": "Escreava-nos um comentário diretamente",
       "quote1": "“Foram dois dias excelentes, realmente um refúgio para quem gosta de fugir à confusão. A casa é enorme, a vista é espetacular e a piscina, jardim... tudo excecional. A voltar certamente!”",
       "author1": "Paulo — Portugal",
       "quote2": "“Um lugar privado maravilhoso para relaxar no meio da natureza. O Refúgio foi ainda melhor do que esperávamos, com vistas incríveis, muita privacidade e anfitriãs sempre atentas. Esperamos repetir em breve :)”",
@@ -79,8 +82,7 @@
       "quote7": "“A casa é impressionante: bonita, confortável e muito limpa. A nossa estadia foi de 10. Sem dúvida uma das melhores experiências — vamos voltar.”",
       "author7": "Sonia — Espanha",
       "quote8": "“Perfeita para uma escapadinha em família. Jardim amplo, piscina com sol todo o dia e excelente localização. Repetiremos sem dúvida.”",
-      "author8": "Raquel — Espanha",
-      "reviewCta": "Adicionar avaliação no Google Maps"
+      "author8": "Raquel — Espanha"
     },
     "sponsors": {
       "eyebrow": "Parceiros Locais",
@@ -96,6 +98,8 @@
       "card4": "Aquapura Terrace - Bar à beira rio",
       "card4Alt": "Bar local junto ao rio"
     }
+
+
   },
   "galleryPage": {
     "meta": {
@@ -116,21 +120,23 @@
       "zoomOut": "Reduzir imagem",
       "zoomReset": "Repor zoom"
     }
+
+
   },
   "bookingPage": {
     "meta": {
       "title": "O Refúgio | Reservas",
-      "description": "Consulte a disponibilidade d'O Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
+      "description": "Consulte a disponibilidade do Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
     },
     "hero": {
       "eyebrow": "Reservas",
-      "title": "Escolha as datas e prepare a sua estadia.",
-      "text": "Consulte a disponibilidade d'O Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
+      "title": "Prepare a sua estadia.",
+      "text": "Consulte a disponibilidade do Refúgio, escolha as datas da estadia e envie o seu pedido de reserva."
     },
     "availability": {
       "eyebrow": "Disponibilidade",
       "title": "Escolha as datas da sua estadia.",
-      "text": "As datas assinaladas como ocupadas não podem ser reservadas. A estadia mínima é de 2 noites.",
+      "text": "A estadia mínima é de 2 noites.",
       "legendAvailable": "Disponível",
       "legendOccupied": "Ocupado",
       "legendSelected": "Seleção",
@@ -140,12 +146,7 @@
     },
     "guests": {
       "eyebrow": "Hóspedes",
-      "title": "Quem vai ficar n'O Refúgio?"
-    },
-    "bikes": {
-      "eyebrow": "Bicicletas",
-      "title": "Quer reservar bicicletas?",
-      "text": "Pode pedir até uma bicicleta por pessoa, por dia. Não precisa de reservar para todos os dias da estadia."
+      "title": "Quem vai ficar no Refúgio?"
     },
     "details": {
       "eyebrow": "Detalhes",
@@ -154,15 +155,14 @@
     "form": {
       "checkinLabel": "Check-in",
       "checkoutLabel": "Check-out",
-      "dateHelp": "Selecione datas livres. Amanhã só pode ser reservado antes das 15h00 (hora de Portugal continental).",
+      "dateHelp": "Calendário sujeito a atualização. Disponibilidade mediante confirmação.",
       "adultsLabel": "Adultos",
       "kidsLabel": "Crianças",
-      "guestCountHelp": "Máximo de 6 hóspedes no total. As crianças correspondem a idades entre 0 e 12 anos.",
+      "guestCountHelp": "Máximo de 6 hóspedes no total.", 
+      "guestCountHelp2": "As crianças correspondem a idades entre 0 e 12 anos.",
       "bedPreferenceTitle": "Configuração das camas",
       "bedPreferenceDouble": "Preferimos cama de casal",
-      "bedPreferenceDoubleHelp": "Usar a única cama de casal disponível na propriedade.",
       "bedPreferenceSingle": "Preferimos camas individuais",
-      "bedPreferenceSingleHelp": "Organizar a estadia sem utilizar a cama de casal.",
       "childAgesTitle": "Idade das crianças",
       "childAgesText": "Indique a idade de cada criança no momento da estadia.",
       "childAgeLabel": "Idade da criança",
@@ -171,16 +171,15 @@
       "contactNamePlaceholder": "Nome completo",
       "emailLabel": "Email do responsável pela reserva",
       "emailPlaceholder": "nome@exemplo.com",
-      "phoneLabel": "Telefone com indicativo internacional",
+      "phoneLabel": "Telefone (com indicativo)",
       "phonePlaceholder": "+351 912 345 678",
-      "confirmationWarning": "A reserva será tratada por email. É por aí que seguirá a confirmação, os esclarecimentos pedidos e os dados para transferência. Sem transferência concluída, a reserva não fica confirmada.",
       "checkinTimeLabel": "Hora prevista de check-in",
       "checkoutTimeLabel": "Hora prevista de check-out",
       "timeHelp": "Se não for possível indicar agora, terá que nos informar das horas com pelo menos 48h de antecedência, para podermos preparar a vossa estadia.",
-      "timeRangeHelp": "Check-in entre as 15h00 e as 19h00. Check-out entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.",
+      "timeRangeHelp": "Check-in entre as 15h00 e as 19h00. Check-out entre as 08h00 e as 10h00.",
       "timezoneWarning": "Atenção ao fuso horário de Portugal continental (1h mais cedo do que Espanha, França, Suíça e Suécia).",
       "depositToggleLabel": "Pretendo adiantar o depósito de segurança com a reserva",
-      "depositToggleHelp": "Por defeito, o depósito de 200€ é entregue em numerário no check-in. Se selecionar esta opção, poderá indicar que prefere incluí-lo logo na transferência para a reserva.",
+      "depositToggleHelp": "O depósito de 200€ pode ser entregue em numerário no check-in ou pode selecionar esta opção para incluí-lo na transferência para a reserva.",
       "bikeToggleLabel": "Gostaria de alugar bicicletas durante a estadia?",
       "bikeToggleHelp": "Pode adicionar este pedido agora ou tratar connosco mais tarde.",
       "bikeDaysTitle": "Pedido de bicicletas",
@@ -190,16 +189,14 @@
       "commentsLabel": "Comentários ou pedidos especiais",
       "commentsPlaceholder": "Ex.: horários extraordinários de chegada, pedidos, dúvida sobre acessos...",
       "rulesConfirmLabel": "Confirmo que li e aceito as regras da casa",
-      "rulesConfirmHelp": "Antes de enviar o pedido, pedimos apenas que confirme alguns pontos importantes para garantir uma estadia tranquila.",
       "rulesLink": "Ver regras",
-      "submitNotice": "Este pedido não confirma automaticamente a reserva. A confirmação será enviada por email após validação da disponibilidade.",
+      "submitNotice": "Este pedido não confirma automaticamente a reserva. A a confirmação, os esclarecimentos pedidos e os dados para transferência serão enviada por email após validação da disponibilidade. Sem transferência concluída, a reserva não fica confirmada.",
       "submit": "Enviar pedido de reserva",
       "reset": "Limpar seleção"
     },
     "summary": {
       "eyebrow": "Resumo",
       "title": "Estimativa atual da estadia.",
-      "text": "Valores de referência para o desenho da página. Pode substituir estes montantes mais tarde.",
       "rateAdultLabel": "Adulto / noite",
       "rateChildLabel": "Criança / noite",
       "rateBikeLabel": "Bicicleta / dia",
@@ -225,7 +222,7 @@
     "contact": {
       "eyebrow": "Contacto",
       "title": "Prefere confirmar detalhes primeiro?",
-      "text": "Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode abrir a página de contacto e indicar como prefere receber resposta.",
+      "text": "Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode nos contactar.",
       "button": "Abrir página de contacto"
     },
     "highlights": {

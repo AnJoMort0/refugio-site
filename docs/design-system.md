@@ -3,16 +3,7 @@
 ## Mood
 Warm stone luxury, mountain calm, boutique rural retreat.
 
-## Suggested image placeholders
-- hero_exterior_stone_house.jpg
-- pool_mountain_view.jpg
-- suite_warm_interior.jpg
-- night_pool_lighting.jpg
-- local_mountain_trail.jpg
-
-
 # Multilingual prototype note
-
 The homepage has been prepared for multilingual expansion with a lightweight client-side i18n setup.
 
 ## Current approach
