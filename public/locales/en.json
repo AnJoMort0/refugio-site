@@ -16,6 +16,10 @@
     "fr": "Français",
     "es": "Español"
   },
+  "carousel": {
+    "previous": "Previous item",
+    "next": "Next item"
+  },
   "nav": {
     "toggleLabel": "Open menu",
     "toggleText": "Open menu",
@@ -95,7 +99,8 @@
       "author7": "Guest name",
       "quote8": "“Placeholder testimonial about a family escape and sunny garden days.”",
       "author8": "Guest name",
-      "reviewCta": "Add a Google Maps review"
+      "reviewCta": "Add a Google Maps review",
+      "reviewCta2": "Send feedback by message"
     },
     "sponsors": {
       "eyebrow": "Local Partners",

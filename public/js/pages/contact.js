@@ -1,40 +1,63 @@
 const DEFAULT_LANGUAGE = 'pt';
+const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
 const TOPIC_CONFIG = {
-  'Já tenho uma reserva': [
-    ['confirmedCancel', 'Cancelar reserva'],
-    ['confirmedChange', 'Alterar reserva'],
-    ['confirmedQuestion', 'Perguntas sobre a reserva']
-  ],
-  'Fiz um pedido de reserva': [
-    ['requestCancel', 'Cancelar pedido de reserva'],
-    ['requestChange', 'Alterar pedido de reserva'],
-    ['requestQuestion', 'Perguntas sobre pedido de reserva'],
-    ['requestStatus', 'Saber o estado do pedido']
-  ],
-  'Já tive uma reserva': [
-    ['pastFeedback', 'Estive aqui e quero deixar feedback'],
-    ['pastQuestion', 'Pergunta sobre uma estadia anterior']
-  ],
-  'Não tenho reserva': [
-    ['noReservationBooking', 'Perguntas sobre reservar'],
-    ['noReservationSpace', 'Perguntas sobre o espaço'],
-    ['noReservationAccessibility', 'Acessibilidade ou pedidos especiais'],
-    ['noReservationLocalArea', 'Perguntas sobre a zona'],
-    ['noReservationPartnerships', 'Parcerias ou imprensa'],
-    ['other', 'Outro']
+  confirmed: ['confirmedCancel', 'confirmedChange', 'confirmedQuestion'],
+  requested: ['requestCancel', 'requestChange', 'requestQuestion', 'requestStatus'],
+  past: ['pastFeedback', 'pastQuestion'],
+  none: [
+    'pastFeedback',
+    'noReservationBooking',
+    'noReservationSpace',
+    'noReservationAccessibility',
+    'noReservationLocalArea',
+    'noReservationPartnerships',
+    'other'
   ]
 };
 
 const LANGUAGE_BY_PAGE_LANG = {
-  pt: 'Português',
-  fr: 'Français',
-  en: 'English',
-  de: 'Deutsch',
-  es: 'Español'
+  pt: 'pt',
+  fr: 'fr',
+  en: 'en',
+  de: 'de',
+  es: 'es'
 };
 
 function getNestedValue(object, path) {
   return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
+}
+
+function mergeDictionaries(baseDictionary, overrideDictionary) {
+  if (!baseDictionary || typeof baseDictionary !== 'object') return overrideDictionary;
+  if (!overrideDictionary || typeof overrideDictionary !== 'object') return baseDictionary;
+
+  const mergedDictionary = { ...baseDictionary };
+
+  Object.entries(overrideDictionary).forEach(([key, value]) => {
+    if (
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      baseDictionary[key] &&
+      typeof baseDictionary[key] === 'object' &&
+      !Array.isArray(baseDictionary[key])
+    ) {
+      mergedDictionary[key] = mergeDictionaries(baseDictionary[key], value);
+      return;
+    }
+
+    mergedDictionary[key] = value;
+  });
+
+  return mergedDictionary;
+}
+
+async function loadLocale(language) {
+  const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
+  const response = await fetch(`./locales/${safeLanguage}.json`);
+
+  if (!response.ok) throw new Error(`Could not load locale file for ${safeLanguage}`);
+  return response.json();
 }
 
 function isValidPhoneNumber(value) {
@@ -64,23 +87,25 @@ export async function initContactPage() {
   const params = new URLSearchParams(window.location.search);
   let dictionary = {};
 
-  const getText = (path, fallback) => getNestedValue(dictionary, path) || fallback;
+  const getText = (path, fallback = '') => getNestedValue(dictionary, path) || fallback;
 
   async function loadDictionary() {
     try {
-      const language = localStorage.getItem('refugio-language') || DEFAULT_LANGUAGE;
-      const response = await fetch(`./locales/${language}.json`);
-      if (!response.ok) throw new Error('Locale not found');
-      dictionary = await response.json();
+      const language = (localStorage.getItem('refugio-language') || DEFAULT_LANGUAGE).slice(0, 2).toLowerCase();
+      const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
+      const fallbackDictionary = await loadLocale(DEFAULT_LANGUAGE);
+      dictionary = safeLanguage === DEFAULT_LANGUAGE
+        ? fallbackDictionary
+        : mergeDictionaries(fallbackDictionary, await loadLocale(safeLanguage));
     } catch (error) {
       dictionary = {};
     }
   }
 
   function getTopicOptions(context) {
-    return (TOPIC_CONFIG[context] || []).map(([key, fallback]) => ({
-      value: fallback,
-      label: getText(`contactPage.topics.${key}`, fallback)
+    return (TOPIC_CONFIG[context] || []).map((key) => ({
+      value: key,
+      label: getText(`contactPage.topics.${key}`)
     }));
   }
 
@@ -112,7 +137,7 @@ export async function initContactPage() {
     preferredContactSelect.querySelectorAll('[data-requires-phone]').forEach((option) => {
       option.dataset.locked = String(!phoneIsValid);
       option.setAttribute('aria-disabled', String(!phoneIsValid));
-      option.title = phoneIsValid ? '' : getText('contactPage.validation.phoneRequiredForMethod', 'Indique um telefone para usar esta opção.');
+      option.title = phoneIsValid ? '' : getText('contactPage.validation.phoneRequiredForMethod');
     });
   }
 
@@ -125,8 +150,8 @@ export async function initContactPage() {
     const placeholder = document.createElement('option');
     placeholder.value = '';
     placeholder.textContent = options.length
-      ? getText('contactPage.form.topicPlaceholder', 'Escolha uma opção')
-      : getText('contactPage.form.topicContextFirst', 'Escolha primeiro o contexto');
+      ? getText('contactPage.form.topicPlaceholder')
+      : getText('contactPage.form.topicContextFirst');
     topicSelect.append(placeholder);
 
     options.forEach(({ value, label }) => {
@@ -174,7 +199,7 @@ export async function initContactPage() {
     fields.forEach((input) => setFieldValidity(input, ''));
 
     if (phoneInput?.value.trim() && !isValidPhoneNumber(phoneInput.value)) {
-      setFieldValidity(phoneInput, getText('contactPage.validation.phoneInvalid', 'Indique um telefone válido.'));
+      setFieldValidity(phoneInput, getText('contactPage.validation.phoneInvalid'));
       phoneInput.reportValidity();
       return false;
     }
@@ -182,7 +207,7 @@ export async function initContactPage() {
     if (preferredContactSelect?.selectedOptions[0]?.dataset.requiresPhone !== undefined && !hasValidPhone()) {
       setFieldValidity(
         phoneInput,
-        getText('contactPage.validation.phoneRequiredForMethod', 'Indique um telefone para pedir contacto por telefone.')
+        getText('contactPage.validation.phoneRequiredForMethod')
       );
       blinkPhoneField();
       phoneInput?.reportValidity();
@@ -214,7 +239,7 @@ export async function initContactPage() {
   phoneInput?.addEventListener('input', () => {
     setFieldValidity(phoneInput, '');
     if (phoneInput.value.trim() && !isValidPhoneNumber(phoneInput.value)) {
-      setFieldValidity(phoneInput, getText('contactPage.validation.phoneInvalid', 'Indique um telefone válido.'));
+      setFieldValidity(phoneInput, getText('contactPage.validation.phoneInvalid'));
     }
     updatePhoneDependentOptions();
   });
@@ -225,10 +250,10 @@ export async function initContactPage() {
     if (preferredContactSelect.selectedOptions[0]?.dataset.requiresPhone !== undefined && !hasValidPhone()) {
       setFieldValidity(
         phoneInput,
-        getText('contactPage.validation.phoneRequiredForMethod', 'Indique um telefone para usar esta opção.')
+        getText('contactPage.validation.phoneRequiredForMethod')
       );
       blinkPhoneField();
-      preferredContactSelect.value = 'Email';
+      preferredContactSelect.value = 'email';
     }
   });
 

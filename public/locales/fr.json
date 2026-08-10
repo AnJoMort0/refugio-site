@@ -16,6 +16,10 @@
     "fr": "Français",
     "es": "Español"
   },
+  "carousel": {
+    "previous": "Élément précédent",
+    "next": "Élément suivant"
+  },
   "nav": {
     "toggleLabel": "Ouvrir le menu",
     "toggleText": "Ouvrir le menu",
@@ -95,7 +99,8 @@
       "author7": "Nom du client",
       "quote8": "« Témoignage provisoire sur une escapade en famille et le jardin ensoleillé. »",
       "author8": "Nom du client",
-      "reviewCta": "Ajouter un avis sur Google Maps"
+      "reviewCta": "Ajouter un avis sur Google Maps",
+      "reviewCta2": "Envoyer un commentaire par message"
     },
     "sponsors": {
       "eyebrow": "Partenaires Locaux",

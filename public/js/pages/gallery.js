@@ -27,17 +27,45 @@ export async function initGalleryPage() {
   const zoomInButton = document.querySelector('#lightbox-zoom-in');
   const zoomOutButton = document.querySelector('#lightbox-zoom-out');
   const zoomResetButton = document.querySelector('#lightbox-zoom-reset');
+  const lightboxViewport = document.querySelector('.gallery-lightbox-viewport');
   const closeTargets = document.querySelectorAll('[data-lightbox-close]');
   const gap = 16;
 
   let images = [];
   let activeIndex = 0;
   let zoom = 1;
+  let panX = 0;
+  let panY = 0;
+  let panStart = null;
   let resizeFrame = null;
+
+  const clampPan = () => {
+    if (!lightboxImage || !lightboxViewport || zoom <= 1) {
+      panX = 0;
+      panY = 0;
+      return;
+    }
+
+    const maxX = Math.max(0, ((lightboxImage.clientWidth * zoom) - lightboxViewport.clientWidth) / 2);
+    const maxY = Math.max(0, ((lightboxImage.clientHeight * zoom) - lightboxViewport.clientHeight) / 2);
+
+    panX = Math.min(maxX, Math.max(-maxX, panX));
+    panY = Math.min(maxY, Math.max(-maxY, panY));
+  };
+
+  const applyLightboxTransform = () => {
+    if (!lightboxImage) return;
+
+    lightboxImage.style.setProperty('--lightbox-zoom', String(zoom));
+    lightboxImage.style.setProperty('--lightbox-pan-x', `${Math.round(panX)}px`);
+    lightboxImage.style.setProperty('--lightbox-pan-y', `${Math.round(panY)}px`);
+    lightboxViewport?.classList.toggle('is-zoomed', zoom > 1);
+  };
 
   const setZoom = (value) => {
     zoom = Math.min(4, Math.max(1, Number(value.toFixed(2))));
-    lightboxImage?.style.setProperty('--lightbox-zoom', String(zoom));
+    clampPan();
+    applyLightboxTransform();
     if (zoomResetButton) {
       zoomResetButton.textContent = `${Math.round(zoom * 100)}%`;
     }
@@ -51,6 +79,8 @@ export async function initGalleryPage() {
     lightboxImage.alt = image.alt;
     lightboxLabel.textContent = image.label;
     lightboxCount.textContent = `${activeIndex + 1} / ${images.length}`;
+    panX = 0;
+    panY = 0;
     setZoom(1);
   };
 
@@ -67,6 +97,7 @@ export async function initGalleryPage() {
     if (lightboxImage) {
       lightboxImage.removeAttribute('src');
     }
+    lightboxViewport?.classList.remove('is-zoomed', 'is-panning');
   };
 
   const goTo = (direction) => {
@@ -175,13 +206,56 @@ export async function initGalleryPage() {
   zoomOutButton?.addEventListener('click', () => setZoom(zoom - 0.25));
   zoomResetButton?.addEventListener('click', () => setZoom(1));
   closeTargets.forEach((target) => target.addEventListener('click', closeLightbox));
+  lightboxImage?.setAttribute('draggable', 'false');
 
   lightbox?.addEventListener('click', (event) => {
     if (event.target === lightbox) closeLightbox();
   });
 
-  lightbox?.addEventListener('wheel', (event) => {
+  lightboxViewport?.addEventListener('pointerdown', (event) => {
+    if (zoom <= 1 || event.button !== 0) return;
+
     event.preventDefault();
+    panStart = {
+      pointerId: event.pointerId,
+      clientX: event.clientX,
+      clientY: event.clientY,
+      panX,
+      panY
+    };
+    lightboxViewport.setPointerCapture(event.pointerId);
+    lightboxViewport.classList.add('is-panning');
+  });
+
+  lightboxViewport?.addEventListener('pointermove', (event) => {
+    if (!panStart || panStart.pointerId !== event.pointerId) return;
+
+    panX = panStart.panX + event.clientX - panStart.clientX;
+    panY = panStart.panY + event.clientY - panStart.clientY;
+    clampPan();
+    applyLightboxTransform();
+  });
+
+  ['pointerup', 'pointercancel'].forEach((eventName) => {
+    lightboxViewport?.addEventListener(eventName, (event) => {
+      if (!panStart || panStart.pointerId !== event.pointerId) return;
+
+      panStart = null;
+      lightboxViewport.classList.remove('is-panning');
+    });
+  });
+
+  lightboxViewport?.addEventListener('wheel', (event) => {
+    event.preventDefault();
+
+    if (zoom > 1 && !event.ctrlKey && !event.metaKey) {
+      panX -= event.deltaX;
+      panY -= event.deltaY;
+      clampPan();
+      applyLightboxTransform();
+      return;
+    }
+
     setZoom(zoom + (event.deltaY < 0 ? 0.12 : -0.12));
   }, { passive: false });
 

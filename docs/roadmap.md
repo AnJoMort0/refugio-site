@@ -35,69 +35,37 @@ Routine operational changes should be manageable through the Cloudflare-hosted a
 
 ### Tweaks
 
-- [c] Lots of text is not the same in pt.json and in the fallback in the html pages. The project is becoming too big to have maintain the fallback hardcoded constantly, remove the entire hardcoded portuguese fallback from the html pages, so that the only source of truth is the i18n files
-- [ ] Make <span data-i18n="home.location.address">Rua da Arejinha 627, 4550-518 Pedorido</span> in index.html be a link itself to google maps and add a pin icon behing this text too
-- [ ] There's no intuitive way to scroll through the carroussels on computer, can you add faded in on hover "<" and ">" with a white to transparent gradient background when the mouse hovers the sides of the carrousel, and when clicking on them, it moves to the next/previous items
-- [ ] in reservas.html, when there's the name for the reservation, email and phone number, the boxes are not always lined up in a single line, the phone one for instance can be higher than the other, which looks ugly, make suere they aligned if next to each other
-- [ ] In reserva-enviada.html the Idades das crianças has 2 list icon before it like "- - Idade da criança 1". Same for bikes.
-- [ ] In reserva-confirmada.html, you can remove the part Detalhe das bicicletas, since it's already explained above
-- [ ] In contacto.html, make the context and assunto of the message not mandatory (but keep the *), the idea is that people that see it would still add them, but sometimes less tech savy people or confused people won't know what to do with it so that it isn't frustrating that their message isn't sent and they can't understand why
-- [ ] In contacto.js is it normal that TOPIC_CONFIG still has hardcoded portuguese text? There's also other occurences in that js file
-- [ ] In booking-sent.js it uses hardcoded portuguese text in contactLink, make sure it works with the i18n system
-- [ ] In booking.js there's this hardcoded portuguese: '{bikes} bicicleta(s) x {days} dia(s) = {units} bicicleta-dias' ---> Make sure any hardcoded portuguese in .js files is also replaced to work with the i18n system.
-- [ ] In galeria.html, you can zoom in the images but you can't naviagate within the zoom like move to a bottom corner of the zoomed image, which is frustrating
-
-- [x] In smaller width screens, the images carrossels don't show the faded bits of the previous/next image (it shows on load but then disappears). I think it's fighting with the appearing animations from the scrolling down of the page but I'm not sure
-      - Note: Removed carousel cards from scroll-reveal targets so cloned edge cards are not hidden by reveal opacity.
-- [c] I changed lots of things in pt.json, remove from the pages anything that I removed from pt.json, add anything that I add, and replace all the portuguese fallback text hardcoded into the html files.
-      - Note: Removed stale booking/accommodation blocks, added missing Portuguese keys, stripped hardcoded HTML fallback text/translated attributes, and verified every HTML data-i18n key exists in pt.json.
-- [ ] reservas.html
-  - [x] Add "guestCountHelp2"
-  - [x] The bed preference background box stays even if the contents are not visible
-  - [x] Sort the "form": contents a little bit in the pt.json file to better correspond to where the elements actually appear in the page.
-  - [x] only show "timezoneWarning" if the device seems to have a different timezone that isn't Portugal.
-  - [x] "submitNotice" should be in the redder warning to be clear that it is important to read
-  - [x] "reset" should have a confirm you want to clear everything pop-up.
-  - [x] check the entire "validation" section and see what is really needed, what should be removed, rephrased, added, to actually match what is possible in the website
-      - Note: Removed an unused date validation string and updated phone validation to allow Portuguese local formats.
-  - [x] Is the summary section standard/easily readable to see prices and where the costs come from? If it is, keep as is, otherwise tweak it to look better. At least for the bikes it doesn't seem very clear to me
-      - Note: Bike summary now shows bikes x days = bicycle-days alongside the per-day rate.
+- [x] Kids are between 0 and 12 yo, so when someone inputs a kid's age >12 it should trigger a validation error
+- [x] Make <span data-i18n="home.location.address">Rua da Arejinha 627, 4550-518 Pedorido</span> in index.html be a link itself to google maps and add a pin icon behing this text too
+- [x] There's no intuitive way to scroll through the carroussels on computer, can you add faded in on hover "<" and ">" with a white to transparent gradient background when the mouse hovers the sides of the carrousel, and when clicking on them, it moves to the next/previous items
+  - [x] Once clicked the ">" don't disappear, even on hover off
+      - Note: Pointer-clicked carousel controls now blur after moving the carousel, so the hover overlay does not stay open just because the button kept focus.
+- [x] in reservas.html, when there's the name for the reservation, email and phone number, the boxes are not always lined up in a single line, the phone one for instance can be higher than the other, which looks ugly, make sure they aligned if next to each other
+  - [x] The same problem is in the contacto.html there's also the boxes that are not aligned when the text above warps
+- [x] In reserva-enviada.html the Idades das crianças has 2 list icon before it like "- - Idade da criança 1". Same for bikes.
+      - Note: Removed the native list bullets for the sent-page detail list; the redundant bike detail list is removed below, so bikes no longer have a second bullet source.
+- [x] In reserva-enviada.html, you can remove the part Detalhe das bicicletas, since it's already explained above
+- [x] In contacto.html, make the context and assunto of the message not mandatory (but keep the *), the idea is that people that see it would still add them, but sometimes less tech savy people or confused people won't know what to do with it so that it isn't frustrating that their message isn't sent and they can't understand why
+- [x] In contacto.js is it normal that TOPIC_CONFIG still has hardcoded portuguese text? There's also other occurences in that js file
+- [x] In booking-sent.js it uses hardcoded portuguese text in contactLink, make sure it works with the i18n system
+- [x] In booking.js there's this hardcoded portuguese: '{bikes} bicicleta(s) x {days} dia(s) = {units} bicicleta-dias' ---> Make sure any hardcoded portuguese in .js files is also replaced to work with the i18n system.
+- [x] In galeria.html, you can zoom in the images but you can't naviagate within the zoom like move to a bottom corner of the zoomed image, which is frustrating
   
-- [ ] reserva-enviada.html
-  - [x] adultsLabel and kidsLabel should be indented under guestsLabel
-  - [x] depositNote should only appear when the deposit was ticked yes (if it's not already the case)
-      - Note: Confirmed and kept conditional behavior; the note stays hidden unless deposit_prepay is true.
-  - [!] remove the bikeLabel part and move the bikeDaysTitle up to the summary to be a proper description (this only appears when the bikes are asked of course)
-  - [x] the actions > contact button from this page should, if possible, already autofill the context to say a request was already sent, and even autofill name/email/phone etc
-  - [x] remove the button actions > back and instead add a voltar para a página principal
+- [x] reserva-enviada.html
+  - [x] remove the bikeLabel part and move the bikeDaysTitle up to the summary to be a proper description (this only appears when the bikes are asked of course)
+      - Note: Bikes now appear only in the summary row when requested; the separate "Detalhe das bicicletas" card was removed.
 
-- [ ] contacto.html
-  - [x] The text needs to be added to pt.json
-  - [x] If the person tries to click the locked contact option linked to phones the phone number box should blink
-  - [x] Add the "Had a reservation" context option with a few options for assuntos (move the feedback one there)
-  - [x] Add to socials (and in any other page in the website where it seems fit) the buttons to open Facebook and Instagram (I'll fill up the links after just make an easily ctrl+h replaceable link so I'll do it to the entire repo later) with either icons or text, whatever you think would better fit the aesthetic
-      - Note: Added replaceable Facebook/Instagram placeholder links on Contacto and in the shared footer.
-
-- [ ] Others
-  - [x] The icons are ugly (looking at alojamento.html mostly) can you replace every icon in the website to be consistant Lucide icons instead?
-      - Note: Replaced the visible symbol icons in the header and alojamento highlights with inline Lucide-style SVGs.
-  - [!] reorganise pt.json for it to be consistent and proper and easy to find the different elements of the different pages, so that the footer text is not in the middle of the file, and the pages texts is maybe in the same order of the context menu, etc, just make it human readable and modifyable
-      - Note: Reordered booking form strings and added Contacto as a page-level block; a full-file locale reorganization can still be done later.
-  - [x] If phone numbers have a portuguese format, don't refuse them from not having +xxx or 00xxx.
-  - [x] The footer looks ugly. Maybe a smaller font, proper alignements, proper separation between the elements, there needs to be a place to link to the website creator me (subtle, but not fully hidden, website by André Fonseca, later that would open a website to my website)
-
-### Google Maps and location
-
-- [x] Add the full address to the Homepage (Rua da Arejinha 627, 4550-518 Pedorido).
-- [x] Embed Google Maps on the Alojamento page (https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0205166,-8.3828538,108m/data=!3m1!1e3!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?ucbcb=1&entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D).
-- [x] Provide a normal external map link as a fallback when the embedded map cannot load.
-- [ ] Investigate whether separate pins or labels can clearly represent the different rooms or accommodation areas.
+- [x] Others
+  - [x] reorganise pt.json for it to be consistent and proper and easy to find the different elements of the different pages, so that the footer text is not in the middle of the file, and the pages texts is maybe in the same order of the context menu, etc, just make it human readable and modifyable
+      - Note: Reordered `pt.json` in site/page order: shared setup, homepage, Alojamento, Galeria, Reservas, sent booking, rules, Contacto, supporting pages, then footer.
+      - [x] Then do the reorganization now.
 
 ## Additions
 
 ### Subscribe to updates
 
-- [ ] In reservas.html before the confirm the rules were read add an option "I want to receive updates, offers and discounts from O Refúgio"
+- [x] In reservas.html and contacto.html before the confirm the rules were read add an option "I want to receive updates, offers and discounts from O Refúgio"
+  - [x] In reserva.html make this a square checkbox too, not a switch style one
 
 ### Google Maps review call to action
 
@@ -106,102 +74,16 @@ Add a clearly labelled **“Review O Refúgio on Google Maps”** button whereve
 Suggested locations:
 
 - [x] Homepage testimonial or trust section
-      - [ ] Also the button "reviewCta2" with linkling to the contact page, if possible with the Context and Assunto already filled in to "Naõ tenho reserva" and "Estive aqui e quero deixar feedback"
-- [ ] Contacto page
-- [ ] Reserva enviada confirmation page
-- [ ] Post-stay or feedback section
-- [ ] Footer, if it does not make the footer too crowded
+      - [~] Also add the button "reviewCta2" with linkling to the contact page, if possible with the Context and Assunto already filled in to "Já tive reserva" and "Estive aqui e quero deixar feedback"
+- [x] Footer, if it does not make the footer too crowded
 
 Review URL:
 
 <https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D>
 
-#### Acceptance criteria
-
-- The button opens the correct Google Maps listing.
-- The link works on desktop and mobile.
-- External-link behaviour and accessibility text are consistent across the site.
-- The call to action is not displayed so often that it becomes distracting.
-
 ---
 
 # Phase 2 — Design and build the Contacto page
-
-## 2.1 Page goals
-
-The Contacto page should help visitors:
-
-1. Send a structured enquiry.
-2. Reach the correct person based on their language and situation.
-3. Contact O Refúgio by telephone or WhatsApp.
-4. Find social media and location information.
-5. Leave feedback or a Google Maps review.
-
-## 2.2 Recommended page structure
-
-### Section A — Contact introduction
-
-- [ ] Short, welcoming introduction.
-- [ ] Typical response-time guidance.
-- [ ] Clarify which contact should be used by current guests versus general enquiries.
-- [ ] Provide a visible emergency note that directs current guests to the Guest Stay page rather than using the ordinary contact form.
-
-### Section B — Structured contact form
-
-#### Personal details
-
-- [ ] Full name — required
-- [ ] Email address — required
-- [ ] Telephone number — optional unless telephone or WhatsApp is selected
-- [ ] Preferred language
-- [ ] Message — required
-
-#### Preferred response method
-
-Allow one or more preferences where appropriate:
-
-- [ ] Email
-- [ ] Telephone call
-- [ ] WhatsApp message
-- [ ] WhatsApp call
-
-#### Contact context
-
-Use a **single-choice control** such as radio buttons or a select menu for the main context. This avoids contradictory selections.
-
-##### I already have a confirmed reservation
-
-- [ ] Cancel my reservation
-- [ ] Change my reservation
-- [ ] Ask a question about my reservation
-- [ ] Report an issue during my stay
-- [ ] Other reservation-related request
-
-##### I submitted a reservation request
-
-- [ ] Cancel my reservation request
-- [ ] Change my reservation request
-- [ ] Ask a question about my reservation request
-- [ ] Check the status of my request
-- [ ] Other request-related question
-
-##### I do not have a reservation
-
-- [ ] Ask about availability or booking
-- [ ] Ask about O Refúgio or its facilities
-- [ ] Ask about accessibility or special requirements
-- [ ] Ask about group stays
-- [ ] Ask about the local area
-- [ ] I previously stayed and want to share feedback
-- [ ] Other
-
-#### Conditional fields
-
-- [ ] Show a reservation number field when the visitor already has a reservation.
-- [ ] Show a reservation-request reference field when the visitor submitted a request.
-- [ ] Require a telephone number when the chosen reply method needs it.
-- [ ] Show WhatsApp-specific guidance only when a WhatsApp option is selected.
-- [ ] Keep conditional behaviour accessible to keyboard and screen-reader users.
 
 #### Consent and preferences
 
@@ -212,43 +94,14 @@ Use a **single-choice control** such as radio buttons or a select menu for the m
 
 #### Form behaviour
 
-- [ ] Validate required fields clearly.
-- [ ] Prevent accidental duplicate submissions.
 - [ ] Display a useful success state after submission.
 - [ ] Display actionable error messages.
 - [ ] Protect the form from spam.
 - [ ] Send or store enough context for staff to handle the enquiry efficiently.
 
-### Contact actions to implement
-
-- [ ] `tel:` link for normal telephone calls.
-- [ ] WhatsApp deep link using the international number without spaces or punctuation.
-- [ ] Copy-number button with a brief “Copied” confirmation.
-- [ ] Downloadable `.vcf` contact card for Apple and Android devices.
-- [ ] Clear language badges or labels for every contact.
-- [ ] Identify the recommended contact after the visitor selects a preferred language.
-- [ ] Avoid automatically opening an application without a deliberate user action.
-
 ## 2.4 Other Contacto page content
 
-- [ ] Social media links.
-- [ ] Address and map link.
-- [ ] Opening or contact hours, if applicable.
-- [ ] Google Maps review button.
 - [ ] Frequently asked questions for common contact topics.
-- [ ] Link to Reservas for visitors who are ready to book.
-- [ ] Link to the Guest Stay page for current guests seeking property or emergency information.
-- [ ] Link to Guia Local for local activities, nearby shops, services, and sponsored recommendations.
-
-## 2.5 Contacto page acceptance criteria
-
-- Visitors can identify the correct contact without reading the entire page.
-- The form adapts to the visitor’s reservation status.
-- Telephone, WhatsApp, copy, and save-contact actions work on supported devices.
-- Every field has a visible label and understandable validation.
-- The page works in every supported language.
-- Personal data and marketing consent are handled separately.
-- The layout remains usable on small mobile screens.
 
 ---
 
@@ -256,45 +109,7 @@ Use a **single-choice control** such as radio buttons or a select menu for the m
 
 This page feels way to cluttered, remove useless text, add small toggles to add information, only show information when relevant (like timezones or checkin times etc).
 
-## 3.1 Optional bicycle reservations
-
-Add bicycle hire as an optional extra during booking.
-
-### Business rules
-
-- Price: **€5 per bicycle per day**.
-- Maximum quantity: **one bicycle per guest per selected day**.
-- Bicycle dates may cover only part of the accommodation stay.
-- Example: a guest staying five nights may reserve bicycles for only one or two days.
-- Availability must be checked per day, not only for the full stay.
-
-### Booking interface
-
-- [ ] Add an optional bicycle section after the stay and guest details are known.
-- [ ] Allow visitors to select individual dates within their stay.
-- [ ] Allow a bicycle quantity for each selected date.
-- [ ] Limit each day’s quantity to the number of guests on the reservation.
-- [ ] Show the daily price and calculated bicycle subtotal.
-- [ ] Include bicycle details in the full booking-price summary.
-- [ ] Include bicycle details in confirmation screens and messages.
-- [ ] Make it clear that bicycle requests remain subject to availability, if availability is not confirmed instantly.
-
-### Data and administration
-
-- [ ] Store bicycle quantity by date.
-- [ ] Make bicycle reservations visible in the admin reservation view.
-- [ ] Prevent overbooking when total bicycle inventory is known.
-- [ ] Allow staff to edit or remove bicycle extras.
-- [ ] Record bicycle changes in the reservation history or logs.
-
-### Acceptance criteria
-
-- A visitor can reserve bicycles for some, all, or none of the stay dates.
-- A visitor cannot reserve more than one bicycle per guest on any selected day.
-- The price is always calculated as `selected bicycles × selected days × €5`.
-- Bicycle selections are preserved through validation errors and booking review steps.
-
-## 3.2 Reservation lifecycle improvements
+## 3.2 Reservation lifecycle improvements --> this is to be added to the Admin page
 
 - [ ] Add a reservation status for a guest who is added after the stay has already begun.
 - [ ] Define how this status affects occupancy, price, guest records, and reporting.
@@ -686,7 +501,7 @@ Provide owner-friendly controls for frequently changing website and guest inform
 
 ## Milestone A — Finish the prototype
 
-- [ ] Contacto page scaffold
+- [ ] Contacto Enviado page scaffold
 - [ ] Guia Local scaffold
 - [ ] Guest Stay page scaffold
 - [ ] `404.html`
@@ -776,6 +591,10 @@ A feature is complete when:
 ---
 
 # Removed Ideas
+
+## Google Maps and location
+
+- [ ] Investigate whether separate pins or labels can clearly represent the different rooms or accommodation areas.
 
 ## Direct contact directory
 

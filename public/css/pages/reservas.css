@@ -184,7 +184,7 @@
 }
 
 .booking-contact-grid-wide {
-  align-items: start;
+  align-items: stretch;
 }
 
 .guest-count-grid {
@@ -745,6 +745,15 @@ body[data-page="booking"] .sticky-booking-cta {
 
   .booking-contact-grid-wide {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .booking-contact-grid-wide .field {
+    grid-template-rows: minmax(2.8rem, auto) auto;
+  }
+
+  .booking-contact-grid-wide .field > span:first-child {
+    display: flex;
+    align-items: flex-end;
   }
 }
 

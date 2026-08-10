@@ -160,15 +160,30 @@
   place-items: center;
   overflow: hidden;
   border-radius: 12px;
+  touch-action: none;
 }
 
 .gallery-lightbox-viewport img {
   max-width: 100%;
   max-height: min(70vh, 760px);
   object-fit: contain;
-  transform: scale(var(--lightbox-zoom, 1));
+  transform: translate(var(--lightbox-pan-x, 0), var(--lightbox-pan-y, 0)) scale(var(--lightbox-zoom, 1));
   transform-origin: center center;
   transition: transform 180ms ease;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.gallery-lightbox-viewport.is-zoomed {
+  cursor: grab;
+}
+
+.gallery-lightbox-viewport.is-panning {
+  cursor: grabbing;
+}
+
+.gallery-lightbox-viewport.is-panning img {
+  transition: none;
 }
 
 body.gallery-lightbox-open {

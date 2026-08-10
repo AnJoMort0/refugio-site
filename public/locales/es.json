@@ -16,6 +16,10 @@
     "fr": "Français",
     "es": "Español"
   },
+  "carousel": {
+    "previous": "Elemento anterior",
+    "next": "Elemento siguiente"
+  },
   "nav": {
     "toggleLabel": "Abrir menú",
     "toggleText": "Abrir menú",
@@ -95,7 +99,8 @@
       "author7": "Nombre del huésped",
       "quote8": "“Testimonio provisional sobre una escapada familiar y días de jardín.”",
       "author8": "Nombre del huésped",
-      "reviewCta": "Añadir reseña en Google Maps"
+      "reviewCta": "Añadir reseña en Google Maps",
+      "reviewCta2": "Enviar feedback por mensaje"
     },
     "sponsors": {
       "eyebrow": "Socios Locales",
@@ -115,7 +120,7 @@
   "galleryPage": {
     "meta": {
       "title": "O Refúgio | Galería",
-      "description": "Galería completa de O Refúgio con los espacios interiores, exteriores y el ambiente de la estancia."
+      "description": "Galería completa do Refúgio con los espacios interiores, exteriores y el ambiente de la estancia."
     },
     "hero": {
       "eyebrow": "Galería",

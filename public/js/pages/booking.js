@@ -1,4 +1,5 @@
 const DEFAULT_LANGUAGE = 'pt';
+const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
 const PRICE_CONFIG = {
   adultPerNight: 48,
   childPerNight: 28,
@@ -45,6 +46,39 @@ function eachDate(start, endExclusive) {
 
 function getNestedValue(object, path) {
   return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
+}
+
+function mergeDictionaries(baseDictionary, overrideDictionary) {
+  if (!baseDictionary || typeof baseDictionary !== 'object') return overrideDictionary;
+  if (!overrideDictionary || typeof overrideDictionary !== 'object') return baseDictionary;
+
+  const mergedDictionary = { ...baseDictionary };
+
+  Object.entries(overrideDictionary).forEach(([key, value]) => {
+    if (
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      baseDictionary[key] &&
+      typeof baseDictionary[key] === 'object' &&
+      !Array.isArray(baseDictionary[key])
+    ) {
+      mergedDictionary[key] = mergeDictionaries(baseDictionary[key], value);
+      return;
+    }
+
+    mergedDictionary[key] = value;
+  });
+
+  return mergedDictionary;
+}
+
+async function loadLocale(language) {
+  const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
+  const response = await fetch(`./locales/${safeLanguage}.json`);
+
+  if (!response.ok) throw new Error(`Could not load locale file for ${safeLanguage}`);
+  return response.json();
 }
 
 function formatCurrency(value) {
@@ -129,6 +163,7 @@ export async function initBookingPage() {
   const bikeCountInput = document.querySelector('#bike-count');
   const bikeRentalDaysInput = document.querySelector('#bike-rental-days');
   const rulesConfirmationInput = document.querySelector('#rules-confirmation');
+  const marketingOptInInput = document.querySelector('#booking-marketing-opt-in');
   const bedPreferenceInputs = Array.from(document.querySelectorAll('input[name="bed_preference"]'));
   const childAgesGroup = document.querySelector('#child-ages-group');
   const childAgeFields = document.querySelector('#child-ages-fields');
@@ -177,7 +212,7 @@ export async function initBookingPage() {
   checkinInput.min = minimumCheckin;
   checkoutInput.min = formatDateKey(addDays(earliestCheckinDate, 2));
 
-  const getText = (path, fallback) => getNestedValue(dictionary, path) || fallback;
+  const getText = (path, fallback = '') => getNestedValue(dictionary, path) || fallback;
 
   function setFieldValidity(input, message = '') {
     if (!input) return;
@@ -197,10 +232,12 @@ export async function initBookingPage() {
 
   async function loadDictionary() {
     try {
-      const language = localStorage.getItem('refugio-language') || DEFAULT_LANGUAGE;
-      const response = await fetch(`./locales/${language}.json`);
-      if (!response.ok) throw new Error('Locale not found');
-      dictionary = await response.json();
+      const language = (localStorage.getItem('refugio-language') || DEFAULT_LANGUAGE).slice(0, 2).toLowerCase();
+      const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
+      const fallbackDictionary = await loadLocale(DEFAULT_LANGUAGE);
+      dictionary = safeLanguage === DEFAULT_LANGUAGE
+        ? fallbackDictionary
+        : mergeDictionaries(fallbackDictionary, await loadLocale(safeLanguage));
     } catch (error) {
       dictionary = {};
     }
@@ -263,7 +300,7 @@ export async function initBookingPage() {
       const label = document.createElement('label');
       label.className = 'field';
       label.innerHTML = `
-        <span>${requiredLabel(`${getText('bookingPage.form.childAgeLabel', 'Idade da criança')} ${index + 1}`)}</span>
+        <span>${requiredLabel(`${getText('bookingPage.form.childAgeLabel')} ${index + 1}`)}</span>
         <input type="number" min="0" max="12" step="1" name="child_age_${index + 1}" required value="${existingValues[index] || ''}" />
       `;
       fragment.append(label);
@@ -369,15 +406,12 @@ export async function initBookingPage() {
     summaryKids.textContent = String(children);
     if (summaryDepositChoice) {
       summaryDepositChoice.textContent = includeDeposit
-        ? getText('bookingPage.summary.depositChoiceYes', 'Sim')
-        : getText('bookingPage.summary.depositChoiceNo', 'Não');
+        ? getText('bookingPage.summary.depositChoiceYes')
+        : getText('bookingPage.summary.depositChoiceNo');
     }
     if (summaryBikesRow && summaryBikes) {
       summaryBikesRow.hidden = bikeDays === 0;
-      summaryBikes.textContent = getText(
-        'bookingPage.summary.bikesPattern',
-        '{bikes} bicicleta(s) x {days} dia(s) = {units} bicicleta-dias'
-      )
+      summaryBikes.textContent = getText('bookingPage.summary.bikesPattern')
         .replace('{bikes}', String(bikeSelection.bikes))
         .replace('{days}', String(bikeSelection.rentalDays))
         .replace('{units}', String(bikeDays));
@@ -388,10 +422,10 @@ export async function initBookingPage() {
       if (showBedPreference) {
         summaryBedPreference.textContent =
           selectedBedPreference === 'double'
-            ? getText('bookingPage.summary.bedPreferenceDouble', 'Cama de casal')
+            ? getText('bookingPage.summary.bedPreferenceDouble')
             : selectedBedPreference === 'single'
-              ? getText('bookingPage.summary.bedPreferenceSingle', 'Camas individuais')
-              : getText('bookingPage.summary.bedPreferencePending', 'Por indicar');
+              ? getText('bookingPage.summary.bedPreferenceSingle')
+              : getText('bookingPage.summary.bedPreferencePending');
       } else {
         summaryBedPreference.textContent = '-';
       }
@@ -414,10 +448,7 @@ export async function initBookingPage() {
     previousButton.className = 'calendar-nav-button';
     previousButton.textContent = '‹';
     previousButton.disabled = visibleMonthOffset === 0;
-    previousButton.setAttribute(
-      'aria-label',
-      getText('bookingPage.availability.previousMonths', 'Ver meses anteriores')
-    );
+    previousButton.setAttribute('aria-label', getText('bookingPage.availability.previousMonths'));
     previousButton.addEventListener('click', () => {
       visibleMonthOffset = Math.max(visibleMonthOffset - 1, 0);
       renderCalendar();
@@ -437,7 +468,7 @@ export async function initBookingPage() {
     nextButton.type = 'button';
     nextButton.className = 'calendar-nav-button';
     nextButton.textContent = '›';
-    nextButton.setAttribute('aria-label', getText('bookingPage.availability.nextMonths', 'Ver meses seguintes'));
+    nextButton.setAttribute('aria-label', getText('bookingPage.availability.nextMonths'));
     nextButton.addEventListener('click', () => {
       visibleMonthOffset += 1;
       renderCalendar();
@@ -446,7 +477,7 @@ export async function initBookingPage() {
     const todayButton = document.createElement('button');
     todayButton.type = 'button';
     todayButton.className = 'calendar-today-button';
-    todayButton.textContent = getText('bookingPage.availability.todayButton', 'Hoje');
+    todayButton.textContent = getText('bookingPage.availability.todayButton');
     todayButton.disabled = visibleMonthOffset === 0;
     todayButton.addEventListener('click', () => {
       visibleMonthOffset = 0;
@@ -526,7 +557,7 @@ export async function initBookingPage() {
             checkinInput.value = key;
             checkoutInput.value = '';
             syncCheckoutBounds();
-            setStatus(getText('bookingPage.validation.chooseCheckout', 'Agora escolha a data de check-out.'));
+            setStatus(getText('bookingPage.validation.chooseCheckout'));
           } else {
             const [startDate, endDate] = key < checkinInput.value ? [key, checkinInput.value] : [checkinInput.value, key];
             checkinInput.value = startDate;
@@ -564,7 +595,7 @@ export async function initBookingPage() {
     clearFieldValidity(checkoutInput);
 
     if (!checkIn || !checkOut) {
-      const message = getText('bookingPage.validation.datesRequired', 'Selecione as datas de check-in e check-out.');
+      const message = getText('bookingPage.validation.datesRequired');
       setFieldValidity(checkinInput, message);
       setFieldValidity(checkoutInput, message);
       if (showBrowserMessages) checkinInput.reportValidity();
@@ -572,21 +603,21 @@ export async function initBookingPage() {
     }
 
     if (checkIn < minimumCheckin) {
-      const message = getText('bookingPage.validation.checkinTooSoon', 'A primeira data disponível para chegada já teve em conta a regra de hoje / amanhã em hora de Portugal.');
+      const message = getText('bookingPage.validation.checkinTooSoon');
       setFieldValidity(checkinInput, message);
       if (showBrowserMessages) checkinInput.reportValidity();
       return message;
     }
 
     if (nights < 2) {
-      const message = getText('bookingPage.validation.minStay', 'A estadia mínima é de 2 noites.');
+      const message = getText('bookingPage.validation.minStay');
       setFieldValidity(checkoutInput, message);
       if (showBrowserMessages) checkoutInput.reportValidity();
       return message;
     }
 
     if (datesOverlapOccupied(checkIn, checkOut)) {
-      const message = getText('bookingPage.validation.occupiedRange', 'O intervalo escolhido inclui datas ocupadas.');
+      const message = getText('bookingPage.validation.occupiedRange');
       setFieldValidity(checkoutInput, message);
       if (showBrowserMessages) checkoutInput.reportValidity();
       return message;
@@ -605,13 +636,13 @@ export async function initBookingPage() {
       clearFieldValidity(checkinInput);
 
       if (checkinInput.value < minimumCheckin) {
-        const message = getText('bookingPage.validation.checkinTooSoon', 'A primeira data disponível para chegada já teve em conta a regra de hoje / amanhã em hora de Portugal.');
+        const message = getText('bookingPage.validation.checkinTooSoon');
         setFieldValidity(checkinInput, message);
         return message;
       }
 
       if (occupiedDates.has(checkinInput.value)) {
-        const message = getText('bookingPage.validation.dateUnavailable', 'A data escolhida não está disponível.');
+        const message = getText('bookingPage.validation.dateUnavailable');
         setFieldValidity(checkinInput, message);
         return message;
       }
@@ -626,7 +657,7 @@ export async function initBookingPage() {
 
       const earliestCheckout = formatDateKey(addDays(earliestCheckinDate, 2));
       if (checkoutInput.value < earliestCheckout) {
-        const message = getText('bookingPage.validation.checkoutTooSoon', 'Escolha uma data de check-out válida para uma estadia mínima de 2 noites.');
+        const message = getText('bookingPage.validation.checkoutTooSoon');
         setFieldValidity(checkoutInput, message);
         return message;
       }
@@ -655,56 +686,56 @@ export async function initBookingPage() {
     }
 
     if (!contactNameInput?.value.trim()) {
-      const message = getText('bookingPage.validation.contactNameRequired', 'Indique o nome do responsável pela reserva.');
+      const message = getText('bookingPage.validation.contactNameRequired');
       setFieldValidity(contactNameInput, message);
       if (showBrowserMessages) contactNameInput?.reportValidity();
       return message;
     }
 
     if (!contactEmailInput?.value.trim()) {
-      const message = getText('bookingPage.validation.emailRequired', 'Indique o email do responsável pela reserva.');
+      const message = getText('bookingPage.validation.emailRequired');
       setFieldValidity(contactEmailInput, message);
       if (showBrowserMessages) contactEmailInput?.reportValidity();
       return message;
     }
 
     if (contactEmailInput && !contactEmailInput.checkValidity()) {
-      const message = getText('bookingPage.validation.emailInvalid', 'Indique um endereço de email válido.');
+      const message = getText('bookingPage.validation.emailInvalid');
       setFieldValidity(contactEmailInput, message);
       if (showBrowserMessages) contactEmailInput.reportValidity();
       return message;
     }
 
     if (contactPhoneInput?.value.trim() && !isValidPhoneNumber(contactPhoneInput.value)) {
-      const message = getText('bookingPage.validation.phoneInvalid', 'Indique um telefone válido.');
+      const message = getText('bookingPage.validation.phoneInvalid');
       setFieldValidity(contactPhoneInput, message);
       if (showBrowserMessages) contactPhoneInput.reportValidity();
       return message;
     }
 
     if (checkinTimeInput?.value && (checkinTimeInput.value < '15:00' || checkinTimeInput.value > '19:00')) {
-      const message = getText('bookingPage.validation.checkinTimeInvalid', 'O check-in deve estar entre as 15h00 e as 19h00. Se precisar de outro horário, indique esse pedido nos comentários.');
+      const message = getText('bookingPage.validation.checkinTimeInvalid');
       setFieldValidity(checkinTimeInput, message);
       if (showBrowserMessages) checkinTimeInput.reportValidity();
       return message;
     }
 
     if (checkoutTimeInput?.value && (checkoutTimeInput.value < '08:00' || checkoutTimeInput.value > '10:00')) {
-      const message = getText('bookingPage.validation.checkoutTimeInvalid', 'O check-out deve estar entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.');
+      const message = getText('bookingPage.validation.checkoutTimeInvalid');
       setFieldValidity(checkoutTimeInput, message);
       if (showBrowserMessages) checkoutTimeInput.reportValidity();
       return message;
     }
 
     if (adults < 1) {
-      const message = getText('bookingPage.validation.minimumAdults', 'É necessário pelo menos 1 adulto.');
+      const message = getText('bookingPage.validation.minimumAdults');
       setFieldValidity(adultInput, message);
       if (showBrowserMessages) adultInput.reportValidity();
       return message;
     }
 
     if (total > 6) {
-      const message = getText('bookingPage.validation.maxGuests', 'O máximo permitido é 6 hóspedes no total.');
+      const message = getText('bookingPage.validation.maxGuests');
       setFieldValidity(childInput, message);
       if (showBrowserMessages) childInput.reportValidity();
       return message;
@@ -716,28 +747,28 @@ export async function initBookingPage() {
       const nights = Math.max(diffNights(checkinInput.value, checkoutInput.value), 0);
 
       if (!checkinInput.value || !checkoutInput.value) {
-        const message = getText('bookingPage.validation.bikeDatesRequired', 'Escolha as datas da estadia antes de reservar bicicletas.');
+        const message = getText('bookingPage.validation.bikeDatesRequired');
         setFieldValidity(bikeReservationToggle, message);
         if (showBrowserMessages) bikeReservationToggle.reportValidity();
         return message;
       }
 
       if (bikeCount < 1) {
-        const message = getText('bookingPage.validation.bikesRequired', 'Indique pelo menos uma bicicleta, ou desative esta opção.');
+        const message = getText('bookingPage.validation.bikesRequired');
         setFieldValidity(bikeCountInput, message);
         if (showBrowserMessages) bikeCountInput?.reportValidity();
         return message;
       }
 
       if (bikeCount > total) {
-        const message = getText('bookingPage.validation.bikesMax', 'Só é possível pedir uma bicicleta por hóspede, por dia.');
+        const message = getText('bookingPage.validation.bikesMax');
         setFieldValidity(bikeCountInput, message);
         if (showBrowserMessages) bikeCountInput?.reportValidity();
         return message;
       }
 
       if (rentalDays < 1 || rentalDays > nights) {
-        const message = getText('bookingPage.validation.bikeDaysMax', 'Os dias de aluguer devem estar dentro da duração da estadia.');
+        const message = getText('bookingPage.validation.bikeDaysMax');
         setFieldValidity(bikeRentalDaysInput, message);
         if (showBrowserMessages) bikeRentalDaysInput?.reportValidity();
         return message;
@@ -745,7 +776,7 @@ export async function initBookingPage() {
     }
 
     if (needsBedPreference() && !bedPreferenceInputs.some((input) => input.checked)) {
-      const message = getText('bookingPage.validation.bedPreferenceRequired', 'Escolha se preferem cama de casal ou camas individuais.');
+      const message = getText('bookingPage.validation.bedPreferenceRequired');
       bedPreferenceInputs.forEach((input) => setFieldValidity(input, message));
       if (showBrowserMessages) bedPreferenceInputs[0]?.reportValidity();
       return message;
@@ -753,7 +784,15 @@ export async function initBookingPage() {
 
     for (const input of childAgeInputs) {
       if (!input.value) {
-        const message = getText('bookingPage.validation.childAgeRequired', 'Indique a idade de cada criança.');
+        const message = getText('bookingPage.validation.childAgeRequired');
+        setFieldValidity(input, message);
+        if (showBrowserMessages) input.reportValidity();
+        return message;
+      }
+
+      const age = Number(input.value);
+      if (!Number.isFinite(age) || age < 0 || age > 12) {
+        const message = getText('bookingPage.validation.childAgeRange');
         setFieldValidity(input, message);
         if (showBrowserMessages) input.reportValidity();
         return message;
@@ -761,7 +800,7 @@ export async function initBookingPage() {
     }
 
     if (rulesConfirmationInput && !rulesConfirmationInput.checked) {
-      const message = getText('bookingPage.validation.rulesConfirmationRequired', 'Confirme que leu e aceita as regras da casa.');
+      const message = getText('bookingPage.validation.rulesConfirmationRequired');
       setFieldValidity(rulesConfirmationInput, message);
       if (showBrowserMessages) rulesConfirmationInput.reportValidity();
       return message;
@@ -893,9 +932,7 @@ export async function initBookingPage() {
   });
 
   resetButton?.addEventListener('click', () => {
-    const confirmed = window.confirm(
-      getText('bookingPage.form.resetConfirm', 'Tem a certeza que quer limpar todos os dados deste pedido?')
-    );
+    const confirmed = window.confirm(getText('bookingPage.form.resetConfirm'));
 
     if (!confirmed) return;
 
@@ -963,6 +1000,10 @@ export async function initBookingPage() {
 
     if (includeDeposit) {
       params.set('deposit_prepay', 'true');
+    }
+
+    if (marketingOptInInput?.checked) {
+      params.set('marketing_opt_in', 'true');
     }
 
     if (bikeDays > 0) {

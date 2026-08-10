@@ -115,6 +115,34 @@
   gap: 0.75rem;
 }
 
+.contact-consent {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(90, 75, 63, 0.12);
+  border-radius: 14px;
+  background: rgba(250, 248, 244, 0.78);
+}
+
+.contact-consent input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.18rem;
+  accent-color: var(--color-mountain-forest);
+}
+
+.contact-consent-copy {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.contact-consent-copy small {
+  color: rgba(43, 38, 34, 0.72);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
 .contact-hero-actions {
   margin-top: var(--space-3);
 }
@@ -158,6 +186,16 @@
 @media (min-width: 720px) {
   .contact-field-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .contact-field-grid .field {
+    grid-template-rows: minmax(2.8rem, auto) auto;
+  }
+
+  .contact-field-grid .field > span:first-child {
+    display: flex;
+    align-items: flex-end;
   }
 }
 

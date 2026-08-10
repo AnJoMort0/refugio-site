@@ -1,4 +1,5 @@
 const DEFAULT_LANGUAGE = 'pt';
+const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
 const PRICE_CONFIG = {
   adultPerNight: 48,
   childPerNight: 28,
@@ -19,6 +20,39 @@ function diffNights(checkIn, checkOut) {
 
 function getNestedValue(object, path) {
   return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
+}
+
+function mergeDictionaries(baseDictionary, overrideDictionary) {
+  if (!baseDictionary || typeof baseDictionary !== 'object') return overrideDictionary;
+  if (!overrideDictionary || typeof overrideDictionary !== 'object') return baseDictionary;
+
+  const mergedDictionary = { ...baseDictionary };
+
+  Object.entries(overrideDictionary).forEach(([key, value]) => {
+    if (
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      baseDictionary[key] &&
+      typeof baseDictionary[key] === 'object' &&
+      !Array.isArray(baseDictionary[key])
+    ) {
+      mergedDictionary[key] = mergeDictionaries(baseDictionary[key], value);
+      return;
+    }
+
+    mergedDictionary[key] = value;
+  });
+
+  return mergedDictionary;
+}
+
+async function loadLocale(language) {
+  const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
+  const response = await fetch(`./locales/${safeLanguage}.json`);
+
+  if (!response.ok) throw new Error(`Could not load locale file for ${safeLanguage}`);
+  return response.json();
 }
 
 function formatCurrency(value) {
@@ -59,16 +93,17 @@ export async function initBookingSentPage() {
 
   let dictionary = {};
   try {
-    const language = localStorage.getItem('refugio-language') || DEFAULT_LANGUAGE;
-    const response = await fetch(`./locales/${language}.json`);
-    if (response.ok) {
-      dictionary = await response.json();
-    }
+    const language = (localStorage.getItem('refugio-language') || DEFAULT_LANGUAGE).slice(0, 2).toLowerCase();
+    const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
+    const fallbackDictionary = await loadLocale(DEFAULT_LANGUAGE);
+    dictionary = safeLanguage === DEFAULT_LANGUAGE
+      ? fallbackDictionary
+      : mergeDictionaries(fallbackDictionary, await loadLocale(safeLanguage));
   } catch (error) {
     dictionary = {};
   }
 
-  const getText = (path, fallback) => getNestedValue(dictionary, path) || fallback;
+  const getText = (path, fallback = '') => getNestedValue(dictionary, path) || fallback;
   const params = new URLSearchParams(window.location.search);
 
   const checkin = params.get('checkin') || '';
@@ -140,8 +175,8 @@ export async function initBookingSentPage() {
   setText(
     '#sent-deposit',
     depositPrepay
-      ? getText('bookingPage.summary.depositChoiceYes', 'Sim')
-      : getText('bookingPage.summary.depositChoiceNo', 'Não')
+      ? getText('bookingPage.summary.depositChoiceYes')
+      : getText('bookingPage.summary.depositChoiceNo')
   );
   setText('#sent-email', email || '-');
   setText('#sent-total', formatCurrency(totalWithDeposit));
@@ -150,7 +185,7 @@ export async function initBookingSentPage() {
   setText(
     '#sent-bikes',
     applyTemplate(
-      getText('bookingSentPage.summary.bikeSummaryPattern', '{bikes} bicicleta(s) x {days} dia(s) = {units} bicicleta-dias'),
+      getText('bookingSentPage.summary.bikeSummaryPattern'),
       {
         bikes: String(bikeCount),
         days: String(bikeRentalDays),
@@ -172,9 +207,9 @@ export async function initBookingSentPage() {
   setText(
     '#sent-bed',
     bedPreference === 'double'
-      ? getText('bookingPage.summary.bedPreferenceDouble', 'Cama de casal')
+      ? getText('bookingPage.summary.bedPreferenceDouble')
       : bedPreference === 'single'
-        ? getText('bookingPage.summary.bedPreferenceSingle', 'Camas individuais')
+        ? getText('bookingPage.summary.bedPreferenceSingle')
         : '-'
   );
 
@@ -189,25 +224,14 @@ export async function initBookingSentPage() {
     childAgesList.replaceChildren(
       ...childAges.map((age, index) => {
         const item = document.createElement('li');
-        item.textContent = `${getText('bookingPage.form.childAgeLabel', 'Idade da criança')} ${index + 1}: ${age}`;
+        item.textContent = `${getText('bookingPage.form.childAgeLabel')} ${index + 1}: ${age}`;
         return item;
       })
     );
   }
 
-  const bikeDaysCard = document.querySelector('#sent-bike-days-card');
-  const bikeDaysList = document.querySelector('#sent-bike-days');
-  if (bikeDaysCard) bikeDaysCard.hidden = bikeDays === 0;
-  if (bikeDaysList && bikeDays > 0) {
-    const bikesItem = document.createElement('li');
-    const daysItem = document.createElement('li');
-    bikesItem.textContent = `${getText('bookingPage.form.bikeCountLabel', 'Número de bicicletas')}: ${bikeCount}`;
-    daysItem.textContent = `${getText('bookingPage.form.bikeRentalDaysLabel', 'Dias de aluguer')}: ${bikeRentalDays}`;
-    bikeDaysList.replaceChildren(bikesItem, daysItem);
-  }
-
   const detailGrid = document.querySelector('.booking-sent-detail-grid');
-  if (detailGrid) detailGrid.hidden = !(showChildAges || bikeDays > 0);
+  if (detailGrid) detailGrid.hidden = !showChildAges;
 
   toggleRow('#sent-comments-card', Boolean(comments.trim()));
   setText('#sent-comments', comments.trim() || '-');
@@ -216,18 +240,15 @@ export async function initBookingSentPage() {
   if (contactLink) {
     const contactParams = new URLSearchParams();
     const contactMessage = applyTemplate(
-      getText(
-        'bookingSentPage.actions.contactMessage',
-        'Já enviei um pedido de reserva para {checkin} - {checkout} e queria acrescentar uma informação.'
-      ),
+      getText('bookingSentPage.actions.contactMessage'),
       {
         checkin: formatDate(checkin),
         checkout: formatDate(checkout)
       }
     );
 
-    contactParams.set('context', 'Fiz um pedido de reserva');
-    contactParams.set('topic', 'Perguntas sobre pedido de reserva');
+    contactParams.set('context', 'requested');
+    contactParams.set('topic', 'requestQuestion');
     contactParams.set('message', contactMessage);
     if (contactName || guestNames[0]) contactParams.set('name', contactName || guestNames[0]);
     if (email) contactParams.set('email', email);

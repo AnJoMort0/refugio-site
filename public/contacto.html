@@ -60,34 +60,34 @@
             <label class="field">
               <span><span data-i18n="contactPage.form.languageLabel"></span><span class="required-mark" aria-hidden="true">*</span></span>
               <select id="contact-language" name="contact_language" required>
-                <option value="Português" data-i18n="contactPage.form.languagePortuguese"></option>
-                <option value="Français" data-i18n="contactPage.form.languageFrench"></option>
-                <option value="English" data-i18n="contactPage.form.languageEnglish"></option>
-                <option value="Deutsch" data-i18n="contactPage.form.languageGerman"></option>
-                <option value="Español" data-i18n="contactPage.form.languageSpanish"></option>
+                <option value="pt" data-i18n="contactPage.form.languagePortuguese"></option>
+                <option value="fr" data-i18n="contactPage.form.languageFrench"></option>
+                <option value="en" data-i18n="contactPage.form.languageEnglish"></option>
+                <option value="de" data-i18n="contactPage.form.languageGerman"></option>
+                <option value="es" data-i18n="contactPage.form.languageSpanish"></option>
               </select>
             </label>
             <label class="field">
               <span><span data-i18n="contactPage.form.preferredContactLabel"></span><span class="required-mark" aria-hidden="true">*</span></span>
               <select id="preferred-contact" name="preferred_contact" required>
-                <option value="Email" data-i18n="contactPage.form.preferredEmail"></option>
-                <option value="Pedido de contacto por WhatsApp" data-requires-phone data-i18n="contactPage.form.preferredWhatsApp"></option>
-                <option value="Pedido de chamada de retorno" data-requires-phone data-i18n="contactPage.form.preferredCall"></option>
+                <option value="email" data-i18n="contactPage.form.preferredEmail"></option>
+                <option value="whatsapp_request" data-requires-phone data-i18n="contactPage.form.preferredWhatsApp"></option>
+                <option value="callback_request" data-requires-phone data-i18n="contactPage.form.preferredCall"></option>
               </select>
             </label>
             <label class="field">
               <span><span data-i18n="contactPage.form.contextLabel"></span><span class="required-mark" aria-hidden="true">*</span></span>
-              <select id="contact-context" name="context" required>
+              <select id="contact-context" name="context">
                 <option value="" data-i18n="contactPage.form.contextPlaceholder"></option>
-                <option value="Já tenho uma reserva" data-i18n="contactPage.form.contextConfirmed"></option>
-                <option value="Fiz um pedido de reserva" data-i18n="contactPage.form.contextRequested"></option>
-                <option value="Já tive uma reserva" data-i18n="contactPage.form.contextPast"></option>
-                <option value="Não tenho reserva" data-i18n="contactPage.form.contextNone"></option>
+                <option value="confirmed" data-i18n="contactPage.form.contextConfirmed"></option>
+                <option value="requested" data-i18n="contactPage.form.contextRequested"></option>
+                <option value="past" data-i18n="contactPage.form.contextPast"></option>
+                <option value="none" data-i18n="contactPage.form.contextNone"></option>
               </select>
             </label>
             <label class="field">
               <span><span data-i18n="contactPage.form.topicLabel"></span><span class="required-mark" aria-hidden="true">*</span></span>
-              <select id="contact-topic" name="topic" required disabled>
+              <select id="contact-topic" name="topic" disabled>
                 <option value="" data-i18n="contactPage.form.topicContextFirst"></option>
               </select>
             </label>
@@ -99,6 +99,14 @@
           </label>
 
           <div id="contact-form-status" class="contact-form-status" role="alert" hidden></div>
+
+          <label class="contact-consent">
+            <input id="contact-marketing-opt-in" name="marketing_opt_in" type="checkbox" value="true" />
+            <span class="contact-consent-control" aria-hidden="true"></span>
+            <span class="contact-consent-copy">
+              <strong data-i18n="contactPage.form.marketingOptInLabel"></strong>
+            </span>
+          </label>
 
           <div class="contact-form-actions">
             <button class="button button-primary" type="submit" data-i18n="contactPage.form.submit"></button>

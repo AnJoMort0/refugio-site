@@ -28,17 +28,11 @@
     "contact": "Contacto",
     "guide": "Guia Local"
   },
-  "footer": {
-    "copyright": "© O Refúgio — Família Rodrigues",
-    "googleReview": "Avaliar no Google Maps",
-    "facebook": "Facebook",
-    "instagram": "Instagram",
-    "creator": "Website by André Fonseca",
-    "admin": "Área de gestão"
+  "carousel": {
+    "previous": "Item anterior",
+    "next": "Item seguinte"
   },
   "stickyBookingCta": "Reservar",
-
-
   "home": {
     "hero": {
       "imageAlt": "Vista exterior da casa em pedra",
@@ -90,7 +84,7 @@
       "eyebrow": "Testemunhos",
       "title": "Um lugar ao qual se quer sempre voltar.",
       "reviewCta": "Avaliar no Google Maps",
-      "reviewCta2": "Escreava-nos um comentário diretamente",
+      "reviewCta2": "Enviar feedback por mensagem",
       "quote1": "“Foram dois dias excelentes, realmente um refúgio para quem gosta de fugir à confusão. A casa é enorme, a vista é espetacular e a piscina, jardim... tudo excecional. A voltar certamente!”",
       "author1": "Paulo — Portugal",
       "quote2": "“Um lugar privado maravilhoso para relaxar no meio da natureza. O Refúgio foi ainda melhor do que esperávamos, com vistas incríveis, muita privacidade e anfitriãs sempre atentas. Esperamos repetir em breve :)”",
@@ -122,8 +116,180 @@
       "card4": "Aquapura Terrace - Bar à beira rio",
       "card4Alt": "Bar local junto ao rio"
     }
-
-
+  },
+  "accommodation": {
+    "meta": {
+      "title": "O Refúgio | Alojamento",
+      "description": "Conheça O Refúgio: uma casa privada em Castelo de Paiva com piscina, jardins, churrasqueira e vista para a serra."
+    },
+    "hero": {
+      "imageAlt": "Casa rural Refúgio com piscina e vista para a serra",
+      "eyebrow": "O Alojamento",
+      "title": "Uma casa inteira, só para si, no coração da serra.",
+      "text": "Entre a tranquilidade das montanhas de Castelo de Paiva e a vista aberta sobre o Douro, O Refúgio foi pensado para quem procura privacidade, conforto e tempo para abrandar.",
+      "cta": "Ver disponibilidade"
+    },
+    "overview": {
+      "eyebrow": "Casa privada",
+      "title": "Um refúgio privado para dias sem pressa.",
+      "text1": "O Refúgio é uma casa privada, totalmente reservada para quem a escolhe. Com capacidade até 6 pessoas, é o lugar ideal para uma escapadinha em família, a dois ou entre amigos, longe da confusão e rodeado pela natureza.",
+      "text2": "Aqui, o ambiente combina o charme rural com o conforto moderno, criando um espaço acolhedor, tranquilo e pensado para ser vivido com calma, dentro e fora de casa.",
+      "imageAlt": "Fachada em pedra do alojamento Refúgio"
+    },
+    "highlights": {
+      "eyebrow": "Destaques",
+      "title": "Tudo o que precisa para uma estadia em exclusivo.",
+      "item1": "Casa inteira em exclusivo (não partilhada)",
+      "item2": "Piscina privada com vista para a natureza",
+      "item3": "3 quartos até 6 pessoas",
+      "item4": "Churrasqueira fechada exterior",
+      "item5": "Estacionamento gratuito e vigiado no local",
+      "item6": "Wi-Fi gratuito (inclui hotspot portátil)"
+    },
+    "spaces": {
+      "eyebrow": "Espaços",
+      "title": "Espaços pensados para viver e descansar.",
+      "interiorEyebrow": "Interiores",
+      "interiorTitle": "Quartos e zonas de estar",
+      "text1": "A casa dispõe de três quartos confortáveis, pensados para acolher diferentes tipos de estadia: um quarto de casal, um quarto com beliche e um quarto individual.",
+      "text2": "No interior, encontrará também uma sala de estar acolhedora, com um sofá-cama, uma sala de refeições com caráter rural e uma cozinha totalmente equipada para o dia a dia.",
+      "exteriorEyebrow": "Exterior",
+      "exteriorTitle": "Jardins, churrasqueira e piscina",
+      "text3": "No exterior, o Refúgio abre-se em vários ambientes: jardins, zonas de descanso, grelhador ao ar livre e uma churrasqueira com espaço fechado tipo varanda, onde o interior e o exterior se encontram.",
+      "text4": "A piscina privada completa a experiência, oferecendo um espaço perfeito para relaxar ao longo do dia.",
+      "card1Title": "Quarto de casal",
+      "card1Text": "Um espaço calmo e confortável para descansar depois de um dia entre piscina, serra e refeições ao ar livre.",
+      "card1Alt": "Quarto de casal acolhedor",
+      "card11Title": "Quarto com beliche",
+      "card11Text": "Ideal para crianças, amigos ou estadias em família - prático e flexível.",
+      "card11Alt": "Quarto com beliche",
+      "card2Title": "Quarto individual",
+      "card2Text": "Pequeno mas confortável.",
+      "card2Alt": "Quarto individual",
+      "card3Title": "Sala de estar com sofá-cama",
+      "card3Text": "Interior acolhedor para estar, conversar e ou ver televisão no conforto de uma casa vivida com calma.",
+      "card3Alt": "Sala de estar do Refúgio",
+      "card4Title": "Sala de refeições rural",
+      "card4Text": "O espaço mais tradicional da casa, cheio de história, onde várias gerações da família se reuniram à mesa.",
+      "card4Alt": "Sala de refeições do Refúgio",
+      "card5Title": "Cozinha equipada",
+      "card5Text": "Cozinha completa com fogão, forno, micro-ondas e todos os utensílios necessários para o dia a dia.",
+      "card5Alt": "Cozinha do Refúgio",
+      "card6Title": "Zonas de descanso exteriores",
+      "card6Text": "Jardins e vários recantos com cadeiras, mesas e espreguiçadeiras para aproveitar o exterior.",
+      "card6Alt": "Zona de lazer exterior",
+      "card7Title": "Churrasqueira exterior fechada",
+      "card7Text": "Espaço de churrasqueira com paredes de vidro amovíveis, cozinha equipada e área ideal para refeições em família.",
+      "card7Alt": "Churrasqueira fechada",
+      "card8Title": "Piscina privada",
+      "card8Text": "Piscina no jardim, perfeita para relaxar ou aproveitar em família ao longo do dia.",
+      "card8Alt": "Piscina do Refúgio",
+      "galleryLink": "Ver galeria completa"
+    },
+    "amenities": {
+      "eyebrow": "Comodidades",
+      "title": "Tudo o que precisa para uma estadia confortável e sem preocupações.",
+      "comfort": {
+        "title": "Conforto",
+        "item1": "Casa com 179 m² totalmente privada",
+        "item2": "3 quartos (até 6 hóspedes)",
+        "item3": "Sala de estar acolhedora com sofá-cama",
+        "item4": "Aquecimento",
+        "item5": "Roupa de cama e toalhas incluídas"
+      },
+      "kitchen": {
+        "title": "Cozinha e refeições",
+        "item1": "Cozinha totalmente equipada para o dia a dia",
+        "item2": "Forno, fogão, micro-ondas, frigorífico e congelador",
+        "item3": "Máquina de café, chaleira, torradeira e máquina de raclette",
+        "item4": "Utensílios completos: pratos, talheres, copos e panelas",
+        "item5": "Churrasqueira com cozinha equipada e espaço para refeições"
+      },
+      "bathroom": {
+        "title": "Casas de banho",
+        "item1": "2 casas de banho com duche e bidet",
+        "item2": "1 lavabo adicional",
+        "item3": "Secador de cabelo disponível",
+        "item4": "Máquina de lavar e máquina de secar"
+      },
+      "exterior": {
+        "title": "Exterior",
+        "item1": "Piscina privada (disponível na estação quente)",
+        "item2": "Espreguiçadeiras e guarda-sóis",
+        "item3": "Jardins e várias zonas de descanso",
+        "item4": "Grelhador exterior",
+        "item5": "Vista para a serra e envolvente natural"
+      },
+      "technology": {
+        "title": "Tecnologia e entretenimento",
+        "item1": "Wi-Fi gratuito com hotspot portátil",
+        "item2": "Televisões na sala, churrasqueira e em todos os quartos",
+        "item3": "Canais nacionais por cabo"
+      },
+      "family": {
+        "title": "Família",
+        "item1": "Alguns equipamentos para bebés disponíveis (cadeira e proteções de tomadas)",
+        "item2": "Piscina com boias e acessórios para lazer",
+        "item3": "Espaços amplos ideais para famílias"
+      },
+      "accessibility": {
+        "title": "Acessibilidade",
+        "item1": "Casa maioritariamente ao nível do rés-do-chão",
+        "item2": "Acesso relativamente fácil para pessoas com mobilidade reduzida",
+        "item3": "Ambiente rural não totalmente adaptado a cadeiras de rodas"
+      },
+      "services": {
+        "title": "Serviços",
+        "item1": "Estacionamento privado gratuito e vigiado",
+        "item2": "Possibilidade de emissão de fatura com NIF",
+        "item3": "Aluguer de bicicletas disponível"
+      }
+    },
+    "practical": {
+      "eyebrow": "Antes de reservar",
+      "title": "Informações essenciais da estadia",
+      "stay": {
+        "title": "Estadia",
+        "item1": "Capacidade máxima: 6 hóspedes",
+        "item2": "Estadia mínima: 2 noites",
+        "item3": "Casa totalmente privada (não partilhada)",
+        "item4": "Cancelamento gratuito até 48h antes do check-in"
+      },
+      "checkin": {
+        "title": "Check-in e check-out",
+        "item1": "Check-in: 15h00 – 19h00",
+        "item2": "Check-out: 08h00 – 10h00",
+        "item3": "Horários diferentes sujeitos a confirmação prévia",
+        "note": "Pedimos que indique a hora de chegada e saída com 48h de antecedência."
+      },
+      "rules": {
+        "title": "Regras principais",
+        "item1": "Proibidas festas ou eventos",
+        "item2": "Número de hóspedes não pode ser excedido",
+        "item3": "Não são permitidos animais",
+        "item4": "Não é permitido fumar no interior"
+      },
+      "practical": {
+        "title": "Informações úteis",
+        "item1": "Depósito de segurança de 200€ solicitado no check-in",
+        "item2": "Documento de identificação obrigatório",
+        "item3": "Estacionamento gratuito disponível no local",
+        "item4": "Idiomas: Português, Francês, Inglês e Espanhol"
+      }
+    },
+    "location": {
+      "eyebrow": "Localização",
+      "title": "Rua da Arejinha 627, em Pedorido.",
+      "text": "Use o mapa para encontrar O Refúgio e abrir a localização no Google Maps.",
+      "fallbackLink": "Abrir no Google Maps",
+      "mapTitle": "Mapa da localização do Refúgio"
+    },
+    "finalCta": {
+      "eyebrow": "Reservas",
+      "title": "Pronto para a sua escapadinha?",
+      "text": "Escolha as suas datas e reserve o Refúgio para uma estadia tranquila, privada e sem complicações.",
+      "cta": "Ver disponibilidade"
+    }
   },
   "galleryPage": {
     "meta": {
@@ -146,38 +312,6 @@
       "zoomIn": "Ampliar imagem",
       "zoomOut": "Reduzir imagem",
       "zoomReset": "Repor zoom"
-    }
-
-
-  },
-  "adminPage": {
-    "meta": {
-      "title": "O Refúgio | Administração"
-    },
-    "hero": {
-      "eyebrow": "Placeholder",
-      "title": "admin",
-      "text": "Esta página será construída numa etapa seguinte."
-    }
-  },
-  "guidePage": {
-    "meta": {
-      "title": "O Refúgio | Guia Local"
-    },
-    "hero": {
-      "eyebrow": "Placeholder",
-      "title": "guest-guide",
-      "text": "Esta página será construída numa etapa seguinte."
-    }
-  },
-  "thanksPage": {
-    "meta": {
-      "title": "O Refúgio | Obrigado"
-    },
-    "hero": {
-      "eyebrow": "Placeholder",
-      "title": "obrigado",
-      "text": "Esta página será construída numa etapa seguinte."
     }
   },
   "bookingPage": {
@@ -232,9 +366,9 @@
       "bikeCountLabel": "Número de bicicletas",
       "bikeRentalDaysLabel": "Dias de aluguer",
       "contactTitle": "Contacto e confirmação",
-      "contactNameLabel": "Nome do responsável pela reserva",
+      "contactNameLabel": "Nome para a reserva",
       "contactNamePlaceholder": "Nome completo",
-      "emailLabel": "Email do responsável pela reserva",
+      "emailLabel": "Email para a reserva",
       "emailPlaceholder": "nome@exemplo.com",
       "phoneLabel": "Telefone",
       "phonePlaceholder": "+351 912 345 678",
@@ -248,6 +382,7 @@
       "depositToggleHelp": "O depósito de 200€ pode ser entregue em numerário no check-in ou pode selecionar esta opção para incluí-lo na transferência para a reserva.",
       "commentsLabel": "Comentários ou pedidos especiais",
       "commentsPlaceholder": "Ex.: horários extraordinários de chegada, pedidos, dúvida sobre acessos...",
+      "marketingOptInLabel": "Quero receber novidades, ofertas e descontos do Refúgio",
       "rulesConfirmLabel": "Confirmo que li e aceito as regras da casa",
       "rulesConfirmHelp": "Antes de enviar o pedido, pedimos apenas que confirme alguns pontos importantes para garantir uma estadia tranquila.",
       "rulesLink": "Ver regras",
@@ -301,13 +436,14 @@
       "bikesMax": "Só é possível pedir uma bicicleta por hóspede, por dia.",
       "bikeDaysMax": "Os dias de aluguer devem estar dentro da duração da estadia.",
       "bedPreferenceRequired": "Escolha se preferem cama de casal ou camas individuais.",
-      "contactNameRequired": "Indique o nome do responsável pela reserva.",
-      "emailRequired": "Indique o email do responsável pela reserva.",
+      "contactNameRequired": "Indique o nome para a reserva.",
+      "emailRequired": "Indique o email para a reserva.",
       "emailInvalid": "Indique um endereço de email válido.",
-      "phoneInvalid": "Indique um telefone válido  internacional, começando por + ou 00.",
+      "phoneInvalid": "Indique um telefone válido. Pode usar formato português, +351 ou 00.",
       "checkinTimeInvalid": "O check-in deve estar entre as 15h00 e as 19h00. Se precisar de outro horário, indique esse pedido nos comentários.",
       "checkoutTimeInvalid": "O check-out deve estar entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.",
       "childAgeRequired": "Indique a idade de cada criança.",
+      "childAgeRange": "As crianças devem ter entre 0 e 12 anos.",
       "rulesConfirmationRequired": "Confirme que leu e aceita as regras da casa."
     }
   },
@@ -344,7 +480,6 @@
       "depositNote": "Se optou por adiantar o depósito, os 200€ serão devolvidos no check-out após verificação do espaço.",
       "childAgesTitle": "Idades das crianças",
       "bikeDaysTitle": "Bicicletas pedidas",
-      "bikeDetailsTitle": "Detalhe das bicicletas",
       "bikeSummaryPattern": "{bikes} bicicletas x {days} dias = {units} bicicleta-dias",
       "commentsTitle": "Comentários enviados"
     },
@@ -362,85 +497,6 @@
       "contact": "Abrir página de contacto",
       "home": "Voltar para a página principal",
       "contactMessage": "Já enviei um pedido de reserva para {checkin} - {checkout} e queria acrescentar uma informação."
-    }
-  },
-  "contactPage": {
-    "meta": {
-      "title": "O Refúgio | Contacto",
-      "description": "Envie uma mensagem a O Refúgio para reservas, dúvidas, alterações e feedback da estadia."
-    },
-    "hero": {
-      "eyebrow": "Contacto",
-      "title": "Fale connosco antes, durante ou depois da estadia.",
-      "text": "Envie-nos uma mensagem e indique como prefere ser contactado de volta.",
-      "primaryCta": "Enviar mensagem",
-      "reviewCta": "Avaliar no Google Maps"
-    },
-    "form": {
-      "eyebrow": "Mensagem",
-      "title": "Diga-nos o que precisa.",
-      "text": "Quanto mais contexto enviar, mais fácil é respondermos pela pessoa certa e no canal certo.",
-      "nameLabel": "Nome",
-      "namePlaceholder": "Nome completo",
-      "emailLabel": "Email",
-      "emailPlaceholder": "nome@exemplo.com",
-      "phoneLabel": "Telefone",
-      "phonePlaceholder": "+351 912 345 678",
-      "languageLabel": "Idioma de contacto",
-      "languagePortuguese": "Português",
-      "languageFrench": "Français",
-      "languageEnglish": "English",
-      "languageGerman": "Deutsch",
-      "languageSpanish": "Español",
-      "preferredContactLabel": "Prefiro ser contactado por",
-      "preferredEmail": "Email",
-      "preferredWhatsApp": "Pedido de contacto por WhatsApp",
-      "preferredCall": "Pedido de chamada de retorno",
-      "contextLabel": "Contexto do contacto",
-      "contextPlaceholder": "Escolha uma opção",
-      "contextConfirmed": "Já tenho uma reserva",
-      "contextRequested": "Fiz um pedido de reserva",
-      "contextPast": "Já tive uma reserva",
-      "contextNone": "Não tenho reserva",
-      "topicLabel": "Assunto",
-      "topicPlaceholder": "Escolha uma opção",
-      "topicContextFirst": "Escolha primeiro o contexto",
-      "messageLabel": "Mensagem",
-      "messagePlaceholder": "Escreva aqui a sua pergunta, pedido ou feedback. Se já tiver datas ou número de reserva, inclua também.",
-      "submit": "Enviar mensagem"
-    },
-    "topics": {
-      "confirmedCancel": "Cancelar reserva",
-      "confirmedChange": "Alterar reserva",
-      "confirmedQuestion": "Perguntas sobre a reserva",
-      "requestCancel": "Cancelar pedido de reserva",
-      "requestChange": "Alterar pedido de reserva",
-      "requestQuestion": "Perguntas sobre pedido de reserva",
-      "requestStatus": "Saber o estado do pedido",
-      "pastFeedback": "Estive aqui e quero deixar feedback",
-      "pastQuestion": "Pergunta sobre uma estadia anterior",
-      "noReservationBooking": "Perguntas sobre reservar",
-      "noReservationSpace": "Perguntas sobre o espaço",
-      "noReservationAccessibility": "Acessibilidade ou pedidos especiais",
-      "noReservationLocalArea": "Perguntas sobre a zona",
-      "noReservationPartnerships": "Parcerias ou imprensa",
-      "other": "Outro"
-    },
-    "validation": {
-      "phoneInvalid": "Indique um telefone válido. Pode usar formato português, +351 ou 00.",
-      "phoneRequiredForMethod": "Indique um telefone para usar esta opção."
-    },
-    "stay": {
-      "eyebrow": "Resposta rápida",
-      "title": "Já está hospedado?",
-      "text": "Use o código QR no local, para aceder às opções de contacto direto."
-    },
-    "social": {
-      "eyebrow": "Social",
-      "title": "Encontre O Refúgio online",
-      "googleMaps": "Google Maps",
-      "facebook": "Facebook",
-      "instagram": "Instagram"
     }
   },
   "rulesFull": {
@@ -522,189 +578,122 @@
       "item2": "Faturas com NIF disponíveis mediante pedido"
     }
   },
-  "accommodation": {
+  "contactPage": {
     "meta": {
-      "title": "O Refúgio | Alojamento",
-      "description": "Conheça O Refúgio: uma casa privada em Castelo de Paiva com piscina, jardins, churrasqueira e vista para a serra."
+      "title": "O Refúgio | Contacto",
+      "description": "Envie uma mensagem a O Refúgio para reservas, dúvidas, alterações e feedback da estadia."
     },
     "hero": {
-      "imageAlt": "Casa rural Refúgio com piscina e vista para a serra",
-      "eyebrow": "O Alojamento",
-      "title": "Uma casa inteira, só para si, no coração da serra.",
-      "text": "Entre a tranquilidade das montanhas de Castelo de Paiva e a vista aberta sobre o Douro, O Refúgio foi pensado para quem procura privacidade, conforto e tempo para abrandar.",
-      "cta": "Ver disponibilidade"
+      "eyebrow": "Contacto",
+      "title": "Fale connosco antes, durante ou depois da estadia.",
+      "text": "Envie-nos uma mensagem e indique como prefere ser contactado de volta.",
+      "primaryCta": "Enviar mensagem",
+      "reviewCta": "Avaliar no Google Maps"
     },
-    "overview": {
-      "eyebrow": "Casa privada",
-      "title": "Um refúgio privado para dias sem pressa.",
-      "text1": "O Refúgio é uma casa privada, totalmente reservada para quem a escolhe. Com capacidade até 6 pessoas, é o lugar ideal para uma escapadinha em família, a dois ou entre amigos, longe da confusão e rodeado pela natureza.",
-      "text2": "Aqui, o ambiente combina o charme rural com o conforto moderno, criando um espaço acolhedor, tranquilo e pensado para ser vivido com calma, dentro e fora de casa.",
-      "imageAlt": "Fachada em pedra do alojamento Refúgio"
+    "form": {
+      "eyebrow": "Mensagem",
+      "title": "Diga-nos o que precisa.",
+      "text": "Quanto mais contexto enviar, mais fácil é respondermos pela pessoa certa e no canal certo.",
+      "nameLabel": "Nome",
+      "namePlaceholder": "Nome completo",
+      "emailLabel": "Email",
+      "emailPlaceholder": "nome@exemplo.com",
+      "phoneLabel": "Telefone",
+      "phonePlaceholder": "+351 912 345 678",
+      "languageLabel": "Idioma de contacto",
+      "languagePortuguese": "Português",
+      "languageFrench": "Français",
+      "languageEnglish": "English",
+      "languageGerman": "Deutsch",
+      "languageSpanish": "Español",
+      "preferredContactLabel": "Prefiro ser contactado por",
+      "preferredEmail": "Email",
+      "preferredWhatsApp": "Pedido de contacto por WhatsApp",
+      "preferredCall": "Pedido de chamada de retorno",
+      "contextLabel": "Contexto do contacto",
+      "contextPlaceholder": "Escolha uma opção",
+      "contextConfirmed": "Já tenho uma reserva",
+      "contextRequested": "Fiz um pedido de reserva",
+      "contextPast": "Já tive uma reserva",
+      "contextNone": "Não tenho reserva",
+      "topicLabel": "Assunto",
+      "topicPlaceholder": "Escolha uma opção",
+      "topicContextFirst": "Escolha primeiro o contexto",
+      "messageLabel": "Mensagem",
+      "messagePlaceholder": "Escreva aqui a sua pergunta, pedido ou feedback. Se já tiver datas ou número de reserva, inclua também.",
+      "marketingOptInLabel": "Quero receber novidades, ofertas e descontos do Refúgio",
+      "submit": "Enviar mensagem"
     },
-    "highlights": {
-      "eyebrow": "Destaques",
-      "title": "Tudo o que precisa para uma estadia em exclusivo.",
-      "item1": "Casa inteira em exclusivo (não partilhada)",
-      "item2": "Piscina privada com vista para a natureza",
-      "item3": "3 quartos até 6 pessoas",
-      "item4": "Churrasqueira fechada exterior",
-      "item5": "Estacionamento gratuito e vigiado no local",
-      "item6": "Wi-Fi gratuito (inclui hotspot portátil)"
+    "topics": {
+      "confirmedCancel": "Cancelar reserva",
+      "confirmedChange": "Alterar reserva",
+      "confirmedQuestion": "Perguntas sobre a reserva",
+      "requestCancel": "Cancelar pedido de reserva",
+      "requestChange": "Alterar pedido de reserva",
+      "requestQuestion": "Perguntas sobre pedido de reserva",
+      "requestStatus": "Saber o estado do pedido",
+      "pastFeedback": "Estive aqui e quero deixar feedback",
+      "pastQuestion": "Pergunta sobre uma estadia anterior",
+      "noReservationBooking": "Perguntas sobre reservar",
+      "noReservationSpace": "Perguntas sobre o espaço",
+      "noReservationAccessibility": "Acessibilidade ou pedidos especiais",
+      "noReservationLocalArea": "Perguntas sobre a zona",
+      "noReservationPartnerships": "Parcerias ou imprensa",
+      "other": "Outro"
     },
-    "spaces": {
-      "eyebrow": "Espaços",
-      "title": "Espaços pensados para viver e descansar.",
-      "interiorEyebrow": "Interiores",
-      "interiorTitle": "Quartos e zonas de estar",
-      "text1": "A casa dispõe de três quartos confortáveis, pensados para acolher diferentes tipos de estadia: um quarto de casal, um quarto com beliche e um quarto individual.",
-      "text2": "No interior, encontrará também uma sala de estar acolhedora, com um sofá-cama, uma sala de refeições com caráter rural e uma cozinha totalmente equipada para o dia a dia.",
-      "exteriorEyebrow": "Exterior",
-      "exteriorTitle": "Jardins, churrasqueira e piscina",
-      "text3": "No exterior, o Refúgio abre-se em vários ambientes: jardins, zonas de descanso, grelhador ao ar livre e uma churrasqueira com espaço fechado tipo varanda, onde o interior e o exterior se encontram.",
-      "text4": "A piscina privada completa a experiência, oferecendo um espaço perfeito para relaxar ao longo do dia.",
-      "card1Title": "Quarto de casal",
-      "card1Text": "Um espaço calmo e confortável para descansar depois de um dia entre piscina, serra e refeições ao ar livre.",
-      "card1Alt": "Quarto de casal acolhedor",
-      "card11Title": "Quarto com beliche",
-      "card11Text": "Ideal para crianças, amigos ou estadias em família - prático e flexível.",
-      "card11Alt": "Quarto com beliche",
-      "card2Title": "Quarto individual",
-      "card2Text": "Pequeno mas confortável.",
-      "card2Alt": "Quarto individual",
-      "card3Title": "Sala de estar com sofá-cama",
-      "card3Text": "Interior acolhedor para estar, conversar e ou ver televisão no conforto de uma casa vivida com calma.",
-      "card3Alt": "Sala de estar do Refúgio",
-      "card4Title": "Sala de refeições rural",
-      "card4Text": "O espaço mais tradicional da casa, cheio de história, onde várias gerações da família se reuniram à mesa.",
-      "card4Alt": "Sala de refeições do Refúgio",
-      "card5Title": "Cozinha equipada",
-      "card5Text": "Cozinha completa com fogão, forno, micro-ondas e todos os utensílios necessários para o dia a dia.",
-      "card5Alt": "Cozinha do Refúgio",
-      "card6Title": "Zonas de descanso exteriores",
-      "card6Text": "Jardins e vários recantos com cadeiras, mesas e espreguiçadeiras para aproveitar o exterior.",
-      "card6Alt": "Zona de lazer exterior",
-      "card7Title": "Churrasqueira exterior fechada",
-      "card7Text": "Espaço de churrasqueira com paredes de vidro amovíveis, cozinha equipada e área ideal para refeições em família.",
-      "card7Alt": "Churrasqueira fechada",
-      "card8Title": "Piscina privada",
-      "card8Text": "Piscina no jardim, perfeita para relaxar ou aproveitar em família ao longo do dia.",
-      "card8Alt": "Piscina do Refúgio",
-      "galleryLink": "Ver galeria completa"
+    "validation": {
+      "phoneInvalid": "Indique um telefone válido. Pode usar formato português, +351 ou 00.",
+      "phoneRequiredForMethod": "Indique um telefone para usar esta opção."
     },
-    "amenities": {
-      "eyebrow": "Comodidades",
-      "title": "Tudo o que precisa para uma estadia confortável e sem preocupações.",
-
-      "comfort": {
-        "title": "Conforto",
-        "item1": "Casa com 179 m² totalmente privada",
-        "item2": "3 quartos (até 6 hóspedes)",
-        "item3": "Sala de estar acolhedora com sofá-cama",
-        "item4": "Aquecimento",
-        "item5": "Roupa de cama e toalhas incluídas"
-      },
-
-      "kitchen": {
-        "title": "Cozinha e refeições",
-        "item1": "Cozinha totalmente equipada para o dia a dia",
-        "item2": "Forno, fogão, micro-ondas, frigorífico e congelador",
-        "item3": "Máquina de café, chaleira, torradeira e máquina de raclette",
-        "item4": "Utensílios completos: pratos, talheres, copos e panelas",
-        "item5": "Churrasqueira com cozinha equipada e espaço para refeições"
-      },
-
-      "bathroom": {
-        "title": "Casas de banho",
-        "item1": "2 casas de banho com duche e bidet",
-        "item2": "1 lavabo adicional",
-        "item3": "Secador de cabelo disponível",
-        "item4": "Máquina de lavar e máquina de secar"
-      },
-
-      "exterior": {
-        "title": "Exterior",
-        "item1": "Piscina privada (disponível na estação quente)",
-        "item2": "Espreguiçadeiras e guarda-sóis",
-        "item3": "Jardins e várias zonas de descanso",
-        "item4": "Grelhador exterior",
-        "item5": "Vista para a serra e envolvente natural"
-      },
-
-      "technology": {
-        "title": "Tecnologia e entretenimento",
-        "item1": "Wi-Fi gratuito com hotspot portátil",
-        "item2": "Televisões na sala, churrasqueira e em todos os quartos",
-        "item3": "Canais nacionais por cabo"
-      },
-
-      "family": {
-        "title": "Família",
-        "item1": "Alguns equipamentos para bebés disponíveis (cadeira e proteções de tomadas)",
-        "item2": "Piscina com boias e acessórios para lazer",
-        "item3": "Espaços amplos ideais para famílias"
-      },
-
-      "accessibility": {
-        "title": "Acessibilidade",
-        "item1": "Casa maioritariamente ao nível do rés-do-chão",
-        "item2": "Acesso relativamente fácil para pessoas com mobilidade reduzida",
-        "item3": "Ambiente rural não totalmente adaptado a cadeiras de rodas"
-      },
-
-      "services": {
-        "title": "Serviços",
-        "item1": "Estacionamento privado gratuito e vigiado",
-        "item2": "Possibilidade de emissão de fatura com NIF",
-        "item3": "Aluguer de bicicletas disponível"
-      }
+    "stay": {
+      "eyebrow": "Resposta rápida",
+      "title": "Já está hospedado?",
+      "text": "Use o código QR no local, para aceder às opções de contacto direto."
     },
-    "practical": {
-      "eyebrow": "Antes de reservar",
-      "title": "Informações essenciais da estadia",
-
-      "stay": {
-        "title": "Estadia",
-        "item1": "Capacidade máxima: 6 hóspedes",
-        "item2": "Estadia mínima: 2 noites",
-        "item3": "Casa totalmente privada (não partilhada)",
-        "item4": "Cancelamento gratuito até 48h antes do check-in"
-      },
-
-      "checkin": {
-        "title": "Check-in e check-out",
-        "item1": "Check-in: 15h00 – 19h00",
-        "item2": "Check-out: 08h00 – 10h00",
-        "item3": "Horários diferentes sujeitos a confirmação prévia",
-        "note": "Pedimos que indique a hora de chegada e saída com 48h de antecedência."
-      },
-
-      "rules": {
-        "title": "Regras principais",
-        "item1": "Proibidas festas ou eventos",
-        "item2": "Número de hóspedes não pode ser excedido",
-        "item3": "Não são permitidos animais",
-        "item4": "Não é permitido fumar no interior"
-      },
-
-      "practical": {
-        "title": "Informações úteis",
-        "item1": "Depósito de segurança de 200€ solicitado no check-in",
-        "item2": "Documento de identificação obrigatório",
-        "item3": "Estacionamento gratuito disponível no local",
-        "item4": "Idiomas: Português, Francês, Inglês e Espanhol"
-      }
-    },
-    "location": {
-      "eyebrow": "Localização",
-      "title": "Rua da Arejinha 627, em Pedorido.",
-      "fallbackLink": "Abrir no Google Maps",
-      "mapTitle": "Mapa da localização do Refúgio"
-    },
-    "finalCta": {
-      "eyebrow": "Reservas",
-      "title": "Pronto para a sua escapadinha?",
-      "text": "Escolha as suas datas e reserve o Refúgio para uma estadia tranquila, privada e sem complicações.",
-      "cta": "Ver disponibilidade"
+    "social": {
+      "eyebrow": "Social",
+      "title": "Encontre O Refúgio online",
+      "googleMaps": "Google Maps",
+      "facebook": "Facebook",
+      "instagram": "Instagram"
     }
+  },
+  "guidePage": {
+    "meta": {
+      "title": "O Refúgio | Guia Local"
+    },
+    "hero": {
+      "eyebrow": "Placeholder",
+      "title": "guest-guide",
+      "text": "Esta página será construída numa etapa seguinte."
+    }
+  },
+  "thanksPage": {
+    "meta": {
+      "title": "O Refúgio | Obrigado"
+    },
+    "hero": {
+      "eyebrow": "Placeholder",
+      "title": "obrigado",
+      "text": "Esta página será construída numa etapa seguinte."
+    }
+  },
+  "adminPage": {
+    "meta": {
+      "title": "O Refúgio | Administração"
+    },
+    "hero": {
+      "eyebrow": "Placeholder",
+      "title": "admin",
+      "text": "Esta página será construída numa etapa seguinte."
+    }
+  },
+  "footer": {
+    "copyright": "© O Refúgio — Família Rodrigues",
+    "googleReview": "Avaliar no Google Maps",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "creator": "Website by André Fonseca",
+    "admin": "Área de gestão"
   }
 }

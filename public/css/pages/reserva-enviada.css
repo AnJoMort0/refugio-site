@@ -45,6 +45,8 @@
 
 .booking-sent-list {
   gap: 0.55rem;
+  padding-left: 0;
+  list-style: none;
   color: var(--color-charcoal-earth);
 }
 

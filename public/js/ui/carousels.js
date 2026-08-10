@@ -1,6 +1,102 @@
+const DEFAULT_LANGUAGE = 'pt';
+const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
+
+function getNestedValue(object, path) {
+  return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
+}
+
+function mergeDictionaries(baseDictionary, overrideDictionary) {
+  if (!baseDictionary || typeof baseDictionary !== 'object') return overrideDictionary;
+  if (!overrideDictionary || typeof overrideDictionary !== 'object') return baseDictionary;
+
+  const mergedDictionary = { ...baseDictionary };
+
+  Object.entries(overrideDictionary).forEach(([key, value]) => {
+    if (
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      baseDictionary[key] &&
+      typeof baseDictionary[key] === 'object' &&
+      !Array.isArray(baseDictionary[key])
+    ) {
+      mergedDictionary[key] = mergeDictionaries(baseDictionary[key], value);
+      return;
+    }
+
+    mergedDictionary[key] = value;
+  });
+
+  return mergedDictionary;
+}
+
+async function loadLocale(language) {
+  const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
+  const response = await fetch(`./locales/${safeLanguage}.json`);
+
+  if (!response.ok) throw new Error(`Could not load locale file for ${safeLanguage}`);
+  return response.json();
+}
+
+async function loadResolvedDictionary() {
+  const selectedLanguage = (localStorage.getItem('refugio-language') || document.documentElement.lang || DEFAULT_LANGUAGE)
+    .slice(0, 2)
+    .toLowerCase();
+  const safeLanguage = SUPPORTED_LANGUAGES.includes(selectedLanguage) ? selectedLanguage : DEFAULT_LANGUAGE;
+  const fallbackDictionary = await loadLocale(DEFAULT_LANGUAGE);
+
+  if (safeLanguage === DEFAULT_LANGUAGE) return fallbackDictionary;
+
+  return mergeDictionaries(fallbackDictionary, await loadLocale(safeLanguage));
+}
+
+function getText(dictionary, path) {
+  return getNestedValue(dictionary, path) || '';
+}
+
+function updateCarouselControlLabels(dictionary) {
+  document.querySelectorAll('.carousel-edge-control-prev').forEach((button) => {
+    button.setAttribute('aria-label', getText(dictionary, 'carousel.previous'));
+  });
+
+  document.querySelectorAll('.carousel-edge-control-next').forEach((button) => {
+    button.setAttribute('aria-label', getText(dictionary, 'carousel.next'));
+  });
+}
+
+function ensureCarouselShell(carousel) {
+  if (carousel.parentElement?.classList.contains('carousel-shell')) {
+    return carousel.parentElement;
+  }
+
+  const shell = document.createElement('div');
+  shell.className = 'carousel-shell';
+  carousel.parentNode?.insertBefore(shell, carousel);
+  shell.append(carousel);
+  return shell;
+}
+
+function createCarouselButton(direction, label) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = `carousel-edge-control carousel-edge-control-${direction}`;
+  button.textContent = direction === 'prev' ? '<' : '>';
+  button.setAttribute('aria-label', label);
+  return button;
+}
+
 export function initCarousels() {
+  loadResolvedDictionary()
+    .then(updateCarouselControlLabels)
+    .catch(() => {});
+
+  document.addEventListener('language:changed', (event) => {
+    updateCarouselControlLabels(event.detail?.dictionary || {});
+  });
+
   document.querySelectorAll('[data-carousel]').forEach((carousel) => {
     const initialCards = Array.from(carousel.children);
+    const shell = ensureCarouselShell(carousel);
     const getCloneCount = () => {
       const firstCard = initialCards[0];
       if (!firstCard) return 0;
@@ -100,6 +196,19 @@ export function initCarousels() {
       centerCard(currentIndex === cards.length - 1 && loopClone ? loopClone : cards[nextIndex]);
     };
 
+    const scrollToAdjacentItem = (direction) => {
+      pauseForManualScroll();
+
+      const cards = Array.from(carousel.children);
+      if (!cards.length) return;
+
+      const currentCard = getClosestCard(cards);
+      const currentIndex = cards.indexOf(currentCard);
+      const targetCard = cards[currentIndex + direction];
+
+      centerCard(targetCard || cards[direction > 0 ? 0 : cards.length - 1]);
+    };
+
     const startAutoScroll = () => {
       window.clearInterval(autoScrollTimer);
       autoScrollTimer = window.setInterval(scrollToNextItem, intervalMs);
@@ -108,6 +217,21 @@ export function initCarousels() {
     ['pointerdown', 'wheel', 'touchstart', 'keydown'].forEach((eventName) => {
       carousel.addEventListener(eventName, pauseForManualScroll, { passive: true });
     });
+
+    if (initialCards.length > 1 && !shell.querySelector('.carousel-edge-control')) {
+      const previousButton = createCarouselButton('prev', '');
+      const nextButton = createCarouselButton('next', '');
+
+      previousButton.addEventListener('click', (event) => {
+        scrollToAdjacentItem(-1);
+        if (event.detail > 0) previousButton.blur();
+      });
+      nextButton.addEventListener('click', (event) => {
+        scrollToAdjacentItem(1);
+        if (event.detail > 0) nextButton.blur();
+      });
+      shell.append(previousButton, nextButton);
+    }
 
     window.addEventListener('scroll', () => {
       if (!pausedUntilPageMoves || Math.abs(window.scrollY - pauseScrollY) < 24) return;
