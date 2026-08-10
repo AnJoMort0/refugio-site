@@ -10,6 +10,12 @@
   "languageSwitcher": {
     "label": "Choisir la langue"
   },
+  "languageNames": {
+    "pt": "Português",
+    "en": "English",
+    "fr": "Français",
+    "es": "Español"
+  },
   "nav": {
     "toggleLabel": "Ouvrir le menu",
     "toggleText": "Ouvrir le menu",

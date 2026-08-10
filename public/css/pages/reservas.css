@@ -582,6 +582,10 @@
 
 .booking-submit-notice {
   margin-top: 0.15rem;
+  border-color: rgba(168, 83, 59, 0.38);
+  background: rgba(168, 83, 59, 0.12);
+  color: #8b2f22;
+  font-weight: 700;
 }
 
 .booking-submit-button {
@@ -628,6 +632,12 @@ body[data-page="booking"] .sticky-booking-cta {
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.summary-breakdown > .summary-subrow {
+  padding-left: 1.1rem;
+  border-left: 2px solid rgba(67, 99, 75, 0.18);
+  color: rgba(43, 38, 34, 0.74);
 }
 
 .summary-rates > div[hidden],

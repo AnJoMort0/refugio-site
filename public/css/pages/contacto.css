@@ -98,6 +98,14 @@
   background: rgba(255, 244, 242, 0.96);
 }
 
+.contact-page .field.is-attention input {
+  animation: contact-field-attention 720ms ease;
+}
+
+.contact-page option[data-locked="true"] {
+  color: rgba(93, 70, 58, 0.52);
+}
+
 .contact-hero-actions,
 .contact-form-actions,
 .contact-number-actions,
@@ -170,5 +178,19 @@
   .contact-number-actions,
   .contact-social-links {
     display: grid;
+  }
+}
+
+@keyframes contact-field-attention {
+  0%,
+  100% {
+    box-shadow: none;
+  }
+
+  24%,
+  72% {
+    border-color: rgba(168, 83, 59, 0.86);
+    background: rgba(255, 244, 242, 0.98);
+    box-shadow: 0 0 0 4px rgba(168, 83, 59, 0.16);
   }
 }

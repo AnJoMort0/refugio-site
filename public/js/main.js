@@ -18,4 +18,4 @@ initAccommodationPage();
 await initGalleryPage();
 await initBookingPage();
 await initBookingSentPage();
-initContactPage();
+await initContactPage();

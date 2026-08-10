@@ -7,56 +7,70 @@ const NAV_ITEMS = [
 ];
 const GOOGLE_REVIEW_URL =
   'https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D';
+const FACEBOOK_URL = 'https://example.com/REFUGIO_FACEBOOK_URL_REPLACE_ME';
+const INSTAGRAM_URL = 'https://example.com/REFUGIO_INSTAGRAM_URL_REPLACE_ME';
+const CREATOR_URL = 'https://linktr.ee/anjomorto';
+
+function icon(name) {
+  const icons = {
+    mail: '<rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>',
+    menu: '<path d="M4 12h16"></path><path d="M4 6h16"></path><path d="M4 18h16"></path>',
+    chevronDown: '<path d="m6 9 6 6 6-6"></path>',
+    external: '<path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>'
+  };
+
+  return `<svg class="lucide-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name] || ''}</svg>`;
+}
 
 function buildHeader(activePage) {
   const navLinks = NAV_ITEMS.map(({ key, href, labelKey }) => {
     const isActive = activePage === key ? ' class="is-active"' : '';
-    return `<a${isActive} href="${href}" data-i18n="${labelKey}">${getPortugueseLabel(labelKey)}</a>`;
+    return `<a${isActive} href="${href}" data-i18n="${labelKey}"></a>`;
   }).join('');
 
   return `
     <header class="site-header">
       <div class="container header-inner">
-        <a class="brand" href="./index.html" data-i18n="brand.name">O Refúgio</a>
+        <a class="brand" href="./index.html" data-i18n="brand.name"></a>
 
         <div class="header-actions">
           <a class="header-contact" href="./contacto.html">
-            <span class="header-contact-icon" aria-hidden="true">✉</span>
-            <span class="header-contact-label" data-i18n="nav.contact">Contacto</span>
+            <span class="header-contact-icon" aria-hidden="true">${icon('mail')}</span>
+            <span class="header-contact-label" data-i18n="nav.contact"></span>
           </a>
 
-          <label class="sr-only" for="language-menu-button" data-i18n="languageSwitcher.label">Escolher idioma</label>
+          <label class="sr-only" for="language-menu-button" data-i18n="languageSwitcher.label"></label>
           <div class="language-menu" data-language-menu>
             <button
               id="language-menu-button"
               class="language-menu-button"
               type="button"
-              aria-label="Escolher idioma"
+              aria-label=""
               aria-haspopup="listbox"
               aria-expanded="false"
               data-i18n-attr='{"aria-label":"languageSwitcher.label"}'
             >
-              <span class="language-menu-current">Português</span>
-              <span class="language-menu-caret" aria-hidden="true"></span>
+              <span class="language-menu-current"></span>
+              <span class="language-menu-caret" aria-hidden="true">${icon('chevronDown')}</span>
             </button>
-            <div class="language-menu-popover" role="listbox" aria-label="Escolher idioma">
-              <button class="language-menu-option" type="button" data-language-option="pt">Português</button>
-              <button class="language-menu-option" type="button" data-language-option="en">English</button>
-              <button class="language-menu-option" type="button" data-language-option="fr">Français</button>
-              <button class="language-menu-option" type="button" data-language-option="es">Español</button>
+            <div class="language-menu-popover" role="listbox" aria-label="" data-i18n-attr='{"aria-label":"languageSwitcher.label"}'>
+              <button class="language-menu-option" type="button" data-language-option="pt" data-i18n="languageNames.pt"></button>
+              <button class="language-menu-option" type="button" data-language-option="en" data-i18n="languageNames.en"></button>
+              <button class="language-menu-option" type="button" data-language-option="fr" data-i18n="languageNames.fr"></button>
+              <button class="language-menu-option" type="button" data-language-option="es" data-i18n="languageNames.es"></button>
             </div>
           </div>
 
           <button
             class="nav-toggle"
             type="button"
-            aria-label="Abrir menu"
+            aria-label=""
             aria-expanded="false"
             aria-controls="site-nav"
             data-i18n-attr='{"aria-label":"nav.toggleLabel"}'
           >
-            <span class="sr-only" data-i18n="nav.toggleText">Abrir menu</span>
-            ☰
+            <span class="sr-only" data-i18n="nav.toggleText"></span>
+            ${icon('menu')}
           </button>
         </div>
 
@@ -72,11 +86,16 @@ function buildFooter() {
   return `
     <footer class="site-footer">
       <div class="container footer-inner">
-        <p data-i18n="footer.copyright">© O Refúgio — Família Rodrigues</p>
+        <div class="footer-brand">
+          <p data-i18n="footer.copyright"></p>
+          <a class="footer-creator" href="${CREATOR_URL}" target="_blank" rel="noopener" data-i18n="footer.creator"></a>
+        </div>
         <div class="footer-links">
-          <a href="./contacto.html" data-i18n="nav.contact">Contacto</a>
-          <a href="${GOOGLE_REVIEW_URL}" target="_blank" rel="noopener" data-i18n="footer.googleReview">Adicionar avaliação no Google Maps</a>
-          <a href="./admin.html" data-i18n="footer.admin">Área de gestão</a>
+          <a href="./contacto.html"><span data-i18n="nav.contact"></span></a>
+          <a href="${GOOGLE_REVIEW_URL}" target="_blank" rel="noopener"><span data-i18n="footer.googleReview"></span>${icon('external')}</a>
+          <a href="${FACEBOOK_URL}" target="_blank" rel="noopener"><span data-i18n="footer.facebook"></span>${icon('external')}</a>
+          <a href="${INSTAGRAM_URL}" target="_blank" rel="noopener"><span data-i18n="footer.instagram"></span>${icon('external')}</a>
+          <a href="./admin.html"><span data-i18n="footer.admin"></span></a>
         </div>
       </div>
     </footer>
@@ -84,19 +103,7 @@ function buildFooter() {
 }
 
 function buildStickyBookingCta() {
-  return `<a class="sticky-booking-cta" href="./reservas.html" data-i18n="stickyBookingCta">Reservar</a>`;
-}
-
-function getPortugueseLabel(key) {
-  const labels = {
-    'nav.accommodation': 'Alojamento',
-    'nav.gallery': 'Galeria',
-    'nav.booking': 'Reservas',
-    'nav.contact': 'Contacto',
-    'nav.guide': 'Guia Local'
-  };
-
-  return labels[key] || '';
+  return `<a class="sticky-booking-cta" href="./reservas.html" data-i18n="stickyBookingCta"></a>`;
 }
 
 export function renderSiteShell() {

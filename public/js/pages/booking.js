@@ -67,8 +67,20 @@ function buildOccupiedRanges(today) {
   ];
 }
 
-function isValidInternationalPhone(value) {
-  return /^(?:\+|00)[0-9][0-9\s()\-]{5,}$/.test(value.trim());
+function isValidPhoneNumber(value) {
+  const trimmedValue = value.trim();
+  const digitsOnly = trimmedValue.replace(/\D/g, '');
+  const hasInternationalPrefix = /^(?:\+|00)[0-9][0-9\s()\-]{5,}$/.test(trimmedValue);
+  const hasPortugueseLocalFormat = /^(?:2|9)\d{8}$/.test(digitsOnly);
+
+  return hasInternationalPrefix || hasPortugueseLocalFormat;
+}
+
+function usesPortugueseTimezone() {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const portugueseTimezones = new Set(['Europe/Lisbon', 'Atlantic/Azores', 'Atlantic/Madeira']);
+
+  return Boolean(timeZone && portugueseTimezones.has(timeZone));
 }
 
 function getPortugalNow() {
@@ -123,6 +135,7 @@ export async function initBookingPage() {
   const calendar = document.querySelector('#availability-calendar');
   const formStatus = document.querySelector('#booking-form-status');
   const resetButton = document.querySelector('#booking-reset');
+  const timezoneWarning = document.querySelector('[data-i18n="bookingPage.form.timezoneWarning"]');
   const summaryNights = document.querySelector('#summary-nights');
   const summaryGuests = document.querySelector('#summary-guests');
   const summaryAdults = document.querySelector('#summary-adults');
@@ -259,11 +272,13 @@ export async function initBookingPage() {
     childAgeFields.replaceChildren(fragment);
   }
 
-  function getBikeDayTotal() {
-    if (!bikeReservationToggle?.checked) return 0;
+  function getBikeSelection() {
+    if (!bikeReservationToggle?.checked) return { bikes: 0, rentalDays: 0, units: 0 };
+
     const bikes = Math.max(0, Number(bikeCountInput?.value || 0));
-    const days = Math.max(0, Number(bikeRentalDaysInput?.value || 0));
-    return bikes * days;
+    const rentalDays = Math.max(0, Number(bikeRentalDaysInput?.value || 0));
+
+    return { bikes, rentalDays, units: bikes * rentalDays };
   }
 
   function clampBikeInput(input) {
@@ -329,7 +344,8 @@ export async function initBookingPage() {
     const nights = diffNights(checkinInput.value, checkoutInput.value);
     const includeDeposit = Boolean(depositPrepayInput?.checked);
     const selectedBedPreference = bedPreferenceInputs.find((input) => input.checked)?.value || '';
-    const bikeDays = getBikeDayTotal();
+    const bikeSelection = getBikeSelection();
+    const bikeDays = bikeSelection.units;
     const totalValue = buildReservationTotal({ nights, adults, children, includeDeposit, bikeDays });
 
     priceAdult.textContent = formatCurrency(PRICE_CONFIG.adultPerNight);
@@ -358,10 +374,13 @@ export async function initBookingPage() {
     }
     if (summaryBikesRow && summaryBikes) {
       summaryBikesRow.hidden = bikeDays === 0;
-      summaryBikes.textContent =
-        bikeDays === 1
-          ? getText('bookingPage.summary.bikesSingle', '1 bicicleta-dia')
-          : getText('bookingPage.summary.bikesMultiple', '{count} bicicleta-dias').replace('{count}', String(bikeDays));
+      summaryBikes.textContent = getText(
+        'bookingPage.summary.bikesPattern',
+        '{bikes} bicicleta(s) x {days} dia(s) = {units} bicicleta-dias'
+      )
+        .replace('{bikes}', String(bikeSelection.bikes))
+        .replace('{days}', String(bikeSelection.rentalDays))
+        .replace('{units}', String(bikeDays));
     }
     if (summaryBedPreferenceRow && summaryBedPreference) {
       const showBedPreference = needsBedPreference();
@@ -378,6 +397,12 @@ export async function initBookingPage() {
       }
     }
     summaryTotal.textContent = formatCurrency(totalValue);
+  }
+
+  function renderTimezoneWarning() {
+    if (!timezoneWarning) return;
+
+    timezoneWarning.hidden = usesPortugueseTimezone();
   }
 
   function renderCalendar() {
@@ -650,8 +675,8 @@ export async function initBookingPage() {
       return message;
     }
 
-    if (contactPhoneInput?.value.trim() && !isValidInternationalPhone(contactPhoneInput.value)) {
-      const message = getText('bookingPage.validation.phoneInvalid', 'Indique um telefone válido com indicativo internacional, começando por + ou 00.');
+    if (contactPhoneInput?.value.trim() && !isValidPhoneNumber(contactPhoneInput.value)) {
+      const message = getText('bookingPage.validation.phoneInvalid', 'Indique um telefone válido.');
       setFieldValidity(contactPhoneInput, message);
       if (showBrowserMessages) contactPhoneInput.reportValidity();
       return message;
@@ -754,6 +779,7 @@ export async function initBookingPage() {
   }
 
   await loadDictionary();
+  renderTimezoneWarning();
   rerenderDynamicContent();
   setStatus('');
 
@@ -867,6 +893,12 @@ export async function initBookingPage() {
   });
 
   resetButton?.addEventListener('click', () => {
+    const confirmed = window.confirm(
+      getText('bookingPage.form.resetConfirm', 'Tem a certeza que quer limpar todos os dados deste pedido?')
+    );
+
+    if (!confirmed) return;
+
     form.reset();
     adultInput.value = '2';
     childInput.value = '0';

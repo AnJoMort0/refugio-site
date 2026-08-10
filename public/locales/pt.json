@@ -10,6 +10,15 @@
   "languageSwitcher": {
     "label": "Escolher idioma"
   },
+  "languageNames": {
+    "pt": "Português",
+    "en": "English",
+    "fr": "Français",
+    "es": "Español"
+  },
+  "common": {
+    "backHome": "Voltar à homepage"
+  },
   "nav": {
     "toggleLabel": "Abrir menu",
     "toggleText": "Abrir menu",
@@ -19,6 +28,15 @@
     "contact": "Contacto",
     "guide": "Guia Local"
   },
+  "footer": {
+    "copyright": "© O Refúgio — Família Rodrigues",
+    "googleReview": "Avaliar no Google Maps",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "creator": "Website by André Fonseca",
+    "admin": "Área de gestão"
+  },
+  "stickyBookingCta": "Reservar",
 
 
   "home": {
@@ -47,6 +65,7 @@
       "card3": "Paisagens e silêncio",
       "card3Alt": "Paisagem natural nas redondezas",
       "card4": "Interiores acolhedores",
+      "card4Alt": "Interior acolhedor do alojamento",
       "link": "Ver galeria completa"
     },
     "booking": {
@@ -62,10 +81,15 @@
       "link": "Ver guia local",
       "imageAlt": "Praia flúvial mais próxima"
     },
+    "location": {
+      "label": "Morada",
+      "address": "Rua da Arejinha 627, 4550-518 Pedorido",
+      "mapLink": "Abrir localização no Google Maps"
+    },
     "testimonials": {
       "eyebrow": "Testemunhos",
       "title": "Um lugar ao qual se quer sempre voltar.",
-      "reviewCta": "Adicionar avaliação no Google Maps",
+      "reviewCta": "Avaliar no Google Maps",
       "reviewCta2": "Escreava-nos um comentário diretamente",
       "quote1": "“Foram dois dias excelentes, realmente um refúgio para quem gosta de fugir à confusão. A casa é enorme, a vista é espetacular e a piscina, jardim... tudo excecional. A voltar certamente!”",
       "author1": "Paulo — Portugal",
@@ -109,10 +133,13 @@
     "hero": {
       "eyebrow": "Galeria",
       "title": "Todos os espaços do Refúgio",
-      "text": "Explore a casa, os exteriores, a piscina e os detalhes da estadia. Toque numa imagem para a abrir em grande e aproximar."
+      "text": "Explore a casa, os exteriores, a piscina e os detalhes da estadia."
     },
     "empty": "Não foi possível carregar as imagens da galeria.",
     "lightbox": {
+      "dialogLabel": "Galeria em ecrã inteiro",
+      "imageLabel": "Imagem da galeria",
+      "imageAlt": "Imagem da galeria Refúgio",
       "close": "Fechar galeria",
       "previous": "Imagem anterior",
       "next": "Imagem seguinte",
@@ -122,6 +149,36 @@
     }
 
 
+  },
+  "adminPage": {
+    "meta": {
+      "title": "O Refúgio | Administração"
+    },
+    "hero": {
+      "eyebrow": "Placeholder",
+      "title": "admin",
+      "text": "Esta página será construída numa etapa seguinte."
+    }
+  },
+  "guidePage": {
+    "meta": {
+      "title": "O Refúgio | Guia Local"
+    },
+    "hero": {
+      "eyebrow": "Placeholder",
+      "title": "guest-guide",
+      "text": "Esta página será construída numa etapa seguinte."
+    }
+  },
+  "thanksPage": {
+    "meta": {
+      "title": "O Refúgio | Obrigado"
+    },
+    "hero": {
+      "eyebrow": "Placeholder",
+      "title": "obrigado",
+      "text": "Esta página será construída numa etapa seguinte."
+    }
   },
   "bookingPage": {
     "meta": {
@@ -150,7 +207,7 @@
     },
     "details": {
       "eyebrow": "Detalhes",
-      "title": "Preferências e informações adicionais."
+      "title": "Informações adicionais."
     },
     "form": {
       "checkinLabel": "Check-in",
@@ -158,41 +215,46 @@
       "dateHelp": "Calendário sujeito a atualização. Disponibilidade mediante confirmação.",
       "adultsLabel": "Adultos",
       "kidsLabel": "Crianças",
-      "guestCountHelp": "Máximo de 6 hóspedes no total.", 
+      "guestCountHelp": "Máximo de 6 hóspedes no total.",
       "guestCountHelp2": "As crianças correspondem a idades entre 0 e 12 anos.",
       "bedPreferenceTitle": "Configuração das camas",
       "bedPreferenceDouble": "Preferimos cama de casal",
+      "bedPreferenceDoubleHelp": "Usar a única cama de casal disponível na propriedade.",
       "bedPreferenceSingle": "Preferimos camas individuais",
+      "bedPreferenceSingleHelp": "Organizar a estadia sem utilizar a cama de casal.",
       "childAgesTitle": "Idade das crianças",
       "childAgesText": "Indique a idade de cada criança no momento da estadia.",
       "childAgeLabel": "Idade da criança",
-      "contactTitle": "Contacto e confirmação",
-      "contactNameLabel": "Nome do responsável pela reserva",
-      "contactNamePlaceholder": "Nome completo",
-      "emailLabel": "Email do responsável pela reserva",
-      "emailPlaceholder": "nome@exemplo.com",
-      "phoneLabel": "Telefone (com indicativo)",
-      "phonePlaceholder": "+351 912 345 678",
-      "checkinTimeLabel": "Hora prevista de check-in",
-      "checkoutTimeLabel": "Hora prevista de check-out",
-      "timeHelp": "Se não for possível indicar agora, terá que nos informar das horas com pelo menos 48h de antecedência, para podermos preparar a vossa estadia.",
-      "timeRangeHelp": "Check-in entre as 15h00 e as 19h00. Check-out entre as 08h00 e as 10h00.",
-      "timezoneWarning": "Atenção ao fuso horário de Portugal continental (1h mais cedo do que Espanha, França, Suíça e Suécia).",
-      "depositToggleLabel": "Pretendo adiantar o depósito de segurança com a reserva",
-      "depositToggleHelp": "O depósito de 200€ pode ser entregue em numerário no check-in ou pode selecionar esta opção para incluí-lo na transferência para a reserva.",
       "bikeToggleLabel": "Gostaria de alugar bicicletas durante a estadia?",
       "bikeToggleHelp": "Pode adicionar este pedido agora ou tratar connosco mais tarde.",
       "bikeDaysTitle": "Pedido de bicicletas",
       "bikeDaysText": "O aluguer custa 5€ por bicicleta por dia. Pode pedir até uma bicicleta por hóspede, e escolher apenas alguns dias da estadia.",
       "bikeCountLabel": "Número de bicicletas",
       "bikeRentalDaysLabel": "Dias de aluguer",
+      "contactTitle": "Contacto e confirmação",
+      "contactNameLabel": "Nome do responsável pela reserva",
+      "contactNamePlaceholder": "Nome completo",
+      "emailLabel": "Email do responsável pela reserva",
+      "emailPlaceholder": "nome@exemplo.com",
+      "phoneLabel": "Telefone",
+      "phonePlaceholder": "+351 912 345 678",
+      "confirmationWarning": "A reserva será tratada por email. É por aí que seguirá a confirmação, os esclarecimentos pedidos e os dados para transferência. Sem transferência concluída, a reserva não fica confirmada.",
+      "checkinTimeLabel": "Hora prevista de check-in",
+      "checkoutTimeLabel": "Hora prevista de check-out",
+      "timeRangeHelp": "Check-in entre as 15h00 e as 19h00. Check-out entre as 08h00 e as 10h00.",
+      "timeHelp": "Se não for possível indicar agora, terá que nos informar das horas com pelo menos 48h de antecedência, para podermos preparar a vossa estadia.",
+      "timezoneWarning": "Atenção ao fuso horário de Portugal continental (1h mais cedo do que Espanha, França, Suíça e Suécia).",
+      "depositToggleLabel": "Pretendo adiantar o depósito de segurança com a reserva",
+      "depositToggleHelp": "O depósito de 200€ pode ser entregue em numerário no check-in ou pode selecionar esta opção para incluí-lo na transferência para a reserva.",
       "commentsLabel": "Comentários ou pedidos especiais",
       "commentsPlaceholder": "Ex.: horários extraordinários de chegada, pedidos, dúvida sobre acessos...",
       "rulesConfirmLabel": "Confirmo que li e aceito as regras da casa",
+      "rulesConfirmHelp": "Antes de enviar o pedido, pedimos apenas que confirme alguns pontos importantes para garantir uma estadia tranquila.",
       "rulesLink": "Ver regras",
-      "submitNotice": "Este pedido não confirma automaticamente a reserva. A a confirmação, os esclarecimentos pedidos e os dados para transferência serão enviada por email após validação da disponibilidade. Sem transferência concluída, a reserva não fica confirmada.",
+      "submitNotice": "Este pedido não confirma automaticamente a reserva. A confirmação, os esclarecimentos pedidos e os dados para transferência serão enviados por email após validação da disponibilidade. Sem transferência concluída, a reserva não fica confirmada.",
       "submit": "Enviar pedido de reserva",
-      "reset": "Limpar seleção"
+      "reset": "Limpar seleção",
+      "resetConfirm": "Tem a certeza que quer limpar todos os dados deste pedido?"
     },
     "summary": {
       "eyebrow": "Resumo",
@@ -213,8 +275,7 @@
       "depositChoiceYes": "Sim",
       "depositChoiceNo": "Não",
       "bikesLabel": "Bicicletas",
-      "bikesSingle": "1 bicicleta-dia",
-      "bikesMultiple": "{count} bicicleta-dias",
+      "bikesPattern": "{bikes} x {days} dias = {units} bicicleta-dias",
       "estimatedTotalLabel": "Total estimado",
       "note": "O valor final poderá variar consoante as datas, o número de hóspedes e eventuais condições adicionais.",
       "depositNote": "Se adiantar o depósito de segurança, os 200€ serão devolvidos no check-out após verificação do espaço."
@@ -225,17 +286,8 @@
       "text": "Se quiser validar horários, acessos, condições ou pedir alguma exceção, pode nos contactar.",
       "button": "Abrir página de contacto"
     },
-    "highlights": {
-      "eyebrow": "Antes de enviar",
-      "title": "Pontos essenciais da reserva.",
-      "item1": "Estadia mínima de 2 noites",
-      "item2": "Máximo de 6 hóspedes",
-      "item3": "Documento de identificação obrigatório",
-      "item4": "Cancelamento gratuito até 48h antes do check-in"
-    },
     "validation": {
       "chooseCheckout": "Agora escolha a data de check-out.",
-      "chooseLaterCheckout": "Escolha um check-out pelo menos 2 noites depois.",
       "datesRequired": "Selecione as datas de check-in e check-out.",
       "dateUnavailable": "A data escolhida não está disponível.",
       "checkinTooSoon": "A primeira data disponível para chegada já teve em conta a regra de hoje / amanhã em hora de Portugal.",
@@ -252,7 +304,7 @@
       "contactNameRequired": "Indique o nome do responsável pela reserva.",
       "emailRequired": "Indique o email do responsável pela reserva.",
       "emailInvalid": "Indique um endereço de email válido.",
-      "phoneInvalid": "Indique um telefone válido com indicativo internacional, começando por + ou 00.",
+      "phoneInvalid": "Indique um telefone válido  internacional, começando por + ou 00.",
       "checkinTimeInvalid": "O check-in deve estar entre as 15h00 e as 19h00. Se precisar de outro horário, indique esse pedido nos comentários.",
       "checkoutTimeInvalid": "O check-out deve estar entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.",
       "childAgeRequired": "Indique a idade de cada criança.",
@@ -261,7 +313,7 @@
   },
   "bookingSentPage": {
     "meta": {
-      "title": "O Refúgio | Pedido de reserva enviado",
+      "title": "O Refúgio | Pedido enviado",
       "description": "Resumo do pedido de reserva enviado para O Refúgio e próximos passos de confirmação por email."
     },
     "hero": {
@@ -271,8 +323,8 @@
     },
     "summary": {
       "eyebrow": "Resumo",
-      "title": "Pedido de reserva planeado.",
-      "text": "Confira abaixo os principais detalhes que recebemos com o seu pedido.",
+      "title": "Pedido de reserva enviado.",
+      "text": "Veja abaixo os principais detalhes que recebemos com o seu pedido.",
       "emptyTitle": "Sem dados de reserva neste momento.",
       "emptyText": "Se chegou aqui diretamente, ainda não recebemos detalhes para resumir. Pode voltar à página de reservas e preencher o pedido.",
       "checkinLabel": "Check-in",
@@ -282,7 +334,6 @@
       "adultsLabel": "Adultos",
       "kidsLabel": "Crianças",
       "bedPreferenceLabel": "Camas",
-      "bikesLabel": "Bicicletas",
       "depositLabel": "Depósito com a reserva",
       "contactNameLabel": "Responsável",
       "emailLabel": "Email de contacto",
@@ -293,6 +344,8 @@
       "depositNote": "Se optou por adiantar o depósito, os 200€ serão devolvidos no check-out após verificação do espaço.",
       "childAgesTitle": "Idades das crianças",
       "bikeDaysTitle": "Bicicletas pedidas",
+      "bikeDetailsTitle": "Detalhe das bicicletas",
+      "bikeSummaryPattern": "{bikes} bicicletas x {days} dias = {units} bicicleta-dias",
       "commentsTitle": "Comentários enviados"
     },
     "notice": {
@@ -300,16 +353,94 @@
       "title": "A confirmação segue sempre por email.",
       "warningTitle": "A reserva ainda não está confirmada.",
       "warningText": "Responderemos por email com eventuais respostas, validação do pedido e os dados para transferência. Só depois do pagamento é que a reserva fica confirmada.",
-      "item1": "Acompanhe o email indicado no pedido",
-      "item2": "As respostas e instruções seguem por esse mesmo canal",
-      "item3": "O pagamento é necessário para confirmar a estadia"
+      "item1": "No caso de futuros contactos, use o nome e email indicado no pedido"
     },
     "actions": {
       "eyebrow": "Contacto",
       "title": "Quer acrescentar alguma informação?",
       "text": "Se precisar de completar o pedido, esclarecer um detalhe ou antecipar uma questão, pode usar a página de contacto e indicar como prefere receber resposta.",
       "contact": "Abrir página de contacto",
-      "back": "Voltar às reservas"
+      "home": "Voltar para a página principal",
+      "contactMessage": "Já enviei um pedido de reserva para {checkin} - {checkout} e queria acrescentar uma informação."
+    }
+  },
+  "contactPage": {
+    "meta": {
+      "title": "O Refúgio | Contacto",
+      "description": "Envie uma mensagem a O Refúgio para reservas, dúvidas, alterações e feedback da estadia."
+    },
+    "hero": {
+      "eyebrow": "Contacto",
+      "title": "Fale connosco antes, durante ou depois da estadia.",
+      "text": "Envie-nos uma mensagem e indique como prefere ser contactado de volta.",
+      "primaryCta": "Enviar mensagem",
+      "reviewCta": "Avaliar no Google Maps"
+    },
+    "form": {
+      "eyebrow": "Mensagem",
+      "title": "Diga-nos o que precisa.",
+      "text": "Quanto mais contexto enviar, mais fácil é respondermos pela pessoa certa e no canal certo.",
+      "nameLabel": "Nome",
+      "namePlaceholder": "Nome completo",
+      "emailLabel": "Email",
+      "emailPlaceholder": "nome@exemplo.com",
+      "phoneLabel": "Telefone",
+      "phonePlaceholder": "+351 912 345 678",
+      "languageLabel": "Idioma de contacto",
+      "languagePortuguese": "Português",
+      "languageFrench": "Français",
+      "languageEnglish": "English",
+      "languageGerman": "Deutsch",
+      "languageSpanish": "Español",
+      "preferredContactLabel": "Prefiro ser contactado por",
+      "preferredEmail": "Email",
+      "preferredWhatsApp": "Pedido de contacto por WhatsApp",
+      "preferredCall": "Pedido de chamada de retorno",
+      "contextLabel": "Contexto do contacto",
+      "contextPlaceholder": "Escolha uma opção",
+      "contextConfirmed": "Já tenho uma reserva",
+      "contextRequested": "Fiz um pedido de reserva",
+      "contextPast": "Já tive uma reserva",
+      "contextNone": "Não tenho reserva",
+      "topicLabel": "Assunto",
+      "topicPlaceholder": "Escolha uma opção",
+      "topicContextFirst": "Escolha primeiro o contexto",
+      "messageLabel": "Mensagem",
+      "messagePlaceholder": "Escreva aqui a sua pergunta, pedido ou feedback. Se já tiver datas ou número de reserva, inclua também.",
+      "submit": "Enviar mensagem"
+    },
+    "topics": {
+      "confirmedCancel": "Cancelar reserva",
+      "confirmedChange": "Alterar reserva",
+      "confirmedQuestion": "Perguntas sobre a reserva",
+      "requestCancel": "Cancelar pedido de reserva",
+      "requestChange": "Alterar pedido de reserva",
+      "requestQuestion": "Perguntas sobre pedido de reserva",
+      "requestStatus": "Saber o estado do pedido",
+      "pastFeedback": "Estive aqui e quero deixar feedback",
+      "pastQuestion": "Pergunta sobre uma estadia anterior",
+      "noReservationBooking": "Perguntas sobre reservar",
+      "noReservationSpace": "Perguntas sobre o espaço",
+      "noReservationAccessibility": "Acessibilidade ou pedidos especiais",
+      "noReservationLocalArea": "Perguntas sobre a zona",
+      "noReservationPartnerships": "Parcerias ou imprensa",
+      "other": "Outro"
+    },
+    "validation": {
+      "phoneInvalid": "Indique um telefone válido. Pode usar formato português, +351 ou 00.",
+      "phoneRequiredForMethod": "Indique um telefone para usar esta opção."
+    },
+    "stay": {
+      "eyebrow": "Resposta rápida",
+      "title": "Já está hospedado?",
+      "text": "Use o código QR no local, para aceder às opções de contacto direto."
+    },
+    "social": {
+      "eyebrow": "Social",
+      "title": "Encontre O Refúgio online",
+      "googleMaps": "Google Maps",
+      "facebook": "Facebook",
+      "instagram": "Instagram"
     }
   },
   "rulesFull": {
@@ -328,7 +459,7 @@
       "item1": "Check-in: 15h00 – 19h00",
       "item2": "Check-out: 08h00 – 10h00",
       "item3": "Deve indicar a hora de chegada e saída com pelo menos 48h de antecedência",
-      "item4": "Horários fora destes períodos podem ser possíveis mediante contacto prévio",
+      "item4": "Horários fora destes períodos podem ser possíveis mediante contacto prévio, mas não são garantidos",
       "note": "Poderão ser aplicadas taxas adicionais fora do horário definido."
     },
     "reservation": {
@@ -346,7 +477,7 @@
     "identification": {
       "title": "Identificação",
       "item1": "Documento de identificação obrigatório para todos os hóspedes",
-      "item2": "Os dados poderão ser registados para fins legais e de segurança"
+      "item2": "Os dados poderão ser registados durante o check-in para fins legais e de segurança"
     },
     "parking": {
       "title": "Estacionamento",
@@ -382,7 +513,7 @@
     "security": {
       "title": "Segurança e videovigilância",
       "item1": "A propriedade dispõe de câmaras de segurança",
-      "item2": "Durante a estadia, apenas as câmaras interiores encontram-se desativadas",
+      "item2": "Durante a estadia, todas as câmaras interiores encontram-se desativadas",
       "note": "As câmaras interiores existem exclusivamente para segurança da propriedade fora de estação."
     },
     "legal": {
@@ -391,12 +522,6 @@
       "item2": "Faturas com NIF disponíveis mediante pedido"
     }
   },
-  "footer": {
-    "copyright": "© O Refúgio — Família Rodrigues",
-    "googleReview": "Adicionar avaliação no Google Maps",
-    "admin": "Área de gestão"
-  },
-  "stickyBookingCta": "Reservar",
   "accommodation": {
     "meta": {
       "title": "O Refúgio | Alojamento",
@@ -412,7 +537,7 @@
     "overview": {
       "eyebrow": "Casa privada",
       "title": "Um refúgio privado para dias sem pressa.",
-      "text1": "O Refúgio é uma casa independente, totalmente reservada para quem a escolhe. Com capacidade até 6 pessoas, é o lugar ideal para uma escapadinha em família, a dois ou entre amigos, longe da confusão e rodeado pela natureza.",
+      "text1": "O Refúgio é uma casa privada, totalmente reservada para quem a escolhe. Com capacidade até 6 pessoas, é o lugar ideal para uma escapadinha em família, a dois ou entre amigos, longe da confusão e rodeado pela natureza.",
       "text2": "Aqui, o ambiente combina o charme rural com o conforto moderno, criando um espaço acolhedor, tranquilo e pensado para ser vivido com calma, dentro e fora de casa.",
       "imageAlt": "Fachada em pedra do alojamento Refúgio"
     },
@@ -456,7 +581,7 @@
       "card5Text": "Cozinha completa com fogão, forno, micro-ondas e todos os utensílios necessários para o dia a dia.",
       "card5Alt": "Cozinha do Refúgio",
       "card6Title": "Zonas de descanso exteriores",
-      "card6Text": "Jardins e vários recantos com cadeiras, mesas e espreguiçadeiras para aproveitar o exterior com calma.",
+      "card6Text": "Jardins e vários recantos com cadeiras, mesas e espreguiçadeiras para aproveitar o exterior.",
       "card6Alt": "Zona de lazer exterior",
       "card7Title": "Churrasqueira exterior fechada",
       "card7Text": "Espaço de churrasqueira com paredes de vidro amovíveis, cozinha equipada e área ideal para refeições em família.",
@@ -541,7 +666,8 @@
         "title": "Estadia",
         "item1": "Capacidade máxima: 6 hóspedes",
         "item2": "Estadia mínima: 2 noites",
-        "item3": "Casa totalmente privada (não partilhada)"
+        "item3": "Casa totalmente privada (não partilhada)",
+        "item4": "Cancelamento gratuito até 48h antes do check-in"
       },
 
       "checkin": {
@@ -549,13 +675,7 @@
         "item1": "Check-in: 15h00 – 19h00",
         "item2": "Check-out: 08h00 – 10h00",
         "item3": "Horários diferentes sujeitos a confirmação prévia",
-        "note": "Pedimos que indique a hora de chegada e saída com antecedência."
-      },
-
-      "booking": {
-        "title": "Cancelamento",
-        "item1": "Cancelamento gratuito até 48h antes do check-in",
-        "item2": "Após esse prazo, poderá ser cobrado o valor total da estadia"
+        "note": "Pedimos que indique a hora de chegada e saída com 48h de antecedência."
       },
 
       "rules": {
@@ -573,6 +693,12 @@
         "item3": "Estacionamento gratuito disponível no local",
         "item4": "Idiomas: Português, Francês, Inglês e Espanhol"
       }
+    },
+    "location": {
+      "eyebrow": "Localização",
+      "title": "Rua da Arejinha 627, em Pedorido.",
+      "fallbackLink": "Abrir no Google Maps",
+      "mapTitle": "Mapa da localização do Refúgio"
     },
     "finalCta": {
       "eyebrow": "Reservas",

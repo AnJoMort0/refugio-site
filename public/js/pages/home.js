@@ -2,7 +2,7 @@ export function initHomePage() {
   const isHome = document.body.querySelector('.hero');
   if (!isHome) return;
 
-  const revealTargets = document.querySelectorAll('main > .section, .gallery-card, .testimonial-card, .sponsor-card');
+  const revealTargets = document.querySelectorAll('main > .section, .sponsor-card');
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (prefersReducedMotion || !('IntersectionObserver' in window)) {

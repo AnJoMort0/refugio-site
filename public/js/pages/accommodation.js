@@ -3,7 +3,7 @@ export function initAccommodationPage() {
   if (!page) return;
 
   const revealTargets = document.querySelectorAll(
-    'main > .section, .highlight-card, .space-card, .amenity-group, .info-card, .mini-gallery-grid img'
+    'main > .section, .highlight-card, .amenity-group, .info-card, .mini-gallery-grid img'
   );
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

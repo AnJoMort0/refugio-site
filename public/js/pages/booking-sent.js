@@ -46,6 +46,13 @@ function buildReservationTotal({ nights, adults, children, includeDeposit, bikeD
   return stayValue + bikeDays * PRICE_CONFIG.bikePerDay + (includeDeposit ? PRICE_CONFIG.securityDeposit : 0);
 }
 
+function applyTemplate(template, values) {
+  return Object.entries(values).reduce(
+    (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+    template
+  );
+}
+
 export async function initBookingSentPage() {
   const page = document.querySelector('.booking-sent-page');
   if (!page) return;
@@ -142,9 +149,14 @@ export async function initBookingSentPage() {
   toggleRow('#sent-bikes-row', bikeDays > 0);
   setText(
     '#sent-bikes',
-    bikeDays === 1
-      ? getText('bookingPage.summary.bikesSingle', '1 bicicleta-dia')
-      : getText('bookingPage.summary.bikesMultiple', '{count} bicicleta-dias').replace('{count}', String(bikeDays))
+    applyTemplate(
+      getText('bookingSentPage.summary.bikeSummaryPattern', '{bikes} bicicleta(s) x {days} dia(s) = {units} bicicleta-dias'),
+      {
+        bikes: String(bikeCount),
+        days: String(bikeRentalDays),
+        units: String(bikeDays)
+      }
+    )
   );
 
   toggleRow('#sent-phone-row', Boolean(phone));
@@ -194,6 +206,33 @@ export async function initBookingSentPage() {
     bikeDaysList.replaceChildren(bikesItem, daysItem);
   }
 
+  const detailGrid = document.querySelector('.booking-sent-detail-grid');
+  if (detailGrid) detailGrid.hidden = !(showChildAges || bikeDays > 0);
+
   toggleRow('#sent-comments-card', Boolean(comments.trim()));
   setText('#sent-comments', comments.trim() || '-');
+
+  const contactLink = document.querySelector('.booking-sent-actions .booking-contact-button');
+  if (contactLink) {
+    const contactParams = new URLSearchParams();
+    const contactMessage = applyTemplate(
+      getText(
+        'bookingSentPage.actions.contactMessage',
+        'Já enviei um pedido de reserva para {checkin} - {checkout} e queria acrescentar uma informação.'
+      ),
+      {
+        checkin: formatDate(checkin),
+        checkout: formatDate(checkout)
+      }
+    );
+
+    contactParams.set('context', 'Fiz um pedido de reserva');
+    contactParams.set('topic', 'Perguntas sobre pedido de reserva');
+    contactParams.set('message', contactMessage);
+    if (contactName || guestNames[0]) contactParams.set('name', contactName || guestNames[0]);
+    if (email) contactParams.set('email', email);
+    if (phone) contactParams.set('phone', phone);
+
+    contactLink.setAttribute('href', `./contacto.html?${contactParams.toString()}`);
+  }
 }

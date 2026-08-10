@@ -12,6 +12,7 @@ Routine operational changes should be manageable through the Cloudflare-hosted a
 - [ ] Planned
 - [~] In progress
 - [!] Requires a decision, content, or external dependency
+- [c] Codex changed
 
 ---
 
@@ -24,50 +25,79 @@ Routine operational changes should be manageable through the Cloudflare-hosted a
 - [x] Galeria page
 - [x] Reservas page
 - [x] Reserva enviada page
-- [~] Contacto page
+- [x] Contacto page
+- [ ] Obrigado.html
 - [ ] Guia Local page
 - [ ] Guest Stay page for QR/NFC access
 - [ ] Custom `404.html` page
 
 ## 1.2 Immediate content and consistency fixes
 
-### Brand naming
-
-- [ ] Replace **“Refúgio”** with **“O Refúgio”** in page titles, headings, metadata, navigation, and other places where the full name is appropriate.
-- [ ] Review shorter uses of “Refúgio” individually so natural sentences are not made awkward.
-
-### Accommodation details
-
-- [ ] Update the accommodation content to state that **all rooms have televisions**, not only the bunk bedroom.
-- [ ] Check the gallery, room descriptions, feature lists, structured data, and booking summaries for the same outdated information.
-
 ### Tweaks
 
-- [ ] I changed lots of things in pt.json, remove from the pages anything that I removed from pt.json, add anything that I add, and replace all the portuguese fallback text hardcoded into the html files.
+- [c] Lots of text is not the same in pt.json and in the fallback in the html pages. The project is becoming too big to have maintain the fallback hardcoded constantly, remove the entire hardcoded portuguese fallback from the html pages, so that the only source of truth is the i18n files
+- [ ] Make <span data-i18n="home.location.address">Rua da Arejinha 627, 4550-518 Pedorido</span> in index.html be a link itself to google maps and add a pin icon behing this text too
+- [ ] There's no intuitive way to scroll through the carroussels on computer, can you add faded in on hover "<" and ">" with a white to transparent gradient background when the mouse hovers the sides of the carrousel, and when clicking on them, it moves to the next/previous items
+- [ ] in reservas.html, when there's the name for the reservation, email and phone number, the boxes are not always lined up in a single line, the phone one for instance can be higher than the other, which looks ugly, make suere they aligned if next to each other
+- [ ] In reserva-enviada.html the Idades das crianças has 2 list icon before it like "- - Idade da criança 1". Same for bikes.
+- [ ] In reserva-confirmada.html, you can remove the part Detalhe das bicicletas, since it's already explained above
+- [ ] In contacto.html, make the context and assunto of the message not mandatory (but keep the *), the idea is that people that see it would still add them, but sometimes less tech savy people or confused people won't know what to do with it so that it isn't frustrating that their message isn't sent and they can't understand why
+- [ ] In contacto.js is it normal that TOPIC_CONFIG still has hardcoded portuguese text? There's also other occurences in that js file
+- [ ] In booking-sent.js it uses hardcoded portuguese text in contactLink, make sure it works with the i18n system
+- [ ] In booking.js there's this hardcoded portuguese: '{bikes} bicicleta(s) x {days} dia(s) = {units} bicicleta-dias' ---> Make sure any hardcoded portuguese in .js files is also replaced to work with the i18n system.
+- [ ] In galeria.html, you can zoom in the images but you can't naviagate within the zoom like move to a bottom corner of the zoomed image, which is frustrating
+
+- [x] In smaller width screens, the images carrossels don't show the faded bits of the previous/next image (it shows on load but then disappears). I think it's fighting with the appearing animations from the scrolling down of the page but I'm not sure
+      - Note: Removed carousel cards from scroll-reveal targets so cloned edge cards are not hidden by reveal opacity.
+- [c] I changed lots of things in pt.json, remove from the pages anything that I removed from pt.json, add anything that I add, and replace all the portuguese fallback text hardcoded into the html files.
+      - Note: Removed stale booking/accommodation blocks, added missing Portuguese keys, stripped hardcoded HTML fallback text/translated attributes, and verified every HTML data-i18n key exists in pt.json.
 - [ ] reservas.html
-  - [ ] does
-      ```
-      "details": {
-        "eyebrow": "Detalhes",
-        "title": "Preferências e informações adicionais."
-      },
-      ```
-      do anything? If not, remove this.
-  - [ ] Add "guestCountHelp2"
-  - [ ] The bed preference background box stays even if the contents are not visible
-  - [ ] Sort the "form": contents a little bit in the pt.json file to better correspond to where the elements actually appear in the page.
-  - [ ] only show "timezoneWarning" if the device seems to have a different timezone that isn't Portugal.
-  - [ ] "submitNotice" should be in the redder warning to be clear that it is important to read
+  - [x] Add "guestCountHelp2"
+  - [x] The bed preference background box stays even if the contents are not visible
+  - [x] Sort the "form": contents a little bit in the pt.json file to better correspond to where the elements actually appear in the page.
+  - [x] only show "timezoneWarning" if the device seems to have a different timezone that isn't Portugal.
+  - [x] "submitNotice" should be in the redder warning to be clear that it is important to read
+  - [x] "reset" should have a confirm you want to clear everything pop-up.
+  - [x] check the entire "validation" section and see what is really needed, what should be removed, rephrased, added, to actually match what is possible in the website
+      - Note: Removed an unused date validation string and updated phone validation to allow Portuguese local formats.
+  - [x] Is the summary section standard/easily readable to see prices and where the costs come from? If it is, keep as is, otherwise tweak it to look better. At least for the bikes it doesn't seem very clear to me
+      - Note: Bike summary now shows bikes x days = bicycle-days alongside the per-day rate.
+  
+- [ ] reserva-enviada.html
+  - [x] adultsLabel and kidsLabel should be indented under guestsLabel
+  - [x] depositNote should only appear when the deposit was ticked yes (if it's not already the case)
+      - Note: Confirmed and kept conditional behavior; the note stays hidden unless deposit_prepay is true.
+  - [!] remove the bikeLabel part and move the bikeDaysTitle up to the summary to be a proper description (this only appears when the bikes are asked of course)
+  - [x] the actions > contact button from this page should, if possible, already autofill the context to say a request was already sent, and even autofill name/email/phone etc
+  - [x] remove the button actions > back and instead add a voltar para a página principal
+
+- [ ] contacto.html
+  - [x] The text needs to be added to pt.json
+  - [x] If the person tries to click the locked contact option linked to phones the phone number box should blink
+  - [x] Add the "Had a reservation" context option with a few options for assuntos (move the feedback one there)
+  - [x] Add to socials (and in any other page in the website where it seems fit) the buttons to open Facebook and Instagram (I'll fill up the links after just make an easily ctrl+h replaceable link so I'll do it to the entire repo later) with either icons or text, whatever you think would better fit the aesthetic
+      - Note: Added replaceable Facebook/Instagram placeholder links on Contacto and in the shared footer.
 
 - [ ] Others
-  - [ ] If phone numbers have a portuguese format, don't refuse them from not having +xxx or 00xxx.
+  - [x] The icons are ugly (looking at alojamento.html mostly) can you replace every icon in the website to be consistant Lucide icons instead?
+      - Note: Replaced the visible symbol icons in the header and alojamento highlights with inline Lucide-style SVGs.
+  - [!] reorganise pt.json for it to be consistent and proper and easy to find the different elements of the different pages, so that the footer text is not in the middle of the file, and the pages texts is maybe in the same order of the context menu, etc, just make it human readable and modifyable
+      - Note: Reordered booking form strings and added Contacto as a page-level block; a full-file locale reorganization can still be done later.
+  - [x] If phone numbers have a portuguese format, don't refuse them from not having +xxx or 00xxx.
+  - [x] The footer looks ugly. Maybe a smaller font, proper alignements, proper separation between the elements, there needs to be a place to link to the website creator me (subtle, but not fully hidden, website by André Fonseca, later that would open a website to my website)
 
 ### Google Maps and location
 
-- [ ] Add the full address to the Homepage.
-- [ ] Embed Google Maps on the Alojamento page.
+- [x] Add the full address to the Homepage (Rua da Arejinha 627, 4550-518 Pedorido).
+- [x] Embed Google Maps on the Alojamento page (https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0205166,-8.3828538,108m/data=!3m1!1e3!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?ucbcb=1&entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D).
+- [x] Provide a normal external map link as a fallback when the embedded map cannot load.
 - [ ] Investigate whether separate pins or labels can clearly represent the different rooms or accommodation areas.
-- [ ] Provide a normal external map link as a fallback when the embedded map cannot load.
+
+## Additions
+
+### Subscribe to updates
+
+- [ ] In reservas.html before the confirm the rules were read add an option "I want to receive updates, offers and discounts from O Refúgio"
 
 ### Google Maps review call to action
 
@@ -76,7 +106,7 @@ Add a clearly labelled **“Review O Refúgio on Google Maps”** button whereve
 Suggested locations:
 
 - [x] Homepage testimonial or trust section
-      - [ ] Also the button "reviewCta2" with linkling to the contact page, if possible with the Context and Assunto already filled in to "Nõ tenho reserva" and "Estive aqui e quero deixar feedback"
+      - [ ] Also the button "reviewCta2" with linkling to the contact page, if possible with the Context and Assunto already filled in to "Naõ tenho reserva" and "Estive aqui e quero deixar feedback"
 - [ ] Contacto page
 - [ ] Reserva enviada confirmation page
 - [ ] Post-stay or feedback section

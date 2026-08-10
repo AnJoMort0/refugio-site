@@ -1,16 +1,27 @@
-const TOPIC_OPTIONS = {
-  'Já tenho uma reserva': ['Cancelar reserva', 'Alterar reserva', 'Perguntas sobre a reserva'],
+const DEFAULT_LANGUAGE = 'pt';
+const TOPIC_CONFIG = {
+  'Já tenho uma reserva': [
+    ['confirmedCancel', 'Cancelar reserva'],
+    ['confirmedChange', 'Alterar reserva'],
+    ['confirmedQuestion', 'Perguntas sobre a reserva']
+  ],
   'Fiz um pedido de reserva': [
-    'Cancelar pedido de reserva',
-    'Alterar pedido de reserva',
-    'Perguntas sobre pedido de reserva'
+    ['requestCancel', 'Cancelar pedido de reserva'],
+    ['requestChange', 'Alterar pedido de reserva'],
+    ['requestQuestion', 'Perguntas sobre pedido de reserva'],
+    ['requestStatus', 'Saber o estado do pedido']
+  ],
+  'Já tive uma reserva': [
+    ['pastFeedback', 'Estive aqui e quero deixar feedback'],
+    ['pastQuestion', 'Pergunta sobre uma estadia anterior']
   ],
   'Não tenho reserva': [
-    'Perguntas sobre reservar',
-    'Perguntas sobre o espaço',
-    'Estive aqui e quero deixar feedback',
-    'Parcerias ou imprensa',
-    'Outro'
+    ['noReservationBooking', 'Perguntas sobre reservar'],
+    ['noReservationSpace', 'Perguntas sobre o espaço'],
+    ['noReservationAccessibility', 'Acessibilidade ou pedidos especiais'],
+    ['noReservationLocalArea', 'Perguntas sobre a zona'],
+    ['noReservationPartnerships', 'Parcerias ou imprensa'],
+    ['other', 'Outro']
   ]
 };
 
@@ -22,8 +33,17 @@ const LANGUAGE_BY_PAGE_LANG = {
   es: 'Español'
 };
 
-function isValidInternationalPhone(value) {
-  return /^(?:\+|00)[0-9][0-9\s()\-]{5,}$/.test(value.trim());
+function getNestedValue(object, path) {
+  return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
+}
+
+function isValidPhoneNumber(value) {
+  const trimmedValue = value.trim();
+  const digitsOnly = trimmedValue.replace(/\D/g, '');
+  const hasInternationalPrefix = /^(?:\+|00)[0-9][0-9\s()\-]{5,}$/.test(trimmedValue);
+  const hasPortugueseLocalFormat = /^(?:2|9)\d{8}$/.test(digitsOnly);
+
+  return hasInternationalPrefix || hasPortugueseLocalFormat;
 }
 
 function setFieldValidity(input, message = '') {
@@ -31,7 +51,7 @@ function setFieldValidity(input, message = '') {
   input?.closest('.field')?.classList.toggle('is-invalid', Boolean(message));
 }
 
-export function initContactPage() {
+export async function initContactPage() {
   const page = document.querySelector('.contact-page');
   if (!page) return;
 
@@ -41,59 +61,130 @@ export function initContactPage() {
   const languageSelect = form?.querySelector('#contact-language');
   const contextSelect = form?.querySelector('#contact-context');
   const topicSelect = form?.querySelector('#contact-topic');
+  const params = new URLSearchParams(window.location.search);
+  let dictionary = {};
+
+  const getText = (path, fallback) => getNestedValue(dictionary, path) || fallback;
+
+  async function loadDictionary() {
+    try {
+      const language = localStorage.getItem('refugio-language') || DEFAULT_LANGUAGE;
+      const response = await fetch(`./locales/${language}.json`);
+      if (!response.ok) throw new Error('Locale not found');
+      dictionary = await response.json();
+    } catch (error) {
+      dictionary = {};
+    }
+  }
+
+  function getTopicOptions(context) {
+    return (TOPIC_CONFIG[context] || []).map(([key, fallback]) => ({
+      value: fallback,
+      label: getText(`contactPage.topics.${key}`, fallback)
+    }));
+  }
 
   function updateLanguageDefault() {
-    if (!languageSelect) return;
+    if (!languageSelect || params.has('contact_language')) return;
     const pageLanguage = (document.documentElement.lang || 'pt').slice(0, 2).toLowerCase();
     languageSelect.value = LANGUAGE_BY_PAGE_LANG[pageLanguage] || LANGUAGE_BY_PAGE_LANG.pt;
+  }
+
+  function hasValidPhone() {
+    return Boolean(phoneInput?.value.trim() && isValidPhoneNumber(phoneInput.value));
+  }
+
+  function blinkPhoneField() {
+    const field = phoneInput?.closest('.field');
+    if (!field) return;
+
+    field.classList.remove('is-attention');
+    window.requestAnimationFrame(() => {
+      field.classList.add('is-attention');
+      window.setTimeout(() => field.classList.remove('is-attention'), 760);
+    });
   }
 
   function updatePhoneDependentOptions() {
     if (!preferredContactSelect) return;
 
-    const hasValidPhone = Boolean(phoneInput?.value.trim() && isValidInternationalPhone(phoneInput.value));
+    const phoneIsValid = hasValidPhone();
     preferredContactSelect.querySelectorAll('[data-requires-phone]').forEach((option) => {
-      option.disabled = !hasValidPhone;
+      option.dataset.locked = String(!phoneIsValid);
+      option.setAttribute('aria-disabled', String(!phoneIsValid));
+      option.title = phoneIsValid ? '' : getText('contactPage.validation.phoneRequiredForMethod', 'Indique um telefone para usar esta opção.');
     });
-
-    if (!hasValidPhone && preferredContactSelect.selectedOptions[0]?.dataset.requiresPhone !== undefined) {
-      preferredContactSelect.value = 'Email';
-    }
   }
 
-  function updateTopicOptions() {
+  function updateTopicOptions(selectedTopic = '') {
     if (!contextSelect || !topicSelect) return;
 
-    const options = TOPIC_OPTIONS[contextSelect.value] || [];
+    const options = getTopicOptions(contextSelect.value);
     topicSelect.replaceChildren();
 
     const placeholder = document.createElement('option');
     placeholder.value = '';
-    placeholder.textContent = options.length ? 'Escolha uma opção' : 'Escolha primeiro o contexto';
+    placeholder.textContent = options.length
+      ? getText('contactPage.form.topicPlaceholder', 'Escolha uma opção')
+      : getText('contactPage.form.topicContextFirst', 'Escolha primeiro o contexto');
     topicSelect.append(placeholder);
 
-    options.forEach((topic) => {
+    options.forEach(({ value, label }) => {
       const option = document.createElement('option');
-      option.value = topic;
-      option.textContent = topic;
+      option.value = value;
+      option.textContent = label;
       topicSelect.append(option);
     });
 
     topicSelect.disabled = options.length === 0;
+
+    if (selectedTopic && options.some(({ value }) => value === selectedTopic)) {
+      topicSelect.value = selectedTopic;
+    }
+  }
+
+  function applyUrlPrefill() {
+    if (!form) return;
+
+    ['name', 'email', 'phone', 'message'].forEach((name) => {
+      const value = params.get(name);
+      const field = form.elements.namedItem(name);
+      if (value && (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
+        field.value = value;
+      }
+    });
+
+    const contactLanguage = params.get('contact_language');
+    if (contactLanguage && languageSelect) {
+      languageSelect.value = contactLanguage;
+    }
+
+    const context = params.get('context');
+    const topic = params.get('topic');
+    if (context && contextSelect) {
+      contextSelect.value = context;
+      updateTopicOptions(topic || '');
+    }
+
+    updatePhoneDependentOptions();
   }
 
   function validateContactForm() {
     const fields = Array.from(form?.querySelectorAll('input, select, textarea') || []);
     fields.forEach((input) => setFieldValidity(input, ''));
 
-    if (phoneInput?.value.trim() && !isValidInternationalPhone(phoneInput.value)) {
-      setFieldValidity(phoneInput, 'Indique um telefone válido com indicativo internacional, começando por + ou 00.');
+    if (phoneInput?.value.trim() && !isValidPhoneNumber(phoneInput.value)) {
+      setFieldValidity(phoneInput, getText('contactPage.validation.phoneInvalid', 'Indique um telefone válido.'));
       phoneInput.reportValidity();
       return false;
     }
 
-    if (preferredContactSelect?.selectedOptions[0]?.dataset.requiresPhone !== undefined && !phoneInput?.value.trim()) {
-      setFieldValidity(phoneInput, 'Indique um telefone para pedir contacto por telefone.');
+    if (preferredContactSelect?.selectedOptions[0]?.dataset.requiresPhone !== undefined && !hasValidPhone()) {
+      setFieldValidity(
+        phoneInput,
+        getText('contactPage.validation.phoneRequiredForMethod', 'Indique um telefone para pedir contacto por telefone.')
+      );
+      blinkPhoneField();
       phoneInput?.reportValidity();
       return false;
     }
@@ -106,22 +197,39 @@ export function initContactPage() {
     return true;
   }
 
+  await loadDictionary();
   updateLanguageDefault();
   updatePhoneDependentOptions();
   updateTopicOptions();
+  applyUrlPrefill();
 
-  document.addEventListener('language:changed', updateLanguageDefault);
+  document.addEventListener('language:changed', async () => {
+    const selectedTopic = topicSelect?.value || '';
+    await loadDictionary();
+    updateLanguageDefault();
+    updatePhoneDependentOptions();
+    updateTopicOptions(selectedTopic);
+  });
 
   phoneInput?.addEventListener('input', () => {
     setFieldValidity(phoneInput, '');
-    if (phoneInput.value.trim() && !isValidInternationalPhone(phoneInput.value)) {
-      setFieldValidity(phoneInput, 'Indique um telefone válido com indicativo internacional, começando por + ou 00.');
+    if (phoneInput.value.trim() && !isValidPhoneNumber(phoneInput.value)) {
+      setFieldValidity(phoneInput, getText('contactPage.validation.phoneInvalid', 'Indique um telefone válido.'));
     }
     updatePhoneDependentOptions();
   });
 
   preferredContactSelect?.addEventListener('change', () => {
     setFieldValidity(preferredContactSelect, '');
+
+    if (preferredContactSelect.selectedOptions[0]?.dataset.requiresPhone !== undefined && !hasValidPhone()) {
+      setFieldValidity(
+        phoneInput,
+        getText('contactPage.validation.phoneRequiredForMethod', 'Indique um telefone para usar esta opção.')
+      );
+      blinkPhoneField();
+      preferredContactSelect.value = 'Email';
+    }
   });
 
   contextSelect?.addEventListener('change', () => {
@@ -145,13 +253,13 @@ export function initContactPage() {
     if (!validateContactForm()) return;
 
     const data = new FormData(form);
-    const params = new URLSearchParams();
+    const nextParams = new URLSearchParams();
 
     for (const [key, value] of data.entries()) {
       const text = String(value).trim();
-      if (text) params.set(key, text);
+      if (text) nextParams.set(key, text);
     }
 
-    window.location.href = `${form.getAttribute('action') || './obrigado.html'}?${params.toString()}`;
+    window.location.href = `${form.getAttribute('action') || './obrigado.html'}?${nextParams.toString()}`;
   });
 }

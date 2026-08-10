@@ -12,6 +12,31 @@ function getNestedValue(object, path) {
   return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
 }
 
+function mergeDictionaries(baseDictionary, overrideDictionary) {
+  if (!baseDictionary || typeof baseDictionary !== 'object') return overrideDictionary;
+  if (!overrideDictionary || typeof overrideDictionary !== 'object') return baseDictionary;
+
+  const mergedDictionary = { ...baseDictionary };
+
+  Object.entries(overrideDictionary).forEach(([key, value]) => {
+    if (
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      baseDictionary[key] &&
+      typeof baseDictionary[key] === 'object' &&
+      !Array.isArray(baseDictionary[key])
+    ) {
+      mergedDictionary[key] = mergeDictionaries(baseDictionary[key], value);
+      return;
+    }
+
+    mergedDictionary[key] = value;
+  });
+
+  return mergedDictionary;
+}
+
 async function loadLocale(language) {
   const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
   const response = await fetch(`./locales/${safeLanguage}.json`);
@@ -76,10 +101,12 @@ function updateDocumentLanguage(language, dictionary) {
 export async function setLanguage(language) {
   const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
   const dictionary = await loadLocale(safeLanguage);
+  const fallbackDictionary = safeLanguage === DEFAULT_LANGUAGE ? dictionary : await loadLocale(DEFAULT_LANGUAGE);
+  const resolvedDictionary = mergeDictionaries(fallbackDictionary, dictionary);
 
-  applyTextTranslations(dictionary);
-  applyAttributeTranslations(dictionary);
-  updateDocumentLanguage(safeLanguage, dictionary);
+  applyTextTranslations(resolvedDictionary);
+  applyAttributeTranslations(resolvedDictionary);
+  updateDocumentLanguage(safeLanguage, resolvedDictionary);
 
   localStorage.setItem(STORAGE_KEY, safeLanguage);
 
@@ -88,7 +115,7 @@ export async function setLanguage(language) {
   const options = document.querySelectorAll('[data-language-option]');
 
   if (menuButton) {
-    menuButton.setAttribute('aria-label', dictionary.languageSwitcher?.label || 'Choose language');
+    menuButton.setAttribute('aria-label', resolvedDictionary.languageSwitcher?.label || '');
   }
 
   if (currentLabel) {
@@ -105,7 +132,7 @@ export async function setLanguage(language) {
 
   document.dispatchEvent(
     new CustomEvent('language:changed', {
-      detail: { language: safeLanguage, dictionary }
+      detail: { language: safeLanguage, dictionary: resolvedDictionary }
     })
   );
 }
