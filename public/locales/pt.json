@@ -658,6 +658,37 @@
       "instagram": "Instagram"
     }
   },
+  "notFoundPage": {
+    "meta": {
+      "title": "O Refúgio | Página não encontrada",
+      "description": "Página não encontrada no site do Refúgio, com ligações úteis para continuar a navegar."
+    },
+    "hero": {
+      "eyebrow": "Erro 404",
+      "title": "Não encontrámos esta página.",
+      "text": "O endereço pode ter mudado ou já não estar disponível. Escolha uma das opções abaixo para continuar a planear a sua estadia.",
+      "homeCta": "Voltar à página principal"
+    },
+    "links": {
+      "label": "Ligações úteis",
+      "booking": {
+        "title": "Quer reservar?",
+        "text": "Veja datas, hóspedes, extras e envie um pedido de reserva."
+      },
+      "accommodation": {
+        "title": "Procura informação sobre a casa?",
+        "text": "Conheça os quartos, espaços exteriores, piscina e comodidades."
+      },
+      "contact": {
+        "title": "Precisa de falar connosco?",
+        "text": "Envie uma mensagem para dúvidas, alterações ou pedidos especiais."
+      },
+      "guide": {
+        "title": "Quer explorar a zona?",
+        "text": "Abra o Guia Local para sugestões próximas do Refúgio."
+      }
+    }
+  },
   "guidePage": {
     "meta": {
       "title": "O Refúgio | Guia Local"

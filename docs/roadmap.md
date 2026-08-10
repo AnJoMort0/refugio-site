@@ -20,6 +20,8 @@ Routine operational changes should be manageable through the Cloudflare-hosted a
 
 ## 1.1 Existing page scaffolds
 
+A scaffold means a made static HTML page ready for owner review/approval. A placeholder shell does not count.
+
 - [x] Homepage
 - [x] Alojamento page
 - [x] Galeria page
@@ -29,7 +31,7 @@ Routine operational changes should be manageable through the Cloudflare-hosted a
 - [x] Obrigado.html
 - [ ] Guia Local page
 - [ ] Guest Stay page for QR/NFC access
-- [ ] Custom `404.html` page
+- [x] Custom `404.html` page
 
 ## 1.2 Immediate content and consistency fixes
 
@@ -39,25 +41,31 @@ Routine operational changes should be manageable through the Cloudflare-hosted a
 
 ---
 
-# Phase 2 — Design and build the Contacto page
+# Phase 2 — Contacto page follow-up checklist
 
-#### Consent and preferences
+The current `contacto.html` page already has a usable prototype flow: structured contact form, required name/email/message fields, language preference, preferred reply method, optional context and assunto fields, phone validation, locked phone-dependent reply options, optional marketing checkbox, Google Maps/Facebook/Instagram links, URL prefill support, and a basic `obrigado.html` success page.
 
-- [ ] Required privacy-policy acknowledgement.
-- [ ] Optional checkbox for promotions, special offers, news, and updates.
-- [ ] Keep marketing consent separate from permission to respond to the enquiry.
-- [ ] Do not preselect optional marketing consent.
+## 2.1 Later if needed — data, consent, and delivery
 
-#### Form behaviour
+- [ ] Connect the form to a real backend, email service, CRM, or admin inbox instead of the current GET-based prototype redirect.
+- [ ] Store enough submitted context for staff to handle the enquiry efficiently.
+- [ ] Add a required privacy-policy acknowledgement once the privacy-policy page/text exists.
+- [ ] Store marketing consent status and timestamp if marketing messages will actually be sent.
+- [ ] Provide a clear unsubscribe method before sending future marketing communications.
 
-- [ ] Display a useful success state after submission.
-- [ ] Display actionable error messages.
-- [ ] Protect the form from spam.
-- [ ] Send or store enough context for staff to handle the enquiry efficiently.
+## 2.2 Later if needed — reliability and abuse protection
 
-## 2.4 Other Contacto page content
+- [ ] Prevent accidental duplicate submissions after a real backend exists.
+- [ ] Display actionable backend error messages if message delivery fails.
+- [ ] Add spam protection suitable for the final hosting setup.
+- [ ] Add monitoring or logs for failed contact submissions.
 
-- [ ] Frequently asked questions for common contact topics.
+## 2.3 Later if needed — richer contact help
+
+- [ ] Add FAQ entries for the most common contact topics.
+- [ ] Add reservation/request reference fields if staff need those to match messages faster.
+- [ ] Add direct telephone, WhatsApp deep link, copy-number, and `.vcf` contact-card actions if the page should become a fuller contact hub.
+- [ ] Link current guests to the future Guest Stay page for urgent or stay-specific information once that page exists.
 
 ---
 
@@ -241,26 +249,26 @@ The page should provide the information a guest may need during the stay without
 
 ## 5.1 Custom 404 page
 
-- [ ] Create `404.html`.
-- [ ] Match the main site branding and navigation.
-- [ ] Explain that the requested page could not be found.
-- [ ] Include links to Homepage, Alojamento, Reservas, Contacto, and Guia Local.
-- [ ] Do not link directly to personalised Guest Stay content from the public 404 page.
-- [ ] Include language switching where technically possible.
+- [x] Create `404.html`.
+- [x] Match the main site branding and navigation.
+- [x] Explain that the requested page could not be found.
+- [x] Include links to Homepage, Alojamento, Reservas, Contacto, and Guia Local.
+- [x] Do not link directly to personalised Guest Stay content from the public 404 page.
+- [x] Include language switching where technically possible.
 - [ ] Log or monitor common broken URLs if analytics are available.
 
 ## 5.2 Marketing and communication preferences
 
-- [ ] Add an optional promotions, offers, deals, and news checkbox in suitable forms.
+- [x] Add an optional promotions, offers, deals, and news checkbox in suitable forms.
 - [ ] Store consent status and timestamp.
 - [ ] Provide a clear unsubscribe method for future marketing communications.
-- [ ] Avoid combining service messages with marketing consent.
+- [x] Avoid combining service messages with marketing consent.
 
 ## 5.3 Social proof and post-stay feedback
 
-- [ ] Add a post-stay feedback route or contact-form option.
-- [ ] Invite satisfied guests to leave a Google Maps review.
-- [ ] Keep private feedback available for guests who do not want to post publicly.
+- [x] Add a post-stay feedback route or contact-form option.
+- [x] Invite satisfied guests to leave a Google Maps review.
+- [x] Keep private feedback available for guests who do not want to post publicly.
 
 ---
 
@@ -457,20 +465,20 @@ Provide owner-friendly controls for frequently changing website and guest inform
 
 ## Milestone A — Finish the prototype
 
-- [ ] Contacto Enviado page scaffold
+- [x] Contacto Enviado page scaffold
 - [ ] Guia Local scaffold
 - [ ] Guest Stay page scaffold
-- [ ] `404.html`
-- [ ] “O Refúgio” naming corrections
-- [ ] Television information correction
-- [ ] Homepage address and Alojamento map
+- [x] `404.html`
+- [x] “O Refúgio” naming corrections
+- [x] Television information correction
+- [x] Homepage address and Alojamento map
 
 ## Milestone B — Make contact and booking flows usable
 
-- [ ] Complete the Contacto form
-- [ ] Add browser-language defaults
-- [ ] Add bicycle reservation extras
-- [ ] Add success, error, validation, and spam-protection behaviour
+- [~] Complete the Contacto form
+- [x] Add browser-language defaults
+- [x] Add bicycle reservation extras
+- [~] Add success, error, validation, and spam-protection behaviour
 - [ ] Add the first manual reservation form and calendar conflict checks
 - [ ] Add copy-ready reservation confirmation emails with bank-transfer details
 - [ ] Convert manually approved website requests into confirmed reservations

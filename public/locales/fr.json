@@ -151,6 +151,37 @@
       "home": "Retour à l’accueil"
     }
   },
+  "notFoundPage": {
+    "meta": {
+      "title": "O Refúgio | Page introuvable",
+      "description": "Page introuvable sur le site d’O Refúgio, avec des liens utiles pour continuer la navigation."
+    },
+    "hero": {
+      "eyebrow": "Erreur 404",
+      "title": "Nous n’avons pas trouvé cette page.",
+      "text": "L’adresse a peut-être changé ou n’est plus disponible. Choisissez l’une des options ci-dessous pour continuer à préparer votre séjour.",
+      "homeCta": "Retour à l’accueil"
+    },
+    "links": {
+      "label": "Liens utiles",
+      "booking": {
+        "title": "Vous voulez réserver ?",
+        "text": "Consultez les dates, les hôtes, les extras et envoyez une demande de réservation."
+      },
+      "accommodation": {
+        "title": "Vous cherchez des informations sur la maison ?",
+        "text": "Découvrez les chambres, les extérieurs, la piscine et les équipements."
+      },
+      "contact": {
+        "title": "Besoin de nous contacter ?",
+        "text": "Envoyez un message pour une question, une modification ou une demande spéciale."
+      },
+      "guide": {
+        "title": "Envie d’explorer les alentours ?",
+        "text": "Ouvrez le Guide Local pour des suggestions près d’O Refúgio."
+      }
+    }
+  },
   "footer": {
     "copyright": "© O Refúgio — Famille Rodrigues",
     "googleReview": "Ajouter un avis sur Google Maps",

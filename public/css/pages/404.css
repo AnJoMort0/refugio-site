@@ -1,0 +1,99 @@
+.not-found-page {
+  min-height: calc(100vh - 144px);
+  background:
+    linear-gradient(180deg, rgba(250, 248, 244, 0.97), rgba(216, 203, 184, 0.32)),
+    var(--color-soft-ivory);
+}
+
+.not-found-layout {
+  display: grid;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.not-found-intro {
+  display: grid;
+  gap: 1rem;
+  max-width: 48rem;
+}
+
+.not-found-intro h1 {
+  max-width: 12ch;
+}
+
+.not-found-intro p:not(.eyebrow) {
+  max-width: 42rem;
+  color: rgba(43, 38, 34, 0.78);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.not-found-intro .button {
+  width: fit-content;
+  margin-top: 0.35rem;
+}
+
+.not-found-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.not-found-link-card {
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  min-height: 100%;
+  padding: 1rem;
+  border: 1px solid rgba(90, 75, 63, 0.12);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(250, 248, 244, 0.82)),
+    rgba(255, 255, 255, 0.76);
+  box-shadow: var(--shadow-soft);
+  color: var(--color-charcoal-earth);
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.not-found-link-card:hover,
+.not-found-link-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(67, 99, 75, 0.26);
+  box-shadow: 0 18px 34px rgba(40, 33, 28, 0.08);
+}
+
+.not-found-link-card strong {
+  font-size: 1.05rem;
+  color: var(--color-mountain-forest);
+}
+
+.not-found-link-card span:not(.not-found-link-icon) {
+  color: rgba(43, 38, 34, 0.74);
+  line-height: 1.55;
+}
+
+.not-found-link-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 2.45rem;
+  height: 2.45rem;
+  border-radius: 999px;
+  background: rgba(200, 154, 75, 0.16);
+  color: var(--color-mountain-forest);
+}
+
+.not-found-link-icon .lucide-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+body[data-page="not-found"] .sticky-booking-cta {
+  display: none !important;
+}
+
+@media (min-width: 900px) {
+  .not-found-layout {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+}

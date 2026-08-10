@@ -151,6 +151,37 @@
       "home": "Volver a la página principal"
     }
   },
+  "notFoundPage": {
+    "meta": {
+      "title": "O Refúgio | Página no encontrada",
+      "description": "Página no encontrada en el sitio do Refúgio, con enlaces útiles para seguir navegando."
+    },
+    "hero": {
+      "eyebrow": "Error 404",
+      "title": "No encontramos esta página.",
+      "text": "La dirección puede haber cambiado o ya no estar disponible. Elige una de las opciones siguientes para continuar preparando tu estancia.",
+      "homeCta": "Volver a la página principal"
+    },
+    "links": {
+      "label": "Enlaces útiles",
+      "booking": {
+        "title": "¿Quieres reservar?",
+        "text": "Consulta fechas, huéspedes, extras y envía una solicitud de reserva."
+      },
+      "accommodation": {
+        "title": "¿Buscas información sobre la casa?",
+        "text": "Conoce las habitaciones, exteriores, piscina y comodidades."
+      },
+      "contact": {
+        "title": "¿Necesitas contactarnos?",
+        "text": "Envía un mensaje para dudas, cambios o solicitudes especiales."
+      },
+      "guide": {
+        "title": "¿Quieres explorar la zona?",
+        "text": "Abre la Guía Local para ver sugerencias cerca do Refúgio."
+      }
+    }
+  },
   "footer": {
     "copyright": "© O Refúgio — Familia Rodrigues",
     "googleReview": "Añadir reseña en Google Maps",
