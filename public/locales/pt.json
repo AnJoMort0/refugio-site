@@ -670,12 +670,16 @@
   },
   "thanksPage": {
     "meta": {
-      "title": "O Refúgio | Obrigado"
+      "title": "O Refúgio | Obrigado",
+      "description": "Mensagem enviada com sucesso para O Refúgio."
     },
     "hero": {
-      "eyebrow": "Placeholder",
-      "title": "obrigado",
-      "text": "Esta página será construída numa etapa seguinte."
+      "eyebrow": "Mensagem enviada",
+      "title": "Obrigado pelo seu contacto.",
+      "text": "Recebemos a sua mensagem e responderemos assim que possível pelo contacto indicado."
+    },
+    "actions": {
+      "home": "Voltar à página principal"
     }
   },
   "adminPage": {

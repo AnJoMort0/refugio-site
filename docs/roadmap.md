@@ -26,7 +26,7 @@ Routine operational changes should be manageable through the Cloudflare-hosted a
 - [x] Reservas page
 - [x] Reserva enviada page
 - [x] Contacto page
-- [ ] Obrigado.html
+- [x] Obrigado.html
 - [ ] Guia Local page
 - [ ] Guest Stay page for QR/NFC access
 - [ ] Custom `404.html` page
@@ -35,51 +35,7 @@ Routine operational changes should be manageable through the Cloudflare-hosted a
 
 ### Tweaks
 
-- [x] Kids are between 0 and 12 yo, so when someone inputs a kid's age >12 it should trigger a validation error
-- [x] Make <span data-i18n="home.location.address">Rua da Arejinha 627, 4550-518 Pedorido</span> in index.html be a link itself to google maps and add a pin icon behing this text too
-- [x] There's no intuitive way to scroll through the carroussels on computer, can you add faded in on hover "<" and ">" with a white to transparent gradient background when the mouse hovers the sides of the carrousel, and when clicking on them, it moves to the next/previous items
-  - [x] Once clicked the ">" don't disappear, even on hover off
-      - Note: Pointer-clicked carousel controls now blur after moving the carousel, so the hover overlay does not stay open just because the button kept focus.
-- [x] in reservas.html, when there's the name for the reservation, email and phone number, the boxes are not always lined up in a single line, the phone one for instance can be higher than the other, which looks ugly, make sure they aligned if next to each other
-  - [x] The same problem is in the contacto.html there's also the boxes that are not aligned when the text above warps
-- [x] In reserva-enviada.html the Idades das crianças has 2 list icon before it like "- - Idade da criança 1". Same for bikes.
-      - Note: Removed the native list bullets for the sent-page detail list; the redundant bike detail list is removed below, so bikes no longer have a second bullet source.
-- [x] In reserva-enviada.html, you can remove the part Detalhe das bicicletas, since it's already explained above
-- [x] In contacto.html, make the context and assunto of the message not mandatory (but keep the *), the idea is that people that see it would still add them, but sometimes less tech savy people or confused people won't know what to do with it so that it isn't frustrating that their message isn't sent and they can't understand why
-- [x] In contacto.js is it normal that TOPIC_CONFIG still has hardcoded portuguese text? There's also other occurences in that js file
-- [x] In booking-sent.js it uses hardcoded portuguese text in contactLink, make sure it works with the i18n system
-- [x] In booking.js there's this hardcoded portuguese: '{bikes} bicicleta(s) x {days} dia(s) = {units} bicicleta-dias' ---> Make sure any hardcoded portuguese in .js files is also replaced to work with the i18n system.
-- [x] In galeria.html, you can zoom in the images but you can't naviagate within the zoom like move to a bottom corner of the zoomed image, which is frustrating
-  
-- [x] reserva-enviada.html
-  - [x] remove the bikeLabel part and move the bikeDaysTitle up to the summary to be a proper description (this only appears when the bikes are asked of course)
-      - Note: Bikes now appear only in the summary row when requested; the separate "Detalhe das bicicletas" card was removed.
-
-- [x] Others
-  - [x] reorganise pt.json for it to be consistent and proper and easy to find the different elements of the different pages, so that the footer text is not in the middle of the file, and the pages texts is maybe in the same order of the context menu, etc, just make it human readable and modifyable
-      - Note: Reordered `pt.json` in site/page order: shared setup, homepage, Alojamento, Galeria, Reservas, sent booking, rules, Contacto, supporting pages, then footer.
-      - [x] Then do the reorganization now.
-
 ## Additions
-
-### Subscribe to updates
-
-- [x] In reservas.html and contacto.html before the confirm the rules were read add an option "I want to receive updates, offers and discounts from O Refúgio"
-  - [x] In reserva.html make this a square checkbox too, not a switch style one
-
-### Google Maps review call to action
-
-Add a clearly labelled **“Review O Refúgio on Google Maps”** button wherever it is contextually useful.
-
-Suggested locations:
-
-- [x] Homepage testimonial or trust section
-      - [~] Also add the button "reviewCta2" with linkling to the contact page, if possible with the Context and Assunto already filled in to "Já tive reserva" and "Estive aqui e quero deixar feedback"
-- [x] Footer, if it does not make the footer too crowded
-
-Review URL:
-
-<https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D>
 
 ---
 

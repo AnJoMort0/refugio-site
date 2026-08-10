@@ -137,6 +137,20 @@
       "zoomReset": "Restablecer zoom"
     }
   },
+  "thanksPage": {
+    "meta": {
+      "title": "O Refúgio | Gracias",
+      "description": "Mensaje enviado correctamente a O Refúgio."
+    },
+    "hero": {
+      "eyebrow": "Mensaje enviado",
+      "title": "Gracias por contactar con nosotros.",
+      "text": "Hemos recibido tu mensaje y responderemos lo antes posible usando los datos de contacto indicados."
+    },
+    "actions": {
+      "home": "Volver a la página principal"
+    }
+  },
   "footer": {
     "copyright": "© O Refúgio — Familia Rodrigues",
     "googleReview": "Añadir reseña en Google Maps",

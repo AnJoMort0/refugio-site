@@ -4,21 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title data-i18n="thanksPage.meta.title"></title>
+  <meta name="description" content="" data-i18n-attr='{"content":"thanksPage.meta.description"}' />
   <link rel="stylesheet" href="./css/reset.css" />
   <link rel="stylesheet" href="./css/variables.css" />
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/layout.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/mobile.css" />
+  <link rel="stylesheet" href="./css/pages/obrigado.css" />
 </head>
-<body>
+<body data-page="thanks">
   <div data-site-header></div>
-  <main class="simple-page">
+  <main class="simple-page thanks-page">
     <div class="container narrow">
-      <p class="eyebrow" data-i18n="thanksPage.hero.eyebrow"></p>
-      <h1 data-i18n="thanksPage.hero.title"></h1>
-      <p data-i18n="thanksPage.hero.text"></p>
-      <a class="button button-primary" href="./index.html" data-i18n="common.backHome"></a>
+      <section class="thanks-panel">
+        <span class="thanks-icon" aria-hidden="true">
+          <svg class="lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.8 10A10 10 0 1 1 17 3.34"></path>
+            <path d="m9 11 3 3L22 4"></path>
+          </svg>
+        </span>
+        <p class="eyebrow" data-i18n="thanksPage.hero.eyebrow"></p>
+        <h1 data-i18n="thanksPage.hero.title"></h1>
+        <p data-i18n="thanksPage.hero.text"></p>
+        <div class="thanks-actions">
+          <a class="button button-primary" href="./index.html" data-i18n="thanksPage.actions.home"></a>
+        </div>
+      </section>
     </div>
   </main>
   <div data-site-footer></div>

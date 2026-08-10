@@ -5,7 +5,6 @@ const TOPIC_CONFIG = {
   requested: ['requestCancel', 'requestChange', 'requestQuestion', 'requestStatus'],
   past: ['pastFeedback', 'pastQuestion'],
   none: [
-    'pastFeedback',
     'noReservationBooking',
     'noReservationSpace',
     'noReservationAccessibility',
