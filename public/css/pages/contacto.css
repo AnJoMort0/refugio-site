@@ -80,6 +80,64 @@
   resize: vertical;
 }
 
+.contact-page .field-hint {
+  color: rgba(43, 38, 34, 0.68);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.contact-file-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.contact-page .field .contact-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.contact-file-button {
+  min-height: 2.8rem;
+}
+
+.contact-file-button:focus-visible {
+  outline: 2px solid rgba(200, 154, 75, 0.46);
+  outline-offset: 3px;
+}
+
+.contact-file-summary {
+  color: rgba(43, 38, 34, 0.7);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.contact-attachment-list {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-attachment-list li {
+  padding: 0.45rem 0.65rem;
+  border: 1px solid rgba(90, 75, 63, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.68);
+  color: rgba(43, 38, 34, 0.78);
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
 .contact-page .field input:focus-visible,
 .contact-page .field textarea:focus-visible,
 .contact-page .field select:focus-visible {

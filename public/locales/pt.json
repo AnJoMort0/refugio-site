@@ -621,6 +621,12 @@
       "topicContextFirst": "Escolha primeiro o contexto",
       "messageLabel": "Mensagem",
       "messagePlaceholder": "Escreva aqui a sua pergunta, pedido ou feedback. Se já tiver datas ou número de reserva, inclua também.",
+      "attachmentsLabel": "Ficheiros anexos",
+      "attachmentsButton": "Escolher ficheiros",
+      "attachmentsEmpty": "Nenhum ficheiro escolhido",
+      "attachmentsOne": "1 ficheiro escolhido",
+      "attachmentsMany": "{count} ficheiros escolhidos",
+      "attachmentsHelp": "Pode selecionar imagens ou documentos úteis para juntar ao pedido.",
       "marketingOptInLabel": "Quero receber novidades, ofertas e descontos do Refúgio",
       "submit": "Enviar mensagem"
     },

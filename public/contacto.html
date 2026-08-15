@@ -98,6 +98,17 @@
             <textarea name="message" rows="7" required placeholder="" data-i18n-attr='{"placeholder":"contactPage.form.messagePlaceholder"}'></textarea>
           </label>
 
+          <div class="field contact-file-field">
+            <span id="contact-attachments-label" data-i18n="contactPage.form.attachmentsLabel"></span>
+            <div class="contact-file-picker">
+              <input id="contact-attachments" class="contact-file-input" name="attachments" type="file" multiple accept="image/*,.pdf,.doc,.docx,.txt" aria-labelledby="contact-attachments-label" aria-describedby="contact-attachments-help contact-attachment-summary" />
+              <label class="button contact-secondary-button contact-file-button" for="contact-attachments" role="button" tabindex="0" data-contact-attachment-button data-i18n="contactPage.form.attachmentsButton"></label>
+              <span id="contact-attachment-summary" class="contact-file-summary" data-i18n="contactPage.form.attachmentsEmpty"></span>
+            </div>
+            <small id="contact-attachments-help" class="field-hint" data-i18n="contactPage.form.attachmentsHelp"></small>
+            <ul id="contact-attachment-list" class="contact-attachment-list" aria-live="polite" hidden></ul>
+          </div>
+
           <div id="contact-form-status" class="contact-form-status" role="alert" hidden></div>
 
           <label class="contact-consent">

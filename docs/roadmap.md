@@ -39,15 +39,19 @@ A scaffold means a made static HTML page ready for owner review/approval. A plac
 
 ## Additions
 
+- [c] Add optional file attachments to the Contacto form.
+  - Note: Guests can select multiple files and see the chosen filenames; the static prototype keeps filename context only, while real upload/storage/email delivery remains a backend task.
+
 ---
 
 # Phase 2 — Contacto page follow-up checklist
 
-The current `contacto.html` page already has a usable prototype flow: structured contact form, required name/email/message fields, language preference, preferred reply method, optional context and assunto fields, phone validation, locked phone-dependent reply options, optional marketing checkbox, Google Maps/Facebook/Instagram links, URL prefill support, and a basic `obrigado.html` success page.
+The current `contacto.html` page already has a usable prototype flow: structured contact form, required name/email/message fields, language preference, preferred reply method, optional context and assunto fields, phone validation, locked phone-dependent reply options, optional marketing checkbox, attachment picker with selected-file summary, Google Maps/Facebook/Instagram links, URL prefill support, and a basic `obrigado.html` success page.
 
 ## 2.1 Later if needed — data, consent, and delivery
 
 - [ ] Connect the form to a real backend, email service, CRM, or admin inbox instead of the current GET-based prototype redirect.
+- [ ] Connect selected attachments to real upload/storage/email delivery once the contact backend exists.
 - [ ] Store enough submitted context for staff to handle the enquiry efficiently.
 - [ ] Add a required privacy-policy acknowledgement once the privacy-policy page/text exists.
 - [ ] Store marketing consent status and timestamp if marketing messages will actually be sent.

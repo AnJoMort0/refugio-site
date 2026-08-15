@@ -83,6 +83,10 @@ export async function initContactPage() {
   const languageSelect = form?.querySelector('#contact-language');
   const contextSelect = form?.querySelector('#contact-context');
   const topicSelect = form?.querySelector('#contact-topic');
+  const attachmentInput = form?.querySelector('#contact-attachments');
+  const attachmentButton = form?.querySelector('[data-contact-attachment-button]');
+  const attachmentSummary = form?.querySelector('#contact-attachment-summary');
+  const attachmentList = form?.querySelector('#contact-attachment-list');
   const params = new URLSearchParams(window.location.search);
   let dictionary = {};
 
@@ -193,6 +197,36 @@ export async function initContactPage() {
     updatePhoneDependentOptions();
   }
 
+  function getSelectedAttachments() {
+    return Array.from(attachmentInput?.files || []).filter((file) => file?.name);
+  }
+
+  function renderAttachmentList() {
+    if (!attachmentList) return;
+
+    const attachments = getSelectedAttachments();
+    attachmentList.replaceChildren();
+
+    attachments.forEach((file) => {
+      const item = document.createElement('li');
+      item.textContent = file.name;
+      attachmentList.append(item);
+    });
+
+    attachmentList.hidden = attachmentList.children.length === 0;
+
+    if (!attachmentSummary) return;
+
+    if (attachments.length === 0) {
+      attachmentSummary.textContent = getText('contactPage.form.attachmentsEmpty');
+      return;
+    }
+
+    attachmentSummary.textContent = attachments.length === 1
+      ? getText('contactPage.form.attachmentsOne')
+      : getText('contactPage.form.attachmentsMany').replace('{count}', String(attachments.length));
+  }
+
   function validateContactForm() {
     const fields = Array.from(form?.querySelectorAll('input, select, textarea') || []);
     fields.forEach((input) => setFieldValidity(input, ''));
@@ -226,6 +260,7 @@ export async function initContactPage() {
   updatePhoneDependentOptions();
   updateTopicOptions();
   applyUrlPrefill();
+  renderAttachmentList();
 
   document.addEventListener('language:changed', async () => {
     const selectedTopic = topicSelect?.value || '';
@@ -233,6 +268,7 @@ export async function initContactPage() {
     updateLanguageDefault();
     updatePhoneDependentOptions();
     updateTopicOptions(selectedTopic);
+    renderAttachmentList();
   });
 
   phoneInput?.addEventListener('input', () => {
@@ -265,6 +301,15 @@ export async function initContactPage() {
     setFieldValidity(topicSelect, '');
   });
 
+  attachmentInput?.addEventListener('change', renderAttachmentList);
+
+  attachmentButton?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+
+    event.preventDefault();
+    attachmentInput?.click();
+  });
+
   form?.addEventListener('input', (event) => {
     const target = event.target;
     if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) {
@@ -280,8 +325,15 @@ export async function initContactPage() {
     const nextParams = new URLSearchParams();
 
     for (const [key, value] of data.entries()) {
+      if (typeof File !== 'undefined' && value instanceof File) continue;
+
       const text = String(value).trim();
       if (text) nextParams.set(key, text);
+    }
+
+    const attachmentNames = getSelectedAttachments().map((file) => file.name.trim()).filter(Boolean);
+    if (attachmentNames.length) {
+      nextParams.set('attachments', attachmentNames.join(', '));
     }
 
     window.location.href = `${form.getAttribute('action') || './obrigado.html'}?${nextParams.toString()}`;
