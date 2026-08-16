@@ -95,7 +95,6 @@ function buildFooter() {
           <a href="${GOOGLE_REVIEW_URL}" target="_blank" rel="noopener"><span data-i18n="footer.googleReview"></span>${icon('external')}</a>
           <a href="${FACEBOOK_URL}" target="_blank" rel="noopener"><span data-i18n="footer.facebook"></span>${icon('external')}</a>
           <a href="${INSTAGRAM_URL}" target="_blank" rel="noopener"><span data-i18n="footer.instagram"></span>${icon('external')}</a>
-          <a href="./admin.html"><span data-i18n="footer.admin"></span></a>
         </div>
       </div>
     </footer>

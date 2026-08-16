@@ -463,6 +463,7 @@
       "text": "Veja abaixo os principais detalhes que recebemos com o seu pedido.",
       "emptyTitle": "Sem dados de reserva neste momento.",
       "emptyText": "Se chegou aqui diretamente, ainda não recebemos detalhes para resumir. Pode voltar à página de reservas e preencher o pedido.",
+      "reservationIdLabel": "Referência do pedido",
       "checkinLabel": "Check-in",
       "checkoutLabel": "Check-out",
       "nightsLabel": "Noites",
@@ -719,22 +720,11 @@
       "home": "Voltar à página principal"
     }
   },
-  "adminPage": {
-    "meta": {
-      "title": "O Refúgio | Administração"
-    },
-    "hero": {
-      "eyebrow": "Placeholder",
-      "title": "admin",
-      "text": "Esta página será construída numa etapa seguinte."
-    }
-  },
   "footer": {
     "copyright": "© O Refúgio — Família Rodrigues",
     "googleReview": "Avaliar no Google Maps",
     "facebook": "Facebook",
     "instagram": "Instagram",
-    "creator": "Website by André Fonseca",
-    "admin": "Área de gestão"
+    "creator": "Website by André Fonseca"
   }
 }

@@ -106,6 +106,7 @@ export async function initBookingSentPage() {
   const getText = (path, fallback = '') => getNestedValue(dictionary, path) || fallback;
   const params = new URLSearchParams(window.location.search);
 
+  const reservationId = params.get('reservation_id') || params.get('request_id') || '';
   const checkin = params.get('checkin') || '';
   const checkout = params.get('checkout') || '';
   const adults = Math.max(0, Number(params.get('adults') || 0));
@@ -117,6 +118,7 @@ export async function initBookingSentPage() {
   const phone = params.get('contact_phone') || '';
   const checkinTime = params.get('checkin_time') || '';
   const checkoutTime = params.get('checkout_time') || '';
+  const preferredLanguage = params.get('preferred_language') || '';
   const comments = params.get('comments') || '';
   const depositPrepay = textToBoolean(params.get('deposit_prepay') || '');
   const bedPreference = params.get('bed_preference') || '';
@@ -165,6 +167,7 @@ export async function initBookingSentPage() {
     if (node) node.hidden = !shouldShow;
   };
 
+  setText('#sent-reservation-id', reservationId || '-');
   setText('#sent-checkin', formatDate(checkin));
   setText('#sent-checkout', formatDate(checkout));
   setText('#sent-nights', String(nights));
@@ -250,6 +253,8 @@ export async function initBookingSentPage() {
     contactParams.set('context', 'requested');
     contactParams.set('topic', 'requestQuestion');
     contactParams.set('message', contactMessage);
+    if (reservationId) contactParams.set('reservation_id', reservationId);
+    if (preferredLanguage) contactParams.set('contact_language', preferredLanguage);
     if (contactName || guestNames[0]) contactParams.set('name', contactName || guestNames[0]);
     if (email) contactParams.set('email', email);
     if (phone) contactParams.set('phone', phone);

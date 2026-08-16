@@ -6,12 +6,23 @@ const PRICE_CONFIG = {
   bikePerDay: 5,
   securityDeposit: 200
 };
+const ADMIN_STORAGE_KEY = 'refugio-admin-prototype-state-v1';
+const ADMIN_BLOCKING_STATUSES = new Set(['awaiting_payment', 'confirmed', 'checked_in']);
 
 function formatDateKey(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+function createWebsiteReservationId() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const compactDate = `${year}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+  const compactTime = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+  const randomPart = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `WEB-${compactDate}-${compactTime}-${randomPart}`;
 }
 
 function parseDateKey(value) {
@@ -92,13 +103,89 @@ function buildReservationTotal({ nights, adults, children, includeDeposit, bikeD
   return stayValue + bikeValue + (includeDeposit ? PRICE_CONFIG.securityDeposit : 0);
 }
 
-function buildOccupiedRanges(today) {
-  return [
-    { start: formatDateKey(addDays(today, 9)), end: formatDateKey(addDays(today, 12)) },
-    { start: formatDateKey(addDays(today, 17)), end: formatDateKey(addDays(today, 21)) },
-    { start: formatDateKey(addDays(today, 32)), end: formatDateKey(addDays(today, 36)) },
-    { start: formatDateKey(addDays(today, 47)), end: formatDateKey(addDays(today, 51)) }
-  ];
+function getAdminPrototypeState() {
+  try {
+    const state = JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY) || 'null');
+    return state && Array.isArray(state.reservations) ? state : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+async function getWritableAdminPrototypeState() {
+  const currentState = getAdminPrototypeState();
+  if (currentState && Array.isArray(currentState.websiteRequests)) return currentState;
+
+  try {
+    const { createInitialAdminState } = await import('../admin/admin-seed.js');
+    return createInitialAdminState();
+  } catch (error) {
+    return currentState;
+  }
+}
+
+function saveAdminPrototypeState(state) {
+  if (!state) return;
+  state.updatedAt = new Date().toISOString();
+  localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(state));
+}
+
+function addWebsiteRequestAudit(state, requestId) {
+  if (!Array.isArray(state.auditLog)) state.auditLog = [];
+  state.auditLog.unshift({
+    id: `AUDIT-WEB-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+    at: new Date().toISOString(),
+    actorId: 'website',
+    actorName: 'Website',
+    action: 'Pedido do website recebido',
+    entityType: 'websiteRequest',
+    entityId: requestId
+  });
+}
+
+async function saveWebsiteRequestToAdminPrototype(request) {
+  try {
+    const state = await getWritableAdminPrototypeState();
+    if (!state) return;
+    if (!Array.isArray(state.websiteRequests)) state.websiteRequests = [];
+
+    const existingIndex = state.websiteRequests.findIndex((candidate) => candidate.id === request.id);
+    if (existingIndex >= 0) {
+      state.websiteRequests[existingIndex] = {
+        ...state.websiteRequests[existingIndex],
+        ...request,
+        updatedAt: new Date().toISOString()
+      };
+    } else {
+      state.websiteRequests.unshift(request);
+    }
+
+    addWebsiteRequestAudit(state, request.id);
+    saveAdminPrototypeState(state);
+  } catch (error) {
+    console.warn('Could not save booking request to admin prototype state.', error);
+  }
+}
+
+function syncPriceConfigFromAdminState(state) {
+  if (!state?.pricing) return;
+
+  PRICE_CONFIG.adultPerNight = Number(state.pricing.adultNight || PRICE_CONFIG.adultPerNight);
+  PRICE_CONFIG.childPerNight = Number(state.pricing.childNight || PRICE_CONFIG.childPerNight);
+  PRICE_CONFIG.bikePerDay = Number(state.pricing.bikeDay || PRICE_CONFIG.bikePerDay);
+  PRICE_CONFIG.securityDeposit = Number(state.pricing.securityDeposit || PRICE_CONFIG.securityDeposit);
+}
+
+function buildOccupiedRanges(adminState) {
+  if (!adminState) return [];
+
+  return adminState.reservations
+    .filter((reservation) => ADMIN_BLOCKING_STATUSES.has(reservation.status))
+    .map((reservation) => ({
+      start: reservation.stay?.checkIn,
+      end: reservation.stay?.checkOut
+    }))
+    .filter(({ start, end }) => start && end);
 }
 
 function isValidPhoneNumber(value) {
@@ -190,10 +277,12 @@ export async function initBookingPage() {
   const priceDeposit = document.querySelector('[data-price-deposit]');
 
   const portugalNow = getPortugalNow();
+  const adminState = getAdminPrototypeState();
+  syncPriceConfigFromAdminState(adminState);
   const today = portugalNow.date;
   today.setHours(0, 0, 0, 0);
   const earliestCheckinDate = addDays(today, portugalNow.hour < 15 ? 1 : 2);
-  const occupiedRanges = buildOccupiedRanges(today);
+  const occupiedRanges = buildOccupiedRanges(adminState);
   const occupiedDates = new Set();
   const monthsToRender = 2;
   const monthFormatter = () =>
@@ -951,7 +1040,7 @@ export async function initBookingPage() {
     rerenderDynamicContent();
   });
 
-  form?.addEventListener('submit', (event) => {
+  form?.addEventListener('submit', async (event) => {
     const message = validateBooking(true);
     if (message) {
       event.preventDefault();
@@ -971,13 +1060,23 @@ export async function initBookingPage() {
     const params = new URLSearchParams();
     const action = form.getAttribute('action') || './reserva-enviada.html';
     const commentsInput = form.querySelector('#reservation-comments');
+    const reservationId = createWebsiteReservationId();
+    const preferredLanguage = (localStorage.getItem('refugio-language') || document.documentElement.lang || DEFAULT_LANGUAGE).slice(0, 2).toLowerCase();
+    const childAges = Array.from(childAgeFields.querySelectorAll('input'))
+      .map((input) => input.value.trim())
+      .filter(Boolean)
+      .map(Number);
+    const selectedBedPreference = bedPreferenceInputs.find((input) => input.checked)?.value || '';
+    const comments = commentsInput instanceof HTMLTextAreaElement ? commentsInput.value.trim() : '';
 
+    params.set('reservation_id', reservationId);
     params.set('checkin', checkinInput.value);
     params.set('checkout', checkoutInput.value);
     params.set('nights', String(nights));
     params.set('adults', String(adults));
     params.set('children', String(children));
     params.set('total_guests', String(total));
+    params.set('preferred_language', preferredLanguage);
     params.set('contact_name', contactNameInput?.value.trim() || '');
     params.set('contact_email', contactEmailInput?.value.trim() || '');
 
@@ -993,7 +1092,6 @@ export async function initBookingPage() {
       params.set('checkout_time', checkoutTimeInput.value);
     }
 
-    const selectedBedPreference = bedPreferenceInputs.find((input) => input.checked)?.value || '';
     if (selectedBedPreference) {
       params.set('bed_preference', selectedBedPreference);
     }
@@ -1012,17 +1110,48 @@ export async function initBookingPage() {
       params.set('bike_days_total', String(bikeDays));
     }
 
-    const comments = commentsInput instanceof HTMLTextAreaElement ? commentsInput.value.trim() : '';
     if (comments) {
       params.set('comments', comments);
     }
 
-    childAgeFields.querySelectorAll('input').forEach((input) => {
-      const value = input.value.trim();
-      if (value) params.append('child_age', value);
-    });
+    childAges.forEach((age) => params.append('child_age', String(age)));
 
     params.set('reservation_total', String(totalEstimate));
+
+    await saveWebsiteRequestToAdminPrototype({
+      id: reservationId,
+      status: 'new',
+      submittedAt: new Date().toISOString(),
+      preferredLanguage,
+      contact: {
+        name: contactNameInput?.value.trim() || '',
+        email: contactEmailInput?.value.trim() || '',
+        phone: contactPhoneInput?.value.trim() || ''
+      },
+      stay: {
+        checkIn: checkinInput.value,
+        checkOut: checkoutInput.value,
+        checkInTime: checkinTimeInput?.value || '15:00',
+        checkOutTime: checkoutTimeInput?.value || '10:00'
+      },
+      guests: {
+        adults,
+        children,
+        childAges
+      },
+      preferences: {
+        bed: selectedBedPreference
+      },
+      extras: {
+        bikes: {
+          count: bikeCount,
+          days: bikeRentalDays
+        }
+      },
+      marketingOptIn: Boolean(marketingOptInInput?.checked),
+      comments,
+      estimatedTotal: totalEstimate
+    });
 
     window.location.href = `${action}?${params.toString()}`;
   });

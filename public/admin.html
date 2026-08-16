@@ -3,26 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title data-i18n="adminPage.meta.title"></title>
+  <title>O Refúgio | Administração</title>
+  <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="./css/reset.css" />
   <link rel="stylesheet" href="./css/variables.css" />
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/layout.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/mobile.css" />
+  <link rel="stylesheet" href="./css/pages/admin.css" />
 </head>
-<body data-page="admin">
-  <div data-site-header></div>
-  <main class="simple-page">
-    <div class="container narrow">
-      <p class="eyebrow" data-i18n="adminPage.hero.eyebrow"></p>
-      <h1 data-i18n="adminPage.hero.title"></h1>
-      <p data-i18n="adminPage.hero.text"></p>
-      <a class="button button-primary" href="./index.html" data-i18n="common.backHome"></a>
-    </div>
-  </main>
-  <div data-site-footer></div>
-  <div data-sticky-booking></div>
-  <script type="module" src="./js/main.js"></script>
+<body class="admin-body" data-page="admin">
+  <div id="admin-app" class="admin-app">
+    <main class="admin-login-page">
+      <section class="admin-login-panel">
+        <p class="admin-eyebrow">Administração</p>
+        <h1>A carregar gestão de O Refúgio...</h1>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="./js/admin/main.js"></script>
 </body>
 </html>
