@@ -216,6 +216,19 @@
               </span>
             </label>
 
+            <label class="field">
+              <span data-i18n="bookingPage.form.discountCodeLabel"></span>
+              <input
+                id="discount-code"
+                name="discount_code"
+                type="text"
+                autocomplete="off"
+                autocapitalize="characters"
+                placeholder=""
+                data-i18n-attr='{"placeholder":"bookingPage.form.discountCodePlaceholder"}'
+              />
+            </label>
+
             <label class="field field-textarea">
               <span data-i18n="bookingPage.form.commentsLabel"></span>
               <textarea
@@ -308,6 +321,10 @@
               <div id="summary-bikes-row" hidden>
                 <dt data-i18n="bookingPage.summary.bikesLabel"></dt>
                 <dd id="summary-bikes"></dd>
+              </div>
+              <div id="summary-discount-row" hidden>
+                <dt data-i18n="bookingPage.summary.discountLabel"></dt>
+                <dd id="summary-discount">-</dd>
               </div>
               <div id="summary-bed-preference-row" hidden>
                 <dt data-i18n="bookingPage.summary.bedPreferenceLabel"></dt>

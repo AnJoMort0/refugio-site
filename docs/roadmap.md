@@ -52,6 +52,8 @@ A scaffold means a made static HTML page ready for owner review/approval. A plac
     - [c] The Desconto field only shows % still, not plain values
     - [c] Hospedes . total . adults . kids is confusing, it could be "[total] ([adults] adultos + [crianças] crianças)", when there are kids, otherwise just states "[adults] adultos"
       - Note: Reservation forms now use dd/mm/yyyy text date fields, 24h time fields, email/phone contact rows with icons, a typed discount value, and clearer guest summaries.
+    - [c] Add the missing discount code field to `reservas.html`.
+      - Note: The public booking form now validates active admin discount codes, subtracts valid discounts from the estimate, carries the code into the sent summary, and stores it with the admin website request.
     - [c] Add a closed-by-default "Reservas passadas" section underneath the page with compact past/cancelled reservation rows and expandable details.
       - Note: The main reservation list now focuses on active/future reservations; checked-out, no-show, cancelled, and ended stays live in the expandable history section.
   - [c] Pedidos do website

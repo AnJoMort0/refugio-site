@@ -283,6 +283,13 @@ function getBikeText(reservation) {
   return `${count} bicicleta(s) · ${days} dia(s) · ${count * days} bicicleta-dia(s)`;
 }
 
+function getRequestDiscountText(request) {
+  const code = request.pricing?.discountCode || '';
+  const amount = Number(request.pricing?.discountAmount || 0);
+  if (!code && !amount) return '';
+  return `${code || 'Desconto'} · -${renderMoney(amount)}`;
+}
+
 function getBedPreferenceText(reservation) {
   const value = reservation.preferences?.bed || reservation.guests?.bedPreference || '';
   if (value === 'double') return 'Cama de casal';
@@ -946,6 +953,7 @@ function renderRequestSummary(request) {
         <div><dt>Hóspedes</dt><dd>${escapeHtml(formatGuestSummary(request.guests))}</dd></div>
         <div><dt>Idades das crianças</dt><dd>${escapeHtml(getChildAgeText(request.guests))}</dd></div>
         <div><dt>Bicicletas</dt><dd>${escapeHtml(getBikeText(request))}</dd></div>
+        ${getRequestDiscountText(request) ? `<div><dt>Desconto</dt><dd>${escapeHtml(getRequestDiscountText(request))}</dd></div>` : ''}
         ${renderContactDetailRows(request.contact)}
         <div><dt>Total estimado</dt><dd>${renderMoney(request.estimatedTotal || 0)}</dd></div>
         <div><dt>Marketing</dt><dd>${request.marketingOptIn ? 'Sim' : 'Não'}</dd></div>
@@ -1265,9 +1273,10 @@ function renderCreateReservationForm() {
     bedPreference: editingReservation?.preferences?.bed || editingReservation?.guests?.bedPreference || draftRequest?.preferences?.bed || draftRequest?.guests?.bedPreference || '',
     bikeCount: Number(editingReservation?.extras?.bikes?.count || draftRequest?.extras?.bikes?.count || 0),
     bikeDays: Number(editingReservation?.extras?.bikes?.days || draftRequest?.extras?.bikes?.days || 0),
-    discountType: editingReservation?.pricing?.discountType || (Number(editingReservation?.pricing?.discountAmount || 0) > 0 ? 'amount' : 'percentage'),
-    discountPercent: Number(editingReservation?.pricing?.discountPercent || 0),
-    discountAmount: Number(editingReservation?.pricing?.discountAmount || 0),
+    discountType: editingReservation?.pricing?.discountType || draftRequest?.pricing?.discountType || (Number(editingReservation?.pricing?.discountAmount || draftRequest?.pricing?.discountAmount || 0) > 0 ? 'amount' : 'percentage'),
+    discountPercent: Number(editingReservation?.pricing?.discountPercent || draftRequest?.pricing?.discountPercent || 0),
+    discountAmount: Number(editingReservation?.pricing?.discountAmount || draftRequest?.pricing?.discountAmount || 0),
+    discountCode: editingReservation?.pricing?.discountCode || draftRequest?.pricing?.discountCode || '',
     depositIncluded: Boolean(editingReservation?.pricing?.depositIncluded),
     ownerNotes: editingReservation?.notes?.owner || draftRequest?.comments || '',
     operationalNotes: editingReservation?.notes?.operational || '',
@@ -1295,6 +1304,7 @@ function renderCreateReservationForm() {
       <form class="admin-form-grid" data-form="create-reservation">
         <input name="websiteRequestId" type="hidden" value="${escapeHtml(defaults.websiteRequestId)}" />
         <input name="reservationId" type="hidden" value="${escapeHtml(defaults.reservationId)}" />
+        <input name="discountCode" type="hidden" value="${escapeHtml(defaults.discountCode)}" />
         <label class="admin-field">
           <span>Nome do hóspede *</span>
           <input name="guestName" type="text" value="${escapeHtml(defaults.guestName)}" required />
@@ -2757,6 +2767,7 @@ function buildReservationFromForm(form) {
       discountType,
       discountPercent: discountType === 'percentage' ? Math.min(100, discountValue) : 0,
       discountAmount: discountType === 'amount' ? discountValue : 0,
+      discountCode: String(data.get('discountCode') || '').trim(),
       depositIncluded: data.get('depositIncluded') === 'on'
     },
     extras: {

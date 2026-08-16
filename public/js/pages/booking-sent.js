@@ -128,6 +128,8 @@ export async function initBookingSentPage() {
     Number(params.get('bike_days_total') || 0),
     bikeCount * bikeRentalDays
   );
+  const discountCode = params.get('discount_code') || '';
+  const discountAmount = Math.max(0, Number(params.get('discount_amount') || 0));
   const guestNames = params.getAll('guest_name').map((value) => value.trim()).filter(Boolean);
   const childAges = params.getAll('child_age').map((value) => value.trim()).filter(Boolean);
 
@@ -154,7 +156,10 @@ export async function initBookingSentPage() {
   if (content) content.hidden = !hasBookingData;
   if (!hasBookingData) return;
 
-  const fallbackTotal = buildReservationTotal({ nights, adults, children, includeDeposit: depositPrepay, bikeDays });
+  const fallbackTotal = Math.max(
+    0,
+    buildReservationTotal({ nights, adults, children, includeDeposit: depositPrepay, bikeDays }) - discountAmount
+  );
   const totalWithDeposit = Math.max(Number(params.get('reservation_total') || fallbackTotal), 0);
 
   const setText = (selector, value) => {
@@ -183,6 +188,9 @@ export async function initBookingSentPage() {
   );
   setText('#sent-email', email || '-');
   setText('#sent-total', formatCurrency(totalWithDeposit));
+
+  toggleRow('#sent-discount-row', Boolean(discountCode && discountAmount > 0));
+  setText('#sent-discount', discountCode && discountAmount > 0 ? `${discountCode} · -${formatCurrency(discountAmount)}` : '-');
 
   toggleRow('#sent-bikes-row', bikeDays > 0);
   setText(

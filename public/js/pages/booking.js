@@ -8,6 +8,7 @@ const PRICE_CONFIG = {
 };
 const ADMIN_STORAGE_KEY = 'refugio-admin-prototype-state-v1';
 const ADMIN_BLOCKING_STATUSES = new Set(['awaiting_payment', 'confirmed', 'checked_in']);
+let adminPrototypeStateSnapshot = null;
 
 function formatDateKey(date) {
   const year = date.getFullYear();
@@ -96,11 +97,87 @@ function formatCurrency(value) {
   return `${Math.round(value)}€`;
 }
 
-function buildReservationTotal({ nights, adults, children, includeDeposit, bikeDays = 0 }) {
+function normalizeDiscountCode(value) {
+  return String(value || '').trim().toUpperCase();
+}
+
+function getDiscountPrototypeState() {
+  return getAdminPrototypeState() || adminPrototypeStateSnapshot;
+}
+
+function isDiscountAvailableForDate(discount, checkIn) {
+  if (discount.active === false) return false;
+  if (Number(discount.maxUses || 0) > 0 && Number(discount.usedCount || 0) >= Number(discount.maxUses || 0)) return false;
+  if (!checkIn) return false;
+  if (discount.startDate && checkIn < discount.startDate) return false;
+  if (discount.endDate && checkIn > discount.endDate) return false;
+  return true;
+}
+
+function getDiscountCodeResult(code, { checkIn, stayValue, bikeValue }) {
+  const normalizedCode = normalizeDiscountCode(code);
+  if (!normalizedCode) {
+    return { code: '', valid: false, pending: false, amount: 0, reason: 'empty' };
+  }
+
+  if (!checkIn) {
+    return { code: normalizedCode, valid: false, pending: true, amount: 0, reason: 'dates' };
+  }
+
+  const discount = getDiscountPrototypeState()?.pricing?.discounts
+    ?.find((candidate) => normalizeDiscountCode(candidate.code) === normalizedCode);
+
+  if (!discount || !isDiscountAvailableForDate(discount, checkIn)) {
+    return { code: normalizedCode, valid: false, pending: false, amount: 0, reason: 'invalid' };
+  }
+
+  const appliesTo = discount.appliesTo || 'accommodation';
+  const discountBase = appliesTo === 'services'
+    ? bikeValue
+    : appliesTo === 'both'
+      ? stayValue + bikeValue
+      : stayValue;
+  const discountType = discount.type || (Number(discount.amount || 0) > 0 ? 'amount' : 'percentage');
+  const rawAmount = discountType === 'amount'
+    ? Number(discount.amount || 0)
+    : Math.round(discountBase * (Number(discount.percentage || 0) / 100));
+  const amount = Math.min(discountBase, Math.max(0, rawAmount));
+
+  if (amount <= 0) {
+    return { code: normalizedCode, valid: false, pending: false, amount: 0, reason: 'notApplicable' };
+  }
+
+  return {
+    code: normalizedCode,
+    valid: true,
+    pending: false,
+    amount,
+    title: discount.title || normalizedCode,
+    type: discountType,
+    percentage: Number(discount.percentage || 0),
+    appliesTo
+  };
+}
+
+function buildReservationBreakdown({ nights, adults, children, includeDeposit, bikeDays = 0, checkIn = '', discountCode = '' }) {
   const stayValue =
     nights > 0 ? nights * (adults * PRICE_CONFIG.adultPerNight + children * PRICE_CONFIG.childPerNight) : 0;
   const bikeValue = bikeDays * PRICE_CONFIG.bikePerDay;
-  return stayValue + bikeValue + (includeDeposit ? PRICE_CONFIG.securityDeposit : 0);
+  const depositValue = includeDeposit ? PRICE_CONFIG.securityDeposit : 0;
+  const discount = getDiscountCodeResult(discountCode, { checkIn, stayValue, bikeValue });
+  const discountAmount = discount.valid ? discount.amount : 0;
+
+  return {
+    stayValue,
+    bikeValue,
+    depositValue,
+    discount,
+    total: Math.max(0, stayValue + bikeValue + depositValue - discountAmount)
+  };
+}
+
+function buildReservationTotal(options) {
+  return buildReservationBreakdown(options).total;
 }
 
 function getAdminPrototypeState() {
@@ -127,6 +204,7 @@ async function getWritableAdminPrototypeState() {
 function saveAdminPrototypeState(state) {
   if (!state) return;
   state.updatedAt = new Date().toISOString();
+  adminPrototypeStateSnapshot = state;
   localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(state));
 }
 
@@ -245,6 +323,8 @@ export async function initBookingPage() {
   const checkinTimeInput = document.querySelector('#checkin-time');
   const checkoutTimeInput = document.querySelector('#checkout-time');
   const depositPrepayInput = document.querySelector('#deposit-prepay');
+  const discountCodeInput = document.querySelector('#discount-code');
+  const discountCodeStatus = document.querySelector('#discount-code-status');
   const bikeReservationToggle = document.querySelector('#bike-reservation-toggle');
   const bikeDaysGroup = document.querySelector('#bike-days-group');
   const bikeCountInput = document.querySelector('#bike-count');
@@ -265,6 +345,8 @@ export async function initBookingPage() {
   const summaryDepositChoice = document.querySelector('#summary-deposit-choice');
   const summaryBikesRow = document.querySelector('#summary-bikes-row');
   const summaryBikes = document.querySelector('#summary-bikes');
+  const summaryDiscountRow = document.querySelector('#summary-discount-row');
+  const summaryDiscount = document.querySelector('#summary-discount');
   const summaryBikeRate = document.querySelector('#summary-bike-rate');
   const summaryBedPreferenceRow = document.querySelector('#summary-bed-preference-row');
   const summaryBedPreference = document.querySelector('#summary-bed-preference');
@@ -277,7 +359,8 @@ export async function initBookingPage() {
   const priceDeposit = document.querySelector('[data-price-deposit]');
 
   const portugalNow = getPortugalNow();
-  const adminState = getAdminPrototypeState();
+  const adminState = getAdminPrototypeState() || await getWritableAdminPrototypeState();
+  adminPrototypeStateSnapshot = adminState;
   syncPriceConfigFromAdminState(adminState);
   const today = portugalNow.date;
   today.setHours(0, 0, 0, 0);
@@ -456,6 +539,36 @@ export async function initBookingPage() {
     formStatus.textContent = message;
   }
 
+  function getDiscountStatusMessage(discount) {
+    if (discount.valid) {
+      return getText('bookingPage.form.discountCodeApplied')
+        .replace('{code}', discount.code)
+        .replace('{amount}', formatCurrency(discount.amount));
+    }
+    if (discount.pending) return getText('bookingPage.validation.discountCodeNeedsDates');
+    if (discount.reason === 'notApplicable') return getText('bookingPage.validation.discountCodeNotApplicable');
+    return getText('bookingPage.validation.discountCodeInvalid');
+  }
+
+  function renderDiscountCodeStatus(discount, { markInvalid = false } = {}) {
+    if (!discountCodeInput || !discountCodeStatus) return;
+
+    const message = getDiscountStatusMessage(discount);
+    discountCodeStatus.hidden = !message;
+    discountCodeStatus.textContent = message;
+    discountCodeStatus.classList.toggle('field-success', Boolean(discount.valid));
+    discountCodeStatus.classList.toggle('field-warning', Boolean(discount.code && !discount.valid && !discount.pending));
+
+    if (!discount.code || discount.valid || discount.pending) {
+      clearFieldValidity(discountCodeInput);
+      return;
+    }
+
+    if (markInvalid) {
+      setFieldValidity(discountCodeInput, message);
+    }
+  }
+
   function syncCheckoutBounds() {
     if (!checkinInput.value) {
       checkoutInput.min = formatDateKey(addDays(earliestCheckinDate, 2));
@@ -472,7 +585,15 @@ export async function initBookingPage() {
     const selectedBedPreference = bedPreferenceInputs.find((input) => input.checked)?.value || '';
     const bikeSelection = getBikeSelection();
     const bikeDays = bikeSelection.units;
-    const totalValue = buildReservationTotal({ nights, adults, children, includeDeposit, bikeDays });
+    const breakdown = buildReservationBreakdown({
+      nights,
+      adults,
+      children,
+      includeDeposit,
+      bikeDays,
+      checkIn: checkinInput.value,
+      discountCode: discountCodeInput?.value || ''
+    });
 
     priceAdult.textContent = formatCurrency(PRICE_CONFIG.adultPerNight);
     priceChild.textContent = formatCurrency(PRICE_CONFIG.childPerNight);
@@ -505,6 +626,13 @@ export async function initBookingPage() {
         .replace('{days}', String(bikeSelection.rentalDays))
         .replace('{units}', String(bikeDays));
     }
+    if (summaryDiscountRow && summaryDiscount) {
+      summaryDiscountRow.hidden = !breakdown.discount.valid;
+      summaryDiscount.textContent = breakdown.discount.valid
+        ? `-${formatCurrency(breakdown.discount.amount)}`
+        : '-';
+    }
+    renderDiscountCodeStatus(breakdown.discount);
     if (summaryBedPreferenceRow && summaryBedPreference) {
       const showBedPreference = needsBedPreference();
       summaryBedPreferenceRow.hidden = !showBedPreference;
@@ -519,7 +647,7 @@ export async function initBookingPage() {
         summaryBedPreference.textContent = '-';
       }
     }
-    summaryTotal.textContent = formatCurrency(totalValue);
+    summaryTotal.textContent = formatCurrency(breakdown.total);
   }
 
   function renderTimezoneWarning() {
@@ -767,6 +895,7 @@ export async function initBookingPage() {
     clearFieldValidity(contactNameInput);
     clearFieldValidity(contactEmailInput);
     clearFieldValidity(contactPhoneInput);
+    clearFieldValidity(discountCodeInput);
     clearFieldValidity(rulesConfirmationInput);
 
     const dateMessage = validateDateSelection(showBrowserMessages);
@@ -813,6 +942,23 @@ export async function initBookingPage() {
       const message = getText('bookingPage.validation.checkoutTimeInvalid');
       setFieldValidity(checkoutTimeInput, message);
       if (showBrowserMessages) checkoutTimeInput.reportValidity();
+      return message;
+    }
+
+    const discountBreakdown = buildReservationBreakdown({
+      nights: diffNights(checkinInput.value, checkoutInput.value),
+      adults,
+      children: getGuestCounts().children,
+      includeDeposit: Boolean(depositPrepayInput?.checked),
+      bikeDays: getBikeSelection().units,
+      checkIn: checkinInput.value,
+      discountCode: discountCodeInput?.value || ''
+    });
+
+    if (discountCodeInput?.value.trim() && !discountBreakdown.discount.valid) {
+      const message = getDiscountStatusMessage(discountBreakdown.discount);
+      renderDiscountCodeStatus(discountBreakdown.discount, { markInvalid: true });
+      if (showBrowserMessages) discountCodeInput.reportValidity();
       return message;
     }
 
@@ -989,6 +1135,17 @@ export async function initBookingPage() {
     renderSummary();
   });
 
+  discountCodeInput?.addEventListener('input', () => {
+    discountCodeInput.value = discountCodeInput.value.toUpperCase();
+    clearFieldValidity(discountCodeInput);
+    renderSummary();
+  });
+
+  discountCodeInput?.addEventListener('blur', () => {
+    discountCodeInput.value = normalizeDiscountCode(discountCodeInput.value);
+    renderSummary();
+  });
+
   bikeReservationToggle?.addEventListener('change', () => {
     clearFieldValidity(bikeReservationToggle);
     renderBikeDayFields({ forceDefaults: bikeReservationToggle.checked });
@@ -1056,7 +1213,16 @@ export async function initBookingPage() {
     const bikeCount = bikeReservationToggle?.checked ? Math.max(0, Number(bikeCountInput?.value || 0)) : 0;
     const bikeRentalDays = bikeReservationToggle?.checked ? Math.max(0, Number(bikeRentalDaysInput?.value || 0)) : 0;
     const bikeDays = bikeCount * bikeRentalDays;
-    const totalEstimate = buildReservationTotal({ nights, adults, children, includeDeposit, bikeDays });
+    const totalBreakdown = buildReservationBreakdown({
+      nights,
+      adults,
+      children,
+      includeDeposit,
+      bikeDays,
+      checkIn: checkinInput.value,
+      discountCode: discountCodeInput?.value || ''
+    });
+    const totalEstimate = totalBreakdown.total;
     const params = new URLSearchParams();
     const action = form.getAttribute('action') || './reserva-enviada.html';
     const commentsInput = form.querySelector('#reservation-comments');
@@ -1114,6 +1280,12 @@ export async function initBookingPage() {
       params.set('comments', comments);
     }
 
+    if (totalBreakdown.discount.valid) {
+      params.set('discount_code', totalBreakdown.discount.code);
+      params.set('discount_amount', String(totalBreakdown.discount.amount));
+      params.set('discount_title', totalBreakdown.discount.title || totalBreakdown.discount.code);
+    }
+
     childAges.forEach((age) => params.append('child_age', String(age)));
 
     params.set('reservation_total', String(totalEstimate));
@@ -1150,6 +1322,13 @@ export async function initBookingPage() {
       },
       marketingOptIn: Boolean(marketingOptInInput?.checked),
       comments,
+      pricing: totalBreakdown.discount.valid ? {
+        discountCode: totalBreakdown.discount.code,
+        discountTitle: totalBreakdown.discount.title || totalBreakdown.discount.code,
+        discountType: 'amount',
+        discountPercent: 0,
+        discountAmount: totalBreakdown.discount.amount
+      } : undefined,
       estimatedTotal: totalEstimate
     });
 

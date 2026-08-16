@@ -274,7 +274,7 @@
         "item1": "Depósito de segurança de 200€ solicitado no check-in",
         "item2": "Documento de identificação obrigatório",
         "item3": "Estacionamento gratuito disponível no local",
-        "item4": "Idiomas: Português, Francês, Inglês e Espanhol"
+        "item4": "Idiomas: Português, Francês, Inglês, Alemão e Espanhol"
       }
     },
     "location": {
@@ -372,7 +372,7 @@
       "emailPlaceholder": "nome@exemplo.com",
       "phoneLabel": "Telefone",
       "phonePlaceholder": "+351 912 345 678",
-      "confirmationWarning": "A reserva será tratada por email. É por aí que seguirá a confirmação, os esclarecimentos pedidos e os dados para transferência. Sem transferência concluída, a reserva não fica confirmada.",
+      "confirmationWarning": "A reserva será tratada por email. É por aí que seguirá os dados para transferência. Sem transferência concluída, a reserva não fica confirmada.",
       "checkinTimeLabel": "Hora prevista de check-in",
       "checkoutTimeLabel": "Hora prevista de check-out",
       "timeRangeHelp": "Check-in entre as 15h00 e as 19h00. Check-out entre as 08h00 e as 10h00.",
@@ -380,6 +380,9 @@
       "timezoneWarning": "Atenção ao fuso horário de Portugal continental (1h mais cedo do que Espanha, França, Suíça e Suécia).",
       "depositToggleLabel": "Pretendo adiantar o depósito de segurança com a reserva",
       "depositToggleHelp": "O depósito de 200€ pode ser entregue em numerário no check-in ou pode selecionar esta opção para incluí-lo na transferência para a reserva.",
+      "discountCodeLabel": "Código de desconto",
+      "discountCodePlaceholder": "Ex.: REFUGIO10",
+      "discountCodeApplied": "Código {code} aplicado: -{amount}",
       "commentsLabel": "Comentários ou pedidos especiais",
       "commentsPlaceholder": "Ex.: horários extraordinários de chegada, pedidos, dúvida sobre acessos...",
       "marketingOptInLabel": "Quero receber novidades, ofertas e descontos do Refúgio",
@@ -411,6 +414,7 @@
       "depositChoiceNo": "Não",
       "bikesLabel": "Bicicletas",
       "bikesPattern": "{bikes} x {days} dias = {units} bicicleta-dias",
+      "discountLabel": "Desconto",
       "estimatedTotalLabel": "Total estimado",
       "note": "O valor final poderá variar consoante as datas, o número de hóspedes e eventuais condições adicionais.",
       "depositNote": "Se adiantar o depósito de segurança, os 200€ serão devolvidos no check-out após verificação do espaço."
@@ -442,6 +446,9 @@
       "phoneInvalid": "Indique um telefone válido. Pode usar formato português, +351 ou 00.",
       "checkinTimeInvalid": "O check-in deve estar entre as 15h00 e as 19h00. Se precisar de outro horário, indique esse pedido nos comentários.",
       "checkoutTimeInvalid": "O check-out deve estar entre as 08h00 e as 10h00. Se precisar de outro horário, indique esse pedido nos comentários.",
+      "discountCodeNeedsDates": "Escolha as datas da estadia para validar o código de desconto.",
+      "discountCodeInvalid": "Este código de desconto não existe, expirou ou já não está disponível.",
+      "discountCodeNotApplicable": "Este código de desconto não se aplica aos serviços selecionados.",
       "childAgeRequired": "Indique a idade de cada criança.",
       "childAgeRange": "As crianças devem ter entre 0 e 12 anos.",
       "rulesConfirmationRequired": "Confirme que leu e aceita as regras da casa."
@@ -482,6 +489,7 @@
       "childAgesTitle": "Idades das crianças",
       "bikeDaysTitle": "Bicicletas pedidas",
       "bikeSummaryPattern": "{bikes} bicicletas x {days} dias = {units} bicicleta-dias",
+      "discountLabel": "Desconto aplicado",
       "commentsTitle": "Comentários enviados"
     },
     "notice": {

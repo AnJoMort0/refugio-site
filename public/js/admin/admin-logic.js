@@ -304,7 +304,10 @@ export function reservationFromWebsiteRequest(state, request, currentUser) {
       adultNight: state.pricing.adultNight,
       childNight: state.pricing.childNight,
       bikeDay: state.pricing.bikeDay,
-      discountPercent: 0,
+      discountType: request.pricing?.discountType || 'percentage',
+      discountPercent: Number(request.pricing?.discountPercent || 0),
+      discountAmount: Number(request.pricing?.discountAmount || 0),
+      discountCode: request.pricing?.discountCode || '',
       depositIncluded: false
     },
     extras: {

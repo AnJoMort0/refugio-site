@@ -108,6 +108,11 @@
   font-size: 0.95rem;
 }
 
+.field-hint.field-success {
+  color: var(--color-mountain-forest);
+  font-weight: 700;
+}
+
 .field-warning {
   padding: 0.8rem 0.95rem;
   border-radius: 14px;
