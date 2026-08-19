@@ -56,6 +56,12 @@ A scaffold means a made static HTML page ready for owner review/approval. A plac
       - Note: The public booking form now validates active admin discount codes, subtracts valid discounts from the estimate, carries the code into the sent summary, and stores it with the admin website request.
     - [c] Add a closed-by-default "Reservas passadas" section underneath the page with compact past/cancelled reservation rows and expandable details.
       - Note: The main reservation list now focuses on active/future reservations; checked-out, no-show, cancelled, and ended stays live in the expandable history section.
+    - [c] Make the "Abrir histórico" control a compact icon-only disclosure and remove the closed-state helper text.
+      - Note: The history section now uses a chevron button with an accessible label, keeping the Reservas page cleaner when the archive is closed.
+    - [c] Add `Abritel.fr` to the reservation source options.
+      - Note: Abritel.fr now appears wherever admin reservation sources are listed or filtered.
+    - [c] Add nationality to reservation/guest fields.
+      - Note: Public booking requests and admin-created reservations can now include nationality; saving a reservation updates the linked guest profile so nationality statistics have editable source data.
   - [c] Pedidos do website
     - [c] For example when clicking to answer to Marlene Keller, she is supposed to have a German answer, and she doesn't. Also to answer a comment, the comment itself should be written as a quote for the ownwer to then answer
     - [c] The "histórico" part can be very summarized with 1-2 lines per case, the details are opened when clicking on the "Abrir Reserva" anyway
@@ -73,6 +79,20 @@ A scaffold means a made static HTML page ready for owner review/approval. A plac
       * agradecimento depois da estadia and request for feedback.
     - [c] Give the possibility to generate the messages, not linked to reservations but by language still
       - Note: Added the requested template set and a standalone-by-language generation mode.
+    - [c] Adjust the owner-style Portuguese guest messages and dashboard shortcuts.
+      - Note: The owner dashboard can open the Mensagens tab from current guest, next arrival, and next departure cards with a logical template selected; Portuguese arrival, useful-info, and checkout messages now personalize the reservation and omit deposit/time requests when already handled.
+    - [c] Move admin guest-message templates into a single locale catalogue with all supported languages.
+      - Note: `public/locales/messages.json` now contains the message list, translated bodies, and request reply/refusal drafts; the Mensagens dropdown is built dynamically from that file.
+    - [c] Make the caução source note dynamic by reservation source.
+      - Note: Website, Booking.com, and Abritel.fr reservations now get source-specific wording in the deposit reminder; private-contact reservations omit the platform note.
+    - [c] Fuse overlapping pre-arrival message templates.
+      - Note: `checkinInfo`, `arrivalReminder`, and `usefulInfo` were merged into one `preArrivalInfo` template so the admin message list is shorter and closer to what owners would realistically use.
+    - [c] Collapse payment confirmation into the reservation-confirmation template.
+      - Note: `paymentReceived` now resolves to `bookingConfirmation`; when a reservation is paid or the deposit is received, the confirmation message adds a payment/deposit-received line automatically.
+    - [c] Add direct actions beside generated messages.
+      - Note: The Mensagens page now keeps the copy-message action and adds quick copy-email, open-email, and WhatsApp buttons when the selected reservation/request has the needed contact details.
+    - [c] Include the Google Maps review link in the post-stay feedback request.
+      - Note: The multilingual post-stay template now fills `{googleReviewUrl}` from the admin property data, with a fallback to the existing O Refúgio Google Maps URL.
   - [c] Preços
     - [c] Replace the "Preços Base" section with the seasonal section that works like the following:
       - [c] Force to have a Base price if there are not prices that are covering the entire year, that will be the default outside of seasons
@@ -83,6 +103,8 @@ A scaffold means a made static HTML page ready for owner review/approval. A plac
     - [c] Move the "Gerar código" to instead be a dice icon button in the Código field
     - [c] Since there's a "Tipo" field, fuse the Percentagem and the Valor Fixo field into one, that reflects the type
       - Note: Added recurring seasons, dated overrides, active-price indicator, group discounts, dice-code generation, and typed discount values.
+    - [c] Update the demo seed and accommodation calculation to the current owner prices.
+      - Note: Accommodation is now priced per adult/night with a minimum charge of 2 adults, children remain 65€/night, and the seed stores half of the previously supplied 2-adult prices (62,50€/70€/75€/85€). Public/admin totals calculate dated and seasonal nightly prices from the selected guest counts, while the public booking summary shows only the dynamic adult nightly total and only shows the child nightly total when children are selected.
   - [c] Despesas
     - [c] There's a notes section but no way to actually read said note
   - [c] Funcionários
@@ -90,6 +112,8 @@ A scaffold means a made static HTML page ready for owner review/approval. A plac
     - [c] There's no way to change the "Modo habitual"
     - [c] There's no way to check and change individual employee's working time and costs per job
       - Note: Added Portuguese role labels, default work-mode editing, and hidden-by-default employee detail drawers with work/cost history, per-line editing, and add-session controls.
+    - [c] Simplify "O meu trabalho" so start/stop and manual hours are not duplicated on screen.
+      - Note: Manual hour entry is now an expandable correction form; the live work clock remains the primary visible action.
   - [c] Add a log/audit section to the Settings page
     - [c] The log tracks every change and by whom, in a single line list, with possibility to expand for details, with sorting/filters to find specific changes
       - Note: Added a compact expandable audit list with search/entity/actor filters.
@@ -108,10 +132,14 @@ A scaffold means a made static HTML page ready for owner review/approval. A plac
   - [c] Can the left menu bar have it's own scrollbar, and for example when going down a long content page, the left part automatically stays visible, so it's easier to jump between pages without the need to scroll up a long reservations list page for example
   - [c] Dashboard
     - [c] If there's a current guest, it makes more sense for the "Próxima saída" to show first and then "Próxima chegada", otherwise the current order works
+    - [c] Add a quick reservation button and mail shortcuts for Hóspede atual, Próxima chegada, and Próxima saída.
+      - Note: Owner dashboard cards now open the Mensagens tab for the relevant reservation and preselect the most logical template for that stay context; the Criar reserva button now sits in the topbar beside the user/logout box to avoid adding a blank row in the dashboard.
   - [c] Calendar
     - [c] The calendar could be a little less tall, so the entire month is visible in most computer screens at least, while still having space for 2 lines in there since it's the max guests that can be there per day
     - [c] There should be a button next to "Gerar Mensagem" to "Gerir Reserva" that opens the reservations tab in the proper reservation in editing mode
     - [c] Check-in/out times should be in the description too, the total is not needed, the description should be times, guest number, status, contacts and prefered language, logically ordered
+    - [c] Make preferred language appear as a compact top label for reservations too, matching website requests.
+      - Note: Reservation cards in the calendar and reservations list now show the language next to status/source instead of burying it in the details rows.
     - [c] Contact info should have an easy copy button, add contact button, whatsapp button, call button, send email button in the form of easily discernable icons
     - [c] Remove the "Cancelar" button from here, the owner will need to go through Gerir Reserva instead
     - [c] A "+" on top of the calendar, opens the Reservas page in the manual adding section
@@ -490,8 +518,8 @@ After a manual reservation is prepared, generate an editable email that staff ca
 - [ ] Include cancellation terms, important booking conditions, and contact details.
 - [c] Add a one-click **Copy email** action with a clear copied confirmation.
 - [ ] Let staff edit the generated text before copying it.
-- [~] Provide approved templates for confirmation, payment reminder, payment received, amendment, and cancellation.
-  - Note: The prototype includes payment-instruction and payment-received templates in Portuguese, French, English, Spanish, and German.
+- [~] Provide approved templates for confirmation, payment reminder, amendment, and cancellation.
+  - Note: The prototype includes payment instructions, combined reservation/payment confirmation, pre-arrival, checkout, and post-stay feedback templates in Portuguese, French, English, Spanish, and German.
 - [ ] Store the template version used without storing unnecessary clipboard contents.
 - [ ] Mark whether the email was only generated, copied, or later recorded as sent.
 - [!] Confirm the final IBAN, account-holder details, payment deadline, and approved legal wording.
@@ -509,7 +537,7 @@ After a manual reservation is prepared, generate an editable email that staff ca
 - [c] Add the accepted reservation to the calendar without re-entering guest data.
 - [c] Prevent confirmation when dates have become unavailable.
 - [c] Generate the appropriate confirmation or rejection email.
-  - Note: The prototype generates payment instructions, payment-received messages, and rejection/response drafts. Final approved legal/payment wording remains open.
+  - Note: The prototype generates payment instructions, combined reservation/payment confirmations, and rejection/response drafts. Final approved legal/payment wording remains open.
 - [c] Keep the original request, changes, payment status, and staff actions in the audit history.
 - [ ] Notify staff when a request has remained unanswered or unpaid for too long.
 

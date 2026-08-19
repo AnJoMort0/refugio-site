@@ -28,6 +28,7 @@ export const PAYMENT_LABELS = {
 
 export const SOURCE_LABELS = {
   booking: 'Booking.com',
+  abritel: 'Abritel.fr',
   website: 'Website',
   private: 'Contacto privado',
   owner: 'Reserva do proprietário'
@@ -62,84 +63,6 @@ export const WORK_TASK_LABELS = {
 
 const BLOCKING_STATUSES = new Set(['awaiting_payment', 'confirmed', 'checked_in']);
 
-export const MESSAGE_TEMPLATE_LABELS = {
-  requestReceived: 'Pedido de reserva recebido',
-  paymentInstructions: 'Instruções de pagamento',
-  bookingConfirmation: 'Confirmação de reserva',
-  paymentReceived: 'Confirmação de pagamento',
-  checkinInfo: 'Informação de check-in',
-  arrivalReminder: 'Lembrete antes da chegada',
-  usefulInfo: 'Informações úteis',
-  checkoutInstructions: 'Instruções de checkout',
-  postStayThanks: 'Agradecimento e pedido de feedback'
-};
-
-const GUEST_MESSAGE_TEMPLATES = {
-  requestReceived: {
-    pt: 'Olá {guestName}, recebemos o seu pedido de reserva para O Refúgio.\n\nResumo: {checkIn} a {checkOut}, {nights} noite(s), {guestCount} hóspede(s).\n\nVamos verificar a disponibilidade e responder o mais brevemente possível. Obrigado.',
-    fr: 'Bonjour {guestName}, nous avons bien reçu votre demande de réservation pour O Refúgio.\n\nRésumé : du {checkIn} au {checkOut}, {nights} nuit(s), {guestCount} personne(s).\n\nNous allons vérifier la disponibilité et vous répondre dès que possible. Merci.',
-    en: 'Hello {guestName}, we have received your reservation request for O Refúgio.\n\nSummary: {checkIn} to {checkOut}, {nights} night(s), {guestCount} guest(s).\n\nWe will check availability and reply as soon as possible. Thank you.',
-    es: 'Hola {guestName}, hemos recibido su solicitud de reserva para O Refúgio.\n\nResumen: del {checkIn} al {checkOut}, {nights} noche(s), {guestCount} huésped(es).\n\nComprobaremos la disponibilidad y responderemos lo antes posible. Gracias.',
-    de: 'Hallo {guestName}, wir haben Ihre Reservierungsanfrage für O Refúgio erhalten.\n\nZusammenfassung: {checkIn} bis {checkOut}, {nights} Nacht/Nächte, {guestCount} Gast/Gäste.\n\nWir prüfen die Verfügbarkeit und antworten so bald wie möglich. Vielen Dank.'
-  },
-  paymentInstructions: {
-    pt: 'Olá {guestName}, obrigado pelo seu pedido de reserva em O Refúgio.\n\nResumo: {checkIn} a {checkOut}, {nights} noite(s), {guestCount} hóspede(s).\nValor estimado: {total}.\n\nPara confirmar a reserva, pedimos a transferência do valor indicado para o IBAN definido pelo proprietário, usando a referência {reservationId}. Assim que o pagamento for confirmado, enviaremos a confirmação final.\n\nQualquer dúvida, estamos disponíveis.',
-    fr: 'Bonjour {guestName}, merci pour votre demande de réservation à O Refúgio.\n\nRésumé : du {checkIn} au {checkOut}, {nights} nuit(s), {guestCount} personne(s).\nMontant estimé : {total}.\n\nPour confirmer la réservation, merci d’effectuer le virement du montant indiqué vers l’IBAN défini par le propriétaire, avec la référence {reservationId}. Dès réception du paiement, nous enverrons la confirmation finale.\n\nNous restons disponibles pour toute question.',
-    en: 'Hello {guestName}, thank you for your reservation request at O Refúgio.\n\nSummary: {checkIn} to {checkOut}, {nights} night(s), {guestCount} guest(s).\nEstimated amount: {total}.\n\nTo confirm the reservation, please transfer the indicated amount to the IBAN defined by the owner, using reference {reservationId}. Once payment is confirmed, we will send the final confirmation.\n\nPlease let us know if you have any questions.',
-    es: 'Hola {guestName}, gracias por su solicitud de reserva en O Refúgio.\n\nResumen: del {checkIn} al {checkOut}, {nights} noche(s), {guestCount} huésped(es).\nImporte estimado: {total}.\n\nPara confirmar la reserva, realice la transferencia del importe indicado al IBAN definido por el propietario, usando la referencia {reservationId}. Cuando el pago esté confirmado, enviaremos la confirmación final.\n\nEstamos disponibles para cualquier pregunta.',
-    de: 'Hallo {guestName}, vielen Dank für Ihre Reservierungsanfrage bei O Refúgio.\n\nZusammenfassung: {checkIn} bis {checkOut}, {nights} Nacht/Nächte, {guestCount} Gast/Gäste.\nGeschätzter Betrag: {total}.\n\nZur Bestätigung der Reservierung überweisen Sie bitte den angegebenen Betrag auf die vom Eigentümer festgelegte IBAN mit der Referenz {reservationId}. Sobald die Zahlung bestätigt ist, senden wir die endgültige Bestätigung.\n\nBei Fragen stehen wir gerne zur Verfügung.'
-  },
-  paymentReceived: {
-    pt: 'Olá {guestName}, confirmamos a receção do pagamento da reserva {reservationId}. A sua estadia em O Refúgio fica confirmada de {checkIn} a {checkOut}. Obrigado e até breve.',
-    fr: 'Bonjour {guestName}, nous confirmons la réception du paiement de la réservation {reservationId}. Votre séjour à O Refúgio est confirmé du {checkIn} au {checkOut}. Merci et à bientôt.',
-    en: 'Hello {guestName}, we confirm that payment for reservation {reservationId} has been received. Your stay at O Refúgio is confirmed from {checkIn} to {checkOut}. Thank you and see you soon.',
-    es: 'Hola {guestName}, confirmamos la recepción del pago de la reserva {reservationId}. Su estancia en O Refúgio queda confirmada del {checkIn} al {checkOut}. Gracias y hasta pronto.',
-    de: 'Hallo {guestName}, wir bestätigen den Zahlungseingang für die Reservierung {reservationId}. Ihr Aufenthalt im O Refúgio ist vom {checkIn} bis {checkOut} bestätigt. Vielen Dank und bis bald.'
-  },
-  bookingConfirmation: {
-    pt: 'Olá {guestName}, a sua reserva {reservationId} em O Refúgio está confirmada.\n\nEstadia: {checkIn} a {checkOut}, {nights} noite(s), {guestCount} hóspede(s).\nCheck-in previsto: {checkInTime}. Check-out: {checkOutTime}.\n\nObrigado pela confiança. Ficamos à sua espera.',
-    fr: 'Bonjour {guestName}, votre réservation {reservationId} à O Refúgio est confirmée.\n\nSéjour : du {checkIn} au {checkOut}, {nights} nuit(s), {guestCount} personne(s).\nCheck-in prévu : {checkInTime}. Check-out : {checkOutTime}.\n\nMerci pour votre confiance. Nous vous attendons avec plaisir.',
-    en: 'Hello {guestName}, your reservation {reservationId} at O Refúgio is confirmed.\n\nStay: {checkIn} to {checkOut}, {nights} night(s), {guestCount} guest(s).\nExpected check-in: {checkInTime}. Check-out: {checkOutTime}.\n\nThank you for your trust. We look forward to welcoming you.',
-    es: 'Hola {guestName}, su reserva {reservationId} en O Refúgio está confirmada.\n\nEstancia: del {checkIn} al {checkOut}, {nights} noche(s), {guestCount} huésped(es).\nCheck-in previsto: {checkInTime}. Check-out: {checkOutTime}.\n\nGracias por su confianza. Les esperamos.',
-    de: 'Hallo {guestName}, Ihre Reservierung {reservationId} bei O Refúgio ist bestätigt.\n\nAufenthalt: {checkIn} bis {checkOut}, {nights} Nacht/Nächte, {guestCount} Gast/Gäste.\nVoraussichtlicher Check-in: {checkInTime}. Check-out: {checkOutTime}.\n\nVielen Dank für Ihr Vertrauen. Wir freuen uns auf Sie.'
-  },
-  checkinInfo: {
-    pt: 'Olá {guestName}, deixamos a informação principal para o check-in da reserva {reservationId}.\n\nEntrada: {checkIn}, a partir das {checkInTime}.\nMorada: {propertyAddress}.\n\nSe houver atraso ou alguma dúvida no caminho, responda a esta mensagem.',
-    fr: 'Bonjour {guestName}, voici les informations principales pour le check-in de la réservation {reservationId}.\n\nArrivée : {checkIn}, à partir de {checkInTime}.\nAdresse : {propertyAddress}.\n\nEn cas de retard ou de question pendant le trajet, répondez à ce message.',
-    en: 'Hello {guestName}, here is the main check-in information for reservation {reservationId}.\n\nArrival: {checkIn}, from {checkInTime}.\nAddress: {propertyAddress}.\n\nIf you are delayed or have any question on the way, please reply to this message.',
-    es: 'Hola {guestName}, aquí tiene la información principal para el check-in de la reserva {reservationId}.\n\nEntrada: {checkIn}, a partir de las {checkInTime}.\nDirección: {propertyAddress}.\n\nSi hay retraso o alguna duda durante el camino, responda a este mensaje.',
-    de: 'Hallo {guestName}, hier sind die wichtigsten Check-in-Informationen für die Reservierung {reservationId}.\n\nAnreise: {checkIn}, ab {checkInTime}.\nAdresse: {propertyAddress}.\n\nWenn Sie sich verspäten oder unterwegs Fragen haben, antworten Sie bitte auf diese Nachricht.'
-  },
-  arrivalReminder: {
-    pt: 'Olá {guestName}, lembramos que a sua estadia em O Refúgio começa em {checkIn}.\n\nCheck-in previsto: {checkInTime}. Morada: {propertyAddress}.\n\nBoa viagem e até breve.',
-    fr: 'Bonjour {guestName}, petit rappel : votre séjour à O Refúgio commence le {checkIn}.\n\nCheck-in prévu : {checkInTime}. Adresse : {propertyAddress}.\n\nBon voyage et à bientôt.',
-    en: 'Hello {guestName}, a quick reminder that your stay at O Refúgio starts on {checkIn}.\n\nExpected check-in: {checkInTime}. Address: {propertyAddress}.\n\nSafe travels and see you soon.',
-    es: 'Hola {guestName}, le recordamos que su estancia en O Refúgio empieza el {checkIn}.\n\nCheck-in previsto: {checkInTime}. Dirección: {propertyAddress}.\n\nBuen viaje y hasta pronto.',
-    de: 'Hallo {guestName}, eine kurze Erinnerung: Ihr Aufenthalt bei O Refúgio beginnt am {checkIn}.\n\nVoraussichtlicher Check-in: {checkInTime}. Adresse: {propertyAddress}.\n\nGute Reise und bis bald.'
-  },
-  usefulInfo: {
-    pt: 'Olá {guestName}, seguem algumas informações úteis para a sua estadia em O Refúgio.\n\nMorada: {propertyAddress}.\nCheck-out: {checkOut}, até às {checkOutTime}.\n\n[Acrescentar aqui Wi-Fi, estacionamento, regras ou recomendações relevantes.]',
-    fr: 'Bonjour {guestName}, voici quelques informations utiles pour votre séjour à O Refúgio.\n\nAdresse : {propertyAddress}.\nCheck-out : {checkOut}, jusqu’à {checkOutTime}.\n\n[Ajouter ici Wi-Fi, stationnement, règles ou recommandations utiles.]',
-    en: 'Hello {guestName}, here is some useful information for your stay at O Refúgio.\n\nAddress: {propertyAddress}.\nCheck-out: {checkOut}, by {checkOutTime}.\n\n[Add Wi-Fi, parking, rules, or useful recommendations here.]',
-    es: 'Hola {guestName}, aquí tiene información útil para su estancia en O Refúgio.\n\nDirección: {propertyAddress}.\nCheck-out: {checkOut}, hasta las {checkOutTime}.\n\n[Añadir aquí Wi-Fi, aparcamiento, normas o recomendaciones útiles.]',
-    de: 'Hallo {guestName}, hier sind einige nützliche Informationen für Ihren Aufenthalt bei O Refúgio.\n\nAdresse: {propertyAddress}.\nCheck-out: {checkOut}, bis {checkOutTime}.\n\n[Hier WLAN, Parkplatz, Regeln oder Empfehlungen ergänzen.]'
-  },
-  checkoutInstructions: {
-    pt: 'Olá {guestName}, deixamos as instruções de checkout da reserva {reservationId}.\n\nSaída: {checkOut}, até às {checkOutTime}.\n\n[Acrescentar aqui entrega de chaves, lixo, loiça, janelas, aquecimento ou outros pontos importantes.]',
-    fr: 'Bonjour {guestName}, voici les instructions de check-out pour la réservation {reservationId}.\n\nDépart : {checkOut}, jusqu’à {checkOutTime}.\n\n[Ajouter ici clés, déchets, vaisselle, fenêtres, chauffage ou autres points importants.]',
-    en: 'Hello {guestName}, here are the check-out instructions for reservation {reservationId}.\n\nDeparture: {checkOut}, by {checkOutTime}.\n\n[Add keys, rubbish, dishes, windows, heating, or other important points here.]',
-    es: 'Hola {guestName}, aquí tiene las instrucciones de check-out de la reserva {reservationId}.\n\nSalida: {checkOut}, hasta las {checkOutTime}.\n\n[Añadir aquí llaves, basura, vajilla, ventanas, calefacción u otros puntos importantes.]',
-    de: 'Hallo {guestName}, hier sind die Check-out-Anweisungen für die Reservierung {reservationId}.\n\nAbreise: {checkOut}, bis {checkOutTime}.\n\n[Hier Schlüssel, Müll, Geschirr, Fenster, Heizung oder weitere wichtige Punkte ergänzen.]'
-  },
-  postStayThanks: {
-    pt: 'Olá {guestName}, esperamos que tenha gostado da estadia em O Refúgio.\n\nObrigado pela visita. Se quiser deixar feedback privado, basta responder a esta mensagem. Se a experiência foi positiva, agradecemos também uma avaliação no Google Maps.\n\nAté uma próxima.',
-    fr: 'Bonjour {guestName}, nous espérons que votre séjour à O Refúgio vous a plu.\n\nMerci pour votre visite. Pour un retour privé, répondez simplement à ce message. Si l’expérience a été positive, un avis sur Google Maps nous aiderait beaucoup.\n\nÀ une prochaine fois.',
-    en: 'Hello {guestName}, we hope you enjoyed your stay at O Refúgio.\n\nThank you for visiting. If you would like to leave private feedback, simply reply to this message. If you had a positive experience, a Google Maps review would also be greatly appreciated.\n\nHope to welcome you again.',
-    es: 'Hola {guestName}, esperamos que haya disfrutado de su estancia en O Refúgio.\n\nGracias por la visita. Si quiere dejar feedback privado, responda a este mensaje. Si la experiencia fue positiva, agradeceríamos una reseña en Google Maps.\n\nHasta la próxima.',
-    de: 'Hallo {guestName}, wir hoffen, dass Ihnen Ihr Aufenthalt bei O Refúgio gefallen hat.\n\nVielen Dank für Ihren Besuch. Für privates Feedback antworten Sie einfach auf diese Nachricht. Wenn die Erfahrung positiv war, freuen wir uns auch sehr über eine Google-Maps-Bewertung.\n\nBis zum nächsten Mal.'
-  }
-};
-
 const REQUEST_COMMENT_LABELS = {
   pt: {
     comment: 'Comentário do hóspede:',
@@ -163,6 +86,62 @@ const REQUEST_COMMENT_LABELS = {
   }
 };
 
+const MESSAGE_LOCALES = {
+  pt: 'pt-PT',
+  fr: 'fr-FR',
+  en: 'en-GB',
+  es: 'es-ES',
+  de: 'de-DE'
+};
+
+const STANDALONE_PLACEHOLDERS = {
+  pt: {
+    guestName: '[nome do hóspede]',
+    reservationId: '[referência]',
+    checkIn: '[data de check-in]',
+    checkOut: '[data de check-out]',
+    nights: '[número]',
+    guestCount: '[número]',
+    total: '[valor]'
+  },
+  fr: {
+    guestName: '[nom du client]',
+    reservationId: '[référence]',
+    checkIn: '[date d’arrivée]',
+    checkOut: '[date de départ]',
+    nights: '[nombre]',
+    guestCount: '[nombre]',
+    total: '[montant]'
+  },
+  en: {
+    guestName: '[guest name]',
+    reservationId: '[reference]',
+    checkIn: '[check-in date]',
+    checkOut: '[check-out date]',
+    nights: '[number]',
+    guestCount: '[number]',
+    total: '[amount]'
+  },
+  es: {
+    guestName: '[nombre del huésped]',
+    reservationId: '[referencia]',
+    checkIn: '[fecha de entrada]',
+    checkOut: '[fecha de salida]',
+    nights: '[número]',
+    guestCount: '[número]',
+    total: '[importe]'
+  },
+  de: {
+    guestName: '[Name des Gastes]',
+    reservationId: '[Referenz]',
+    checkIn: '[Anreisedatum]',
+    checkOut: '[Abreisedatum]',
+    nights: '[Anzahl]',
+    guestCount: '[Anzahl]',
+    total: '[Betrag]'
+  }
+};
+
 export function escapeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -173,11 +152,14 @@ export function escapeHtml(value) {
 }
 
 export function formatCurrency(value, currency = 'EUR') {
+  const amount = Math.round(Number(value || 0) * 100) / 100;
+  const hasCents = !Number.isInteger(amount);
   return new Intl.NumberFormat('pt-PT', {
     style: 'currency',
     currency,
-    maximumFractionDigits: 0
-  }).format(Number(value || 0));
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: 2
+  }).format(amount);
 }
 
 export function formatDate(value) {
@@ -216,15 +198,76 @@ export function reservationTouchesDate(reservation, dateKey) {
   return dateRangeOverlaps(reservation.stay.checkIn, reservation.stay.checkOut, dateKey, formatDateKey(addDays(parseDateKey(dateKey), 1)));
 }
 
+function eachNightDateKey(checkIn, checkOut) {
+  if (!checkIn || !checkOut) return [];
+  const start = parseDateKey(checkIn);
+  const end = parseDateKey(checkOut);
+  if (!start || !end || Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) return [];
+
+  const dates = [];
+  const cursor = new Date(start);
+  while (cursor < end) {
+    dates.push(formatDateKey(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return dates;
+}
+
+function monthDayOrdinal(monthDay) {
+  const [month, day] = String(monthDay || '').split('-').map(Number);
+  const date = new Date(2028, month - 1, day);
+  const start = new Date(2028, 0, 1);
+  if (Number.isNaN(date.getTime())) return 0;
+  return Math.round((date - start) / 86400000) + 1;
+}
+
+function seasonTouchesDate(season, dateKey) {
+  if (!dateKey) return false;
+  if (season?.active === false) return false;
+
+  if ((season?.kind || 'dated') === 'recurring') {
+    const date = parseDateKey(dateKey);
+    if (!date || Number.isNaN(date.getTime())) return false;
+    const todayOrdinal = monthDayOrdinal(`${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
+    const start = monthDayOrdinal(season.startMonthDay);
+    const end = monthDayOrdinal(season.endMonthDay);
+    if (!start || !end) return false;
+    return start <= end
+      ? todayOrdinal >= start && todayOrdinal <= end
+      : todayOrdinal >= start || todayOrdinal <= end;
+  }
+
+  return Boolean(season?.startDate && season?.endDate && season.startDate <= dateKey && season.endDate >= dateKey);
+}
+
+function getPricingRuleForDate(state, dateKey) {
+  if (!dateKey) return null;
+  const seasons = state?.pricing?.seasons || [];
+  const datedOverride = seasons.find((season) => (season.kind || 'dated') === 'dated' && seasonTouchesDate(season, dateKey));
+  const recurringSeason = seasons.find((season) => season.kind === 'recurring' && seasonTouchesDate(season, dateKey));
+  return datedOverride || recurringSeason || null;
+}
+
+function getNightlyAccommodationValue(dateKey, adults, children, state, fallbackPricing = {}) {
+  const rule = getPricingRuleForDate(state, dateKey);
+  const adultNight = Number(rule?.adultNight ?? fallbackPricing.adultNight ?? state?.pricing?.adultNight ?? 0);
+  const childNight = Number(rule?.childNight ?? fallbackPricing.childNight ?? state?.pricing?.childNight ?? 0);
+  const minimumPaidAdults = Number(fallbackPricing.minimumPaidAdults ?? state?.pricing?.minimumPaidAdults ?? 2);
+  const paidAdults = adults > 0 ? Math.max(Math.max(0, adults), minimumPaidAdults) : 0;
+
+  return (paidAdults * adultNight) + (Math.max(0, children) * childNight);
+}
+
 export function calculateReservationTotals(reservation, state) {
   const nights = diffNights(reservation.stay.checkIn, reservation.stay.checkOut);
   const adults = Number(reservation.guests?.adults || 0);
   const children = Number(reservation.guests?.children || 0);
-  const adultNight = Number(reservation.pricing?.adultNight || state.pricing.adultNight);
-  const childNight = Number(reservation.pricing?.childNight || state.pricing.childNight);
   const bikeDay = Number(reservation.pricing?.bikeDay || state.pricing.bikeDay);
   const bikeUnits = Number(reservation.extras?.bikes?.count || 0) * Number(reservation.extras?.bikes?.days || 0);
-  const accommodation = nights * ((adults * adultNight) + (children * childNight));
+  const nightDates = eachNightDateKey(reservation.stay.checkIn, reservation.stay.checkOut);
+  const accommodation = nightDates.length
+    ? nightDates.reduce((total, dateKey) => total + getNightlyAccommodationValue(dateKey, adults, children, state, reservation.pricing), 0)
+    : nights * getNightlyAccommodationValue(reservation.stay.checkIn, adults, children, state, reservation.pricing);
   const services = bikeUnits * bikeDay;
   const guestCount = adults + children;
   const groupDiscountPerNight = [...(state.pricing.groupDiscounts || [])]
@@ -265,6 +308,11 @@ export function getOrCreateGuest(state, contact, preferredLanguage = 'pt', natio
   const existing = state.guests.find((guest) => email && guest.email.toLowerCase() === email);
 
   if (existing) {
+    existing.name = contact.name || existing.name;
+    existing.email = contact.email || existing.email;
+    existing.phone = contact.phone || existing.phone;
+    existing.preferredLanguage = preferredLanguage || existing.preferredLanguage;
+    if (nationality) existing.nationality = nationality;
     return existing;
   }
 
@@ -283,7 +331,7 @@ export function getOrCreateGuest(state, contact, preferredLanguage = 'pt', natio
 }
 
 export function reservationFromWebsiteRequest(state, request, currentUser) {
-  const guest = getOrCreateGuest(state, request.contact, request.preferredLanguage);
+  const guest = getOrCreateGuest(state, request.contact, request.preferredLanguage, request.contact?.nationality || request.nationality || '');
 
   return {
     id: makeId('RES', state.reservations),
@@ -302,6 +350,7 @@ export function reservationFromWebsiteRequest(state, request, currentUser) {
     },
     pricing: {
       adultNight: state.pricing.adultNight,
+      minimumPaidAdults: state.pricing.minimumPaidAdults || 2,
       childNight: state.pricing.childNight,
       bikeDay: state.pricing.bikeDay,
       discountType: request.pricing?.discountType || 'percentage',
@@ -338,47 +387,195 @@ export function addAudit(state, currentUser, action, entityType, entityId) {
   });
 }
 
-export function generateGuestMessage(reservation, state, templateKey = 'paymentInstructions') {
+function applyTemplateValues(template, values, options = {}) {
+  const text = Object.entries(values)
+    .reduce((text, [key, value]) => text.replaceAll(`{${key}}`, value), template)
+    .replace(/\n{3,}/g, '\n\n');
+  return options.trim === false ? text : text.trim();
+}
+
+export function getMessageTemplates(catalog = {}) {
+  return Array.isArray(catalog?.templates) ? catalog.templates.filter((template) => template?.id) : [];
+}
+
+export function getDefaultMessageTemplateId(catalog = {}) {
+  const templates = getMessageTemplates(catalog);
+  const defaultTemplate = catalog?.defaultTemplate;
+  if (defaultTemplate && templates.some((template) => template.id === defaultTemplate)) return defaultTemplate;
+  return templates[0]?.id || '';
+}
+
+export function getMessageTemplate(catalog = {}, templateKey = '') {
+  const templates = getMessageTemplates(catalog);
+  return templates.find((template) => template.id === templateKey) || templates.find((template) => template.id === getDefaultMessageTemplateId(catalog)) || templates[0] || null;
+}
+
+export function getMessageTemplateLabel(template = {}, language = 'pt') {
+  return template.label?.[language] || template.label?.pt || template.label?.en || template.id || '';
+}
+
+function getMessageSnippet(catalog = {}, key = '', language = 'pt', values = {}) {
+  const snippets = catalog?.snippets || {};
+  const template = snippets[key]?.[language] || snippets[key]?.pt || snippets[key]?.en || '';
+  return applyTemplateValues(template, values, { trim: false });
+}
+
+function getNestedMessageSnippet(catalog = {}, key = '', nestedKey = '', language = 'pt', values = {}) {
+  const snippets = catalog?.snippets || {};
+  const group = snippets[key] || {};
+  const template = group[nestedKey]?.[language] || group[nestedKey]?.pt || group[nestedKey]?.en || '';
+  return applyTemplateValues(template, values, { trim: false });
+}
+
+function formatMessageTime(value, fallback = '') {
+  const time = String(value || fallback || '').trim();
+  return time ? time.replace(':', 'h') : '';
+}
+
+function formatMessageDate(value, language = 'pt') {
+  if (!value) return '-';
+  const date = parseDateKey(value);
+  if (!date || Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(MESSAGE_LOCALES[language] || MESSAGE_LOCALES.pt, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).format(date);
+}
+
+function hasCustomStayTime(value, fallback) {
+  const time = String(value || '').trim();
+  return Boolean(time && time !== fallback);
+}
+
+function isTomorrow(dateKey) {
+  return dateKey === formatDateKey(addDays(new Date(), 1));
+}
+
+function hasSecurityDepositHandled(reservation) {
+  return Boolean(reservation.pricing?.depositIncluded) || reservation.paymentStatus === 'deposit_paid';
+}
+
+function getDepositSourceMention(reservation, language = 'pt', catalog = {}) {
+  const source = String(reservation?.source || '').trim();
+  if (!['website', 'booking', 'abritel'].includes(source)) return '';
+  return getNestedMessageSnippet(catalog, 'depositSourceMention', source, language);
+}
+
+function getDepositReminderLine(reservation, state, language = 'pt', catalog = {}) {
+  if (hasSecurityDepositHandled(reservation)) return '';
+  const amount = `${Number(state?.pricing?.securityDeposit || 200)}€`;
+  return getMessageSnippet(catalog, 'depositReminder', language, {
+    amount,
+    sourceDepositMention: getDepositSourceMention(reservation, language, catalog)
+  });
+}
+
+function getPaymentReceivedLine(reservation, language = 'pt', catalog = {}) {
+  const paymentStatus = String(reservation?.paymentStatus || '').trim();
+  if (!['paid', 'deposit_paid'].includes(paymentStatus)) return '';
+  return getNestedMessageSnippet(catalog, 'paymentReceivedLine', paymentStatus, language);
+}
+
+function getGoogleReviewUrl(state) {
+  return state?.property?.googleReviewUrl
+    || state?.property?.googleMapsUrl
+    || 'https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu';
+}
+
+function getCheckInTimeLine(reservation, state, language = 'pt', catalog = {}) {
+  const fallback = state?.property?.defaultCheckInTime || '15:00';
+  const time = reservation.stay?.checkInTime || '';
+
+  if (hasCustomStayTime(time, fallback)) {
+    return getMessageSnippet(catalog, 'checkInTimeKnown', language, { time: formatMessageTime(time) });
+  }
+
+  return getMessageSnippet(catalog, 'checkInTimeRequest', language);
+}
+
+function getLocalizedCheckoutDay(reservation, language = 'pt', catalog = {}) {
+  if (isTomorrow(reservation.stay?.checkOut)) {
+    return getMessageSnippet(catalog, 'checkoutWhenTomorrow', language);
+  }
+
+  const date = formatMessageDate(reservation.stay?.checkOut, language);
+  return getMessageSnippet(catalog, 'checkoutWhenDate', language, { date });
+}
+
+function getCheckOutTimeLine(reservation, state, language = 'pt', catalog = {}) {
+  const fallback = state?.property?.defaultCheckOutTime || '10:00';
+  const time = reservation.stay?.checkOutTime || '';
+
+  if (hasCustomStayTime(time, fallback)) {
+    return getMessageSnippet(catalog, 'checkOutTimeKnown', language, { time: formatMessageTime(time) });
+  }
+
+  const when = getLocalizedCheckoutDay(reservation, language, catalog);
+  const timeText = formatMessageTime(fallback);
+  return getMessageSnippet(catalog, 'checkOutTimeRequest', language, { when, time: timeText });
+}
+
+export function generateGuestMessage(reservation, state, templateKey = '', catalog = {}) {
   const totals = calculateReservationTotals(reservation, state);
   const language = reservation.preferredLanguage || 'pt';
-  const template = GUEST_MESSAGE_TEMPLATES[templateKey]?.[language] || GUEST_MESSAGE_TEMPLATES[templateKey]?.pt || GUEST_MESSAGE_TEMPLATES.paymentInstructions.pt;
+  const catalogTemplate = getMessageTemplate(catalog, templateKey);
+  const template = catalogTemplate?.body?.[language] || catalogTemplate?.body?.pt || catalogTemplate?.body?.en || '';
   const requestComment = reservation.source === 'website' ? String(reservation.notes?.owner || '').trim() : '';
   const commentLabels = REQUEST_COMMENT_LABELS[language] || REQUEST_COMMENT_LABELS.pt;
+
+  if (!template) return '';
+
   const values = {
-    guestName: reservation.contact?.name || 'Hóspede',
+    guestName: reservation.contact?.name || STANDALONE_PLACEHOLDERS[language]?.guestName || 'Hóspede',
     reservationId: reservation.id,
-    checkIn: formatDate(reservation.stay.checkIn),
-    checkOut: formatDate(reservation.stay.checkOut),
-    checkInTime: reservation.stay.checkInTime || state.property.defaultCheckInTime || '15:00',
-    checkOutTime: reservation.stay.checkOutTime || state.property.defaultCheckOutTime || '10:00',
+    checkIn: formatMessageDate(reservation.stay.checkIn, language),
+    checkOut: formatMessageDate(reservation.stay.checkOut, language),
+    checkInTime: formatMessageTime(reservation.stay.checkInTime || state.property.defaultCheckInTime || '15:00'),
+    checkOutTime: formatMessageTime(reservation.stay.checkOutTime || state.property.defaultCheckOutTime || '10:00'),
     nights: String(totals.nights),
     guestCount: String(getGuestCount(reservation)),
     propertyAddress: state.property.address || '',
-    total: formatCurrency(totals.total, state.pricing.currency)
+    total: formatCurrency(totals.total, state.pricing.currency),
+    depositReminder: getDepositReminderLine(reservation, state, language, catalog),
+    paymentReceivedLine: getPaymentReceivedLine(reservation, language, catalog),
+    checkInTimeLine: getCheckInTimeLine(reservation, state, language, catalog),
+    checkOutTimeLine: getCheckOutTimeLine(reservation, state, language, catalog),
+    googleReviewUrl: getGoogleReviewUrl(state)
   };
 
-  const message = Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, value), template);
+  const message = applyTemplateValues(template, values);
   if (!requestComment || templateKey !== 'paymentInstructions') return message;
 
   return `${message}\n\n${commentLabels.comment}\n${requestComment}\n\n${commentLabels.reply}\n[ ]`;
 }
 
-export function generateStandaloneMessage(state, language = 'pt', templateKey = 'usefulInfo') {
-  const template = GUEST_MESSAGE_TEMPLATES[templateKey]?.[language] || GUEST_MESSAGE_TEMPLATES[templateKey]?.pt || GUEST_MESSAGE_TEMPLATES.usefulInfo.pt;
+export function generateStandaloneMessage(state, language = 'pt', templateKey = '', catalog = {}) {
+  const catalogTemplate = getMessageTemplate(catalog, templateKey);
+  const template = catalogTemplate?.body?.[language] || catalogTemplate?.body?.pt || catalogTemplate?.body?.en || '';
+  const placeholders = STANDALONE_PLACEHOLDERS[language] || STANDALONE_PLACEHOLDERS.pt;
+
+  if (!template) return '';
+
   const values = {
-    guestName: '[nome do hóspede]',
-    reservationId: '[referência]',
-    checkIn: '[data de check-in]',
-    checkOut: '[data de check-out]',
-    checkInTime: state?.property?.defaultCheckInTime || '15:00',
-    checkOutTime: state?.property?.defaultCheckOutTime || '10:00',
-    nights: '[número]',
-    guestCount: '[número]',
+    guestName: placeholders.guestName,
+    reservationId: placeholders.reservationId,
+    checkIn: placeholders.checkIn,
+    checkOut: placeholders.checkOut,
+    checkInTime: formatMessageTime(state?.property?.defaultCheckInTime || '15:00'),
+    checkOutTime: formatMessageTime(state?.property?.defaultCheckOutTime || '10:00'),
+    nights: placeholders.nights,
+    guestCount: placeholders.guestCount,
     propertyAddress: state?.property?.address || 'Rua da Arejinha 627, 4550-518 Pedorido',
-    total: '[valor]'
+    total: placeholders.total,
+    depositReminder: getDepositReminderLine({ source: 'website', paymentStatus: 'awaiting_transfer', pricing: { depositIncluded: false } }, state, language, catalog),
+    paymentReceivedLine: '',
+    checkInTimeLine: getCheckInTimeLine({ stay: { checkInTime: '' } }, state, language, catalog),
+    checkOutTimeLine: getCheckOutTimeLine({ stay: { checkOut: '', checkOutTime: '' } }, state, language, catalog),
+    googleReviewUrl: getGoogleReviewUrl(state)
   };
 
-  return Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, value), template);
+  return applyTemplateValues(template, values);
 }
 
 export function getEmployeeForUser(state, user) {

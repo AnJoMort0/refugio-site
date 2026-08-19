@@ -179,6 +179,14 @@
   gap: 1rem;
 }
 
+.admin-topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 .admin-topbar h1 {
   font-size: clamp(2rem, 1.5rem + 1.2vw, 3rem);
 }
@@ -250,9 +258,22 @@
   padding: 1rem;
 }
 
-.admin-kpi > span {
+.admin-kpi-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.admin-kpi-header > span {
   color: rgba(43, 38, 34, 0.66);
   font-weight: 700;
+}
+
+.admin-kpi-action {
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
 }
 
 .admin-kpi strong {
@@ -348,6 +369,11 @@
 
 .admin-past-reservation-row .admin-record-main {
   align-items: center;
+}
+
+.admin-history-toggle .admin-icon {
+  width: 1.05rem;
+  height: 1.05rem;
 }
 
 .admin-record.is-pending {
@@ -601,6 +627,12 @@ form.is-dirty::before {
 
 .admin-active-work p {
   margin: 0;
+}
+
+.admin-work-manual-row {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 0.35rem;
 }
 
 .admin-button-row,
@@ -914,6 +946,10 @@ form.is-dirty::before {
   .admin-record-main {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .admin-topbar-actions {
+    justify-content: space-between;
   }
 
   .admin-record-badges {

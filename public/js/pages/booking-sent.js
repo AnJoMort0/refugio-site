@@ -1,8 +1,9 @@
 const DEFAULT_LANGUAGE = 'pt';
 const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
 const PRICE_CONFIG = {
-  adultPerNight: 48,
-  childPerNight: 28,
+  adultPerNight: 70,
+  minimumPaidAdults: 2,
+  childPerNight: 65,
   bikePerDay: 5,
   securityDeposit: 200
 };
@@ -56,7 +57,13 @@ async function loadLocale(language) {
 }
 
 function formatCurrency(value) {
-  return `${Math.round(value)}€`;
+  const amount = Math.round(Number(value || 0) * 100) / 100;
+  const hasCents = !Number.isInteger(amount);
+  const text = amount.toLocaleString('pt-PT', {
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: 2
+  });
+  return `${text}€`;
 }
 
 function formatDate(value) {
@@ -75,8 +82,12 @@ function textToBoolean(value) {
 }
 
 function buildReservationTotal({ nights, adults, children, includeDeposit, bikeDays = 0 }) {
-  const stayValue =
-    nights > 0 ? nights * (adults * PRICE_CONFIG.adultPerNight + children * PRICE_CONFIG.childPerNight) : 0;
+  const paidAdultCount = adults > 0
+    ? Math.max(adults, Number(PRICE_CONFIG.minimumPaidAdults || 2))
+    : 0;
+  const nightlyAccommodation =
+    (paidAdultCount * PRICE_CONFIG.adultPerNight) + (Math.max(0, children) * PRICE_CONFIG.childPerNight);
+  const stayValue = nights > 0 ? nights * nightlyAccommodation : 0;
   return stayValue + bikeDays * PRICE_CONFIG.bikePerDay + (includeDeposit ? PRICE_CONFIG.securityDeposit : 0);
 }
 

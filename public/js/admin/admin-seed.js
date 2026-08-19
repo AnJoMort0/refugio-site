@@ -1,4 +1,4 @@
-export const ADMIN_DATA_VERSION = 2;
+export const ADMIN_DATA_VERSION = 5;
 
 function parseDateKey(value) {
   const [year, month, day] = value.split('-').map(Number);
@@ -42,41 +42,90 @@ export function createInitialAdminState(now = new Date()) {
     property: {
       name: 'O Refúgio',
       address: 'Rua da Arejinha 627, 4550-518 Pedorido',
+      googleReviewUrl: 'https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu',
       defaultCheckInTime: '15:00',
       defaultCheckOutTime: '10:00',
       occupancyLimit: 6
     },
     pricing: {
       currency: 'EUR',
-      adultNight: 48,
-      childNight: 28,
+      adultNight: 70,
+      minimumPaidAdults: 2,
+      childNight: 65,
       bikeDay: 5,
       securityDeposit: 200,
-      seasons: [],
-      groupDiscounts: [
+      seasons: [
         {
-          id: 'GROUPDISC-4PLUS',
-          minGuests: 4,
-          amountPerNight: 5,
+          id: 'SEASON-2026-UNTIL-DEC-22',
+          kind: 'dated',
+          title: 'Preço atual até 22 dezembro 2026',
+          startDate: todayKey,
+          endDate: '2026-12-22',
+          adultNight: 62.5,
+          childNight: 65,
+          notes: 'Preço por adulto/noite; cobrança mínima de 2 adultos.',
+          active: true
+        },
+        {
+          id: 'SEASON-2026-DEC-24',
+          kind: 'dated',
+          title: 'Natal 24 dezembro',
+          startDate: '2026-12-24',
+          endDate: '2026-12-24',
+          adultNight: 85,
+          childNight: 65,
+          notes: 'Noite especial de dezembro.',
+          active: true
+        },
+        {
+          id: 'SEASON-2026-DEC-25',
+          kind: 'dated',
+          title: 'Natal 25 dezembro',
+          startDate: '2026-12-25',
+          endDate: '2026-12-25',
+          adultNight: 85,
+          childNight: 65,
+          notes: 'Noite especial de dezembro.',
+          active: true
+        },
+        {
+          id: 'SEASON-2026-DEC-30',
+          kind: 'dated',
+          title: 'Ano Novo 30 dezembro',
+          startDate: '2026-12-30',
+          endDate: '2026-12-30',
+          adultNight: 85,
+          childNight: 65,
+          notes: 'Noite especial de dezembro.',
+          active: true
+        },
+        {
+          id: 'SEASON-2026-DEC-31',
+          kind: 'dated',
+          title: 'Ano Novo 31 dezembro',
+          startDate: '2026-12-31',
+          endDate: '2026-12-31',
+          adultNight: 85,
+          childNight: 65,
+          notes: 'Noite especial de dezembro.',
+          active: true
+        },
+        {
+          id: 'SEASON-APR-SEP',
+          kind: 'recurring',
+          title: 'Primavera e verão',
+          startDate: '',
+          endDate: '',
+          startMonthDay: '04-01',
+          endMonthDay: '09-30',
+          adultNight: 75,
+          childNight: 65,
+          notes: 'De 1 de abril ao fim de setembro; fora desta época aplica-se a base de 70€ por adulto/noite, com mínimo de 2 adultos.',
           active: true
         }
       ],
-      discounts: [
-        {
-          id: 'DISC-SUMMER-2026',
-          title: 'Semana tranquila',
-          code: 'REFUGIO10',
-          type: 'percentage',
-          percentage: 10,
-          amount: 0,
-          maxUses: 0,
-          usedCount: 0,
-          startDate: tomorrowKey,
-          endDate: inEightDays,
-          appliesTo: 'accommodation',
-          active: true
-        }
-      ]
+      groupDiscounts: [],
+      discounts: []
     },
     guests: [
       {
@@ -133,8 +182,9 @@ export function createInitialAdminState(now = new Date()) {
           childAges: [7]
         },
         pricing: {
-          adultNight: 48,
-          childNight: 28,
+          adultNight: 62.5,
+          minimumPaidAdults: 2,
+          childNight: 65,
           bikeDay: 5,
           discountPercent: 0,
           depositIncluded: true
@@ -174,8 +224,9 @@ export function createInitialAdminState(now = new Date()) {
           childAges: []
         },
         pricing: {
-          adultNight: 52,
-          childNight: 28,
+          adultNight: 62.5,
+          minimumPaidAdults: 2,
+          childNight: 65,
           bikeDay: 5,
           discountPercent: 0,
           depositIncluded: false
@@ -215,8 +266,9 @@ export function createInitialAdminState(now = new Date()) {
           childAges: []
         },
         pricing: {
-          adultNight: 48,
-          childNight: 28,
+          adultNight: 62.5,
+          minimumPaidAdults: 2,
+          childNight: 65,
           bikeDay: 5,
           discountPercent: 10,
           depositIncluded: false
@@ -259,7 +311,7 @@ export function createInitialAdminState(now = new Date()) {
         },
         marketingOptIn: true,
         comments: 'Gostaria de saber se há berço disponível.',
-        estimatedTotal: 304
+        estimatedTotal: 510
       },
       {
         id: 'REQ-2026-0005',
@@ -287,7 +339,7 @@ export function createInitialAdminState(now = new Date()) {
         },
         marketingOptIn: false,
         comments: 'Chegada provável ao fim da tarde.',
-        estimatedTotal: 298
+        estimatedTotal: 385
       }
     ],
     employees: [

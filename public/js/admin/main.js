@@ -5,7 +5,6 @@ import {
   COMPENSATION_LABELS,
   EXPENSE_LABELS,
   LANGUAGE_LABELS,
-  MESSAGE_TEMPLATE_LABELS,
   PAYMENT_LABELS,
   SOURCE_LABELS,
   STATUS_LABELS,
@@ -24,9 +23,12 @@ import {
   formatDateTime,
   generateGuestMessage,
   generateStandaloneMessage,
+  getDefaultMessageTemplateId,
   getEmployeeForUser,
   getGuestCount,
   getHourlyRate,
+  getMessageTemplateLabel,
+  getMessageTemplates,
   getWorkSessionCost,
   getOrCreateGuest,
   getWorkDurationHours,
@@ -39,7 +41,14 @@ import {
 const app = document.querySelector('#admin-app');
 const repository = createAdminRepository();
 const LAST_LOGIN_USERNAME_KEY = 'refugio-admin-last-username-v1';
+const MESSAGE_CATALOG_URL = new URL('../../locales/messages.json', import.meta.url);
 const ACTIVE_RESERVATION_FILTER_STATUSES = ['awaiting_payment', 'confirmed', 'checked_in'];
+const MESSAGE_TEMPLATE_ALIASES = {
+  checkinInfo: 'preArrivalInfo',
+  arrivalReminder: 'preArrivalInfo',
+  usefulInfo: 'preArrivalInfo',
+  paymentReceived: 'bookingConfirmation'
+};
 const UNSAVED_FORM_TYPES = new Set([
   'create-reservation',
   'pricing',
@@ -90,6 +99,8 @@ const ICONS = {
   calendarDays: '<path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path><path d="M8 18h.01"></path><path d="M12 18h.01"></path><path d="M16 18h.01"></path>',
   chartColumn: '<path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path>',
   check: '<path d="M20 6 9 17l-5-5"></path>',
+  chevronDown: '<path d="m6 9 6 6 6-6"></path>',
+  chevronUp: '<path d="m18 15-6-6-6 6"></path>',
   copy: '<rect width="14" height="14" x="8" y="8" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>',
   dice: '<rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M8 8h.01"></path><path d="M16 8h.01"></path><path d="M8 16h.01"></path><path d="M16 16h.01"></path><path d="M12 12h.01"></path>',
   download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5 5 5-5"></path><path d="M12 15V3"></path>',
@@ -140,6 +151,7 @@ const ui = {
     startDate: '',
     endDate: ''
   },
+  showManualWorkForm: false,
   showPastReservations: false,
   hasUnsavedChanges: false,
   notice: '',
@@ -148,6 +160,7 @@ const ui = {
 
 let currentUser = null;
 let state = null;
+let messageCatalog = { templates: [], requestReplies: [] };
 
 function icon(name) {
   return `<svg class="admin-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
@@ -163,6 +176,59 @@ function renderStatusBadge(status) {
 
 function renderSourceBadge(source) {
   return `<span class="admin-source">${escapeHtml(SOURCE_LABELS[source] || source)}</span>`;
+}
+
+function renderLanguageBadge(language) {
+  return `<span class="admin-source">${escapeHtml(LANGUAGE_LABELS[language] || language || '-')}</span>`;
+}
+
+function getAvailableMessageTemplates() {
+  return getMessageTemplates(messageCatalog);
+}
+
+function hasMessageTemplate(templateId) {
+  return getAvailableMessageTemplates().some((template) => template.id === templateId);
+}
+
+function resolveMessageTemplateId(...templateIds) {
+  for (const templateId of templateIds) {
+    const resolvedTemplateId = MESSAGE_TEMPLATE_ALIASES[templateId] || templateId;
+    if (resolvedTemplateId && hasMessageTemplate(resolvedTemplateId)) return resolvedTemplateId;
+  }
+
+  return getDefaultMessageTemplateId(messageCatalog);
+}
+
+function getSelectedMessageTemplateId() {
+  return resolveMessageTemplateId(ui.selectedMessageTemplate);
+}
+
+function getDashboardMessageTemplate(reservation, context) {
+  if (!reservation) return resolveMessageTemplateId('preArrivalInfo');
+
+  if (context === 'arrival') {
+    return resolveMessageTemplateId('preArrivalInfo');
+  }
+
+  if (context === 'current') {
+    return resolveMessageTemplateId('checkoutInstructions');
+  }
+
+  if (context === 'departure') return resolveMessageTemplateId('checkoutInstructions');
+  return resolveMessageTemplateId('preArrivalInfo');
+}
+
+function renderDashboardMessageButton(reservation, context) {
+  if (!reservation || !can(currentUser, 'messages:generate')) return '';
+  const template = getDashboardMessageTemplate(reservation, context);
+  if (!template) return '';
+  const name = reservation.contact?.name || reservation.id;
+
+  return `
+    <button class="admin-icon-button admin-kpi-action" type="button" data-action="message-for-reservation" data-reservation-id="${escapeHtml(reservation.id)}" data-template="${escapeHtml(template)}" title="Gerar mensagem para ${escapeHtml(name)}" aria-label="Gerar mensagem para ${escapeHtml(name)}">
+      ${icon('mail')}
+    </button>
+  `;
 }
 
 function renderMoney(value) {
@@ -308,6 +374,44 @@ function normalizePhoneForHref(phone) {
   return digits ? `+${digits}` : '';
 }
 
+function getMessageActionSubject(reservation, templateId, fallbackTitle = 'Mensagem') {
+  const template = getAvailableMessageTemplates().find((candidate) => candidate.id === templateId);
+  const language = reservation?.preferredLanguage || ui.selectedMessageLanguage || 'pt';
+  const label = template ? getMessageTemplateLabel(template, language) : fallbackTitle;
+  const reservationLabel = reservation?.id ? ` - ${reservation.id}` : '';
+  return `O Refúgio - ${label}${reservationLabel}`;
+}
+
+function renderMessageQuickActions(options = {}) {
+  const {
+    copyAction = 'copy-message',
+    copyLabel = 'Copiar',
+    email = '',
+    phone = '',
+    subject = 'O Refúgio',
+    message = ''
+  } = options;
+  const cleanEmail = String(email || '').trim();
+  const cleanPhone = String(phone || '').trim();
+  const normalizedPhone = normalizePhoneForHref(cleanPhone);
+  const buttons = [
+    `<button class="button button-primary admin-small-button" type="button" data-action="${escapeHtml(copyAction)}">${icon('copy')} ${escapeHtml(copyLabel)}</button>`
+  ];
+
+  if (cleanEmail) {
+    const mailtoHref = `mailto:${encodeURIComponent(cleanEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+    buttons.push(`<button class="button admin-secondary-button admin-small-button" type="button" data-action="copy-text" data-copy-text="${escapeHtml(cleanEmail)}">${icon('copy')} Copiar email</button>`);
+    buttons.push(`<a class="button admin-secondary-button admin-small-button" href="${escapeHtml(mailtoHref)}">${icon('mail')} Abrir email</a>`);
+  }
+
+  if (normalizedPhone) {
+    const whatsappHref = `https://wa.me/${normalizedPhone.replace('+', '')}?text=${encodeURIComponent(message)}`;
+    buttons.push(`<a class="button admin-secondary-button admin-small-button" href="${escapeHtml(whatsappHref)}" target="_blank" rel="noreferrer">${icon('messageCircle')} WhatsApp</a>`);
+  }
+
+  return `<div class="admin-button-row admin-message-actions">${buttons.join('')}</div>`;
+}
+
 function renderContactActions(contact = {}) {
   const email = String(contact.email || '').trim();
   const phone = String(contact.phone || '').trim();
@@ -385,12 +489,20 @@ function renderContactDetailRows(contact = {}) {
   `;
 }
 
+function getReservationGuest(reservation) {
+  return state.guests.find((guest) => guest.id === reservation.guestId)
+    || state.guests.find((guest) => reservation.contact?.email && guest.email?.toLowerCase() === reservation.contact.email.toLowerCase())
+    || null;
+}
+
 function renderReservationExpandedDetails(reservation, totals) {
+  const guest = getReservationGuest(reservation);
   const sourceReference = reservation.sourceReference || '-';
   const ownerNotes = reservation.notes?.owner || '-';
   const operationalNotes = reservation.notes?.operational || '-';
 
   return `
+    <div><dt>Nacionalidade</dt><dd>${escapeHtml(guest?.nationality || '-')}</dd></div>
     <div><dt>Idades das crianças</dt><dd>${escapeHtml(getChildAgeText(reservation.guests))}</dd></div>
     <div><dt>Preferência de camas</dt><dd>${escapeHtml(getBedPreferenceText(reservation))}</dd></div>
     <div><dt>Bicicletas</dt><dd>${escapeHtml(getBikeText(reservation))}</dd></div>
@@ -416,51 +528,35 @@ function getDraftRequest() {
   return state.websiteRequests.find((request) => request.id === ui.requestDraftId) || null;
 }
 
+function renderCatalogText(template = '', values = {}) {
+  return Object.entries(values)
+    .reduce((text, [key, value]) => text.replaceAll(`{${key}}`, value), String(template || ''))
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 function createRequestMessageDraft(request, templateKey = 'requestResponse') {
-  const isRejection = templateKey === 'requestRejected';
   const language = request.preferredLanguage || 'pt';
+  const replyTemplates = Array.isArray(messageCatalog?.requestReplies) ? messageCatalog.requestReplies : [];
+  const replyTemplate = replyTemplates.find((template) => template.id === templateKey) || replyTemplates[0];
   const quote = request.comments
     ? `\n\n> ${request.comments.replace(/\n/g, '\n> ')}`
     : '';
-  const templates = {
-    pt: {
-      subject: isRejection ? `Resposta ao pedido ${request.id}` : `Resposta à sua mensagem`,
-      body: isRejection
-        ? `Olá ${request.contact.name},\n\nObrigado pelo seu pedido para O Refúgio (${formatStayRange(request.stay)}). Infelizmente, neste momento não conseguimos aceitar este pedido.${quote}\n\nSe quiser, responda a esta mensagem e podemos tentar encontrar outra data.\n\nCom os melhores cumprimentos,\nO Refúgio`
-        : `Olá ${request.contact.name},\n\nObrigado pela sua mensagem sobre O Refúgio (${formatStayRange(request.stay)}).${quote}\n\nResposta:\n[Escrever resposta aqui]\n\nCom os melhores cumprimentos,\nO Refúgio`
-    },
-    fr: {
-      subject: isRejection ? `Réponse à la demande ${request.id}` : `Réponse à votre message`,
-      body: isRejection
-        ? `Bonjour ${request.contact.name},\n\nMerci pour votre demande pour O Refúgio (${formatStayRange(request.stay)}). Malheureusement, nous ne pouvons pas accepter cette demande pour le moment.${quote}\n\nSi vous le souhaitez, répondez à ce message et nous pouvons essayer de trouver une autre date.\n\nCordialement,\nO Refúgio`
-        : `Bonjour ${request.contact.name},\n\nMerci pour votre message concernant O Refúgio (${formatStayRange(request.stay)}).${quote}\n\nRéponse :\n[Écrire la réponse ici]\n\nCordialement,\nO Refúgio`
-    },
-    en: {
-      subject: isRejection ? `Reply to request ${request.id}` : `Reply to your message`,
-      body: isRejection
-        ? `Hello ${request.contact.name},\n\nThank you for your request for O Refúgio (${formatStayRange(request.stay)}). Unfortunately, we cannot accept this request at the moment.${quote}\n\nIf you wish, reply to this message and we can try to find another date.\n\nBest regards,\nO Refúgio`
-        : `Hello ${request.contact.name},\n\nThank you for your message about O Refúgio (${formatStayRange(request.stay)}).${quote}\n\nReply:\n[Write the reply here]\n\nBest regards,\nO Refúgio`
-    },
-    es: {
-      subject: isRejection ? `Respuesta al pedido ${request.id}` : `Respuesta a su mensaje`,
-      body: isRejection
-        ? `Hola ${request.contact.name},\n\nGracias por su solicitud para O Refúgio (${formatStayRange(request.stay)}). Lamentablemente, no podemos aceptar este pedido en este momento.${quote}\n\nSi lo desea, responda a este mensaje e intentaremos encontrar otra fecha.\n\nSaludos cordiales,\nO Refúgio`
-        : `Hola ${request.contact.name},\n\nGracias por su mensaje sobre O Refúgio (${formatStayRange(request.stay)}).${quote}\n\nRespuesta:\n[Escribir la respuesta aquí]\n\nSaludos cordiales,\nO Refúgio`
-    },
-    de: {
-      subject: isRejection ? `Antwort auf Anfrage ${request.id}` : `Antwort auf Ihre Nachricht`,
-      body: isRejection
-        ? `Hallo ${request.contact.name},\n\nvielen Dank für Ihre Anfrage für O Refúgio (${formatStayRange(request.stay)}). Leider können wir diese Anfrage im Moment nicht annehmen.${quote}\n\nWenn Sie möchten, antworten Sie auf diese Nachricht und wir können versuchen, ein anderes Datum zu finden.\n\nMit freundlichen Grüßen,\nO Refúgio`
-        : `Hallo ${request.contact.name},\n\nvielen Dank für Ihre Nachricht zu O Refúgio (${formatStayRange(request.stay)}).${quote}\n\nAntwort:\n[Antwort hier schreiben]\n\nMit freundlichen Grüßen,\nO Refúgio`
-    }
+  const values = {
+    guestName: request.contact.name,
+    requestId: request.id,
+    stayRange: formatStayRange(request.stay),
+    quote
   };
-  const draft = templates[language] || templates.pt;
+  const subjectTemplate = replyTemplate?.subject?.[language] || replyTemplate?.subject?.pt || replyTemplate?.subject?.en || 'Mensagem';
+  const bodyTemplate = replyTemplate?.body?.[language] || replyTemplate?.body?.pt || replyTemplate?.body?.en || '';
 
   return {
-    title: draft.subject,
+    title: renderCatalogText(subjectTemplate, values),
     email: request.contact.email || '',
+    phone: request.contact.phone || '',
     language: LANGUAGE_LABELS[language] || language || 'Português',
-    text: draft.body
+    text: renderCatalogText(bodyTemplate, values)
   };
 }
 
@@ -524,6 +620,20 @@ function updateTypedDiscountField(form) {
   }
 }
 
+async function loadMessageCatalog() {
+  try {
+    const response = await fetch(MESSAGE_CATALOG_URL);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const catalog = await response.json();
+    if (!Array.isArray(catalog?.templates)) throw new Error('Catálogo de mensagens inválido.');
+    messageCatalog = catalog;
+    ui.selectedMessageTemplate = resolveMessageTemplateId(ui.selectedMessageTemplate);
+  } catch (error) {
+    messageCatalog = { templates: [], requestReplies: [] };
+    setNotice('Não foi possível carregar o catálogo de mensagens.', 'danger');
+  }
+}
+
 async function persist(message) {
   clearUnsavedChanges();
   state = await repository.save(state);
@@ -577,11 +687,15 @@ async function loadSessionAndState() {
 
   currentUser = session.user;
   state = await repository.load();
+  await loadMessageCatalog();
   renderApp();
 }
 
 function renderApp() {
   ensureAccessibleView();
+  const dashboardCreateReservationButton = ui.activeView === 'dashboard' && can(currentUser, 'reservations:write')
+    ? `<button class="button button-primary admin-small-button" type="button" data-action="open-create-reservation">${icon('plus')} Criar reserva</button>`
+    : '';
   const navItems = getAccessibleNavItems()
     .map((item) => `
       <button class="admin-nav-item${ui.activeView === item.id ? ' is-active' : ''}" type="button" data-action="set-view" data-view="${item.id}">
@@ -613,12 +727,15 @@ function renderApp() {
             <p class="admin-eyebrow">Área de gestão</p>
             <h1>${escapeHtml(NAV_ITEMS.find((item) => item.id === ui.activeView)?.label || 'Painel')}</h1>
           </div>
-          <div class="admin-user-box">
-            <div>
-              <strong>${escapeHtml(currentUser.displayName)}</strong>
-              <span>${escapeHtml(currentUser.roleLabel)}</span>
+          <div class="admin-topbar-actions">
+            ${dashboardCreateReservationButton}
+            <div class="admin-user-box">
+              <div>
+                <strong>${escapeHtml(currentUser.displayName)}</strong>
+                <span>${escapeHtml(currentUser.roleLabel)}</span>
+              </div>
+              <button class="admin-icon-button" type="button" data-action="logout" aria-label="Sair">${icon('logOut')}</button>
             </div>
-            <button class="admin-icon-button" type="button" data-action="logout" aria-label="Sair">${icon('logOut')}</button>
           </div>
         </header>
         ${ui.notice ? `<p class="admin-alert admin-alert-${escapeHtml(ui.noticeType)}">${escapeHtml(ui.notice)}</p>` : ''}
@@ -658,10 +775,13 @@ function renderActiveView() {
   }
 }
 
-function renderMetric(title, value, detail, tone = '') {
+function renderMetric(title, value, detail, tone = '', actionHtml = '') {
   return `
     <article class="admin-kpi ${tone}">
-      <span>${escapeHtml(title)}</span>
+      <div class="admin-kpi-header">
+        <span>${escapeHtml(title)}</span>
+        ${actionHtml}
+      </div>
       <strong>${escapeHtml(value)}</strong>
       <small>${escapeHtml(detail)}</small>
     </article>
@@ -677,9 +797,27 @@ function renderDashboardView() {
     : 'Sem hóspedes atuais';
   const activeWork = state.workSessions.find((session) => !session.end);
   const workerName = state.employees.find((employee) => employee.id === activeWork?.employeeId)?.name || 'Ninguém';
-  const currentGuestsMetric = renderMetric('Hóspedes atuais', String(summary.activeReservations.length), activeGuestText, 'tone-green');
-  const nextArrivalMetric = renderMetric('Próxima chegada', summary.nextArrival ? summary.nextArrival.contact.name : '-', summary.nextArrival ? formatDate(summary.nextArrival.stay.checkIn) : 'Sem chegadas futuras');
-  const nextDepartureMetric = renderMetric('Próxima saída', summary.nextDeparture ? summary.nextDeparture.contact.name : '-', summary.nextDeparture ? formatDate(summary.nextDeparture.stay.checkOut) : 'Sem saídas futuras');
+  const currentGuestsMetric = renderMetric(
+    'Hóspedes atuais',
+    String(summary.activeReservations.length),
+    activeGuestText,
+    'tone-green',
+    renderDashboardMessageButton(summary.activeReservations[0], 'current')
+  );
+  const nextArrivalMetric = renderMetric(
+    'Próxima chegada',
+    summary.nextArrival ? summary.nextArrival.contact.name : '-',
+    summary.nextArrival ? formatDate(summary.nextArrival.stay.checkIn) : 'Sem chegadas futuras',
+    '',
+    renderDashboardMessageButton(summary.nextArrival, 'arrival')
+  );
+  const nextDepartureMetric = renderMetric(
+    'Próxima saída',
+    summary.nextDeparture ? summary.nextDeparture.contact.name : '-',
+    summary.nextDeparture ? formatDate(summary.nextDeparture.stay.checkOut) : 'Sem saídas futuras',
+    '',
+    renderDashboardMessageButton(summary.nextDeparture, 'departure')
+  );
   const timelineMetrics = summary.activeReservations.length
     ? `${nextDepartureMetric}${nextArrivalMetric}`
     : `${nextArrivalMetric}${nextDepartureMetric}`;
@@ -918,12 +1056,12 @@ function renderReservationSummary(reservation, options = {}) {
         <div class="admin-record-badges">
           ${renderStatusBadge(reservation.status)}
           ${renderSourceBadge(reservation.source)}
+          ${renderLanguageBadge(reservation.preferredLanguage)}
         </div>
       </div>
       <dl class="admin-record-details">
         <div><dt>Hóspedes</dt><dd>${escapeHtml(formatGuestSummary(reservation.guests))}</dd></div>
         ${renderContactDetailRows(reservation.contact)}
-        <div><dt>Idioma</dt><dd>${escapeHtml(LANGUAGE_LABELS[reservation.preferredLanguage] || reservation.preferredLanguage || '-')}</dd></div>
         <div><dt>Total</dt><dd>${renderMoney(totals.total)}</dd></div>
         <div><dt>Pagamento</dt><dd>${escapeHtml(PAYMENT_LABELS[reservation.paymentStatus] || reservation.paymentStatus)}</dd></div>
         ${isExpanded ? renderReservationExpandedDetails(reservation, totals) : ''}
@@ -1098,6 +1236,9 @@ function getPastReservations() {
 
 function renderPastReservationsSection() {
   const pastReservations = getPastReservations();
+  const toggleLabel = ui.showPastReservations
+    ? 'Fechar reservas passadas'
+    : `Abrir ${pastReservations.length} reserva(s) passada(s)`;
 
   return `
     <section class="admin-panel admin-past-reservations">
@@ -1106,15 +1247,15 @@ function renderPastReservationsSection() {
           <p class="admin-eyebrow">Histórico</p>
           <h2>Reservas passadas</h2>
         </div>
-        <button class="button admin-secondary-button admin-small-button" type="button" data-action="toggle-past-reservations">
-          ${ui.showPastReservations ? 'Fechar' : 'Abrir'} histórico · ${pastReservations.length}
+        <button class="admin-icon-button admin-history-toggle" type="button" data-action="toggle-past-reservations" title="${escapeHtml(toggleLabel)}" aria-label="${escapeHtml(toggleLabel)}">
+          ${icon(ui.showPastReservations ? 'chevronUp' : 'chevronDown')}
         </button>
       </div>
       ${ui.showPastReservations ? `
         <div class="admin-record-list">
           ${pastReservations.length ? pastReservations.map(renderPastReservationSummary).join('') : '<p class="admin-empty">Ainda não há reservas passadas, canceladas ou no-show.</p>'}
         </div>
-      ` : '<p class="admin-empty">Fechado por defeito para manter a lista de reservas do dia-a-dia mais limpa.</p>'}
+      ` : ''}
     </section>
   `;
 }
@@ -1140,6 +1281,7 @@ function renderPastReservationSummary(reservation) {
         <div class="admin-record-badges">
           ${renderStatusBadge(reservation.status)}
           ${renderSourceBadge(reservation.source)}
+          ${renderLanguageBadge(reservation.preferredLanguage)}
           <span class="admin-source">${renderMoney(totals.total)}</span>
           <button class="button admin-secondary-button admin-small-button" type="button" data-action="toggle-reservation-details" data-reservation-id="${reservation.id}">
             ${isExpanded ? 'Fechar detalhes' : 'Ver detalhes'}
@@ -1150,7 +1292,6 @@ function renderPastReservationSummary(reservation) {
         <dl class="admin-record-details">
           <div><dt>Hóspedes</dt><dd>${escapeHtml(formatGuestSummary(reservation.guests))}</dd></div>
           ${renderContactDetailRows(reservation.contact)}
-          <div><dt>Idioma</dt><dd>${escapeHtml(LANGUAGE_LABELS[reservation.preferredLanguage] || reservation.preferredLanguage || '-')}</dd></div>
           <div><dt>Pagamento</dt><dd>${escapeHtml(PAYMENT_LABELS[reservation.paymentStatus] || reservation.paymentStatus)}</dd></div>
           <div><dt>Total</dt><dd>${renderMoney(totals.total)}</dd></div>
           ${renderReservationExpandedDetails(reservation, totals)}
@@ -1248,6 +1389,7 @@ function getFilteredReservations() {
 
 function renderCreateReservationForm() {
   const editingReservation = state.reservations.find((reservation) => reservation.id === ui.editingReservationId);
+  const editingGuest = editingReservation ? getReservationGuest(editingReservation) : null;
   const draftRequest = editingReservation ? null : getDraftRequest();
   const today = formatDateKey(new Date());
   const tomorrow = formatDateKey(new Date(Date.now() + 86400000));
@@ -1257,6 +1399,7 @@ function renderCreateReservationForm() {
     guestName: editingReservation?.contact?.name || draftRequest?.contact?.name || '',
     email: editingReservation?.contact?.email || draftRequest?.contact?.email || '',
     phone: editingReservation?.contact?.phone || draftRequest?.contact?.phone || '',
+    nationality: editingGuest?.nationality || draftRequest?.contact?.nationality || draftRequest?.nationality || '',
     checkIn: editingReservation?.stay?.checkIn || draftRequest?.stay?.checkIn || today,
     checkOut: editingReservation?.stay?.checkOut || draftRequest?.stay?.checkOut || tomorrow,
     checkInTime: editingReservation?.stay?.checkInTime || draftRequest?.stay?.checkInTime || state.property.defaultCheckInTime,
@@ -1316,6 +1459,10 @@ function renderCreateReservationForm() {
         <label class="admin-field">
           <span>Telefone</span>
           <input name="phone" type="tel" value="${escapeHtml(defaults.phone)}" />
+        </label>
+        <label class="admin-field">
+          <span>Nacionalidade</span>
+          <input name="nationality" type="text" value="${escapeHtml(defaults.nationality)}" placeholder="Ex.: Portugal, França, Alemanha" />
         </label>
         <label class="admin-field">
           <span>Check-in *</span>
@@ -1469,18 +1616,22 @@ function renderPricingView() {
       </div>
       <p class="admin-alert ${activeRule ? 'admin-alert-success' : 'admin-alert-warning'}">
         ${activeRule
-          ? `Ativo hoje: ${escapeHtml(activeRule.title)} (${renderMoney(activeRule.adultNight)}/adulto/noite, ${renderMoney(activeRule.childNight)}/criança/noite).`
-          : `Ativo hoje: preço base (${renderMoney(state.pricing.adultNight)}/adulto/noite, ${renderMoney(state.pricing.childNight)}/criança/noite).`}
+          ? `Ativo hoje: ${escapeHtml(activeRule.title)} (${renderMoney(activeRule.adultNight)}/adulto/noite, mínimo cobrado ${state.pricing.minimumPaidAdults || 2} adultos; ${renderMoney(activeRule.childNight)}/criança/noite).`
+          : `Ativo hoje: preço base (${renderMoney(state.pricing.adultNight)}/adulto/noite, mínimo cobrado ${state.pricing.minimumPaidAdults || 2} adultos; ${renderMoney(state.pricing.childNight)}/criança/noite).`}
         ${hasFullRecurringCoverage ? 'As épocas anuais cobrem o ano inteiro; o preço base fica apenas como segurança.' : 'O preço base é obrigatório porque as épocas anuais não cobrem o ano inteiro.'}
       </p>
       <form class="admin-form-grid" data-form="pricing">
         <label class="admin-field">
           <span>Preço base adulto/noite</span>
-          <input name="adultNight" type="number" min="0" step="1" value="${state.pricing.adultNight}" ${can(currentUser, 'pricing:write') ? '' : 'disabled'} />
+          <input name="adultNight" type="number" min="0" step="0.01" value="${state.pricing.adultNight}" ${can(currentUser, 'pricing:write') ? '' : 'disabled'} />
+        </label>
+        <label class="admin-field">
+          <span>Mínimo cobrado de adultos</span>
+          <input name="minimumPaidAdults" type="number" min="1" step="1" value="${state.pricing.minimumPaidAdults || 2}" ${can(currentUser, 'pricing:write') ? '' : 'disabled'} />
         </label>
         <label class="admin-field">
           <span>Preço base criança/noite</span>
-          <input name="childNight" type="number" min="0" step="1" value="${state.pricing.childNight}" ${can(currentUser, 'pricing:write') ? '' : 'disabled'} />
+          <input name="childNight" type="number" min="0" step="0.01" value="${state.pricing.childNight}" ${can(currentUser, 'pricing:write') ? '' : 'disabled'} />
         </label>
         ${can(currentUser, 'pricing:write') ? `
           <div class="admin-form-actions">
@@ -1593,12 +1744,13 @@ function renderSeasonForm() {
         <input name="endDate" type="text" inputmode="numeric" value="30/09" placeholder="dd/mm ou dd/mm/aaaa" required />
       </label>
       <label class="admin-field">
-        <span>Adulto/noite</span>
-        <input name="adultNight" type="number" min="0" step="1" value="${state.pricing.adultNight}" required />
+        <span>Preço adulto/noite</span>
+        <input name="adultNight" type="number" min="0" step="0.01" value="${state.pricing.adultNight}" required />
       </label>
+      <p class="admin-form-note">A cobrança mínima de adultos vem do preço base: ${state.pricing.minimumPaidAdults || 2} adulto(s).</p>
       <label class="admin-field">
         <span>Criança/noite</span>
-        <input name="childNight" type="number" min="0" step="1" value="${state.pricing.childNight}" required />
+        <input name="childNight" type="number" min="0" step="0.01" value="${state.pricing.childNight}" required />
       </label>
       <label class="admin-field">
         <span>Notas</span>
@@ -1709,6 +1861,8 @@ function formatSeasonPeriod(season) {
 }
 
 function isSeasonActiveToday(season, todayKey = formatDateKey(new Date())) {
+  if (season.active === false) return false;
+
   if ((season.kind || 'dated') === 'recurring') {
     const today = parseDateKey(todayKey);
     const todayOrdinal = monthDayOrdinal(`${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`);
@@ -2132,6 +2286,12 @@ function renderWorkView() {
     .filter((session) => session.employeeId === employee.id && session.date.startsWith(formatDateKey(new Date()).slice(0, 7)))
     .sort((a, b) => b.date.localeCompare(a.date));
   const monthHours = monthSessions.reduce((total, session) => total + getWorkDurationHours(session), 0);
+  const manualToggleLabel = ui.showManualWorkForm
+    ? (activeSession ? 'Fechar horas manuais' : 'Usar relógio de trabalho')
+    : 'Adicionar horas manualmente';
+  const manualToggleIcon = ui.showManualWorkForm
+    ? (activeSession ? 'chevronUp' : 'timer')
+    : 'plus';
 
   return `
     <div class="admin-kpi-grid">
@@ -2152,7 +2312,7 @@ function renderWorkView() {
           <p><strong>Tarefas:</strong> ${escapeHtml(renderSessionTasks(activeSession))}</p>
           <button class="button button-primary" type="button" data-action="stop-work">${icon('timer')} Terminar trabalho</button>
         </div>
-      ` : `
+      ` : ui.showManualWorkForm ? '' : `
         <form class="admin-form-grid" data-form="work-start">
           ${renderWorkTaskFields(employee)}
           <div class="admin-form-actions">
@@ -2160,28 +2320,35 @@ function renderWorkView() {
           </div>
         </form>
       `}
-      <form class="admin-form-grid admin-subform" data-form="work-manual">
-        <label class="admin-field">
-          <span>Data</span>
-          <input name="date" type="date" value="${formatDateKey(new Date())}" required />
-        </label>
-        <label class="admin-field">
-          <span>Início</span>
-          <input name="start" type="time" required />
-        </label>
-        <label class="admin-field">
-          <span>Fim</span>
-          <input name="end" type="time" required />
-        </label>
-        ${renderWorkTaskFields(employee)}
-        <label class="admin-field admin-field-full">
-          <span>Notas</span>
-          <input name="notes" type="text" />
-        </label>
-        <div class="admin-form-actions">
-          <button class="button admin-secondary-button" type="submit">Adicionar horas manualmente</button>
-        </div>
-      </form>
+      <div class="admin-work-manual-row">
+        <button class="button admin-secondary-button admin-small-button" type="button" data-action="toggle-manual-work-form">
+          ${icon(manualToggleIcon)} ${manualToggleLabel}
+        </button>
+      </div>
+      ${ui.showManualWorkForm ? `
+        <form class="admin-form-grid admin-subform" data-form="work-manual">
+          <label class="admin-field">
+            <span>Data</span>
+            <input name="date" type="date" value="${formatDateKey(new Date())}" required />
+          </label>
+          <label class="admin-field">
+            <span>Início</span>
+            <input name="start" type="time" required />
+          </label>
+          <label class="admin-field">
+            <span>Fim</span>
+            <input name="end" type="time" required />
+          </label>
+          ${renderWorkTaskFields(employee)}
+          <label class="admin-field admin-field-full">
+            <span>Notas</span>
+            <input name="notes" type="text" />
+          </label>
+          <div class="admin-form-actions">
+            <button class="button admin-secondary-button" type="submit">Guardar horas</button>
+          </div>
+        </form>
+      ` : ''}
     </section>
     <section class="admin-panel">
       <div class="admin-panel-heading">
@@ -2227,6 +2394,12 @@ function renderWorkTable(sessions, options = {}) {
 }
 
 function renderMessagesView() {
+  const templates = getAvailableMessageTemplates();
+  const selectedTemplateId = getSelectedMessageTemplateId();
+  if (selectedTemplateId && ui.selectedMessageTemplate !== selectedTemplateId) {
+    ui.selectedMessageTemplate = selectedTemplateId;
+  }
+
   const reservations = state.reservations
     .filter((reservation) => reservation.status !== 'cancelled')
     .sort((a, b) => a.stay.checkIn.localeCompare(b.stay.checkIn));
@@ -2237,9 +2410,11 @@ function renderMessagesView() {
   const selectedReservation = isStandaloneMessage
     ? null
     : state.reservations.find((reservation) => reservation.id === selectedReservationId);
-  const message = selectedReservation
-    ? generateGuestMessage(selectedReservation, state, ui.selectedMessageTemplate)
-    : generateStandaloneMessage(state, ui.selectedMessageLanguage, ui.selectedMessageTemplate);
+  const message = selectedTemplateId
+    ? selectedReservation
+      ? generateGuestMessage(selectedReservation, state, selectedTemplateId, messageCatalog)
+      : generateStandaloneMessage(state, ui.selectedMessageLanguage, selectedTemplateId, messageCatalog)
+    : '';
   const draft = ui.messageDraft;
 
   return `
@@ -2256,9 +2431,14 @@ function renderMessagesView() {
           <span>${escapeHtml(draft.email || 'Sem email')}</span>
         </div>
         <textarea class="admin-message-output" readonly>${escapeHtml(draft.text)}</textarea>
-        <div class="admin-button-row">
-          <button class="button button-primary" type="button" data-action="copy-draft-message">${icon('copy')} Copiar rascunho</button>
-        </div>
+        ${renderMessageQuickActions({
+          copyAction: 'copy-draft-message',
+          copyLabel: 'Copiar rascunho',
+          email: draft.email,
+          phone: draft.phone,
+          subject: `O Refúgio - ${draft.title}`,
+          message: draft.text
+        })}
       </section>
     ` : ''}
     <section class="admin-panel">
@@ -2278,8 +2458,8 @@ function renderMessagesView() {
         </label>
         <label class="admin-field">
           <span>Modelo</span>
-          <select name="template">
-            ${Object.entries(MESSAGE_TEMPLATE_LABELS).map(([value, label]) => renderOption(value, label, ui.selectedMessageTemplate)).join('')}
+          <select name="template" ${templates.length ? '' : 'disabled'}>
+            ${templates.map((template) => renderOption(template.id, getMessageTemplateLabel(template, 'pt'), selectedTemplateId)).join('')}
           </select>
         </label>
         <label class="admin-field">
@@ -2292,15 +2472,18 @@ function renderMessagesView() {
           <button class="button admin-secondary-button" type="submit">Atualizar mensagem</button>
         </div>
       </form>
-      ${selectedReservation || isStandaloneMessage ? `
+      ${!templates.length ? '<p class="admin-empty">Não há modelos configurados em locales/messages.json.</p>' : selectedReservation || isStandaloneMessage ? `
         <div class="admin-message-meta">
           <span>${escapeHtml(selectedReservation ? LANGUAGE_LABELS[selectedReservation.preferredLanguage] || selectedReservation.preferredLanguage : LANGUAGE_LABELS[ui.selectedMessageLanguage])}</span>
           <span>${escapeHtml(selectedReservation ? selectedReservation.contact.email || 'Sem email' : 'Sem reserva específica')}</span>
         </div>
         <textarea class="admin-message-output" readonly>${escapeHtml(message)}</textarea>
-        <div class="admin-button-row">
-          <button class="button button-primary" type="button" data-action="copy-message">${icon('copy')} Copiar</button>
-        </div>
+        ${renderMessageQuickActions({
+          email: selectedReservation?.contact?.email || '',
+          phone: selectedReservation?.contact?.phone || '',
+          subject: getMessageActionSubject(selectedReservation, selectedTemplateId),
+          message
+        })}
       ` : draft ? '' : '<p class="admin-empty">Ainda não há reservas para gerar mensagens.</p>'}
     </section>
   `;
@@ -2726,6 +2909,7 @@ function buildReservationFromForm(form) {
     email: String(data.get('email') || '').trim(),
     phone: String(data.get('phone') || '').trim()
   };
+  const guestNationality = String(data.get('nationality') || '').trim();
   const websiteRequestId = String(data.get('websiteRequestId') || '').trim();
   const preferredLanguage = String(data.get('preferredLanguage') || 'pt');
   const status = String(data.get('status') || 'awaiting_payment');
@@ -2762,6 +2946,7 @@ function buildReservationFromForm(form) {
     },
     pricing: {
       adultNight: state.pricing.adultNight,
+      minimumPaidAdults: state.pricing.minimumPaidAdults || 2,
       childNight: state.pricing.childNight,
       bikeDay: state.pricing.bikeDay,
       discountType,
@@ -2777,6 +2962,7 @@ function buildReservationFromForm(form) {
       }
     },
     marketingOptIn: data.get('marketingOptIn') === 'on',
+    guestNationality,
     websiteRequestId,
     notes: {
       owner: String(data.get('ownerNotes') || '').trim(),
@@ -2811,8 +2997,9 @@ async function handleCreateReservation(form) {
     if (!confirmed) return;
   }
 
-  const guest = getOrCreateGuest(state, reservation.contact, reservation.preferredLanguage);
+  const guest = getOrCreateGuest(state, reservation.contact, reservation.preferredLanguage, reservation.guestNationality);
   reservation.guestId = guest.id;
+  delete reservation.guestNationality;
   if (isEditing) {
     state.reservations[existingIndex] = reservation;
     addAudit(state, currentUser, 'Reserva editada', 'reservation', reservation.id);
@@ -2833,6 +3020,7 @@ async function handleCreateReservation(form) {
   }
 
   ui.selectedMessageReservationId = reservation.id;
+  ui.selectedMessageTemplate = resolveMessageTemplateId('paymentInstructions');
   ui.messageDraft = null;
   ui.requestDraftId = '';
   ui.editingReservationId = '';
@@ -2941,6 +3129,7 @@ async function handlePricingSubmit(form) {
   requirePermission(currentUser, 'pricing:write');
   const data = new FormData(form);
   state.pricing.adultNight = Math.max(0, Number(data.get('adultNight') || 0));
+  state.pricing.minimumPaidAdults = Math.max(1, Number(data.get('minimumPaidAdults') || 2));
   state.pricing.childNight = Math.max(0, Number(data.get('childNight') || 0));
   addAudit(state, currentUser, 'Preços de alojamento atualizados', 'pricing', 'base');
   await persist('Preços de alojamento guardados.');
@@ -3188,6 +3377,7 @@ async function handleManualWorkSubmit(form) {
     otherDetails: workDetails.otherDetails,
     notes: String(data.get('notes') || '').trim()
   });
+  ui.showManualWorkForm = false;
   addAudit(state, currentUser, 'Horas adicionadas manualmente', 'workSession', state.workSessions[0].id);
   await persist('Horas adicionadas.');
 }
@@ -3216,6 +3406,7 @@ async function handleStartWork(form) {
     otherDetails: workDetails.otherDetails,
     notes: ''
   });
+  ui.showManualWorkForm = false;
   addAudit(state, currentUser, 'Horário iniciado', 'workSession', state.workSessions[0].id);
   await persist('Horário iniciado.');
 }
@@ -3366,6 +3557,12 @@ function togglePastReservations() {
   renderApp();
 }
 
+function toggleManualWorkForm() {
+  if (ui.showManualWorkForm && !confirmDiscardUnsavedChanges()) return;
+  ui.showManualWorkForm = !ui.showManualWorkForm;
+  renderApp();
+}
+
 async function handleRestoreRequest(requestId) {
   requirePermission(currentUser, 'requests:manage');
   const request = state.websiteRequests.find((candidate) => candidate.id === requestId);
@@ -3445,7 +3642,7 @@ function fillDiscountCode() {
 function handleMessageSubmit(form) {
   const data = new FormData(form);
   ui.selectedMessageReservationId = String(data.get('reservationId') || '');
-  ui.selectedMessageTemplate = String(data.get('template') || 'paymentInstructions');
+  ui.selectedMessageTemplate = resolveMessageTemplateId(String(data.get('template') || ''));
   ui.selectedMessageLanguage = String(data.get('language') || ui.selectedMessageLanguage || 'pt');
   ui.messageDraft = null;
   renderApp();
@@ -3477,10 +3674,10 @@ async function copyMessage() {
 
   const reservation = state.reservations.find((candidate) => candidate.id === (ui.selectedMessageReservationId || state.reservations[0]?.id));
   if (!reservation || ui.selectedMessageReservationId === 'standalone') {
-    await copyText(generateStandaloneMessage(state, ui.selectedMessageLanguage, ui.selectedMessageTemplate));
+    await copyText(generateStandaloneMessage(state, ui.selectedMessageLanguage, getSelectedMessageTemplateId(), messageCatalog));
     return;
   }
-  const message = generateGuestMessage(reservation, state, ui.selectedMessageTemplate);
+  const message = generateGuestMessage(reservation, state, getSelectedMessageTemplateId(), messageCatalog);
   await copyText(message);
 }
 
@@ -3645,6 +3842,11 @@ async function handleClick(event) {
       return;
     }
 
+    if (action === 'toggle-manual-work-form') {
+      toggleManualWorkForm();
+      return;
+    }
+
     if (action === 'manage-reservation') {
       if (!confirmDiscardUnsavedChanges()) return;
       manageReservation(target.dataset.reservationId || '');
@@ -3721,6 +3923,7 @@ async function handleClick(event) {
     if (action === 'restore-reservation') await handleRestoreReservation(target.dataset.reservationId);
     if (action === 'message-for-reservation') {
       ui.selectedMessageReservationId = target.dataset.reservationId || '';
+      ui.selectedMessageTemplate = resolveMessageTemplateId(target.dataset.template || ui.selectedMessageTemplate);
       ui.messageDraft = null;
       ui.activeView = 'messages';
       renderApp();

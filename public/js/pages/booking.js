@@ -1,12 +1,15 @@
 const DEFAULT_LANGUAGE = 'pt';
 const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
 const PRICE_CONFIG = {
-  adultPerNight: 48,
-  childPerNight: 28,
+  adultPerNight: 70,
+  minimumPaidAdults: 2,
+  childPerNight: 65,
   bikePerDay: 5,
-  securityDeposit: 200
+  securityDeposit: 200,
+  seasons: []
 };
 const ADMIN_STORAGE_KEY = 'refugio-admin-prototype-state-v1';
+const ADMIN_DATA_VERSION = 5;
 const ADMIN_BLOCKING_STATUSES = new Set(['awaiting_payment', 'confirmed', 'checked_in']);
 let adminPrototypeStateSnapshot = null;
 
@@ -56,6 +59,95 @@ function eachDate(start, endExclusive) {
   return dates;
 }
 
+function monthDayOrdinal(monthDay) {
+  const [month, day] = String(monthDay || '').split('-').map(Number);
+  const date = new Date(2028, month - 1, day);
+  const start = new Date(2028, 0, 1);
+  if (Number.isNaN(date.getTime())) return 0;
+  return Math.round((date - start) / 86400000) + 1;
+}
+
+function seasonTouchesDate(season, dateKey) {
+  if (season?.active === false) return false;
+
+  if ((season?.kind || 'dated') === 'recurring') {
+    const date = parseDateKey(dateKey);
+    if (!date || Number.isNaN(date.getTime())) return false;
+    const dateOrdinal = monthDayOrdinal(`${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
+    const start = monthDayOrdinal(season.startMonthDay);
+    const end = monthDayOrdinal(season.endMonthDay);
+    if (!start || !end) return false;
+    return start <= end
+      ? dateOrdinal >= start && dateOrdinal <= end
+      : dateOrdinal >= start || dateOrdinal <= end;
+  }
+
+  return Boolean(season?.startDate && season?.endDate && season.startDate <= dateKey && season.endDate >= dateKey);
+}
+
+function getPricingRuleForDate(dateKey) {
+  const seasons = PRICE_CONFIG.seasons || [];
+  const datedOverride = seasons.find((season) => (season.kind || 'dated') === 'dated' && seasonTouchesDate(season, dateKey));
+  const recurringSeason = seasons.find((season) => season.kind === 'recurring' && seasonTouchesDate(season, dateKey));
+  return datedOverride || recurringSeason || null;
+}
+
+function getNightlyPrices(dateKey = '') {
+  const rule = dateKey ? getPricingRuleForDate(dateKey) : null;
+  return {
+    adultPerNight: Number(rule?.adultNight ?? PRICE_CONFIG.adultPerNight),
+    childPerNight: Number(rule?.childNight ?? PRICE_CONFIG.childPerNight)
+  };
+}
+
+function getPaidAdultCount(adults) {
+  const adultCount = Math.max(0, adults);
+  if (adultCount === 0) return 0;
+  return Math.max(adultCount, Number(PRICE_CONFIG.minimumPaidAdults || 2));
+}
+
+function getNightlyAdultValue(dateKey, adults) {
+  const prices = getNightlyPrices(dateKey);
+  return getPaidAdultCount(adults) * prices.adultPerNight;
+}
+
+function getNightlyChildValue(dateKey, children) {
+  const prices = getNightlyPrices(dateKey);
+  return Math.max(0, children) * prices.childPerNight;
+}
+
+function getNightlyAccommodationValue(dateKey, adults, children) {
+  return getNightlyAdultValue(dateKey, adults) + getNightlyChildValue(dateKey, children);
+}
+
+function getStayDateKeys(checkIn, checkOut) {
+  if (!checkIn || !checkOut) return [];
+  const start = parseDateKey(checkIn);
+  const end = parseDateKey(checkOut);
+  if (!start || !end || Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) return [];
+  return eachDate(start, end).map(formatDateKey);
+}
+
+function buildStayValue({ nights, adults, children, checkIn = '', checkOut = '' }) {
+  const dateKeys = getStayDateKeys(checkIn, checkOut);
+  if (dateKeys.length) {
+    return dateKeys.reduce((total, dateKey) => total + getNightlyAccommodationValue(dateKey, adults, children), 0);
+  }
+  return nights > 0 ? nights * getNightlyAccommodationValue(checkIn, adults, children) : 0;
+}
+
+function formatRateRange(values) {
+  const rates = [...new Set(values.filter((value) => Number.isFinite(value)).map((value) => Math.round(value * 100) / 100))];
+  if (!rates.length) return formatCurrency(0);
+  if (rates.length === 1) return formatCurrency(rates[0]);
+  return `${formatCurrency(Math.min(...rates))} - ${formatCurrency(Math.max(...rates))}`;
+}
+
+function formatGuestRateLabel({ amountText, count, singularLabel, pluralLabel }) {
+  const label = count === 1 ? singularLabel : pluralLabel;
+  return `${amountText} (${count} ${label})`;
+}
+
 function getNestedValue(object, path) {
   return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
 }
@@ -94,7 +186,13 @@ async function loadLocale(language) {
 }
 
 function formatCurrency(value) {
-  return `${Math.round(value)}€`;
+  const amount = Math.round(Number(value || 0) * 100) / 100;
+  const hasCents = !Number.isInteger(amount);
+  const text = amount.toLocaleString('pt-PT', {
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: 2
+  });
+  return `${text}€`;
 }
 
 function normalizeDiscountCode(value) {
@@ -159,9 +257,8 @@ function getDiscountCodeResult(code, { checkIn, stayValue, bikeValue }) {
   };
 }
 
-function buildReservationBreakdown({ nights, adults, children, includeDeposit, bikeDays = 0, checkIn = '', discountCode = '' }) {
-  const stayValue =
-    nights > 0 ? nights * (adults * PRICE_CONFIG.adultPerNight + children * PRICE_CONFIG.childPerNight) : 0;
+function buildReservationBreakdown({ nights, adults, children, includeDeposit, bikeDays = 0, checkIn = '', checkOut = '', discountCode = '' }) {
+  const stayValue = buildStayValue({ nights, adults, children, checkIn, checkOut });
   const bikeValue = bikeDays * PRICE_CONFIG.bikePerDay;
   const depositValue = includeDeposit ? PRICE_CONFIG.securityDeposit : 0;
   const discount = getDiscountCodeResult(discountCode, { checkIn, stayValue, bikeValue });
@@ -183,7 +280,7 @@ function buildReservationTotal(options) {
 function getAdminPrototypeState() {
   try {
     const state = JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY) || 'null');
-    return state && Array.isArray(state.reservations) ? state : null;
+    return state && state.version === ADMIN_DATA_VERSION && Array.isArray(state.reservations) ? state : null;
   } catch (error) {
     return null;
   }
@@ -249,9 +346,11 @@ function syncPriceConfigFromAdminState(state) {
   if (!state?.pricing) return;
 
   PRICE_CONFIG.adultPerNight = Number(state.pricing.adultNight || PRICE_CONFIG.adultPerNight);
+  PRICE_CONFIG.minimumPaidAdults = Number(state.pricing.minimumPaidAdults || PRICE_CONFIG.minimumPaidAdults || 2);
   PRICE_CONFIG.childPerNight = Number(state.pricing.childNight || PRICE_CONFIG.childPerNight);
   PRICE_CONFIG.bikePerDay = Number(state.pricing.bikeDay || PRICE_CONFIG.bikePerDay);
   PRICE_CONFIG.securityDeposit = Number(state.pricing.securityDeposit || PRICE_CONFIG.securityDeposit);
+  PRICE_CONFIG.seasons = Array.isArray(state.pricing.seasons) ? state.pricing.seasons : [];
 }
 
 function buildOccupiedRanges(adminState) {
@@ -320,6 +419,7 @@ export async function initBookingPage() {
   const contactNameInput = document.querySelector('#contact-name');
   const contactEmailInput = document.querySelector('#contact-email');
   const contactPhoneInput = document.querySelector('#contact-phone');
+  const contactNationalityInput = document.querySelector('#contact-nationality');
   const checkinTimeInput = document.querySelector('#checkin-time');
   const checkoutTimeInput = document.querySelector('#checkout-time');
   const depositPrepayInput = document.querySelector('#deposit-prepay');
@@ -347,6 +447,7 @@ export async function initBookingPage() {
   const summaryBikes = document.querySelector('#summary-bikes');
   const summaryDiscountRow = document.querySelector('#summary-discount-row');
   const summaryDiscount = document.querySelector('#summary-discount');
+  const summaryChildRate = document.querySelector('#summary-child-rate');
   const summaryBikeRate = document.querySelector('#summary-bike-rate');
   const summaryBedPreferenceRow = document.querySelector('#summary-bed-preference-row');
   const summaryBedPreference = document.querySelector('#summary-bed-preference');
@@ -592,11 +693,32 @@ export async function initBookingPage() {
       includeDeposit,
       bikeDays,
       checkIn: checkinInput.value,
+      checkOut: checkoutInput.value,
       discountCode: discountCodeInput?.value || ''
     });
 
-    priceAdult.textContent = formatCurrency(PRICE_CONFIG.adultPerNight);
-    priceChild.textContent = formatCurrency(PRICE_CONFIG.childPerNight);
+    const summaryDateKeys = getStayDateKeys(checkinInput.value, checkoutInput.value);
+    const rateDateKeys = summaryDateKeys.length ? summaryDateKeys : [checkinInput.value];
+    const adultNightlyTotals = rateDateKeys.map((dateKey) => getNightlyAdultValue(dateKey, adults));
+    const childNightlyTotals = rateDateKeys.map((dateKey) => getNightlyChildValue(dateKey, children));
+
+    priceAdult.textContent = formatGuestRateLabel({
+      amountText: formatRateRange(adultNightlyTotals),
+      count: adults,
+      singularLabel: getText('bookingPage.summary.adultSingular', 'adulto'),
+      pluralLabel: getText('bookingPage.summary.adultPlural', 'adultos')
+    });
+    if (summaryChildRate) {
+      summaryChildRate.hidden = children === 0;
+    }
+    if (priceChild) {
+      priceChild.textContent = formatGuestRateLabel({
+        amountText: formatRateRange(childNightlyTotals),
+        count: children,
+        singularLabel: getText('bookingPage.summary.childSingular', 'criança'),
+        pluralLabel: getText('bookingPage.summary.childPlural', 'crianças')
+      });
+    }
     if (priceBike) {
       priceBike.textContent = formatCurrency(PRICE_CONFIG.bikePerDay);
     }
@@ -952,6 +1074,7 @@ export async function initBookingPage() {
       includeDeposit: Boolean(depositPrepayInput?.checked),
       bikeDays: getBikeSelection().units,
       checkIn: checkinInput.value,
+      checkOut: checkoutInput.value,
       discountCode: discountCodeInput?.value || ''
     });
 
@@ -1111,7 +1234,7 @@ export async function initBookingPage() {
     })
   );
 
-  [contactNameInput, contactEmailInput, contactPhoneInput].forEach((input) =>
+  [contactNameInput, contactEmailInput, contactPhoneInput, contactNationalityInput].forEach((input) =>
     input?.addEventListener('input', () => {
       clearFieldValidity(input);
       setStatus('');
@@ -1220,6 +1343,7 @@ export async function initBookingPage() {
       includeDeposit,
       bikeDays,
       checkIn: checkinInput.value,
+      checkOut: checkoutInput.value,
       discountCode: discountCodeInput?.value || ''
     });
     const totalEstimate = totalBreakdown.total;
@@ -1245,6 +1369,9 @@ export async function initBookingPage() {
     params.set('preferred_language', preferredLanguage);
     params.set('contact_name', contactNameInput?.value.trim() || '');
     params.set('contact_email', contactEmailInput?.value.trim() || '');
+    if (contactNationalityInput?.value.trim()) {
+      params.set('contact_nationality', contactNationalityInput.value.trim());
+    }
 
     if (contactPhoneInput?.value.trim()) {
       params.set('contact_phone', contactPhoneInput.value.trim());
@@ -1298,7 +1425,8 @@ export async function initBookingPage() {
       contact: {
         name: contactNameInput?.value.trim() || '',
         email: contactEmailInput?.value.trim() || '',
-        phone: contactPhoneInput?.value.trim() || ''
+        phone: contactPhoneInput?.value.trim() || '',
+        nationality: contactNationalityInput?.value.trim() || ''
       },
       stay: {
         checkIn: checkinInput.value,
