@@ -11,6 +11,7 @@ import {
   WORK_TASK_LABELS,
   addAudit,
   addDays,
+  calculateExtraGuestAdjustmentTotals,
   calculateEmployeeEarnings,
   calculateReservationTotals,
   dateRangeOverlaps,
@@ -43,6 +44,7 @@ const repository = createAdminRepository();
 const LAST_LOGIN_USERNAME_KEY = 'refugio-admin-last-username-v1';
 const MESSAGE_CATALOG_URL = new URL('../../locales/messages.json', import.meta.url);
 const ACTIVE_RESERVATION_FILTER_STATUSES = ['awaiting_payment', 'confirmed', 'checked_in'];
+const EXTRA_GUEST_PAYMENT_STATUSES = ['awaiting_transfer', 'paid'];
 const MESSAGE_TEMPLATE_ALIASES = {
   checkinInfo: 'preArrivalInfo',
   arrivalReminder: 'preArrivalInfo',
@@ -61,6 +63,7 @@ const UNSAVED_FORM_TYPES = new Set([
   'employee-rate',
   'employee-work',
   'reservation-operations',
+  'work-active-details',
   'work-start',
   'work-manual'
 ]);
@@ -139,7 +142,9 @@ const ui = {
   selectedMessageReservationId: '',
   selectedMessageTemplate: 'paymentInstructions',
   selectedMessageLanguage: 'pt',
+  editingSeasonId: '',
   editingDiscountId: '',
+  editingExpenseId: '',
   expandedAuditIds: new Set(),
   auditFilters: {
     search: '',
@@ -151,6 +156,7 @@ const ui = {
     startDate: '',
     endDate: ''
   },
+  showExtraGuestForm: false,
   showManualWorkForm: false,
   showPastReservations: false,
   hasUnsavedChanges: false,
@@ -229,6 +235,19 @@ function renderDashboardMessageButton(reservation, context) {
       ${icon('mail')}
     </button>
   `;
+}
+
+function renderDashboardWorkButton() {
+  if (!can(currentUser, 'work:own')) return '';
+  const employee = getEmployeeForUser(state, currentUser);
+  if (!employee) return '';
+  const activeSession = state.workSessions.find((session) => session.employeeId === employee.id && !session.end);
+
+  if (activeSession) {
+    return `<button class="button button-primary admin-small-button" type="button" data-action="stop-work">${icon('timer')} Terminar trabalho</button>`;
+  }
+
+  return `<button class="button admin-secondary-button admin-small-button" type="button" data-action="quick-start-work">${icon('timer')} Iniciar trabalho</button>`;
 }
 
 function renderMoney(value) {
@@ -396,6 +415,143 @@ function getBikeText(reservation) {
   return `${count} bicicleta(s) · ${days} dia(s) · ${count * days} bicicleta-dia(s)`;
 }
 
+function getDepositRequestText(request) {
+  if (request.depositPrepay === true || request.pricing?.depositIncluded === true) {
+    return 'Pagar antecipadamente';
+  }
+
+  if (request.depositPrepay === false) {
+    return 'Pagar na chegada';
+  }
+
+  return 'Pagar na chegada';
+}
+
+function getGuestAdjustments(reservation) {
+  return Array.isArray(reservation?.guestAdjustments) ? reservation.guestAdjustments : [];
+}
+
+function getExtraGuestNumberText(adjustment) {
+  const adults = Number(adjustment.adults || 0);
+  const children = Number(adjustment.children || 0);
+  const parts = [];
+  if (adults) parts.push(`${adults} adulto${adults === 1 ? '' : 's'}`);
+  if (children) parts.push(`${children} criança${children === 1 ? '' : 's'}`);
+  return parts.join(' + ') || 'Sem hóspedes';
+}
+
+function getExtraGuestAgeText(adjustment) {
+  return Array.isArray(adjustment.childAges) && adjustment.childAges.length
+    ? adjustment.childAges.map((age) => `${age} ano(s)`).join(', ')
+    : '-';
+}
+
+function getExtraGuestDateText(reservation, adjustment) {
+  return `${formatCompactDate(adjustment.fromDate || adjustment.from)} a ${formatCompactDate(reservation.stay?.checkOut)}`;
+}
+
+function getExtraGuestDiscountType(adjustment) {
+  return adjustment.discountType || (Number(adjustment.discountPercent || 0) > 0 ? 'percentage' : 'amount');
+}
+
+function getExtraGuestPaymentFieldName(adjustment) {
+  return `guestAdjustmentPaymentStatus:${adjustment?.id || ''}`;
+}
+
+function normalizeExtraGuestPaymentStatus(value) {
+  return EXTRA_GUEST_PAYMENT_STATUSES.includes(value) ? value : 'awaiting_transfer';
+}
+
+function formatExtraGuestDiscount(adjustment, total) {
+  if (!total.discount) return '-';
+  if (getExtraGuestDiscountType(adjustment) === 'percentage') {
+    return `${Number(adjustment.discountPercent || 0)}% (${renderMoney(total.discount)})`;
+  }
+
+  return renderMoney(total.discount);
+}
+
+function getExtraGuestPaymentStatusChanges(previousReservation, reservation) {
+  const previousById = new Map(getGuestAdjustments(previousReservation).map((adjustment) => [adjustment.id, adjustment]));
+
+  return getGuestAdjustments(reservation).flatMap((adjustment) => {
+    const previous = previousById.get(adjustment.id);
+    if (!previous) return [];
+
+    const before = normalizeExtraGuestPaymentStatus(previous.paymentStatus);
+    const after = normalizeExtraGuestPaymentStatus(adjustment.paymentStatus);
+    if (before === after) return [];
+
+    const label = `${getExtraGuestDateText(reservation, adjustment)} - ${getExtraGuestNumberText(adjustment)}`;
+    return [`${label}: ${PAYMENT_LABELS[before] || before} -> ${PAYMENT_LABELS[after] || after}`];
+  });
+}
+
+function renderGuestAdjustmentsSummary(reservation) {
+  const totals = calculateExtraGuestAdjustmentTotals(reservation, state);
+  if (!totals.length) return '-';
+  return totals
+    .map(({ adjustment, total }) => `${getExtraGuestDateText(reservation, adjustment)} · ${getExtraGuestNumberText(adjustment)} · ${renderMoney(total)}`)
+    .join('; ');
+}
+
+function renderGuestAdjustmentsList(reservation) {
+  const totals = calculateExtraGuestAdjustmentTotals(reservation, state);
+  if (!totals.length) return '<p class="admin-empty">Ainda não há hóspedes extra registados para parte da estadia.</p>';
+
+  return `
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>Datas</th><th>Número</th><th>Idades</th><th>Desconto</th><th>Valor a pagar</th><th>Pagamento</th><th></th></tr></thead>
+        <tbody>
+          ${totals.map(({ adjustment, total, discount }) => `
+            <tr>
+              <td>${escapeHtml(getExtraGuestDateText(reservation, adjustment))}</td>
+              <td>${escapeHtml(getExtraGuestNumberText(adjustment))}</td>
+              <td>${escapeHtml(getExtraGuestAgeText(adjustment))}</td>
+              <td>${escapeHtml(formatExtraGuestDiscount(adjustment, { discount }))}</td>
+              <td>${renderMoney(total)}</td>
+              <td>
+                <select class="admin-table-select" name="${escapeHtml(getExtraGuestPaymentFieldName(adjustment))}" aria-label="Estado do pagamento dos hóspedes extra">
+                  ${EXTRA_GUEST_PAYMENT_STATUSES.map((value) => renderOption(value, PAYMENT_LABELS[value], normalizeExtraGuestPaymentStatus(adjustment.paymentStatus))).join('')}
+                </select>
+              </td>
+              <td>
+                <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-guest-adjustment" data-reservation-id="${escapeHtml(reservation.id)}" data-adjustment-id="${escapeHtml(adjustment.id || '')}">${icon('trash')} Remover</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderGuestAdjustmentsDetails(reservation) {
+  const totals = calculateExtraGuestAdjustmentTotals(reservation, state);
+  if (!totals.length) return '';
+
+  return `
+    <div class="admin-record-detail-section">
+      <dt>Hóspedes extra</dt>
+      <dd>
+        <div class="admin-extra-guest-lines">
+          ${totals.map(({ adjustment, total, discount }) => `
+            <p>
+              <strong>${escapeHtml(getExtraGuestNumberText(adjustment))}</strong>
+              <span>Idades: ${escapeHtml(getExtraGuestAgeText(adjustment))}</span>
+              <span>Datas: ${escapeHtml(getExtraGuestDateText(reservation, adjustment))}</span>
+              <span>Desconto: ${escapeHtml(formatExtraGuestDiscount(adjustment, { discount }))}</span>
+              <span>Valor a pagar: ${renderMoney(total)}</span>
+              <span>Pagamento: ${escapeHtml(PAYMENT_LABELS[adjustment.paymentStatus] || adjustment.paymentStatus || PAYMENT_LABELS.awaiting_transfer)}</span>
+            </p>
+          `).join('')}
+        </div>
+      </dd>
+    </div>
+  `;
+}
+
 function getRequestDiscountText(request) {
   const code = request.pricing?.discountCode || '';
   const amount = Number(request.pricing?.discountAmount || 0);
@@ -435,8 +591,7 @@ function renderMessageQuickActions(options = {}) {
     copyLabel = 'Copiar',
     email = '',
     phone = '',
-    subject = 'O Refúgio',
-    message = ''
+    subject = 'O Refúgio'
   } = options;
   const cleanEmail = String(email || '').trim();
   const cleanPhone = String(phone || '').trim();
@@ -446,14 +601,12 @@ function renderMessageQuickActions(options = {}) {
   ];
 
   if (cleanEmail) {
-    const mailtoHref = `mailto:${encodeURIComponent(cleanEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
     buttons.push(`<button class="button admin-secondary-button admin-small-button" type="button" data-action="copy-text" data-copy-text="${escapeHtml(cleanEmail)}">${icon('copy')} Copiar email</button>`);
-    buttons.push(`<a class="button admin-secondary-button admin-small-button" href="${escapeHtml(mailtoHref)}">${icon('mail')} Abrir email</a>`);
+    buttons.push(`<button class="button admin-secondary-button admin-small-button" type="button" data-action="send-message-email" data-email="${escapeHtml(cleanEmail)}" data-subject="${escapeHtml(subject)}">${icon('mail')} Abrir email</button>`);
   }
 
   if (normalizedPhone) {
-    const whatsappHref = `https://wa.me/${normalizedPhone.replace('+', '')}?text=${encodeURIComponent(message)}`;
-    buttons.push(`<a class="button admin-secondary-button admin-small-button" href="${escapeHtml(whatsappHref)}" target="_blank" rel="noreferrer">${icon('messageCircle')} WhatsApp</a>`);
+    buttons.push(`<button class="button admin-secondary-button admin-small-button" type="button" data-action="send-message-whatsapp" data-phone="${escapeHtml(normalizedPhone)}">${icon('messageCircle')} WhatsApp</button>`);
   }
 
   return `<div class="admin-button-row admin-message-actions">${buttons.join('')}</div>`;
@@ -558,6 +711,7 @@ function renderReservationExpandedDetails(reservation, totals) {
     <div><dt>Serviços</dt><dd>${renderMoney(totals.services)}</dd></div>
     <div><dt>Depósito</dt><dd>${renderMoney(totals.deposit)}</dd></div>
     <div><dt>Desconto</dt><dd>${renderMoney(totals.discount)}</dd></div>
+    ${renderGuestAdjustmentsDetails(reservation)}
     <div><dt>Notas internas</dt><dd>${escapeHtml(ownerNotes)}</dd></div>
     <div><dt>Notas operacionais</dt><dd>${escapeHtml(operationalNotes)}</dd></div>
   `;
@@ -743,6 +897,7 @@ function renderApp() {
   const dashboardCreateReservationButton = ui.activeView === 'dashboard' && can(currentUser, 'reservations:write')
     ? `<button class="button button-primary admin-small-button" type="button" data-action="open-create-reservation">${icon('plus')} Criar reserva</button>`
     : '';
+  const dashboardWorkButton = ui.activeView === 'dashboard' ? renderDashboardWorkButton() : '';
   const navItems = getAccessibleNavItems()
     .map((item) => `
       <button class="admin-nav-item${ui.activeView === item.id ? ' is-active' : ''}" type="button" data-action="set-view" data-view="${item.id}">
@@ -776,6 +931,7 @@ function renderApp() {
           </div>
           <div class="admin-topbar-actions">
             ${dashboardCreateReservationButton}
+            ${dashboardWorkButton}
             <div class="admin-user-box">
               <div>
                 <strong>${escapeHtml(currentUser.displayName)}</strong>
@@ -965,12 +1121,7 @@ function renderEmployeeDashboardView() {
           </div>
         </div>
         ${activeSession ? `
-          <div class="admin-active-work">
-            <p><strong>Desde:</strong> ${escapeHtml(formatDateTime(activeSession.start))}</p>
-            <p><strong>Tipo:</strong> ${escapeHtml(COMPENSATION_LABELS[activeSession.compensationType || 'paid'] || activeSession.compensationType)}</p>
-            <p><strong>Tarefas:</strong> ${escapeHtml(renderSessionTasks(activeSession))}</p>
-            <button class="button button-primary" type="button" data-action="stop-work">${icon('timer')} Terminar trabalho</button>
-          </div>
+          ${renderActiveWorkDetailsForm(employee, activeSession)}
         ` : `
           <form class="admin-form-grid" data-form="work-start">
             ${renderWorkTaskFields(employee)}
@@ -1138,6 +1289,7 @@ function renderRequestSummary(request) {
         <div><dt>Hóspedes</dt><dd>${escapeHtml(formatGuestSummary(request.guests))}</dd></div>
         <div><dt>Idades das crianças</dt><dd>${escapeHtml(getChildAgeText(request.guests))}</dd></div>
         <div><dt>Bicicletas</dt><dd>${escapeHtml(getBikeText(request))}</dd></div>
+        <div><dt>Depósito</dt><dd>${escapeHtml(getDepositRequestText(request))}</dd></div>
         ${getRequestDiscountText(request) ? `<div><dt>Desconto</dt><dd>${escapeHtml(getRequestDiscountText(request))}</dd></div>` : ''}
         ${renderContactDetailRows(request.contact)}
         <div><dt>Total estimado</dt><dd>${renderMoney(request.estimatedTotal || 0)}</dd></div>
@@ -1197,17 +1349,19 @@ function renderReservationActions(reservation, options = {}) {
   const isCalendar = options.context === 'calendar';
   const isExpanded = ui.expandedReservationIds.has(reservation.id);
   const editLabel = canWriteReservations ? 'Editar' : 'Operação';
+  const manageButton = `<button class="button admin-secondary-button admin-small-button" type="button" data-action="manage-reservation" data-reservation-id="${reservation.id}">${icon('edit')} ${isCalendar ? 'Gerir reserva' : editLabel}</button>`;
 
   return `
     <div class="admin-button-row">
       <button class="button admin-secondary-button admin-small-button" type="button" data-action="toggle-reservation-details" data-reservation-id="${reservation.id}">
         ${isExpanded ? 'Ver menos' : 'Ver mais'}
       </button>
-      ${!isCalendar ? `<button class="button admin-secondary-button admin-small-button" type="button" data-action="manage-reservation" data-reservation-id="${reservation.id}">${icon('edit')} ${editLabel}</button>` : ''}
+      ${isCalendar ? '' : manageButton}
       ${canWriteReservations && reservation.status === 'awaiting_payment' ? `
         <button class="button button-primary admin-small-button" type="button" data-action="mark-paid" data-reservation-id="${reservation.id}">${icon('check')} Pagamento recebido</button>
       ` : ''}
       <button class="button admin-secondary-button admin-small-button" type="button" data-action="message-for-reservation" data-reservation-id="${reservation.id}">${icon('mail')} Gerar mensagem</button>
+      ${isCalendar ? manageButton : ''}
       ${canWriteReservations && reservation.status === 'cancelled' ? `
         <button class="button admin-secondary-button admin-small-button" type="button" data-action="restore-reservation" data-reservation-id="${reservation.id}">${icon('rotateCcw')} Restaurar</button>
       ` : ''}
@@ -1467,7 +1621,7 @@ function renderCreateReservationForm() {
     discountPercent: Number(editingReservation?.pricing?.discountPercent || draftRequest?.pricing?.discountPercent || 0),
     discountAmount: Number(editingReservation?.pricing?.discountAmount || draftRequest?.pricing?.discountAmount || 0),
     discountCode: editingReservation?.pricing?.discountCode || draftRequest?.pricing?.discountCode || '',
-    depositIncluded: Boolean(editingReservation?.pricing?.depositIncluded),
+    depositIncluded: Boolean(editingReservation?.pricing?.depositIncluded || draftRequest?.depositPrepay || draftRequest?.pricing?.depositIncluded),
     ownerNotes: editingReservation?.notes?.owner || draftRequest?.comments || '',
     operationalNotes: editingReservation?.notes?.operational || '',
     marketingOptIn: Boolean(editingReservation?.marketingOptIn || draftRequest?.marketingOptIn)
@@ -1604,6 +1758,51 @@ function renderCreateReservationForm() {
           <span>Notas operacionais</span>
           <textarea name="operationalNotes" rows="2">${escapeHtml(defaults.operationalNotes)}</textarea>
         </label>
+        ${editingReservation ? `
+          <div class="admin-field admin-field-full" id="extra-guests-editor">
+            ${getGuestAdjustments(editingReservation).length ? renderGuestAdjustmentsList(editingReservation) : ''}
+            <div class="admin-button-row">
+              <button class="button admin-secondary-button admin-small-button" type="button" data-action="toggle-extra-guest-form">
+                ${icon(ui.showExtraGuestForm ? 'chevronUp' : 'plus')} ${ui.showExtraGuestForm ? 'Fechar hóspedes extra' : 'Adicionar hóspede extra'}
+              </button>
+            </div>
+          </div>
+          ${ui.showExtraGuestForm ? `
+            <label class="admin-field">
+              <span>Chegada</span>
+              ${renderAdminDateControl({ name: 'extraGuestFromDate', value: formatDateInputValue(editingReservation.status === 'checked_in' ? today : defaults.checkIn), placeholder: 'dd/mm/aaaa' })}
+            </label>
+            <label class="admin-field">
+              <span>Adultos extra</span>
+              <input name="extraGuestAdults" type="number" min="0" max="${state.property.occupancyLimit}" value="0" />
+            </label>
+            <label class="admin-field">
+              <span>Crianças extra</span>
+              <input name="extraGuestChildren" type="number" min="0" max="${state.property.occupancyLimit}" value="0" />
+            </label>
+            <label class="admin-field">
+              <span>Idades das crianças extra</span>
+              <input name="extraGuestChildAges" type="text" placeholder="Ex.: 5, 8" />
+            </label>
+            <label class="admin-field">
+              <span>Tipo de desconto</span>
+              <select name="extraGuestDiscountType">
+                ${renderOption('amount', 'Valor fixo', 'amount')}
+                ${renderOption('percentage', 'Percentagem', 'amount')}
+              </select>
+            </label>
+            <label class="admin-field">
+              <span>Desconto dos hóspedes extra</span>
+              <input name="extraGuestDiscount" type="number" min="0" step="1" value="0" />
+            </label>
+            <label class="admin-field">
+              <span>Estado do pagamento</span>
+              <select name="extraGuestPaymentStatus">
+                ${EXTRA_GUEST_PAYMENT_STATUSES.map((value) => renderOption(value, PAYMENT_LABELS[value], 'awaiting_transfer')).join('')}
+              </select>
+            </label>
+          ` : ''}
+        ` : ''}
         <label class="admin-field admin-field-full">
           <span>Colar email da Booking.com</span>
           <textarea name="bookingPaste" rows="4" placeholder="Cole aqui o email da Booking.com para consultar enquanto preenche a reserva. A extração automática fica para uma próxima versão."></textarea>
@@ -1682,7 +1881,7 @@ function renderPricingView() {
         </label>
         ${can(currentUser, 'pricing:write') ? `
           <div class="admin-form-actions">
-            <button class="button button-primary" type="submit">Guardar preço base</button>
+            <button class="button button-primary" type="submit">${icon('check')} Guardar preço base</button>
           </div>
         ` : ''}
       </form>
@@ -1719,7 +1918,7 @@ function renderPricingView() {
         </label>
         ${can(currentUser, 'pricing:write') ? `
           <div class="admin-form-actions">
-            <button class="button button-primary" type="submit">Guardar serviços</button>
+            <button class="button button-primary" type="submit">${icon('check')} Guardar serviços</button>
           </div>
         ` : ''}
       </form>
@@ -1757,7 +1956,10 @@ function renderSeasonList(seasons) {
               <td>${escapeHtml(season.notes || '-')}</td>
               <td>
                 ${can(currentUser, 'pricing:write') ? `
-                  <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-season" data-season-id="${season.id}">${icon('trash')} Remover</button>
+                  <div class="admin-button-row">
+                    <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-season" data-season-id="${season.id}">${icon('edit')} Editar</button>
+                    <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-season" data-season-id="${season.id}">${icon('trash')} Remover</button>
+                  </div>
                 ` : ''}
               </td>
             </tr>
@@ -1769,42 +1971,53 @@ function renderSeasonList(seasons) {
 }
 
 function renderSeasonForm() {
+  const editingSeason = (state.pricing.seasons || []).find((season) => season.id === ui.editingSeasonId);
+  const kind = editingSeason?.kind || 'recurring';
+  const startValue = kind === 'dated'
+    ? formatDateInputValue(editingSeason?.startDate || '')
+    : formatMonthDay(editingSeason?.startMonthDay || '04-01');
+  const endValue = kind === 'dated'
+    ? formatDateInputValue(editingSeason?.endDate || '')
+    : formatMonthDay(editingSeason?.endMonthDay || '09-30');
+
   return `
     <form class="admin-form-grid admin-subform" data-form="season">
+      <input name="seasonId" type="hidden" value="${escapeHtml(editingSeason?.id || '')}" />
       <label class="admin-field">
         <span>Nome da época</span>
-        <input name="title" type="text" placeholder="Ex.: Verão, Natal, Páscoa" required />
+        <input name="title" type="text" value="${escapeHtml(editingSeason?.title || '')}" placeholder="Ex.: Verão, Natal, Páscoa" required />
       </label>
       <label class="admin-field">
         <span>Tipo</span>
         <select name="kind">
-          ${renderOption('recurring', 'Época anual sem ano', 'recurring')}
-          ${renderOption('dated', 'Override com data completa', 'recurring')}
+          ${renderOption('recurring', 'Época anual sem ano', kind)}
+          ${renderOption('dated', 'Override com data completa', kind)}
         </select>
       </label>
       <label class="admin-field">
         <span>Início</span>
-        ${renderAdminDateControl({ name: 'startDate', value: '01/06', placeholder: 'dd/mm ou dd/mm/aaaa', pattern: getAdminFlexibleDateInputPattern(), required: true })}
+        ${renderAdminDateControl({ name: 'startDate', value: startValue, placeholder: 'dd/mm ou dd/mm/aaaa', pattern: getAdminFlexibleDateInputPattern(), required: true })}
       </label>
       <label class="admin-field">
         <span>Fim</span>
-        ${renderAdminDateControl({ name: 'endDate', value: '30/09', placeholder: 'dd/mm ou dd/mm/aaaa', pattern: getAdminFlexibleDateInputPattern(), required: true })}
+        ${renderAdminDateControl({ name: 'endDate', value: endValue, placeholder: 'dd/mm ou dd/mm/aaaa', pattern: getAdminFlexibleDateInputPattern(), required: true })}
       </label>
       <label class="admin-field">
         <span>Preço adulto/noite</span>
-        <input name="adultNight" type="number" min="0" step="0.01" value="${state.pricing.adultNight}" required />
+        <input name="adultNight" type="number" min="0" step="0.01" value="${Number(editingSeason?.adultNight ?? state.pricing.adultNight)}" required />
       </label>
       <p class="admin-form-note">A cobrança mínima de adultos vem do preço base: ${state.pricing.minimumPaidAdults || 2} adulto(s).</p>
       <label class="admin-field">
         <span>Criança/noite</span>
-        <input name="childNight" type="number" min="0" step="0.01" value="${state.pricing.childNight}" required />
+        <input name="childNight" type="number" min="0" step="0.01" value="${Number(editingSeason?.childNight ?? state.pricing.childNight)}" required />
       </label>
       <label class="admin-field">
         <span>Notas</span>
-        <input name="notes" type="text" />
+        <input name="notes" type="text" value="${escapeHtml(editingSeason?.notes || '')}" />
       </label>
       <div class="admin-form-actions">
-        <button class="button admin-secondary-button" type="submit">${icon('plus')} Adicionar época</button>
+        <button class="button admin-secondary-button" type="submit">${editingSeason ? `${icon('check')} Guardar época` : `${icon('plus')} Adicionar época`}</button>
+        ${editingSeason ? '<button class="button admin-secondary-button" type="button" data-action="cancel-season-edit">Cancelar edição</button>' : ''}
       </div>
     </form>
   `;
@@ -2064,7 +2277,7 @@ function renderDiscountForm() {
         <span>Desconto ativo</span>
       </label>
       <div class="admin-form-actions">
-        <button class="button button-primary" type="submit">${editingDiscount ? 'Guardar desconto' : `${icon('plus')} Adicionar desconto`}</button>
+        <button class="button button-primary" type="submit">${editingDiscount ? `${icon('check')} Guardar desconto` : `${icon('plus')} Adicionar desconto`}</button>
         ${editingDiscount ? `<button class="button admin-secondary-button" type="button" data-action="cancel-discount-edit">Cancelar edição</button>` : ''}
       </div>
     </form>
@@ -2100,7 +2313,7 @@ function renderExpenseTable() {
   return `
     <div class="admin-table-wrap">
       <table class="admin-table">
-        <thead><tr><th>Data</th><th>Categoria</th><th>Descrição</th><th>Notas</th><th>Valor</th></tr></thead>
+        <thead><tr><th>Data</th><th>Categoria</th><th>Descrição</th><th>Notas</th><th>Valor</th><th></th></tr></thead>
         <tbody>
           ${state.expenses.map((expense) => `
             <tr>
@@ -2109,6 +2322,14 @@ function renderExpenseTable() {
               <td>${escapeHtml(expense.description)}</td>
               <td>${escapeHtml(expense.notes || '-')}</td>
               <td>${renderMoney(expense.amount)}</td>
+              <td>
+                ${can(currentUser, 'expenses:write') ? `
+                  <div class="admin-button-row">
+                    <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-expense" data-expense-id="${expense.id}">${icon('edit')} Editar</button>
+                    <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-expense" data-expense-id="${expense.id}">${icon('trash')} Remover</button>
+                  </div>
+                ` : ''}
+              </td>
             </tr>
           `).join('')}
         </tbody>
@@ -2118,30 +2339,34 @@ function renderExpenseTable() {
 }
 
 function renderExpenseForm() {
+  const editingExpense = state.expenses.find((expense) => expense.id === ui.editingExpenseId);
+
   return `
     <form class="admin-form-grid admin-subform" data-form="expense">
+      <input name="expenseId" type="hidden" value="${escapeHtml(editingExpense?.id || '')}" />
       <label class="admin-field">
         <span>Data</span>
-        ${renderAdminDateControl({ name: 'date', value: formatDateInputValue(formatDateKey(new Date())), required: true })}
+        ${renderAdminDateControl({ name: 'date', value: formatDateInputValue(editingExpense?.date || formatDateKey(new Date())), required: true })}
       </label>
       <label class="admin-field">
         <span>Categoria</span>
-        <select name="category">${Object.entries(EXPENSE_LABELS).map(([value, label]) => renderOption(value, label, 'outros')).join('')}</select>
+        <select name="category">${Object.entries(EXPENSE_LABELS).map(([value, label]) => renderOption(value, label, editingExpense?.category || 'outros')).join('')}</select>
       </label>
       <label class="admin-field">
         <span>Valor</span>
-        <input name="amount" type="number" min="0" step="0.01" required />
+        <input name="amount" type="number" min="0" step="0.01" value="${Number(editingExpense?.amount || 0)}" required />
       </label>
       <label class="admin-field admin-field-full">
         <span>Descrição</span>
-        <input name="description" type="text" required />
+        <input name="description" type="text" value="${escapeHtml(editingExpense?.description || '')}" required />
       </label>
       <label class="admin-field admin-field-full">
         <span>Notas</span>
-        <textarea name="notes" rows="3"></textarea>
+        <textarea name="notes" rows="3">${escapeHtml(editingExpense?.notes || '')}</textarea>
       </label>
       <div class="admin-form-actions">
-        <button class="button admin-secondary-button" type="submit">${icon('plus')} Adicionar despesa</button>
+        <button class="button admin-secondary-button" type="submit">${editingExpense ? `${icon('check')} Guardar despesa` : `${icon('plus')} Adicionar despesa`}</button>
+        ${editingExpense ? '<button class="button admin-secondary-button" type="button" data-action="cancel-expense-edit">Cancelar edição</button>' : ''}
       </div>
     </form>
   `;
@@ -2202,7 +2427,7 @@ function renderEmployeesView() {
                           <span>Desde</span>
                           ${renderAdminDateControl({ name: 'from', value: formatDateInputValue(formatDateKey(new Date())) })}
                         </label>
-                        <button class="button admin-secondary-button admin-small-button" type="submit">Guardar taxa</button>
+                        <button class="button admin-secondary-button admin-small-button" type="submit">${icon('check')} Guardar taxa</button>
                       </form>
                     </div>
                   ` : ''}
@@ -2234,7 +2459,7 @@ function renderEmployeeProfileForm(employee) {
           ${renderCompensationOptions(getEmployeeDefaultCompensation(employee))}
         </select>
       </label>
-      <button class="button admin-secondary-button admin-small-button" type="submit">Guardar modo</button>
+      <button class="button admin-secondary-button admin-small-button" type="submit">${icon('check')} Guardar modo</button>
     </form>
   `;
 }
@@ -2251,7 +2476,7 @@ function renderEmployeeSessionSummary(employee) {
 function renderEmployeeWorkCorrectionForm(employee) {
   const editingSession = state.workSessions.find((session) => session.id === ui.editingWorkSessionId && session.employeeId === employee.id);
   const title = editingSession ? 'Editar sessão de trabalho' : 'Adicionar sessão de trabalho';
-  const buttonLabel = editingSession ? 'Guardar sessão' : 'Adicionar horas';
+  const buttonLabel = editingSession ? `${icon('check')} Guardar sessão` : `${icon('plus')} Adicionar horas`;
 
   return `
     <form class="admin-form-grid admin-subform" data-form="employee-work" data-work-form-for="${employee.id}">
@@ -2350,6 +2575,23 @@ function renderSessionTasks(session) {
   return labels.length ? labels.join(', ') : '-';
 }
 
+function renderActiveWorkDetailsForm(employee, session) {
+  return `
+    <form class="admin-form-grid admin-active-work" data-form="work-active-details" id="active-work-editor">
+      <input type="hidden" name="workSessionId" value="${escapeHtml(session.id)}" />
+      <input type="hidden" name="date" value="${escapeHtml(session.date)}" />
+      <div class="admin-form-intro admin-field-full">
+        <p><strong>Desde:</strong> ${escapeHtml(formatDateTime(session.start))}</p>
+      </div>
+      ${renderWorkTaskFields(employee, session)}
+      <div class="admin-form-actions">
+        <button class="button admin-secondary-button" type="submit">${icon('check')} Guardar tipo e tarefas</button>
+        <button class="button button-primary" type="button" data-action="stop-work">${icon('timer')} Terminar trabalho</button>
+      </div>
+    </form>
+  `;
+}
+
 function renderWorkView() {
   const employee = getEmployeeForUser(state, currentUser);
   if (!employee) {
@@ -2357,6 +2599,7 @@ function renderWorkView() {
   }
 
   const activeSession = state.workSessions.find((session) => session.employeeId === employee.id && !session.end);
+  const editingOwnSession = state.workSessions.find((session) => session.id === ui.editingWorkSessionId && session.employeeId === employee.id && session.end);
   const monthEarnings = calculateEmployeeEarnings(state, employee.id);
   const monthSessions = state.workSessions
     .filter((session) => session.employeeId === employee.id && session.date.startsWith(formatDateKey(new Date()).slice(0, 7)))
@@ -2383,11 +2626,7 @@ function renderWorkView() {
         </div>
       </div>
       ${activeSession ? `
-        <div class="admin-active-work">
-          <p><strong>Tipo:</strong> ${escapeHtml(COMPENSATION_LABELS[activeSession.compensationType || 'paid'] || activeSession.compensationType)}</p>
-          <p><strong>Tarefas:</strong> ${escapeHtml(renderSessionTasks(activeSession))}</p>
-          <button class="button button-primary" type="button" data-action="stop-work">${icon('timer')} Terminar trabalho</button>
-        </div>
+        ${renderActiveWorkDetailsForm(employee, activeSession)}
       ` : ui.showManualWorkForm ? '' : `
         <form class="admin-form-grid" data-form="work-start">
           ${renderWorkTaskFields(employee)}
@@ -2396,32 +2635,36 @@ function renderWorkView() {
           </div>
         </form>
       `}
-      <div class="admin-work-manual-row">
-        <button class="button admin-secondary-button admin-small-button" type="button" data-action="toggle-manual-work-form">
-          ${icon(manualToggleIcon)} ${manualToggleLabel}
-        </button>
-      </div>
+      ${editingOwnSession ? '' : `
+        <div class="admin-work-manual-row">
+          <button class="button admin-secondary-button admin-small-button" type="button" data-action="toggle-manual-work-form">
+            ${icon(manualToggleIcon)} ${manualToggleLabel}
+          </button>
+        </div>
+      `}
       ${ui.showManualWorkForm ? `
-        <form class="admin-form-grid admin-subform" data-form="work-manual">
+        <form class="admin-form-grid admin-subform" data-form="work-manual" id="own-work-editor">
+          <input type="hidden" name="workSessionId" value="${escapeHtml(editingOwnSession?.id || '')}" />
           <label class="admin-field">
             <span>Data</span>
-            ${renderAdminDateControl({ name: 'date', value: formatDateInputValue(formatDateKey(new Date())), required: true })}
+            ${renderAdminDateControl({ name: 'date', value: formatDateInputValue(editingOwnSession?.date || formatDateKey(new Date())), required: true })}
           </label>
           <label class="admin-field">
             <span>Início</span>
-            <input name="start" type="time" required />
+            <input name="start" type="time" value="${escapeHtml(formatTimeInputValue(editingOwnSession?.start))}" required />
           </label>
           <label class="admin-field">
             <span>Fim</span>
-            <input name="end" type="time" required />
+            <input name="end" type="time" value="${escapeHtml(formatTimeInputValue(editingOwnSession?.end))}" required />
           </label>
-          ${renderWorkTaskFields(employee)}
+          ${renderWorkTaskFields(employee, editingOwnSession)}
           <label class="admin-field admin-field-full">
             <span>Notas</span>
-            <input name="notes" type="text" />
+            <input name="notes" type="text" value="${escapeHtml(editingOwnSession?.notes || '')}" />
           </label>
           <div class="admin-form-actions">
-            <button class="button admin-secondary-button" type="submit">Guardar horas</button>
+            <button class="button admin-secondary-button" type="submit">${editingOwnSession ? `${icon('check')} Guardar alterações` : `${icon('plus')} Guardar horas`}</button>
+            ${editingOwnSession ? '<button class="button admin-secondary-button" type="button" data-action="cancel-own-work-session-edit">Cancelar edição</button>' : ''}
           </div>
         </form>
       ` : ''}
@@ -2433,14 +2676,14 @@ function renderWorkView() {
           <h2>Sessões recentes</h2>
         </div>
       </div>
-      ${renderWorkTable(monthSessions)}
+      ${renderWorkTable(monthSessions, { editable: true, own: true })}
     </section>
   `;
 }
 
 function renderWorkTable(sessions, options = {}) {
   if (!sessions.length) return '<p class="admin-empty">Ainda não há horas registadas este mês.</p>';
-  const showActions = Boolean(options.editable);
+  const showActions = Boolean(options.editable || options.own);
 
   return `
     <div class="admin-table-wrap">
@@ -2458,7 +2701,14 @@ function renderWorkTable(sessions, options = {}) {
               <td>${renderMoney(getWorkSessionCost(session))}</td>
               ${showActions ? `
                 <td>
-                  <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-work-session" data-work-session-id="${session.id}">Editar</button>
+                  <div class="admin-button-row">
+                    ${options.own ? `
+                      <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-own-work-session" data-work-session-id="${session.id}">${icon('edit')} ${session.end ? 'Editar' : 'Atualizar'}</button>
+                      ${session.end ? `<button class="button admin-danger-button admin-small-button" type="button" data-action="remove-own-work-session" data-work-session-id="${session.id}">${icon('trash')} Remover</button>` : ''}
+                    ` : `
+                      <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-work-session" data-work-session-id="${session.id}">${icon('edit')} Editar</button>
+                    `}
+                  </div>
                 </td>
               ` : ''}
             </tr>
@@ -2506,7 +2756,7 @@ function renderMessagesView() {
           <span>${escapeHtml(draft.language)}</span>
           <span>${escapeHtml(draft.email || 'Sem email')}</span>
         </div>
-        <textarea class="admin-message-output" readonly>${escapeHtml(draft.text)}</textarea>
+        <textarea class="admin-message-output">${escapeHtml(draft.text)}</textarea>
         ${renderMessageQuickActions({
           copyAction: 'copy-draft-message',
           copyLabel: 'Copiar rascunho',
@@ -2545,7 +2795,7 @@ function renderMessagesView() {
           </select>
         </label>
         <div class="admin-form-actions">
-          <button class="button admin-secondary-button" type="submit">Atualizar mensagem</button>
+          <button class="button admin-secondary-button" type="submit">${icon('check')} Atualizar mensagem</button>
         </div>
       </form>
       ${!templates.length ? '<p class="admin-empty">Não há modelos configurados em locales/messages.json.</p>' : selectedReservation || isStandaloneMessage ? `
@@ -2553,7 +2803,7 @@ function renderMessagesView() {
           <span>${escapeHtml(selectedReservation ? LANGUAGE_LABELS[selectedReservation.preferredLanguage] || selectedReservation.preferredLanguage : LANGUAGE_LABELS[ui.selectedMessageLanguage])}</span>
           <span>${escapeHtml(selectedReservation ? selectedReservation.contact.email || 'Sem email' : 'Sem reserva específica')}</span>
         </div>
-        <textarea class="admin-message-output" readonly>${escapeHtml(message)}</textarea>
+        <textarea class="admin-message-output">${escapeHtml(message)}</textarea>
         ${renderMessageQuickActions({
           email: selectedReservation?.contact?.email || '',
           phone: selectedReservation?.contact?.phone || '',
@@ -2597,7 +2847,7 @@ function renderReportsView() {
           <span>Fim personalizado</span>
           ${renderAdminDateControl({ name: 'endDate', value: formatDateInputValue(ui.reportFilters.endDate) })}
         </label>
-        <button class="button admin-secondary-button" type="submit">Atualizar</button>
+        <button class="button admin-secondary-button" type="submit">${icon('check')} Atualizar</button>
       </form>
       <p class="admin-empty">Período ativo: ${escapeHtml(report.range.label)}</p>
     </section>
@@ -2923,6 +3173,125 @@ function getFilteredAuditLog() {
     .sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));
 }
 
+function formatAuditValue(value) {
+  if (value === null || value === undefined || value === '') return '-';
+  if (typeof value === 'number') return Number.isFinite(value) ? String(value) : '-';
+  if (typeof value === 'boolean') return value ? 'Sim' : 'Não';
+  if (Array.isArray(value)) return value.length ? value.join(', ') : '-';
+  if (typeof value === 'object') return JSON.stringify(value);
+  return String(value);
+}
+
+function humanizeAuditDetailKey(key) {
+  return String(key || '')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/[_-]+/g, ' ')
+    .replace(/^./, (letter) => letter.toUpperCase());
+}
+
+function getAuditEntityDetailRows(entry) {
+  const rows = [];
+
+  Object.entries(entry.details || {}).forEach(([key, value]) => {
+    rows.push([humanizeAuditDetailKey(key), formatAuditValue(value)]);
+  });
+
+  if (entry.entityType === 'reservation') {
+    const reservation = state.reservations.find((candidate) => candidate.id === entry.entityId);
+    if (!reservation) return rows;
+    const totals = calculateReservationTotals(reservation, state);
+    rows.push(
+      ['Hóspede', reservation.contact?.name || '-'],
+      ['Datas', formatStayRange(reservation.stay)],
+      ['Estado atual', STATUS_LABELS[reservation.status] || reservation.status],
+      ['Pagamento atual', PAYMENT_LABELS[reservation.paymentStatus] || reservation.paymentStatus],
+      ['Hóspedes', formatGuestSummary(reservation.guests)],
+      ['Hóspedes extra', renderGuestAdjustmentsSummary(reservation)],
+      ['Total atual', renderMoney(totals.total)]
+    );
+  } else if (entry.entityType === 'websiteRequest') {
+    const request = state.websiteRequests.find((candidate) => candidate.id === entry.entityId);
+    if (!request) return rows;
+    rows.push(
+      ['Contacto', request.contact?.name || '-'],
+      ['Datas', formatStayRange(request.stay)],
+      ['Estado atual', getRequestStatusLabel(request.status)],
+      ['Depósito', getDepositRequestText(request)],
+      ['Total estimado', renderMoney(request.estimatedTotal || 0)]
+    );
+  } else if (entry.entityType === 'expense') {
+    const expense = state.expenses.find((candidate) => candidate.id === entry.entityId);
+    if (!expense) return rows;
+    rows.push(
+      ['Data', formatCompactDate(expense.date)],
+      ['Categoria', EXPENSE_LABELS[expense.category] || expense.category],
+      ['Descrição', expense.description],
+      ['Valor', renderMoney(expense.amount)],
+      ['Notas', expense.notes || '-']
+    );
+  } else if (entry.entityType === 'workSession') {
+    const session = state.workSessions.find((candidate) => candidate.id === entry.entityId);
+    const employee = state.employees.find((candidate) => candidate.id === session?.employeeId);
+    if (!session) return rows;
+    rows.push(
+      ['Pessoa', employee?.name || session.employeeId],
+      ['Início', formatDateTime(session.start)],
+      ['Fim', session.end ? formatDateTime(session.end) : 'Em curso'],
+      ['Tipo', COMPENSATION_LABELS[session.compensationType || 'paid'] || session.compensationType],
+      ['Tarefas', renderSessionTasks(session)],
+      ['Custo', renderMoney(getWorkSessionCost(session))]
+    );
+  } else if (entry.entityType === 'employee') {
+    const employee = state.employees.find((candidate) => candidate.id === entry.entityId);
+    if (!employee) return rows;
+    rows.push(
+      ['Nome', employee.name],
+      ['Perfil', EMPLOYEE_PROFILE_LABELS[employee.permissionsProfile] || employee.permissionsProfile],
+      ['Modo habitual', COMPENSATION_LABELS[getEmployeeDefaultCompensation(employee)]],
+      ['Taxa atual', `${renderMoney(getHourlyRate(employee))}/h`]
+    );
+  } else if (entry.entityType === 'pricing') {
+    const season = (state.pricing.seasons || []).find((candidate) => candidate.id === entry.entityId);
+    const discount = (state.pricing.discounts || []).find((candidate) => candidate.id === entry.entityId);
+    if (season) {
+      rows.push(
+        ['Época', season.title],
+        ['Período', formatSeasonPeriod(season)],
+        ['Adulto/noite', renderMoney(season.adultNight)],
+        ['Criança/noite', renderMoney(season.childNight)]
+      );
+    } else if (discount) {
+      rows.push(
+        ['Desconto', discount.title],
+        ['Código', discount.code || '-'],
+        ['Valor', renderDiscountValue(discount)],
+        ['Período', renderDiscountPeriod(discount)]
+      );
+    } else if (entry.entityId === 'base') {
+      rows.push(
+        ['Adulto/noite base', renderMoney(state.pricing.adultNight)],
+        ['Mínimo cobrado', `${state.pricing.minimumPaidAdults || 2} adulto(s)`],
+        ['Criança/noite base', renderMoney(state.pricing.childNight)]
+      );
+    } else if (entry.entityId === 'services') {
+      rows.push(
+        ['Bicicleta/dia', renderMoney(state.pricing.bikeDay)],
+        ['Depósito', renderMoney(state.pricing.securityDeposit)]
+      );
+    }
+  }
+
+  return rows;
+}
+
+function renderAuditEntryDetails(entry) {
+  const rows = getAuditEntityDetailRows(entry);
+  if (!rows.length) return '<div><dt>Detalhes</dt><dd>Sem detalhes adicionais para esta alteração.</dd></div>';
+  return rows
+    .map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(formatAuditValue(value))}</dd></div>`)
+    .join('');
+}
+
 function renderAuditList() {
   const entries = getFilteredAuditLog();
 
@@ -2942,6 +3311,7 @@ function renderAuditList() {
                 <div><dt>Utilizador</dt><dd>${escapeHtml(entry.actorName)} (${escapeHtml(entry.actorId)})</dd></div>
                 <div><dt>Entidade</dt><dd>${escapeHtml(entry.entityType)} · ${escapeHtml(entry.entityId)}</dd></div>
                 <div><dt>Quando</dt><dd>${escapeHtml(formatDateTime(entry.at))}</dd></div>
+                ${renderAuditEntryDetails(entry)}
               </dl>
             ` : ''}
           </article>
@@ -2967,6 +3337,27 @@ function buildReservationFromForm(form) {
     .map((value) => value.trim())
     .filter(Boolean)
     .map(Number);
+  const existingGuestAdjustments = getGuestAdjustments(existingReservation).map((adjustment) => {
+    const fieldName = getExtraGuestPaymentFieldName(adjustment);
+    return {
+      ...adjustment,
+      paymentStatus: data.has(fieldName)
+        ? normalizeExtraGuestPaymentStatus(String(data.get(fieldName) || 'awaiting_transfer'))
+        : normalizeExtraGuestPaymentStatus(adjustment.paymentStatus)
+    };
+  });
+  const extraGuestAdults = Math.max(0, Number(data.get('extraGuestAdults') || 0));
+  const extraGuestChildren = Math.max(0, Number(data.get('extraGuestChildren') || 0));
+  const extraGuestTotal = extraGuestAdults + extraGuestChildren;
+  const extraGuestChildAges = String(data.get('extraGuestChildAges') || '')
+    .split(/[,;\n]/)
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .map(Number);
+  const extraGuestDiscountType = String(data.get('extraGuestDiscountType') || 'amount');
+  const extraGuestDiscount = Math.max(0, Number(data.get('extraGuestDiscount') || 0));
+  const extraGuestPaymentStatus = normalizeExtraGuestPaymentStatus(String(data.get('extraGuestPaymentStatus') || 'awaiting_transfer'));
+  const extraGuestFromDateInput = String(data.get('extraGuestFromDate') || '').trim();
 
   if (!checkIn || !checkOut || parseDateKey(checkOut) <= parseDateKey(checkIn)) {
     throw new Error('O check-out deve ser depois do check-in.');
@@ -2978,6 +3369,44 @@ function buildReservationFromForm(form) {
 
   if (childAges.some((age) => !Number.isFinite(age) || age < 0 || age > 12)) {
     throw new Error('As idades das crianças devem estar entre 0 e 12 anos.');
+  }
+
+  if (extraGuestChildAges.some((age) => !Number.isFinite(age) || age < 0 || age > 12)) {
+    throw new Error('As idades das crianças extra devem estar entre 0 e 12 anos.');
+  }
+
+  if (extraGuestTotal && !extraGuestFromDateInput) {
+    throw new Error('Indique a data de chegada dos hóspedes extra.');
+  }
+
+  if (extraGuestTotal) {
+    const extraGuestFromDate = parseAdminDateInput(extraGuestFromDateInput, 'Chegada do hóspede extra');
+    if (extraGuestFromDate < checkIn || extraGuestFromDate >= checkOut) {
+      throw new Error('A chegada do hóspede extra deve ficar dentro das datas da estadia.');
+    }
+
+    existingGuestAdjustments.push({
+      id: makeId('GUESTADD', existingGuestAdjustments),
+      fromDate: extraGuestFromDate,
+      adults: extraGuestAdults,
+      children: extraGuestChildren,
+      childAges: extraGuestChildAges,
+      discountType: extraGuestDiscountType,
+      discountPercent: extraGuestDiscountType === 'percentage' ? Math.min(100, extraGuestDiscount) : 0,
+      discountAmount: extraGuestDiscountType === 'amount' ? extraGuestDiscount : 0,
+      paymentStatus: extraGuestPaymentStatus,
+      createdAt: new Date().toISOString(),
+      createdBy: currentUser.id
+    });
+  }
+
+  const maxGuestLoad = totalGuests + existingGuestAdjustments.reduce((total, adjustment) =>
+    total + Number(adjustment.adults || 0) + Number(adjustment.children || 0),
+    0
+  );
+
+  if (maxGuestLoad > state.property.occupancyLimit) {
+    throw new Error(`Com os hóspedes extra, o limite atual é de ${state.property.occupancyLimit} hóspedes.`);
   }
 
   const contact = {
@@ -3037,6 +3466,7 @@ function buildReservationFromForm(form) {
         days: Math.max(0, Number(data.get('bikeDays') || 0))
       }
     },
+    guestAdjustments: existingGuestAdjustments,
     marketingOptIn: data.get('marketingOptIn') === 'on',
     guestNationality,
     websiteRequestId,
@@ -3065,6 +3495,10 @@ async function handleCreateReservation(form) {
   const reservation = buildReservationFromForm(form);
   const existingIndex = state.reservations.findIndex((candidate) => candidate.id === reservation.id);
   const isEditing = existingIndex >= 0;
+  const previousReservation = isEditing ? state.reservations[existingIndex] : null;
+  const extraGuestPaymentStatusChanges = isEditing
+    ? getExtraGuestPaymentStatusChanges(previousReservation, reservation)
+    : [];
   const conflicts = findReservationConflicts(state, reservation, isEditing ? reservation.id : '');
 
   if (conflicts.length) {
@@ -3078,7 +3512,9 @@ async function handleCreateReservation(form) {
   delete reservation.guestNationality;
   if (isEditing) {
     state.reservations[existingIndex] = reservation;
-    addAudit(state, currentUser, 'Reserva editada', 'reservation', reservation.id);
+    addAudit(state, currentUser, 'Reserva editada', 'reservation', reservation.id, extraGuestPaymentStatusChanges.length ? {
+      'Pagamento dos hóspedes extra': extraGuestPaymentStatusChanges
+    } : {});
   } else {
     state.reservations.push(reservation);
   }
@@ -3095,12 +3531,15 @@ async function handleCreateReservation(form) {
     addAudit(state, currentUser, 'Reserva criada manualmente', 'reservation', reservation.id);
   }
 
-  ui.selectedMessageReservationId = reservation.id;
-  ui.selectedMessageTemplate = resolveMessageTemplateId('paymentInstructions');
   ui.messageDraft = null;
   ui.requestDraftId = '';
   ui.editingReservationId = '';
-  ui.activeView = 'messages';
+  ui.reservationFilters.search = '';
+  if (!isEditing) {
+    ui.selectedMessageReservationId = reservation.id;
+    ui.selectedMessageTemplate = resolveMessageTemplateId('paymentInstructions');
+    ui.activeView = 'messages';
+  }
   await persist(isEditing ? `Reserva ${reservation.id} atualizada.` : `Reserva ${reservation.id} criada.`);
 }
 
@@ -3223,6 +3662,7 @@ async function handleServicePricingSubmit(form) {
 async function handleSeasonSubmit(form) {
   requirePermission(currentUser, 'pricing:write');
   const data = new FormData(form);
+  const seasonId = String(data.get('seasonId') || '');
   const kind = String(data.get('kind') || 'recurring');
   const startInput = String(data.get('startDate') || '');
   const endInput = String(data.get('endDate') || '');
@@ -3238,6 +3678,7 @@ async function handleSeasonSubmit(form) {
   state.pricing.seasons ||= [];
   const candidate = { kind, startDate, endDate, startMonthDay, endMonthDay };
   const overlaps = state.pricing.seasons.filter((season) => {
+    if (season.id === seasonId) return false;
     const seasonKind = season.kind || 'dated';
     if (kind === 'dated' && seasonKind === 'dated') {
       return dateRangeOverlaps(startDate, endDate, season.startDate, season.endDate);
@@ -3252,8 +3693,13 @@ async function handleSeasonSubmit(form) {
     throw new Error(`Esta época sobrepõe-se a ${overlaps.map((season) => season.title).join(', ')}.`);
   }
 
-  state.pricing.seasons.push({
+  const existingSeason = state.pricing.seasons.find((item) => item.id === seasonId);
+  const season = existingSeason || {
     id: makeId('SEASON', state.pricing.seasons),
+    active: true
+  };
+
+  Object.assign(season, {
     kind,
     title: String(data.get('title') || '').trim(),
     startDate,
@@ -3263,10 +3709,18 @@ async function handleSeasonSubmit(form) {
     adultNight: Math.max(0, Number(data.get('adultNight') || state.pricing.adultNight)),
     childNight: Math.max(0, Number(data.get('childNight') || state.pricing.childNight)),
     notes: String(data.get('notes') || '').trim(),
-    active: true
+    active: season.active !== false
   });
-  addAudit(state, currentUser, 'Preço sazonal criado', 'pricing', 'season');
-  await persist('Época adicionada.');
+
+  if (!existingSeason) state.pricing.seasons.push(season);
+  ui.editingSeasonId = '';
+  addAudit(state, currentUser, existingSeason ? 'Preço sazonal atualizado' : 'Preço sazonal criado', 'pricing', season.id, {
+    title: season.title,
+    period: formatSeasonPeriod(season),
+    adultNight: season.adultNight,
+    childNight: season.childNight
+  });
+  await persist(existingSeason ? 'Época atualizada.' : 'Época adicionada.');
 }
 
 async function handleGroupDiscountSubmit(form) {
@@ -3343,17 +3797,31 @@ async function handleDiscountSubmit(form) {
 async function handleExpenseSubmit(form) {
   requirePermission(currentUser, 'expenses:write');
   const data = new FormData(form);
+  const expenseId = String(data.get('expenseId') || '');
+  const existingExpense = state.expenses.find((expense) => expense.id === expenseId);
   const date = parseAdminDateInput(data.get('date'), 'Data da despesa');
-  state.expenses.unshift({
-    id: makeId('EXP', state.expenses),
+
+  const expense = existingExpense || {
+    id: makeId('EXP', state.expenses)
+  };
+
+  Object.assign(expense, {
     date,
     category: String(data.get('category') || 'outros'),
     description: String(data.get('description') || '').trim(),
     amount: Math.max(0, Number(data.get('amount') || 0)),
     notes: String(data.get('notes') || '').trim()
   });
-  addAudit(state, currentUser, 'Despesa adicionada', 'expense', state.expenses[0].id);
-  await persist('Despesa adicionada.');
+
+  if (!existingExpense) state.expenses.unshift(expense);
+  ui.editingExpenseId = '';
+  addAudit(state, currentUser, existingExpense ? 'Despesa atualizada' : 'Despesa adicionada', 'expense', expense.id, {
+    description: expense.description,
+    category: EXPENSE_LABELS[expense.category] || expense.category,
+    amount: expense.amount,
+    date: formatCompactDate(expense.date)
+  });
+  await persist(existingExpense ? 'Despesa atualizada.' : 'Despesa adicionada.');
 }
 
 async function handleEmployeeRateSubmit(form) {
@@ -3433,6 +3901,7 @@ async function handleManualWorkSubmit(form) {
   requirePermission(currentUser, 'work:own');
   const employee = getEmployeeForUser(state, currentUser);
   const data = new FormData(form);
+  const workSessionId = String(data.get('workSessionId') || '');
   const date = parseAdminDateInput(data.get('date'), 'Data do trabalho');
   const start = String(data.get('start') || '');
   const end = String(data.get('end') || '');
@@ -3443,8 +3912,7 @@ async function handleManualWorkSubmit(form) {
   if (new Date(endDateTime) <= new Date(startDateTime)) throw new Error('A hora final deve ser depois da hora inicial.');
 
   const workDetails = getWorkFormDetails(data, employee);
-  state.workSessions.unshift({
-    id: makeId('WORK', state.workSessions),
+  const payload = {
     employeeId: employee.id,
     date,
     start: startDateTime,
@@ -3454,10 +3922,50 @@ async function handleManualWorkSubmit(form) {
     tasks: workDetails.tasks,
     otherDetails: workDetails.otherDetails,
     notes: String(data.get('notes') || '').trim()
+  };
+
+  if (workSessionId) {
+    const session = state.workSessions.find((candidate) => candidate.id === workSessionId && candidate.employeeId === employee.id);
+    if (!session) throw new Error('Sessão de trabalho não encontrada.');
+    Object.assign(session, payload);
+    state.workSessions.sort((a, b) => String(b.start || '').localeCompare(String(a.start || '')));
+    ui.editingWorkSessionId = '';
+    ui.showManualWorkForm = false;
+    addAudit(state, currentUser, 'Sessão própria de trabalho atualizada', 'workSession', session.id);
+    await persist('Horas atualizadas.');
+    return;
+  }
+
+  state.workSessions.unshift({
+    id: makeId('WORK', state.workSessions),
+    ...payload
   });
+  ui.editingWorkSessionId = '';
   ui.showManualWorkForm = false;
   addAudit(state, currentUser, 'Horas adicionadas manualmente', 'workSession', state.workSessions[0].id);
   await persist('Horas adicionadas.');
+}
+
+async function handleActiveWorkDetailsSubmit(form) {
+  requirePermission(currentUser, 'work:own');
+  const employee = getEmployeeForUser(state, currentUser);
+  const data = new FormData(form);
+  const session = state.workSessions.find((candidate) =>
+    candidate.id === data.get('workSessionId') &&
+    candidate.employeeId === employee?.id &&
+    !candidate.end
+  );
+
+  if (!employee) throw new Error('Não existe funcionário ligado a este utilizador.');
+  if (!session) throw new Error('Horário iniciado não encontrado.');
+
+  const workDetails = getWorkFormDetails(data, employee);
+  session.rateSnapshot = workDetails.rateSnapshot;
+  session.compensationType = workDetails.compensationType;
+  session.tasks = workDetails.tasks;
+  session.otherDetails = workDetails.otherDetails;
+  addAudit(state, currentUser, 'Tipo e tarefas do horário ativo atualizados', 'workSession', session.id);
+  await persist('Tipo e tarefas atualizados.');
 }
 
 async function handleStartWork(form) {
@@ -3486,6 +3994,34 @@ async function handleStartWork(form) {
   });
   ui.showManualWorkForm = false;
   addAudit(state, currentUser, 'Horário iniciado', 'workSession', state.workSessions[0].id);
+  await persist('Horário iniciado.');
+}
+
+async function handleQuickStartWork() {
+  requirePermission(currentUser, 'work:own');
+  const employee = getEmployeeForUser(state, currentUser);
+  if (!employee) throw new Error('Não existe funcionário ligado a este utilizador.');
+
+  if (state.workSessions.some((session) => session.employeeId === employee.id && !session.end)) {
+    throw new Error('Já existe um horário iniciado.');
+  }
+
+  const now = new Date();
+  const date = formatDateKey(now);
+  const compensationType = getEmployeeDefaultCompensation(employee);
+  state.workSessions.unshift({
+    id: makeId('WORK', state.workSessions),
+    employeeId: employee.id,
+    date,
+    start: now.toISOString(),
+    end: null,
+    rateSnapshot: compensationType === 'paid' ? getHourlyRate(employee, date) : 0,
+    compensationType,
+    tasks: ['other'],
+    otherDetails: 'Iniciado no painel',
+    notes: ''
+  });
+  addAudit(state, currentUser, 'Horário iniciado no painel', 'workSession', state.workSessions[0].id);
   await persist('Horário iniciado.');
 }
 
@@ -3578,6 +4114,10 @@ function toggleEmployeeDetails(employeeId) {
   renderApp();
 }
 
+function scrollToAdminEditor(selector) {
+  document.querySelector(selector)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 function editWorkSession(sessionId) {
   const session = state.workSessions.find((candidate) => candidate.id === sessionId);
   if (!session) return;
@@ -3586,7 +4126,28 @@ function editWorkSession(sessionId) {
   ui.expandedEmployeeIds.add(session.employeeId);
   ui.editingWorkSessionId = session.id;
   renderApp();
-  document.querySelector(`[data-work-form-for="${session.employeeId}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  scrollToAdminEditor(`[data-work-form-for="${session.employeeId}"]`);
+}
+
+function editOwnWorkSession(sessionId) {
+  const employee = getEmployeeForUser(state, currentUser);
+  const session = state.workSessions.find((candidate) => candidate.id === sessionId && candidate.employeeId === employee?.id);
+  if (!session) return;
+
+  if (!confirmDiscardUnsavedChanges()) return;
+  ui.activeView = 'work';
+  if (session.end) {
+    ui.editingWorkSessionId = session.id;
+    ui.showManualWorkForm = true;
+    renderApp();
+    scrollToAdminEditor('#own-work-editor');
+    return;
+  }
+
+  ui.editingWorkSessionId = '';
+  ui.showManualWorkForm = false;
+  renderApp();
+  scrollToAdminEditor('#active-work-editor');
 }
 
 function cancelWorkSessionEdit() {
@@ -3595,28 +4156,39 @@ function cancelWorkSessionEdit() {
   renderApp();
 }
 
+function cancelOwnWorkSessionEdit() {
+  if (!confirmDiscardUnsavedChanges()) return;
+  ui.editingWorkSessionId = '';
+  ui.showManualWorkForm = false;
+  renderApp();
+}
+
 function openCreateReservation(requestId = '') {
   ui.requestDraftId = requestId;
   ui.editingReservationId = '';
+  ui.showExtraGuestForm = false;
   ui.activeView = 'reservations';
   renderApp();
-  document.querySelector('#create-reservation')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  scrollToAdminEditor('#create-reservation');
 }
 
 function manageReservation(reservationId) {
   ui.activeView = 'reservations';
   ui.editingReservationId = reservationId;
+  ui.showExtraGuestForm = false;
   ui.requestDraftId = '';
   ui.reservationFilters.search = reservationId;
   ui.reservationFilters.status = 'all';
   ui.reservationFilters.source = 'all';
   ui.expandedReservationIds.add(reservationId);
   renderApp();
-  document.querySelector('#create-reservation, #reservation-operations')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  scrollToAdminEditor('#create-reservation, #reservation-operations');
 }
 
 function cancelReservationEdit() {
   ui.editingReservationId = '';
+  ui.showExtraGuestForm = false;
+  ui.reservationFilters.search = '';
   renderApp();
 }
 
@@ -3637,8 +4209,16 @@ function togglePastReservations() {
 
 function toggleManualWorkForm() {
   if (ui.showManualWorkForm && !confirmDiscardUnsavedChanges()) return;
+  ui.editingWorkSessionId = '';
   ui.showManualWorkForm = !ui.showManualWorkForm;
   renderApp();
+}
+
+function toggleExtraGuestForm() {
+  if (ui.showExtraGuestForm && !confirmDiscardUnsavedChanges()) return;
+  ui.showExtraGuestForm = !ui.showExtraGuestForm;
+  renderApp();
+  if (ui.showExtraGuestForm) scrollToAdminEditor('#extra-guests-editor');
 }
 
 function openNativeDatePicker(button) {
@@ -3700,13 +4280,46 @@ async function copyText(text) {
   renderApp();
 }
 
+function getMessageTextFromAction(target) {
+  const panel = target?.closest?.('.admin-panel');
+  const textarea = panel?.querySelector?.('.admin-message-output');
+  if (textarea instanceof HTMLTextAreaElement) return textarea.value;
+  return '';
+}
+
 async function removeSeason(seasonId) {
   requirePermission(currentUser, 'pricing:write');
   if (!window.confirm('Remover este preço sazonal?')) return;
 
   state.pricing.seasons = (state.pricing.seasons || []).filter((season) => season.id !== seasonId);
+  if (ui.editingSeasonId === seasonId) ui.editingSeasonId = '';
   addAudit(state, currentUser, 'Preço sazonal removido', 'pricing', seasonId);
   await persist('Época removida.');
+}
+
+function editSeason(seasonId) {
+  ui.editingSeasonId = seasonId;
+  renderApp();
+  scrollToAdminEditor('form[data-form="season"]');
+}
+
+function cancelSeasonEdit() {
+  ui.editingSeasonId = '';
+  renderApp();
+}
+
+async function removeGuestAdjustment(reservationId, adjustmentId) {
+  requirePermission(currentUser, 'reservations:write');
+  const reservation = state.reservations.find((candidate) => candidate.id === reservationId);
+  if (!reservation || !adjustmentId) return;
+  if (!window.confirm('Remover este hóspede extra da reserva?')) return;
+
+  reservation.guestAdjustments = getGuestAdjustments(reservation).filter((adjustment) => adjustment.id !== adjustmentId);
+  reservation.updatedAt = new Date().toISOString();
+  addAudit(state, currentUser, 'Hóspede extra removido', 'reservation', reservation.id, {
+    adjustmentId
+  });
+  await persist(`Hóspede extra removido de ${reservation.id}.`);
 }
 
 async function removeDiscount(discountId) {
@@ -3731,11 +4344,58 @@ async function removeGroupDiscount(discountId) {
 function editDiscount(discountId) {
   ui.editingDiscountId = discountId;
   renderApp();
+  scrollToAdminEditor('form[data-form="discount"]');
 }
 
 function cancelDiscountEdit() {
   ui.editingDiscountId = '';
   renderApp();
+}
+
+function editExpense(expenseId) {
+  ui.editingExpenseId = expenseId;
+  renderApp();
+  scrollToAdminEditor('form[data-form="expense"]');
+}
+
+function cancelExpenseEdit() {
+  ui.editingExpenseId = '';
+  renderApp();
+}
+
+async function removeExpense(expenseId) {
+  requirePermission(currentUser, 'expenses:write');
+  if (!window.confirm('Remover esta despesa?')) return;
+
+  const expense = state.expenses.find((candidate) => candidate.id === expenseId);
+  state.expenses = state.expenses.filter((candidate) => candidate.id !== expenseId);
+  if (ui.editingExpenseId === expenseId) ui.editingExpenseId = '';
+  addAudit(state, currentUser, 'Despesa removida', 'expense', expenseId, {
+    description: expense?.description || '',
+    amount: expense?.amount || 0
+  });
+  await persist('Despesa removida.');
+}
+
+async function removeOwnWorkSession(sessionId) {
+  requirePermission(currentUser, 'work:own');
+  const employee = getEmployeeForUser(state, currentUser);
+  const session = state.workSessions.find((candidate) => candidate.id === sessionId && candidate.employeeId === employee?.id);
+  if (!session) return;
+  if (!session.end) throw new Error('Termine o horário antes de o remover.');
+  if (!window.confirm('Remover esta sessão do seu histórico?')) return;
+
+  state.workSessions = state.workSessions.filter((candidate) => candidate.id !== sessionId);
+  if (ui.editingWorkSessionId === sessionId) {
+    ui.editingWorkSessionId = '';
+    ui.showManualWorkForm = false;
+  }
+  addAudit(state, currentUser, 'Sessão própria de trabalho removida', 'workSession', sessionId, {
+    date: formatCompactDate(session.date),
+    duration: `${getWorkDurationHours(session).toFixed(1)} h`,
+    tasks: renderSessionTasks(session)
+  });
+  await persist('Sessão de trabalho removida.');
 }
 
 function fillDiscountCode() {
@@ -3775,7 +4435,13 @@ function handleReportFilters(form) {
   renderApp();
 }
 
-async function copyMessage() {
+async function copyMessage(target = null) {
+  const editedMessage = getMessageTextFromAction(target);
+  if (editedMessage) {
+    await copyText(editedMessage);
+    return;
+  }
+
   if (ui.messageDraft) {
     await copyText(ui.messageDraft.text);
     return;
@@ -3788,6 +4454,21 @@ async function copyMessage() {
   }
   const message = generateGuestMessage(reservation, state, getSelectedMessageTemplateId(), messageCatalog);
   await copyText(message);
+}
+
+function sendMessageEmail(target) {
+  const email = String(target.dataset.email || '').trim();
+  if (!email) return;
+  const subject = String(target.dataset.subject || 'O Refúgio').trim();
+  const message = getMessageTextFromAction(target);
+  window.location.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+}
+
+function sendMessageWhatsapp(target) {
+  const phone = String(target.dataset.phone || '').replace(/\D/g, '');
+  if (!phone) return;
+  const message = getMessageTextFromAction(target);
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
 }
 
 function exportData() {
@@ -3941,8 +4622,18 @@ async function handleClick(event) {
       return;
     }
 
+    if (action === 'edit-own-work-session') {
+      editOwnWorkSession(target.dataset.workSessionId || '');
+      return;
+    }
+
     if (action === 'cancel-work-session-edit') {
       cancelWorkSessionEdit();
+      return;
+    }
+
+    if (action === 'cancel-own-work-session-edit') {
+      cancelOwnWorkSessionEdit();
       return;
     }
 
@@ -3958,6 +4649,11 @@ async function handleClick(event) {
 
     if (action === 'toggle-manual-work-form') {
       toggleManualWorkForm();
+      return;
+    }
+
+    if (action === 'toggle-extra-guest-form') {
+      toggleExtraGuestForm();
       return;
     }
 
@@ -3978,6 +4674,18 @@ async function handleClick(event) {
       return;
     }
 
+    if (action === 'edit-season') {
+      if (!confirmDiscardUnsavedChanges()) return;
+      editSeason(target.dataset.seasonId || '');
+      return;
+    }
+
+    if (action === 'cancel-season-edit') {
+      if (!confirmDiscardUnsavedChanges()) return;
+      cancelSeasonEdit();
+      return;
+    }
+
     if (action === 'edit-discount') {
       if (!confirmDiscardUnsavedChanges()) return;
       editDiscount(target.dataset.discountId || '');
@@ -3987,6 +4695,18 @@ async function handleClick(event) {
     if (action === 'cancel-discount-edit') {
       if (!confirmDiscardUnsavedChanges()) return;
       cancelDiscountEdit();
+      return;
+    }
+
+    if (action === 'edit-expense') {
+      if (!confirmDiscardUnsavedChanges()) return;
+      editExpense(target.dataset.expenseId || '');
+      return;
+    }
+
+    if (action === 'cancel-expense-edit') {
+      if (!confirmDiscardUnsavedChanges()) return;
+      cancelExpenseEdit();
       return;
     }
 
@@ -4042,11 +4762,17 @@ async function handleClick(event) {
       ui.activeView = 'messages';
       renderApp();
     }
+    if (action === 'quick-start-work') await handleQuickStartWork();
     if (action === 'stop-work') await handleStopWork();
-    if (action === 'copy-message') await copyMessage();
-    if (action === 'copy-draft-message') await copyMessage();
+    if (action === 'copy-message') await copyMessage(target);
+    if (action === 'copy-draft-message') await copyMessage(target);
+    if (action === 'send-message-email') sendMessageEmail(target);
+    if (action === 'send-message-whatsapp') sendMessageWhatsapp(target);
     if (action === 'remove-season') await removeSeason(target.dataset.seasonId);
+    if (action === 'remove-guest-adjustment') await removeGuestAdjustment(target.dataset.reservationId, target.dataset.adjustmentId);
     if (action === 'remove-discount') await removeDiscount(target.dataset.discountId);
+    if (action === 'remove-expense') await removeExpense(target.dataset.expenseId);
+    if (action === 'remove-own-work-session') await removeOwnWorkSession(target.dataset.workSessionId);
     if (action === 'remove-group-discount') await removeGroupDiscount(target.dataset.groupDiscountId);
     if (action === 'export-data') exportData();
     if (action === 'export-report') exportReport(target.dataset.report || 'summary');
@@ -4082,6 +4808,7 @@ async function handleSubmit(event) {
     if (formType === 'employee-profile') await handleEmployeeProfileSubmit(form);
     if (formType === 'employee-rate') await handleEmployeeRateSubmit(form);
     if (formType === 'employee-work') await handleEmployeeWorkSubmit(form);
+    if (formType === 'work-active-details') await handleActiveWorkDetailsSubmit(form);
     if (formType === 'work-start') await handleStartWork(form);
     if (formType === 'work-manual') await handleManualWorkSubmit(form);
     if (formType === 'message') handleMessageSubmit(form);

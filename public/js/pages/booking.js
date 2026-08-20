@@ -1448,6 +1448,7 @@ export async function initBookingPage() {
           days: bikeRentalDays
         }
       },
+      depositPrepay: includeDeposit,
       marketingOptIn: Boolean(marketingOptInInput?.checked),
       comments,
       pricing: totalBreakdown.discount.valid ? {

@@ -38,8 +38,38 @@ A scaffold means a made static HTML page ready for owner review/approval. A plac
 ### Tweaks
 
 - [~] Admin page
+  - [c] Dashboard
+    - [c] Added a quick "Iniciar trabalho" / "Terminar trabalho" button next to "Criar reserva" for owner/dev users.
+      - Note: Quick start uses the user's default work mode and records the task as "Outro - Iniciado no painel"; detailed task ticking remains in "O meu trabalho".
+  - [c] Calendar
+    - [c] Added "Gerir reserva" next to the reservation actions so calendar entries can open the reservation editor directly.
+  - [c] Reservas
+    - [c] Website requests now show whether the guest wants to pay the security deposit in advance or only on arrival.
+    - [c] Added mid-stay extra guest entries to reservation editing, including pro-rated accommodation calculation from the extra guest arrival date until checkout.
+      - Note: Extra guest entries preserve the original reservation guest count, are collapsed behind an "Adicionar hóspedes extra" button, keep only dates/counts/child ages/discount, and appear in expanded reservation details and audit details.
+    - [c] Moved the extra-guest button to the quiet spot between "Notas operacionais" and the Booking.com paste box, without helper text around it.
+    - [c] Extra guest discounts now support fixed value or percentage, store payment status, show a dedicated details section, and are included in guest statistics.
+    - [c] Extra guest payment status can now be edited from the reservation editor, and ordinary reservation edits no longer open the Mensagens tab automatically.
+    - [c] Saving or cancelling reservation edits now clears the silently applied reservation-ID search filter.
+  - [c] Mensagens
+    - [c] Payment instructions now include a localized cost breakdown for accommodation, extra guests, bikes/services, deposit, discounts, and total.
+    - [c] Message textareas are editable before copying/opening email/WhatsApp, and quick actions use the edited textarea text.
+  - [c] Preços e descontos
+    - [c] Added an edit button next to remove for seasonal prices.
+    - [c] Edit buttons now scroll to the matching editor form after opening it.
+  - [c] Despesas
+    - [c] Added edit and remove buttons to the expenses list.
+    - [c] Edit buttons now scroll to the expense editor form after opening it.
+  - [c] O meu trabalho
+    - [c] Added edit and remove buttons to the user's own work history.
+    - [c] Active work counters now expose type-of-work and task checkboxes, with a save button before stopping the counter.
+    - [c] Work edit buttons now scroll to the active or manual work editor.
+    - [c] The own-work edit cancel button now sits next to the save button instead of above the form.
+  - [c] UI consistency
+    - [c] Normalized save/add/edit/remove/start/stop buttons with matching icons and primary/secondary styling where the same action appears in multiple places.
+  - [c] Definições / audit log
+    - [c] Expanded audit entries now show richer current-record details and saved action details where available.
   - [ ] Calendar
-    - [ ] There should be a button next to "Gerar Mensagem" to "Gerir Reserva" that opens the reservations tab in the proper reservation in editing mode
     - [ ] Have a text box where they can paste the text of the booking.com email in there and the app would look for the information to fill up the field, need to use an example of email to be able to code the data scrapper.
 
 ## Additions
@@ -79,9 +109,12 @@ The current `contacto.html` page already has a usable prototype flow: structured
 
 ## 3.2 Reservation lifecycle improvements --> this is to be added to the Admin page
 
-- [ ] Add a reservation status for a guest who is added after the stay has already begun.
-- [ ] Define how this status affects occupancy, price, guest records, and reporting.
-- [ ] Ensure mid-stay additions appear in the reservation timeline and audit log.
+- [~] Add a reservation status for a guest who is added after the stay has already begun.
+  - [c] Implemented the current prototype as pro-rated "hóspedes extra" entries inside the reservation instead of a separate status.
+- [c] Define how this status affects occupancy, price, guest records, and reporting.
+  - Note: Pricing now counts extra guests only from their arrival date until checkout and validates against the occupancy limit.
+- [c] Ensure mid-stay additions appear in the reservation timeline and audit log.
+  - Note: Extra guests appear in expanded reservation details and audit detail views; a fuller timeline can still be added later.
 
 ---
 

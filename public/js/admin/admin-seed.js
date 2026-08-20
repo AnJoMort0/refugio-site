@@ -309,6 +309,7 @@ export function createInitialAdminState(now = new Date()) {
         extras: {
           bikes: { count: 0, days: 0 }
         },
+        depositPrepay: false,
         marketingOptIn: true,
         comments: 'Gostaria de saber se há berço disponível.',
         estimatedTotal: 510
@@ -337,6 +338,7 @@ export function createInitialAdminState(now = new Date()) {
         extras: {
           bikes: { count: 1, days: 2 }
         },
+        depositPrepay: true,
         marketingOptIn: false,
         comments: 'Chegada provável ao fim da tarde.',
         estimatedTotal: 385

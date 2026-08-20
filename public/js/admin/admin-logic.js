@@ -86,6 +86,54 @@ const REQUEST_COMMENT_LABELS = {
   }
 };
 
+const PAYMENT_BREAKDOWN_LABELS = {
+  pt: {
+    accommodation: 'Alojamento',
+    extraGuests: 'Hóspedes extra',
+    services: 'Serviços / bicicletas',
+    bikeUnits: 'bicicleta-dia(s)',
+    deposit: 'Depósito de segurança',
+    discount: 'Descontos',
+    total: 'Total a transferir'
+  },
+  fr: {
+    accommodation: 'Hébergement',
+    extraGuests: 'Personnes supplémentaires',
+    services: 'Services / vélos',
+    bikeUnits: 'vélo-jour(s)',
+    deposit: 'Dépôt de garantie',
+    discount: 'Réductions',
+    total: 'Total à transférer'
+  },
+  en: {
+    accommodation: 'Accommodation',
+    extraGuests: 'Extra guests',
+    services: 'Services / bikes',
+    bikeUnits: 'bike-day(s)',
+    deposit: 'Security deposit',
+    discount: 'Discounts',
+    total: 'Total to transfer'
+  },
+  es: {
+    accommodation: 'Alojamiento',
+    extraGuests: 'Huéspedes extra',
+    services: 'Servicios / bicicletas',
+    bikeUnits: 'bicicleta-día(s)',
+    deposit: 'Depósito de seguridad',
+    discount: 'Descuentos',
+    total: 'Total a transferir'
+  },
+  de: {
+    accommodation: 'Unterkunft',
+    extraGuests: 'Zusätzliche Gäste',
+    services: 'Services / Fahrräder',
+    bikeUnits: 'Fahrrad-Tag(e)',
+    deposit: 'Kaution',
+    discount: 'Rabatte',
+    total: 'Zu überweisender Gesamtbetrag'
+  }
+};
+
 const MESSAGE_LOCALES = {
   pt: 'pt-PT',
   fr: 'fr-FR',
@@ -258,6 +306,54 @@ function getNightlyAccommodationValue(dateKey, adults, children, state, fallback
   return (paidAdults * adultNight) + (Math.max(0, children) * childNight);
 }
 
+function getNightlyAdditionalGuestValue(dateKey, adults, children, state, fallbackPricing = {}) {
+  const rule = getPricingRuleForDate(state, dateKey);
+  const adultNight = Number(rule?.adultNight ?? fallbackPricing.adultNight ?? state?.pricing?.adultNight ?? 0);
+  const childNight = Number(rule?.childNight ?? fallbackPricing.childNight ?? state?.pricing?.childNight ?? 0);
+  return (Math.max(0, adults) * adultNight) + (Math.max(0, children) * childNight);
+}
+
+function getExtraGuestAdjustmentAccommodationValue(reservation, adjustment, state) {
+  const fromDate = String(adjustment.fromDate || adjustment.from || '').trim();
+  const effectiveStart = fromDate && fromDate > reservation.stay.checkIn ? fromDate : reservation.stay.checkIn;
+  const effectiveEnd = reservation.stay.checkOut;
+  if (!effectiveStart || !effectiveEnd || parseDateKey(effectiveEnd) <= parseDateKey(effectiveStart)) return 0;
+
+  return eachNightDateKey(effectiveStart, effectiveEnd).reduce(
+    (subtotal, dateKey) => subtotal + getNightlyAdditionalGuestValue(
+      dateKey,
+      Number(adjustment.adults || 0),
+      Number(adjustment.children || 0),
+      state,
+      reservation.pricing
+    ),
+    0
+  );
+}
+
+function getExtraGuestAdjustmentDiscountValue(adjustment, accommodation) {
+  const discountType = adjustment.discountType || (Number(adjustment.discountPercent || 0) > 0 ? 'percentage' : 'amount');
+  if (discountType === 'percentage') {
+    return Math.round(accommodation * (Math.min(100, Math.max(0, Number(adjustment.discountPercent || 0))) / 100));
+  }
+
+  return Math.max(0, Number(adjustment.discountAmount || 0));
+}
+
+export function calculateExtraGuestAdjustmentTotals(reservation, state) {
+  const adjustments = Array.isArray(reservation.guestAdjustments) ? reservation.guestAdjustments : [];
+  return adjustments.map((adjustment) => {
+    const accommodation = getExtraGuestAdjustmentAccommodationValue(reservation, adjustment, state);
+    const discount = Math.min(accommodation, getExtraGuestAdjustmentDiscountValue(adjustment, accommodation));
+    return {
+      adjustment,
+      accommodation,
+      discount,
+      total: Math.max(0, accommodation - discount)
+    };
+  });
+}
+
 export function calculateReservationTotals(reservation, state) {
   const nights = diffNights(reservation.stay.checkIn, reservation.stay.checkOut);
   const adults = Number(reservation.guests?.adults || 0);
@@ -265,9 +361,12 @@ export function calculateReservationTotals(reservation, state) {
   const bikeDay = Number(reservation.pricing?.bikeDay || state.pricing.bikeDay);
   const bikeUnits = Number(reservation.extras?.bikes?.count || 0) * Number(reservation.extras?.bikes?.days || 0);
   const nightDates = eachNightDateKey(reservation.stay.checkIn, reservation.stay.checkOut);
-  const accommodation = nightDates.length
+  const baseAccommodation = nightDates.length
     ? nightDates.reduce((total, dateKey) => total + getNightlyAccommodationValue(dateKey, adults, children, state, reservation.pricing), 0)
     : nights * getNightlyAccommodationValue(reservation.stay.checkIn, adults, children, state, reservation.pricing);
+  const extraGuestTotals = calculateExtraGuestAdjustmentTotals(reservation, state);
+  const extraGuests = extraGuestTotals.reduce((total, item) => total + item.accommodation, 0);
+  const accommodation = baseAccommodation + extraGuests;
   const services = bikeUnits * bikeDay;
   const guestCount = adults + children;
   const groupDiscountPerNight = [...(state.pricing.groupDiscounts || [])]
@@ -278,11 +377,12 @@ export function calculateReservationTotals(reservation, state) {
   const manualDiscount = discountType === 'amount'
     ? Math.max(0, Number(reservation.pricing?.discountAmount || 0))
     : Math.round(accommodation * (Number(reservation.pricing?.discountPercent || 0) / 100));
-  const discount = Math.min(accommodation + services, manualDiscount + groupDiscount);
+  const extraGuestDiscount = extraGuestTotals.reduce((total, item) => total + item.discount, 0);
+  const discount = Math.min(accommodation + services, manualDiscount + groupDiscount + extraGuestDiscount);
   const deposit = reservation.pricing?.depositIncluded ? Number(state.pricing.securityDeposit || 0) : 0;
   const total = Math.max(0, accommodation + services + deposit - discount);
 
-  return { nights, accommodation, services, deposit, discount, total, bikeUnits, groupDiscount, manualDiscount };
+  return { nights, accommodation, baseAccommodation, extraGuests, services, deposit, discount, total, bikeUnits, groupDiscount, manualDiscount, extraGuestDiscount };
 }
 
 export function findReservationConflicts(state, candidate, ignoreId = '') {
@@ -294,7 +394,10 @@ export function findReservationConflicts(state, candidate, ignoreId = '') {
 }
 
 export function getGuestCount(reservation) {
-  return Number(reservation.guests?.adults || 0) + Number(reservation.guests?.children || 0);
+  const baseGuests = Number(reservation.guests?.adults || 0) + Number(reservation.guests?.children || 0);
+  const extraGuests = (Array.isArray(reservation.guestAdjustments) ? reservation.guestAdjustments : [])
+    .reduce((total, adjustment) => total + Number(adjustment.adults || 0) + Number(adjustment.children || 0), 0);
+  return baseGuests + extraGuests;
 }
 
 export function makeId(prefix, collection) {
@@ -357,7 +460,7 @@ export function reservationFromWebsiteRequest(state, request, currentUser) {
       discountPercent: Number(request.pricing?.discountPercent || 0),
       discountAmount: Number(request.pricing?.discountAmount || 0),
       discountCode: request.pricing?.discountCode || '',
-      depositIncluded: false
+      depositIncluded: Boolean(request.depositPrepay)
     },
     extras: {
       bikes: {
@@ -365,6 +468,7 @@ export function reservationFromWebsiteRequest(state, request, currentUser) {
         days: Number(request.extras?.bikes?.days || 0)
       }
     },
+    guestAdjustments: [],
     notes: {
       owner: request.comments || '',
       operational: ''
@@ -375,7 +479,7 @@ export function reservationFromWebsiteRequest(state, request, currentUser) {
   };
 }
 
-export function addAudit(state, currentUser, action, entityType, entityId) {
+export function addAudit(state, currentUser, action, entityType, entityId, details = {}) {
   state.auditLog.unshift({
     id: makeId('AUDIT', state.auditLog),
     at: new Date().toISOString(),
@@ -383,7 +487,8 @@ export function addAudit(state, currentUser, action, entityType, entityId) {
     actorName: currentUser?.displayName || 'Sistema',
     action,
     entityType,
-    entityId
+    entityId,
+    details
   });
 }
 
@@ -477,6 +582,34 @@ function getPaymentReceivedLine(reservation, language = 'pt', catalog = {}) {
   return getNestedMessageSnippet(catalog, 'paymentReceivedLine', paymentStatus, language);
 }
 
+function getPaymentBreakdownText(reservation, state, language = 'pt', totals = calculateReservationTotals(reservation, state)) {
+  const labels = PAYMENT_BREAKDOWN_LABELS[language] || PAYMENT_BREAKDOWN_LABELS.pt;
+  const currency = state?.pricing?.currency || 'EUR';
+  const lines = [
+    `${labels.accommodation}: ${formatCurrency(totals.baseAccommodation ?? totals.accommodation, currency)}`
+  ];
+
+  if (totals.extraGuests > 0) {
+    lines.push(`${labels.extraGuests}: ${formatCurrency(totals.extraGuests, currency)}`);
+  }
+
+  if (totals.services > 0) {
+    const units = totals.bikeUnits ? ` (${totals.bikeUnits} ${labels.bikeUnits})` : '';
+    lines.push(`${labels.services}${units}: ${formatCurrency(totals.services, currency)}`);
+  }
+
+  if (totals.deposit > 0) {
+    lines.push(`${labels.deposit}: ${formatCurrency(totals.deposit, currency)}`);
+  }
+
+  if (totals.discount > 0) {
+    lines.push(`${labels.discount}: -${formatCurrency(totals.discount, currency)}`);
+  }
+
+  lines.push(`${labels.total}: ${formatCurrency(totals.total, currency)}`);
+  return lines.join('\n');
+}
+
 function getGoogleReviewUrl(state) {
   return state?.property?.googleReviewUrl
     || state?.property?.googleMapsUrl
@@ -537,6 +670,7 @@ export function generateGuestMessage(reservation, state, templateKey = '', catal
     guestCount: String(getGuestCount(reservation)),
     propertyAddress: state.property.address || '',
     total: formatCurrency(totals.total, state.pricing.currency),
+    paymentBreakdown: getPaymentBreakdownText(reservation, state, language, totals),
     depositReminder: getDepositReminderLine(reservation, state, language, catalog),
     paymentReceivedLine: getPaymentReceivedLine(reservation, language, catalog),
     checkInTimeLine: getCheckInTimeLine(reservation, state, language, catalog),
@@ -568,6 +702,7 @@ export function generateStandaloneMessage(state, language = 'pt', templateKey = 
     guestCount: placeholders.guestCount,
     propertyAddress: state?.property?.address || 'Rua da Arejinha 627, 4550-518 Pedorido',
     total: placeholders.total,
+    paymentBreakdown: placeholders.total,
     depositReminder: getDepositReminderLine({ source: 'website', paymentStatus: 'awaiting_transfer', pricing: { depositIncluded: false } }, state, language, catalog),
     paymentReceivedLine: '',
     checkInTimeLine: getCheckInTimeLine({ stay: { checkInTime: '' } }, state, language, catalog),

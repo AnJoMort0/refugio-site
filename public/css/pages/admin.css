@@ -349,6 +349,37 @@
   font-weight: 800;
 }
 
+.admin-record-details .admin-record-detail-section {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.admin-record-details .admin-record-detail-section dd {
+  font-weight: 600;
+}
+
+.admin-record-details .admin-extra-guest-lines {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0;
+  border-bottom: 0;
+}
+
+.admin-record-details .admin-extra-guest-lines p {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.35rem 0.8rem;
+  margin: 0;
+  padding: 0.65rem;
+  border: 1px solid rgba(90, 75, 63, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.admin-record-details .admin-extra-guest-lines strong {
+  color: var(--color-charcoal-earth);
+}
+
 .admin-record {
   display: grid;
   gap: 0.85rem;
@@ -867,6 +898,17 @@ form.is-dirty::before {
   font-size: 0.78rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.admin-table-select {
+  width: min(100%, 12rem);
+  min-height: 2.4rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid rgba(90, 75, 63, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-charcoal-earth);
+  font: inherit;
 }
 
 .admin-inline-form {
