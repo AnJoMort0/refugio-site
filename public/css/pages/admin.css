@@ -520,6 +520,28 @@
   min-width: 0;
 }
 
+.admin-date-control {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--color-charcoal-earth);
+  font-size: 1rem;
+}
+
+.admin-date-control input[data-date-text] {
+  min-width: 0;
+}
+
+.admin-native-date-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .admin-field textarea {
   min-height: 6rem;
   resize: vertical;

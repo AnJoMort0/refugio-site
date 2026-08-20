@@ -253,8 +253,8 @@ function parseAdminDateInput(value, label = 'Data') {
 
   if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) return trimmedValue;
 
-  const match = trimmedValue.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (!match) throw new Error(`${label} deve estar no formato dd/mm/aaaa.`);
+  const match = trimmedValue.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
+  if (!match) throw new Error(`${label} deve estar no formato dd/mm/aaaa, dd.mm.aaaa ou dd-mm-aaaa.`);
 
   const [, dayText, monthText, yearText] = match;
   const day = Number(dayText);
@@ -269,8 +269,55 @@ function parseAdminDateInput(value, label = 'Data') {
   return formatDateKey(date);
 }
 
+function parseOptionalAdminDateInput(value, label = 'Data') {
+  const trimmedValue = String(value || '').trim();
+  return trimmedValue ? parseAdminDateInput(trimmedValue, label) : '';
+}
+
+function getAdminDateInputPattern() {
+  return '\\d{1,2}[./-]\\d{1,2}[./-]\\d{4}';
+}
+
+function getAdminFlexibleDateInputPattern() {
+  return '\\d{1,2}[./-]\\d{1,2}(?:[./-]\\d{4})?';
+}
+
 function formatDateInputValue(value) {
   return value ? formatCompactDate(value) : '';
+}
+
+function getDatePickerValueFromText(value) {
+  const trimmedValue = String(value || '').trim();
+  if (!trimmedValue) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) return trimmedValue;
+
+  const fullDateMatch = trimmedValue.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
+  if (fullDateMatch) {
+    const [, dayText, monthText, yearText] = fullDateMatch;
+    const date = new Date(Number(yearText), Number(monthText) - 1, Number(dayText));
+    if (!Number.isNaN(date.getTime())) return formatDateKey(date);
+  }
+
+  const monthDayMatch = trimmedValue.match(/^(\d{1,2})[./-](\d{1,2})$/);
+  if (monthDayMatch) {
+    const [, dayText, monthText] = monthDayMatch;
+    const date = new Date(new Date().getFullYear(), Number(monthText) - 1, Number(dayText));
+    if (!Number.isNaN(date.getTime())) return formatDateKey(date);
+  }
+
+  return '';
+}
+
+function renderAdminDateControl({ name, value = '', placeholder = 'dd/mm/aaaa', required = false, pattern = getAdminDateInputPattern() }) {
+  const pickerValue = getDatePickerValueFromText(value);
+
+  return `
+    <span class="admin-date-control" data-date-control>
+      <input name="${escapeHtml(name)}" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" pattern="${pattern}" data-date-text${required ? ' required' : ''} />
+      <input class="admin-native-date-input" type="date" value="${escapeHtml(pickerValue)}" tabindex="-1" aria-hidden="true" data-date-picker />
+      <button class="admin-icon-button admin-inline-icon-button admin-date-picker-button" type="button" data-action="open-date-picker" aria-label="Abrir calendário">${icon('calendarDays')}</button>
+    </span>
+  `;
 }
 
 function formatTimeInputValue(value) {
@@ -281,8 +328,8 @@ function formatTimeInputValue(value) {
 }
 
 function parseAdminMonthDayInput(value, label = 'Data') {
-  const match = String(value || '').trim().match(/^(\d{1,2})\/(\d{1,2})$/);
-  if (!match) throw new Error(`${label} deve estar no formato dd/mm.`);
+  const match = String(value || '').trim().match(/^(\d{1,2})[./-](\d{1,2})(?:[./-]\d{4})?$/);
+  if (!match) throw new Error(`${label} deve estar no formato dd/mm, dd.mm, dd-mm ou uma data completa equivalente.`);
 
   const day = Number(match[1]);
   const month = Number(match[2]);
@@ -1466,11 +1513,11 @@ function renderCreateReservationForm() {
         </label>
         <label class="admin-field">
           <span>Check-in *</span>
-          <input name="checkIn" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(formatDateInputValue(defaults.checkIn))}" placeholder="dd/mm/aaaa" pattern="\\d{1,2}/\\d{1,2}/\\d{4}" required />
+          ${renderAdminDateControl({ name: 'checkIn', value: formatDateInputValue(defaults.checkIn), required: true })}
         </label>
         <label class="admin-field">
           <span>Check-out *</span>
-          <input name="checkOut" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(formatDateInputValue(defaults.checkOut))}" placeholder="dd/mm/aaaa" pattern="\\d{1,2}/\\d{1,2}/\\d{4}" required />
+          ${renderAdminDateControl({ name: 'checkOut', value: formatDateInputValue(defaults.checkOut), required: true })}
         </label>
         <label class="admin-field">
           <span>Referência externa</span>
@@ -1737,11 +1784,11 @@ function renderSeasonForm() {
       </label>
       <label class="admin-field">
         <span>Início</span>
-        <input name="startDate" type="text" inputmode="numeric" value="01/06" placeholder="dd/mm ou dd/mm/aaaa" required />
+        ${renderAdminDateControl({ name: 'startDate', value: '01/06', placeholder: 'dd/mm ou dd/mm/aaaa', pattern: getAdminFlexibleDateInputPattern(), required: true })}
       </label>
       <label class="admin-field">
         <span>Fim</span>
-        <input name="endDate" type="text" inputmode="numeric" value="30/09" placeholder="dd/mm ou dd/mm/aaaa" required />
+        ${renderAdminDateControl({ name: 'endDate', value: '30/09', placeholder: 'dd/mm ou dd/mm/aaaa', pattern: getAdminFlexibleDateInputPattern(), required: true })}
       </label>
       <label class="admin-field">
         <span>Preço adulto/noite</span>
@@ -1900,6 +1947,34 @@ function renderDiscountUses(discount) {
   return maxUses ? `${usedCount}/${maxUses}` : 'Ilimitado';
 }
 
+function renderDiscountPeriod(discount) {
+  const start = discount.startDate ? formatCompactDate(discount.startDate) : '';
+  const end = discount.endDate ? formatCompactDate(discount.endDate) : '';
+  if (start && end) return `${start} - ${end}`;
+  if (start) return `Desde ${start}`;
+  if (end) return `Até ${end}`;
+  return 'Sem limite';
+}
+
+function formatMaxUsesInputValue(value) {
+  const maxUses = Math.max(0, Number(value || 0));
+  return maxUses ? String(maxUses) : 'Não';
+}
+
+function parseMaxUsesInputValue(value) {
+  const normalizedValue = String(value || '').trim().toLowerCase();
+  if (!normalizedValue || normalizedValue === 'não' || normalizedValue === 'nao' || normalizedValue === 'no') return 0;
+  const numberValue = Number(normalizedValue.replace(',', '.'));
+  if (!Number.isFinite(numberValue) || numberValue < 0) {
+    throw new Error('O máximo de usos deve ser "Não" ou um número igual ou superior a 1.');
+  }
+  return Math.max(0, Math.floor(numberValue));
+}
+
+function normalizeMaxUsesInput(input) {
+  input.value = formatMaxUsesInputValue(parseMaxUsesInputValue(input.value));
+}
+
 function renderDiscountList() {
   if (!state.pricing.discounts.length) return '<p class="admin-empty">Ainda não há descontos configurados.</p>';
 
@@ -1912,7 +1987,7 @@ function renderDiscountList() {
             <tr>
               <td>${escapeHtml(discount.title)}</td>
               <td><code>${escapeHtml(discount.code || '-')}</code></td>
-              <td>${formatCompactDate(discount.startDate)} - ${formatCompactDate(discount.endDate)}</td>
+              <td>${escapeHtml(renderDiscountPeriod(discount))}</td>
               <td>${renderDiscountValue(discount)}</td>
               <td>${renderDiscountUses(discount)}</td>
               <td>${discount.active ? 'Ativo' : 'Inativo'}</td>
@@ -1933,7 +2008,6 @@ function renderDiscountList() {
 }
 
 function renderDiscountForm() {
-  const today = formatDateKey(new Date());
   const editingDiscount = state.pricing.discounts.find((discount) => discount.id === ui.editingDiscountId);
   const discountType = editingDiscount ? getDiscountType(editingDiscount) : 'percentage';
   const discountValue = discountType === 'amount'
@@ -1956,11 +2030,11 @@ function renderDiscountForm() {
       </label>
       <label class="admin-field">
         <span>Início</span>
-        <input name="startDate" type="date" value="${escapeHtml(editingDiscount?.startDate || today)}" required />
+        ${renderAdminDateControl({ name: 'startDate', value: formatDateInputValue(editingDiscount?.startDate || ''), placeholder: 'Sem limite' })}
       </label>
       <label class="admin-field">
         <span>Fim</span>
-        <input name="endDate" type="date" value="${escapeHtml(editingDiscount?.endDate || today)}" required />
+        ${renderAdminDateControl({ name: 'endDate', value: formatDateInputValue(editingDiscount?.endDate || ''), placeholder: 'Sem limite' })}
       </label>
       <label class="admin-field">
         <span>Tipo</span>
@@ -1975,7 +2049,7 @@ function renderDiscountForm() {
       </label>
       <label class="admin-field">
         <span>Máximo de usos</span>
-        <input name="maxUses" type="number" min="0" step="1" value="${Number(editingDiscount?.maxUses || 0)}" placeholder="0 = ilimitado" />
+        <input name="maxUses" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(formatMaxUsesInputValue(editingDiscount?.maxUses || 0))}" data-max-uses-input />
       </label>
       <label class="admin-field">
         <span>Aplica-se a</span>
@@ -2048,7 +2122,7 @@ function renderExpenseForm() {
     <form class="admin-form-grid admin-subform" data-form="expense">
       <label class="admin-field">
         <span>Data</span>
-        <input name="date" type="date" value="${formatDateKey(new Date())}" required />
+        ${renderAdminDateControl({ name: 'date', value: formatDateInputValue(formatDateKey(new Date())), required: true })}
       </label>
       <label class="admin-field">
         <span>Categoria</span>
@@ -2126,7 +2200,7 @@ function renderEmployeesView() {
                         </label>
                         <label class="admin-field">
                           <span>Desde</span>
-                          <input name="from" type="date" value="${formatDateKey(new Date())}" />
+                          ${renderAdminDateControl({ name: 'from', value: formatDateInputValue(formatDateKey(new Date())) })}
                         </label>
                         <button class="button admin-secondary-button admin-small-button" type="submit">Guardar taxa</button>
                       </form>
@@ -2188,7 +2262,7 @@ function renderEmployeeWorkCorrectionForm(employee) {
       </div>
       <label class="admin-field">
         <span>Data</span>
-        <input name="date" type="date" value="${escapeHtml(editingSession?.date || formatDateKey(new Date()))}" required />
+        ${renderAdminDateControl({ name: 'date', value: formatDateInputValue(editingSession?.date || formatDateKey(new Date())), required: true })}
       </label>
       <label class="admin-field">
         <span>Início</span>
@@ -2259,12 +2333,14 @@ function getWorkFormDetails(data, employee) {
   }
 
   const compensationType = String(data.get('compensationType') || getEmployeeDefaultCompensation(employee));
+  const dateInput = String(data.get('date') || '').trim();
+  const rateDate = dateInput ? parseAdminDateInput(dateInput, 'Data do trabalho') : formatDateKey(new Date());
 
   return {
     compensationType,
     tasks,
     otherDetails,
-    rateSnapshot: compensationType === 'paid' ? getHourlyRate(employee, String(data.get('date') || formatDateKey(new Date()))) : 0
+    rateSnapshot: compensationType === 'paid' ? getHourlyRate(employee, rateDate) : 0
   };
 }
 
@@ -2329,7 +2405,7 @@ function renderWorkView() {
         <form class="admin-form-grid admin-subform" data-form="work-manual">
           <label class="admin-field">
             <span>Data</span>
-            <input name="date" type="date" value="${formatDateKey(new Date())}" required />
+            ${renderAdminDateControl({ name: 'date', value: formatDateInputValue(formatDateKey(new Date())), required: true })}
           </label>
           <label class="admin-field">
             <span>Início</span>
@@ -2515,11 +2591,11 @@ function renderReportsView() {
         </label>
         <label class="admin-field">
           <span>Início personalizado</span>
-          <input name="startDate" type="text" inputmode="numeric" value="${escapeHtml(formatDateInputValue(ui.reportFilters.startDate))}" placeholder="dd/mm/aaaa" />
+          ${renderAdminDateControl({ name: 'startDate', value: formatDateInputValue(ui.reportFilters.startDate) })}
         </label>
         <label class="admin-field">
           <span>Fim personalizado</span>
-          <input name="endDate" type="text" inputmode="numeric" value="${escapeHtml(formatDateInputValue(ui.reportFilters.endDate))}" placeholder="dd/mm/aaaa" />
+          ${renderAdminDateControl({ name: 'endDate', value: formatDateInputValue(ui.reportFilters.endDate) })}
         </label>
         <button class="button admin-secondary-button" type="submit">Atualizar</button>
       </form>
@@ -3220,14 +3296,14 @@ async function handleGroupDiscountSubmit(form) {
 async function handleDiscountSubmit(form) {
   requirePermission(currentUser, 'pricing:write');
   const data = new FormData(form);
-  const startDate = String(data.get('startDate') || '');
-  const endDate = String(data.get('endDate') || '');
+  const startDate = parseOptionalAdminDateInput(data.get('startDate'), 'Início do desconto');
+  const endDate = parseOptionalAdminDateInput(data.get('endDate'), 'Fim do desconto');
   const type = String(data.get('type') || 'percentage');
   const discountValue = Math.max(0, Number(data.get('discountValue') || 0));
   const percentage = type === 'percentage' ? Math.min(100, discountValue) : 0;
   const amount = type === 'amount' ? discountValue : 0;
 
-  if (parseDateKey(endDate) < parseDateKey(startDate)) {
+  if (startDate && endDate && parseDateKey(endDate) < parseDateKey(startDate)) {
     throw new Error('A data final do desconto não pode ser anterior ao início.');
   }
 
@@ -3251,7 +3327,7 @@ async function handleDiscountSubmit(form) {
     type,
     percentage,
     amount,
-    maxUses: Math.max(0, Number(data.get('maxUses') || 0)),
+    maxUses: parseMaxUsesInputValue(data.get('maxUses')),
     startDate,
     endDate,
     appliesTo: String(data.get('appliesTo') || 'accommodation'),
@@ -3267,9 +3343,10 @@ async function handleDiscountSubmit(form) {
 async function handleExpenseSubmit(form) {
   requirePermission(currentUser, 'expenses:write');
   const data = new FormData(form);
+  const date = parseAdminDateInput(data.get('date'), 'Data da despesa');
   state.expenses.unshift({
     id: makeId('EXP', state.expenses),
-    date: String(data.get('date') || formatDateKey(new Date())),
+    date,
     category: String(data.get('category') || 'outros'),
     description: String(data.get('description') || '').trim(),
     amount: Math.max(0, Number(data.get('amount') || 0)),
@@ -3284,8 +3361,9 @@ async function handleEmployeeRateSubmit(form) {
   const data = new FormData(form);
   const employee = state.employees.find((candidate) => candidate.id === data.get('employeeId'));
   if (!employee) return;
+  const from = parseAdminDateInput(data.get('from') || formatDateInputValue(formatDateKey(new Date())), 'Data da taxa');
   employee.hourlyRates.push({
-    from: String(data.get('from') || formatDateKey(new Date())),
+    from,
     rate: Math.max(0, Number(data.get('rate') || 0))
   });
   employee.hourlyRates.sort((a, b) => a.from.localeCompare(b.from));
@@ -3309,7 +3387,7 @@ async function handleEmployeeWorkSubmit(form) {
   const data = new FormData(form);
   const employee = state.employees.find((candidate) => candidate.id === data.get('employeeId'));
   const workSessionId = String(data.get('workSessionId') || '');
-  const date = String(data.get('date') || '');
+  const date = parseAdminDateInput(data.get('date'), 'Data do trabalho');
   const start = String(data.get('start') || '');
   const end = String(data.get('end') || '');
   const startDateTime = `${date}T${start}:00`;
@@ -3355,7 +3433,7 @@ async function handleManualWorkSubmit(form) {
   requirePermission(currentUser, 'work:own');
   const employee = getEmployeeForUser(state, currentUser);
   const data = new FormData(form);
-  const date = String(data.get('date') || '');
+  const date = parseAdminDateInput(data.get('date'), 'Data do trabalho');
   const start = String(data.get('start') || '');
   const end = String(data.get('end') || '');
   const startDateTime = `${date}T${start}:00`;
@@ -3561,6 +3639,37 @@ function toggleManualWorkForm() {
   if (ui.showManualWorkForm && !confirmDiscardUnsavedChanges()) return;
   ui.showManualWorkForm = !ui.showManualWorkForm;
   renderApp();
+}
+
+function openNativeDatePicker(button) {
+  const control = button.closest('[data-date-control]');
+  const textInput = control?.querySelector('[data-date-text]');
+  const pickerInput = control?.querySelector('[data-date-picker]');
+  if (!(pickerInput instanceof HTMLInputElement)) return;
+
+  pickerInput.value = getDatePickerValueFromText(textInput?.value || '') || formatDateKey(new Date());
+
+  if (typeof pickerInput.showPicker === 'function') {
+    try {
+      pickerInput.showPicker();
+      return;
+    } catch (error) {
+      // Fall back to the older focus/click behavior below.
+    }
+  }
+
+  pickerInput.focus();
+  pickerInput.click();
+}
+
+function syncNativeDatePicker(pickerInput) {
+  const control = pickerInput.closest('[data-date-control]');
+  const textInput = control?.querySelector('[data-date-text]');
+  if (!(textInput instanceof HTMLInputElement) || !pickerInput.value) return;
+
+  textInput.value = formatDateInputValue(pickerInput.value);
+  const form = pickerInput.closest('form[data-form]');
+  if (form) markFormDirty(form);
 }
 
 async function handleRestoreRequest(requestId) {
@@ -3812,6 +3921,11 @@ async function handleClick(event) {
       return;
     }
 
+    if (action === 'open-date-picker') {
+      openNativeDatePicker(target);
+      return;
+    }
+
     if (action === 'toggle-audit') {
       toggleAuditEntry(target.dataset.auditId || '');
       return;
@@ -3982,6 +4096,22 @@ async function handleSubmit(event) {
 function handleChange(event) {
   const target = event.target;
   if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
+
+  if (target instanceof HTMLInputElement && target.matches('[data-date-picker]')) {
+    syncNativeDatePicker(target);
+    return;
+  }
+
+  if (target instanceof HTMLInputElement && target.matches('[data-max-uses-input]')) {
+    try {
+      target.setCustomValidity('');
+      normalizeMaxUsesInput(target);
+    } catch (error) {
+      target.setCustomValidity(error.message);
+      target.reportValidity();
+      return;
+    }
+  }
 
   const filterForm = target.closest('form[data-form="reservation-filters"]');
   if (filterForm) {

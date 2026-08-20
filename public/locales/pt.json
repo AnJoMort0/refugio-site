@@ -415,7 +415,7 @@
       "depositChoiceYes": "Sim",
       "depositChoiceNo": "Não",
       "bikesLabel": "Bicicletas",
-      "bikesPattern": "{bikes} x {days} dias = {units} bicicleta-dias",
+      "bikesPattern": "{bikes} x {days} dias",
       "discountLabel": "Desconto",
       "estimatedTotalLabel": "Total estimado",
       "note": "O valor final poderá variar consoante as datas, o número de hóspedes e eventuais condições adicionais.",
@@ -490,7 +490,7 @@
       "depositNote": "Se optou por adiantar o depósito, os 200€ serão devolvidos no check-out após verificação do espaço.",
       "childAgesTitle": "Idades das crianças",
       "bikeDaysTitle": "Bicicletas pedidas",
-      "bikeSummaryPattern": "{bikes} bicicletas x {days} dias = {units} bicicleta-dias",
+      "bikeSummaryPattern": "{bikes} bicicletas x {days} dias",
       "discountLabel": "Desconto aplicado",
       "commentsTitle": "Comentários enviados"
     },
