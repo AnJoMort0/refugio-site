@@ -210,6 +210,43 @@
   border: 0;
 }
 
+.accommodation-location-layout {
+  align-items: center;
+}
+
+.accommodation-location-copy {
+  text-align: right;
+}
+
+.location-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.85rem 1rem;
+  margin-top: var(--space-3);
+}
+
+.location-actions .button {
+  min-height: 2.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.location-map-button {
+  border: 1px solid rgba(67, 99, 75, 0.34);
+  background: rgba(250, 248, 244, 0.88);
+  color: var(--color-mountain-forest);
+}
+
+.location-map-button:hover,
+.location-map-button:focus-visible {
+  border-color: rgba(67, 99, 75, 0.58);
+  background: rgba(67, 99, 75, 0.1);
+  color: var(--color-mountain-forest);
+}
+
 .final-cta-card {
   display: grid;
   gap: var(--space-4);
@@ -301,6 +338,16 @@
 
   .spaces-group h3 {
     font-size: 1.45rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .accommodation-location-copy {
+    text-align: left;
+  }
+
+  .location-actions {
+    justify-content: flex-start;
   }
 }
 

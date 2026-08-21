@@ -291,9 +291,10 @@
     "location": {
       "eyebrow": "Localização",
       "title": "Rua da Arejinha 627, em Pedorido.",
-      "text": "Use o mapa para encontrar O Refúgio e abrir a localização no Google Maps.",
+      "text": "Use o mapa para encontrar O Refúgio no Google Maps.",
       "fallbackLink": "Abrir no Google Maps",
-      "mapTitle": "Mapa da localização do Refúgio"
+      "mapTitle": "Mapa da localização do Refúgio",
+      "guideLink": "Ver guia local"
     },
     "finalCta": {
       "eyebrow": "Reservas",
