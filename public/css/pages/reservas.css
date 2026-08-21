@@ -410,11 +410,18 @@
 }
 
 .calendar-empty {
-  min-height: 2.9rem;
+  min-height: 3.8rem;
 }
 
 .calendar-day {
-  min-height: 2.9rem;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-width: 0;
+  min-height: 3.8rem;
+  align-content: stretch;
+  justify-items: center;
+  gap: 0.08rem;
+  padding: 0.32rem 0.08rem 0.22rem;
   border: 1px solid rgba(90, 75, 63, 0.12);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.92);
@@ -422,6 +429,38 @@
   font: inherit;
   cursor: pointer;
   transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.calendar-day-number {
+  align-self: center;
+  font-size: 0.88rem;
+  line-height: 1;
+}
+
+.calendar-day-prices {
+  display: grid;
+  align-self: end;
+  justify-items: center;
+  gap: 0.06rem;
+  min-width: 0;
+  color: rgba(43, 38, 34, 0.48);
+  font-size: 0.52rem;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.calendar-day-price-original {
+  color: rgba(43, 38, 34, 0.56);
+  font-size: 0.48rem;
+  font-weight: 400;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.calendar-day-prices.is-discounted .calendar-day-price-current {
+  color: rgba(135, 49, 39, 0.78);
+  font-weight: 600;
 }
 
 .calendar-day:hover,
@@ -452,6 +491,11 @@
   background: rgba(168, 83, 59, 0.12);
   border-color: rgba(168, 83, 59, 0.26);
   color: rgba(122, 51, 35, 0.82);
+}
+
+.calendar-day.is-turnover.is-valid-checkout {
+  border-color: rgba(200, 154, 75, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(200, 154, 75, 0.3);
 }
 
 .calendar-day:disabled,
@@ -641,6 +685,8 @@ body[data-page="booking"] .sticky-booking-cta {
 
 .summary-rates > div[hidden],
 .summary-breakdown > div[hidden],
+.summary-rates[hidden],
+.summary-total[hidden],
 .summary-note[hidden] {
   display: none;
 }
@@ -654,6 +700,38 @@ body[data-page="booking"] .sticky-booking-cta {
 .summary-breakdown dd,
 .summary-total strong {
   font-weight: 800;
+}
+
+.summary-rates dd.is-limited-time-discount {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 0.15rem 0.5rem;
+  max-width: 13rem;
+  text-align: right;
+}
+
+.summary-rate-original {
+  color: rgba(43, 38, 34, 0.58);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
+
+.summary-rate-sale-label {
+  color: var(--color-promotion-red);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.summary-rate-sale-value {
+  flex-basis: 100%;
+  color: var(--color-promotion-red);
+  font-size: 1.35rem;
+  line-height: 1.1;
 }
 
 .summary-total {
@@ -781,6 +859,6 @@ body[data-page="booking"] .sticky-booking-cta {
   }
 
   .calendar-day {
-    min-height: 2.65rem;
+    min-height: 3.55rem;
   }
 }

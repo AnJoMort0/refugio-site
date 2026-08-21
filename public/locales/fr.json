@@ -38,6 +38,14 @@
       "primaryCta": "Voir les disponibilités",
       "secondaryCta": "Explorer les photos"
     },
+    "promotion": {
+      "label": "Offre à durée limitée",
+      "active": "Un tarif spécial est disponible jusqu’au {endDate} : économisez jusqu’à {discount}% sur le prix habituel.",
+      "startsTomorrow": "Un tarif spécial commence demain, du {startDate} au {endDate} : économisez jusqu’à {discount}%.",
+      "startsInDays": "Un tarif spécial commence dans {count} jours, du {startDate} au {endDate} : économisez jusqu’à {discount}%.",
+      "startsInWeeks": "Un tarif spécial commence dans environ {weeks} semaines, du {startDate} au {endDate} : économisez jusqu’à {discount}%.",
+      "cta": "Voir les dates et les prix"
+    },
     "features": {
       "pool": "Piscine avec vue",
       "privacy": "Intimité premium",
@@ -180,6 +188,21 @@
         "title": "Envie d’explorer les alentours ?",
         "text": "Ouvrez le Guide Local pour des suggestions près d’O Refúgio."
       }
+    }
+  },
+  "promotion": {
+    "saleBadge": "Offre"
+  },
+  "bookingPage": {
+    "availability": {
+      "dayPriceLabel": "{date}, {price}",
+      "discountedDayPriceLabel": "{date}, prix spécial {price}, prix habituel {originalPrice}"
+    },
+    "validation": {
+      "checkinCannotFitMinimumStay": "Il n’y a pas deux nuits consécutives disponibles à partir de cette date. Choisissez une autre date d’arrivée."
+    },
+    "summary": {
+      "specialRateLabel": "Prix spécial"
     }
   },
   "footer": {

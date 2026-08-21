@@ -277,22 +277,22 @@
               <h2 data-i18n="bookingPage.summary.title"></h2>
             </div>
 
-            <dl class="summary-rates">
+            <dl class="summary-rates" id="summary-rates" hidden>
               <div>
                 <dt data-i18n="bookingPage.summary.rateAdultLabel"></dt>
-                <dd data-price-adult>48€</dd>
+                <dd data-price-adult></dd>
               </div>
               <div id="summary-child-rate" hidden>
                 <dt data-i18n="bookingPage.summary.rateChildLabel"></dt>
-                <dd data-price-child>28€</dd>
+                <dd data-price-child></dd>
               </div>
               <div id="summary-bike-rate" hidden>
                 <dt data-i18n="bookingPage.summary.rateBikeLabel"></dt>
-                <dd data-price-bike>5€</dd>
+                <dd data-price-bike></dd>
               </div>
               <div id="summary-deposit-rate" hidden>
                 <dt data-i18n="bookingPage.summary.depositLabel"></dt>
-                <dd data-price-deposit>200€</dd>
+                <dd data-price-deposit></dd>
               </div>
             </dl>
 
@@ -331,9 +331,9 @@
               </div>
             </dl>
 
-            <div class="summary-total">
+            <div class="summary-total" id="summary-total-row" hidden>
               <span data-i18n="bookingPage.summary.estimatedTotalLabel"></span>
-              <strong id="summary-total">0€</strong>
+              <strong id="summary-total"></strong>
             </div>
 
             <p class="summary-note" data-i18n="bookingPage.summary.note"></p>

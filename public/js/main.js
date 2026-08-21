@@ -22,6 +22,15 @@ if (document.querySelector('[data-carousel]')) {
   pageTasks.push(import('./ui/carousels.js').then(({ initCarousels }) => initCarousels()));
 }
 
+if (
+  document.body.dataset.page !== 'booking' &&
+  document.querySelector('[data-promotion-sale-badge], [data-promotion-announcement]')
+) {
+  pageTasks.push(
+    import('./ui/pricing-promotion.js').then(({ initPricingPromotionUi }) => initPricingPromotionUi())
+  );
+}
+
 if (pageInitializer) {
   pageTasks.push(pageInitializer());
 }

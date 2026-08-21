@@ -475,6 +475,26 @@
   box-shadow: var(--shadow-strong);
 }
 
+.sticky-booking-sale {
+  position: absolute;
+  top: -0.55rem;
+  right: -0.35rem;
+  padding: 0.2rem 0.46rem;
+  border: 2px solid var(--color-soft-ivory);
+  border-radius: 999px;
+  background: var(--color-promotion-red);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  box-shadow: 0 5px 14px rgba(43, 38, 34, 0.24);
+}
+
+.sticky-booking-sale[hidden] {
+  display: none;
+}
+
 @media (min-width: 768px) {
   .footer-inner {
     padding-right: 7.5rem;

@@ -13,7 +13,6 @@ export const STATUS_LABELS = {
   request: 'Pedido',
   awaiting_payment: 'A aguardar pagamento',
   confirmed: 'Confirmada',
-  checked_in: 'Check-in realizado',
   checked_out: 'Check-out realizado',
   cancelled: 'Cancelada',
   no_show: 'Não compareceu'

@@ -222,6 +222,7 @@
 
 .admin-panel {
   display: grid;
+  align-content: start;
   gap: 1rem;
   padding: clamp(1rem, 2vw, 1.35rem);
 }
@@ -693,6 +694,30 @@ form.is-dirty::before {
   flex-wrap: wrap;
 }
 
+.admin-conflict-warning {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 2.4rem;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid rgba(184, 95, 59, 0.34);
+  border-radius: 8px;
+  background: rgba(255, 241, 236, 0.94);
+  color: #883f26;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.admin-conflict-warning .admin-icon {
+  flex: 0 0 auto;
+}
+
+.admin-conflict-warning[hidden] {
+  display: none;
+}
+
 .admin-contact-line {
   min-width: 0;
   display: flex;
@@ -840,8 +865,11 @@ form.is-dirty::before {
 }
 
 .calendar-dot {
-  display: block;
+  display: flex;
   min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.2rem;
   padding: 0.2rem 0.35rem;
   border-radius: 5px;
   background: rgba(90, 75, 63, 0.1);
@@ -849,9 +877,22 @@ form.is-dirty::before {
   font-size: 0.68rem;
   font-style: normal;
   line-height: 1.2;
+  white-space: nowrap;
+}
+
+.calendar-dot-name {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.calendar-boundary-marker {
+  flex: 0 0 auto;
+  color: rgba(43, 38, 34, 0.72);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
 .dot-awaiting_payment,

@@ -108,6 +108,7 @@ const ICONS = {
   rotateCcw: '<path d="M3 12a9 9 0 1 0 9-9 9.8 9.8 0 0 0-6.7 2.7L3 8"></path><path d="M3 3v5h5"></path>',
   settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.73l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"></path><circle cx="12" cy="12" r="3"></circle>',
   timer: '<line x1="10" x2="14" y1="2" y2="2"></line><line x1="12" x2="15" y1="14" y2="11"></line><circle cx="12" cy="14" r="8"></circle>',
+  triangleAlert: '<path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path>',
   trash: '<path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path>',
   userPlus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M19 8v6"></path><path d="M22 11h-6"></path>',
   users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>'
@@ -175,6 +176,43 @@ function renderSourceBadge(source) {
 
 function renderLanguageBadge(language) {
   return `<span class="admin-source">${escapeHtml(LANGUAGE_LABELS[language] || language || '-')}</span>`;
+}
+
+function stayTouchesCalendarDate(stay, dateKey) {
+  if (!stay?.checkIn || !stay?.checkOut || !dateKey) return false;
+  return reservationTouchesDate({ stay }, dateKey) || stay.checkOut === dateKey;
+}
+
+function getCalendarBoundaryMarker(stay, dateKey) {
+  if (stay?.checkIn === dateKey) return { symbol: '->|', label: 'Check-in' };
+  if (stay?.checkOut === dateKey) return { symbol: '|->', label: 'Check-out' };
+  return null;
+}
+
+function renderCalendarReservationDot(reservation, dateKey) {
+  const marker = getCalendarBoundaryMarker(reservation.stay, dateKey);
+  return `
+    <i class="calendar-dot dot-${escapeHtml(reservation.status)}">
+      <span class="calendar-dot-name">${escapeHtml(reservation.contact.name)}</span>
+      ${marker ? `<b class="calendar-boundary-marker" title="${marker.label}" aria-label="${marker.label}">${marker.symbol}</b>` : ''}
+    </i>
+  `;
+}
+
+function getStayConflicts(stay, ignoreId = '') {
+  if (!stay?.checkIn || !stay?.checkOut || stay.checkIn >= stay.checkOut) return [];
+  return findReservationConflicts(state, { stay }, ignoreId);
+}
+
+function getConflictWarningText(conflicts) {
+  return `Conflito com ${conflicts.map((reservation) =>
+    `${reservation.contact.name} (${formatStayRange(reservation.stay)})`
+  ).join(', ')}.`;
+}
+
+function renderConflictWarningContent(conflicts) {
+  if (!conflicts.length) return '';
+  return `${icon('triangleAlert')}<span>${escapeHtml(getConflictWarningText(conflicts))}</span>`;
 }
 
 function getAvailableMessageTemplates() {
@@ -1119,9 +1157,9 @@ function renderCalendarView() {
   const monthLabel = new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(ui.calendarMonth);
   const todayKey = formatDateKey(new Date());
   const days = getCalendarDays(ui.calendarMonth);
-  const selectedEntries = state.reservations.filter((reservation) => reservationTouchesDate(reservation, ui.selectedDate));
+  const selectedEntries = state.reservations.filter((reservation) => stayTouchesCalendarDate(reservation.stay, ui.selectedDate));
   const selectedRequests = state.websiteRequests.filter((request) =>
-    request.status === 'new' && reservationTouchesDate({ stay: request.stay }, ui.selectedDate)
+    request.status === 'new' && stayTouchesCalendarDate(request.stay, ui.selectedDate)
   );
   const weekdays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
@@ -1144,19 +1182,21 @@ function renderCalendarView() {
         ${Object.entries(STATUS_LABELS).filter(([status]) => ['awaiting_payment', 'confirmed', 'checked_in', 'cancelled'].includes(status)).map(([status, label]) => `
           <span>${renderStatusBadge(status)} ${escapeHtml(label)}</span>
         `).join('')}
+        <span><b class="calendar-boundary-marker">-&gt;|</b> Check-in</span>
+        <span><b class="calendar-boundary-marker">|-&gt;</b> Check-out</span>
       </div>
       <div class="admin-calendar-grid">
         ${weekdays.map((day) => `<strong class="admin-calendar-weekday">${day}</strong>`).join('')}
         ${days.map((day) => {
           const dateKey = formatDateKey(day);
-          const entries = state.reservations.filter((reservation) => reservationTouchesDate(reservation, dateKey));
-          const requests = state.websiteRequests.filter((request) => request.status === 'new' && reservationTouchesDate({ stay: request.stay }, dateKey));
+          const entries = state.reservations.filter((reservation) => stayTouchesCalendarDate(reservation.stay, dateKey));
+          const requests = state.websiteRequests.filter((request) => request.status === 'new' && stayTouchesCalendarDate(request.stay, dateKey));
           const isOutsideMonth = day.getMonth() !== ui.calendarMonth.getMonth();
           return `
             <button class="admin-calendar-day${dateKey === ui.selectedDate ? ' is-selected' : ''}${dateKey === todayKey ? ' is-today' : ''}${isOutsideMonth ? ' is-muted' : ''}" type="button" data-action="select-date" data-date="${dateKey}">
               <span class="admin-calendar-number">${day.getDate()}</span>
               <span class="admin-calendar-items">
-                ${entries.slice(0, 2).map((reservation) => `<i class="calendar-dot dot-${escapeHtml(reservation.status)}">${escapeHtml(reservation.contact.name)}</i>`).join('')}
+                ${entries.slice(0, 2).map((reservation) => renderCalendarReservationDot(reservation, dateKey)).join('')}
                 ${requests.length ? `<i class="calendar-dot dot-request">${requests.length} pedido(s)</i>` : ''}
               </span>
             </button>
@@ -1218,6 +1258,7 @@ function renderReservationSummary(reservation, options = {}) {
 
 function renderRequestSummary(request) {
   const statusLabel = getRequestStatusLabel(request.status);
+  const conflicts = request.status === 'new' ? getStayConflicts(request.stay) : [];
 
   return `
     <article class="admin-record${request.status === 'rejected' ? ' is-cancelled' : ''}${request.status === 'new' ? ' is-pending' : ''}">
@@ -1247,6 +1288,7 @@ function renderRequestSummary(request) {
         <div class="admin-button-row">
           ${request.status === 'new' ? `
             <button class="button button-primary admin-small-button" type="button" data-action="accept-request" data-request-id="${request.id}">${icon('check')} Preparar reserva</button>
+            ${conflicts.length ? `<span class="admin-conflict-warning" role="alert">${renderConflictWarningContent(conflicts)}</span>` : ''}
             <button class="button admin-secondary-button admin-small-button" type="button" data-action="message-for-request" data-request-id="${request.id}">${icon('mail')} Responder</button>
             <button class="button admin-danger-button admin-small-button" type="button" data-action="reject-request" data-request-id="${request.id}">${icon('trash')} Rejeitar</button>
           ` : ''}
@@ -1573,6 +1615,7 @@ function renderCreateReservationForm() {
     operationalNotes: editingReservation?.notes?.operational || '',
     marketingOptIn: Boolean(editingReservation?.marketingOptIn || draftRequest?.marketingOptIn)
   };
+  const initialConflicts = getStayConflicts({ checkIn: defaults.checkIn, checkOut: defaults.checkOut }, defaults.reservationId);
 
   return `
     <section class="admin-panel" id="create-reservation">
@@ -1757,6 +1800,7 @@ function renderCreateReservationForm() {
         <div class="admin-form-actions">
           <button class="button button-primary" type="submit">${editingReservation ? `${icon('check')} Guardar alterações` : `${icon('plus')} Criar reserva`}</button>
           ${editingReservation ? `<button class="button admin-secondary-button" type="button" data-action="cancel-reservation-edit">Cancelar edição</button>` : ''}
+          <span class="admin-conflict-warning" data-reservation-conflict-warning role="alert" aria-live="polite"${initialConflicts.length ? '' : ' hidden'}>${renderConflictWarningContent(initialConflicts)}</span>
         </div>
       </form>
     </section>
@@ -3443,7 +3487,7 @@ async function handleCreateReservation(form) {
 
   if (conflicts.length) {
     requirePermission(currentUser, 'reservations:override-conflict');
-    const confirmed = window.confirm(`Esta reserva entra em conflito com ${conflicts.map((item) => item.id).join(', ')}. Guardar mesmo assim?`);
+    const confirmed = window.confirm(`${getConflictWarningText(conflicts)} Guardar mesmo assim?`);
     if (!confirmed) return;
   }
 
@@ -3491,7 +3535,7 @@ async function handleAcceptRequest(requestId) {
   const conflicts = findReservationConflicts(state, { stay: request.stay });
 
   if (conflicts.length) {
-    const confirmed = window.confirm(`Este pedido entra em conflito com ${conflicts.map((item) => item.id).join(', ')}. Preparar mesmo assim?`);
+    const confirmed = window.confirm(`${getConflictWarningText(conflicts)} Preparar mesmo assim?`);
     if (!confirmed) return;
   }
 
@@ -4189,7 +4233,31 @@ function syncNativeDatePicker(pickerInput) {
 
   textInput.value = formatDateInputValue(pickerInput.value);
   const form = pickerInput.closest('form[data-form]');
-  if (form) markFormDirty(form);
+  if (form) {
+    markFormDirty(form);
+    updateReservationConflictWarning(form);
+  }
+}
+
+function updateReservationConflictWarning(form) {
+  if (!(form instanceof HTMLFormElement) || form.dataset.form !== 'create-reservation') return;
+  const warning = form.querySelector('[data-reservation-conflict-warning]');
+  if (!(warning instanceof HTMLElement)) return;
+
+  let checkIn = '';
+  let checkOut = '';
+  try {
+    checkIn = parseAdminDateInput(form.elements.checkIn?.value, 'Check-in');
+    checkOut = parseAdminDateInput(form.elements.checkOut?.value, 'Check-out');
+  } catch (error) {
+    warning.hidden = true;
+    warning.replaceChildren();
+    return;
+  }
+
+  const conflicts = getStayConflicts({ checkIn, checkOut }, String(form.elements.reservationId?.value || ''));
+  warning.hidden = !conflicts.length;
+  warning.innerHTML = renderConflictWarningContent(conflicts);
 }
 
 async function handleRestoreRequest(requestId) {
@@ -4800,7 +4868,10 @@ function handleChange(event) {
   }
 
   const changedForm = target.closest('form[data-form]');
-  if (changedForm) markFormDirty(changedForm);
+  if (changedForm) {
+    markFormDirty(changedForm);
+    updateReservationConflictWarning(changedForm);
+  }
 
   if (!(target instanceof HTMLSelectElement)) return;
   if (target.name !== 'username' || !target.closest('form[data-form="login"]')) return;
@@ -4827,7 +4898,10 @@ function handleInput(event) {
   }
 
   const changedForm = target.closest('form[data-form]');
-  if (changedForm) markFormDirty(changedForm);
+  if (changedForm) {
+    markFormDirty(changedForm);
+    updateReservationConflictWarning(changedForm);
+  }
 }
 
 app.addEventListener('click', handleClick);

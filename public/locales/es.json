@@ -38,6 +38,14 @@
       "primaryCta": "Ver disponibilidad",
       "secondaryCta": "Explorar fotos"
     },
+    "promotion": {
+      "label": "Oferta por tiempo limitado",
+      "active": "Hay una tarifa especial disponible hasta el {endDate}: ahorra hasta un {discount}% sobre el precio habitual.",
+      "startsTomorrow": "Mañana empieza una tarifa especial, del {startDate} al {endDate}: ahorra hasta un {discount}%.",
+      "startsInDays": "Dentro de {count} días empieza una tarifa especial, del {startDate} al {endDate}: ahorra hasta un {discount}%.",
+      "startsInWeeks": "Dentro de unas {weeks} semanas empieza una tarifa especial, del {startDate} al {endDate}: ahorra hasta un {discount}%.",
+      "cta": "Ver fechas y precios"
+    },
     "features": {
       "pool": "Piscina con vistas",
       "privacy": "Privacidad premium",
@@ -180,6 +188,21 @@
         "title": "¿Quieres explorar la zona?",
         "text": "Abre la Guía Local para ver sugerencias cerca do Refúgio."
       }
+    }
+  },
+  "promotion": {
+    "saleBadge": "Oferta"
+  },
+  "bookingPage": {
+    "availability": {
+      "dayPriceLabel": "{date}, {price}",
+      "discountedDayPriceLabel": "{date}, precio especial {price}, precio habitual {originalPrice}"
+    },
+    "validation": {
+      "checkinCannotFitMinimumStay": "No hay dos noches consecutivas disponibles a partir de esta fecha. Elige otra fecha de entrada."
+    },
+    "summary": {
+      "specialRateLabel": "Precio especial"
     }
   },
   "footer": {

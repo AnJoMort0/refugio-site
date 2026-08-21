@@ -19,6 +19,58 @@
   animation-delay: 270ms;
 }
 
+.promotion-announcement {
+  border-top: 1px solid color-mix(in srgb, var(--color-promotion-red) 20%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-promotion-red) 25%, transparent);
+  background: var(--color-promotion-soft);
+}
+
+.promotion-announcement[hidden] {
+  display: none;
+}
+
+.promotion-announcement-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem 1.5rem;
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
+}
+
+.promotion-announcement-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+}
+
+.promotion-announcement-copy strong {
+  color: var(--color-promotion-red);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.promotion-announcement-copy p {
+  color: var(--color-charcoal-earth);
+  font-size: 0.94rem;
+}
+
+.promotion-announcement-link {
+  margin-right: 7rem;
+  color: var(--color-promotion-red-dark);
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.promotion-announcement-link:hover,
+.promotion-announcement-link:focus-visible {
+  color: var(--color-charcoal-earth);
+}
+
 .sponsor-grid {
   display: grid;
   gap: var(--space-3);
@@ -181,6 +233,14 @@
 }
 
 @media (max-width: 767px) {
+  .promotion-announcement-inner {
+    align-items: flex-start;
+  }
+
+  .promotion-announcement-link {
+    margin-right: 6.5rem;
+  }
+
   .testimonial-carousel {
     grid-auto-columns: minmax(86%, 1fr);
   }

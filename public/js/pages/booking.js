@@ -1,5 +1,6 @@
 import { getActiveLanguage, getCurrentDictionary, getNestedValue } from '../services/i18n.js';
-import { addDays, diffCalendarDays as diffNights, formatDateKey, monthDayOrdinal, parseDateKey } from '../utils/date.js';
+import { getEffectivePricesForDate, getLimitedTimePriceComparison } from '../services/pricing-promotions.js';
+import { addDays, diffCalendarDays as diffNights, formatDateKey, parseDateKey } from '../utils/date.js';
 import { isValidPhoneNumber } from '../utils/phone.js';
 
 const PRICE_CONFIG = {
@@ -36,36 +37,11 @@ function eachDate(start, endExclusive) {
   return dates;
 }
 
-function seasonTouchesDate(season, dateKey) {
-  if (season?.active === false) return false;
-
-  if ((season?.kind || 'dated') === 'recurring') {
-    const date = parseDateKey(dateKey);
-    if (!date || Number.isNaN(date.getTime())) return false;
-    const dateOrdinal = monthDayOrdinal(`${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
-    const start = monthDayOrdinal(season.startMonthDay);
-    const end = monthDayOrdinal(season.endMonthDay);
-    if (!start || !end) return false;
-    return start <= end
-      ? dateOrdinal >= start && dateOrdinal <= end
-      : dateOrdinal >= start || dateOrdinal <= end;
-  }
-
-  return Boolean(season?.startDate && season?.endDate && season.startDate <= dateKey && season.endDate >= dateKey);
-}
-
-function getPricingRuleForDate(dateKey) {
-  const seasons = PRICE_CONFIG.seasons || [];
-  const datedOverride = seasons.find((season) => (season.kind || 'dated') === 'dated' && seasonTouchesDate(season, dateKey));
-  const recurringSeason = seasons.find((season) => season.kind === 'recurring' && seasonTouchesDate(season, dateKey));
-  return datedOverride || recurringSeason || null;
-}
-
 function getNightlyPrices(dateKey = '') {
-  const rule = dateKey ? getPricingRuleForDate(dateKey) : null;
+  const prices = getEffectivePricesForDate(PRICE_CONFIG, dateKey);
   return {
-    adultPerNight: Number(rule?.adultNight ?? PRICE_CONFIG.adultPerNight),
-    childPerNight: Number(rule?.childNight ?? PRICE_CONFIG.childPerNight)
+    adultPerNight: prices.adultNight,
+    childPerNight: prices.childNight
   };
 }
 
@@ -370,10 +346,12 @@ export async function initBookingPage() {
   const summaryBikes = document.querySelector('#summary-bikes');
   const summaryDiscountRow = document.querySelector('#summary-discount-row');
   const summaryDiscount = document.querySelector('#summary-discount');
+  const summaryRates = document.querySelector('#summary-rates');
   const summaryChildRate = document.querySelector('#summary-child-rate');
   const summaryBikeRate = document.querySelector('#summary-bike-rate');
   const summaryBedPreferenceRow = document.querySelector('#summary-bed-preference-row');
   const summaryBedPreference = document.querySelector('#summary-bed-preference');
+  const summaryTotalRow = document.querySelector('#summary-total-row');
   const summaryTotal = document.querySelector('#summary-total');
   const summaryDepositRate = document.querySelector('#summary-deposit-rate');
   const summaryDepositNote = document.querySelector('#summary-deposit-note');
@@ -391,6 +369,7 @@ export async function initBookingPage() {
   const earliestCheckinDate = addDays(today, portugalNow.hour < 15 ? 1 : 2);
   const occupiedRanges = buildOccupiedRanges(adminState);
   const occupiedDates = new Set();
+  const turnoverDates = new Set();
   const monthsToRender = 2;
   const monthFormatter = () =>
     new Intl.DateTimeFormat(document.documentElement.lang || 'pt-PT', { month: 'long', year: 'numeric' });
@@ -402,6 +381,8 @@ export async function initBookingPage() {
 
   occupiedRanges.forEach(({ start, end }) => {
     eachDate(parseDateKey(start), parseDateKey(end)).forEach((date) => occupiedDates.add(formatDateKey(date)));
+    turnoverDates.add(start);
+    turnoverDates.add(end);
   });
 
   const minimumCheckin = formatDateKey(earliestCheckinDate);
@@ -539,6 +520,21 @@ export async function initBookingPage() {
     );
   }
 
+  function canStartMinimumStay(dateKey) {
+    if (!dateKey || dateKey < minimumCheckin || occupiedDates.has(dateKey)) return false;
+    const earliestCheckout = formatDateKey(addDays(parseDateKey(dateKey), 2));
+    return !datesOverlapOccupied(dateKey, earliestCheckout);
+  }
+
+  function canUseAsCheckout(checkIn, checkOut) {
+    return Boolean(
+      checkIn &&
+      checkOut &&
+      diffNights(checkIn, checkOut) >= 2 &&
+      !datesOverlapOccupied(checkIn, checkOut)
+    );
+  }
+
   function setStatus(message = '') {
     if (!message) {
       formStatus.hidden = true;
@@ -589,6 +585,44 @@ export async function initBookingPage() {
     checkoutInput.min = formatDateKey(addDays(parseDateKey(checkinInput.value), 2));
   }
 
+  function renderNightlyRate(element, {
+    currentValues,
+    baselineValues,
+    count,
+    singularLabel,
+    pluralLabel,
+    discounted
+  }) {
+    if (!element) return;
+
+    const currentText = formatGuestRateLabel({
+      amountText: formatRateRange(currentValues),
+      count,
+      singularLabel,
+      pluralLabel
+    });
+
+    element.classList.toggle('is-limited-time-discount', discounted);
+    if (!discounted) {
+      element.textContent = currentText;
+      return;
+    }
+
+    const originalPrice = document.createElement('span');
+    originalPrice.className = 'summary-rate-original';
+    originalPrice.textContent = formatRateRange(baselineValues);
+
+    const promotionLabel = document.createElement('span');
+    promotionLabel.className = 'summary-rate-sale-label';
+    promotionLabel.textContent = getText('bookingPage.summary.specialRateLabel');
+
+    const currentPrice = document.createElement('strong');
+    currentPrice.className = 'summary-rate-sale-value';
+    currentPrice.textContent = currentText;
+
+    element.replaceChildren(originalPrice, promotionLabel, currentPrice);
+  }
+
   function renderSummary() {
     const { adults, children, total } = getGuestCounts();
     const nights = diffNights(checkinInput.value, checkoutInput.value);
@@ -608,27 +642,42 @@ export async function initBookingPage() {
     });
 
     const summaryDateKeys = getStayDateKeys(checkinInput.value, checkoutInput.value);
+    const hasSelectedCheckin = Boolean(checkinInput.value);
+    const hasCompleteStay = summaryDateKeys.length > 0;
     const rateDateKeys = summaryDateKeys.length ? summaryDateKeys : [checkinInput.value];
-    const adultNightlyTotals = rateDateKeys.map((dateKey) => getNightlyAdultValue(dateKey, adults));
-    const childNightlyTotals = rateDateKeys.map((dateKey) => getNightlyChildValue(dateKey, children));
+    const rateComparisons = rateDateKeys.map((dateKey) => getLimitedTimePriceComparison(PRICE_CONFIG, dateKey));
+    const paidAdultCount = getPaidAdultCount(adults);
+    const adultNightlyTotals = rateComparisons.map(({ effective }) => paidAdultCount * effective.adultNight);
+    const baselineAdultNightlyTotals = rateComparisons.map(({ baseline }) => paidAdultCount * baseline.adultNight);
+    const childNightlyTotals = rateComparisons.map(({ effective }) => children * effective.childNight);
+    const baselineChildNightlyTotals = rateComparisons.map(({ baseline }) => children * baseline.childNight);
 
-    priceAdult.textContent = formatGuestRateLabel({
-      amountText: formatRateRange(adultNightlyTotals),
+    if (summaryRates) {
+      summaryRates.hidden = !hasSelectedCheckin;
+    }
+    if (summaryTotalRow) {
+      summaryTotalRow.hidden = !hasCompleteStay;
+    }
+
+    renderNightlyRate(priceAdult, {
+      currentValues: adultNightlyTotals,
+      baselineValues: baselineAdultNightlyTotals,
       count: adults,
       singularLabel: getText('bookingPage.summary.adultSingular', 'adulto'),
-      pluralLabel: getText('bookingPage.summary.adultPlural', 'adultos')
+      pluralLabel: getText('bookingPage.summary.adultPlural', 'adultos'),
+      discounted: rateComparisons.some(({ adultDiscounted }) => adultDiscounted)
     });
     if (summaryChildRate) {
       summaryChildRate.hidden = children === 0;
     }
-    if (priceChild) {
-      priceChild.textContent = formatGuestRateLabel({
-        amountText: formatRateRange(childNightlyTotals),
-        count: children,
-        singularLabel: getText('bookingPage.summary.childSingular', 'criança'),
-        pluralLabel: getText('bookingPage.summary.childPlural', 'crianças')
-      });
-    }
+    renderNightlyRate(priceChild, {
+      currentValues: childNightlyTotals,
+      baselineValues: baselineChildNightlyTotals,
+      count: children,
+      singularLabel: getText('bookingPage.summary.childSingular', 'criança'),
+      pluralLabel: getText('bookingPage.summary.childPlural', 'crianças'),
+      discounted: rateComparisons.some(({ childDiscounted }) => childDiscounted)
+    });
     if (priceBike) {
       priceBike.textContent = formatCurrency(PRICE_CONFIG.bikePerDay);
     }
@@ -640,7 +689,7 @@ export async function initBookingPage() {
       summaryBikeRate.hidden = bikeDays === 0;
     }
     if (summaryDepositNote) {
-      summaryDepositNote.hidden = !includeDeposit;
+      summaryDepositNote.hidden = !includeDeposit || !hasSelectedCheckin;
     }
     summaryNights.textContent = String(Math.max(nights, 0));
     summaryGuests.textContent = String(total);
@@ -659,7 +708,7 @@ export async function initBookingPage() {
         .replace('{units}', String(bikeDays));
     }
     if (summaryDiscountRow && summaryDiscount) {
-      summaryDiscountRow.hidden = !breakdown.discount.valid;
+      summaryDiscountRow.hidden = !hasCompleteStay || !breakdown.discount.valid;
       summaryDiscount.textContent = breakdown.discount.valid
         ? `-${formatCurrency(breakdown.discount.amount)}`
         : '-';
@@ -689,6 +738,8 @@ export async function initBookingPage() {
   }
 
   function renderCalendar() {
+    const { adults, children } = getGuestCounts();
+    const paidAdultCount = getPaidAdultCount(adults);
     const calendarHeader = document.createElement('div');
     calendarHeader.className = 'calendar-header';
 
@@ -778,7 +829,13 @@ export async function initBookingPage() {
         const date = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
         const key = formatDateKey(date);
         const isPast = key < minimumCheckin;
-        const isOccupied = occupiedDates.has(key);
+        const isOccupiedNight = occupiedDates.has(key);
+        const isTurnoverDate = turnoverDates.has(key);
+        const isVisuallyOccupied = isOccupiedNight && !isTurnoverDate;
+        const isChoosingCheckout = Boolean(checkinInput.value && !checkoutInput.value);
+        const isValidCheckout = isChoosingCheckout && canUseAsCheckout(checkinInput.value, key);
+        const isReplacementCheckin = isChoosingCheckout && canStartMinimumStay(key);
+        const canClearSelection = isChoosingCheckout && key === checkinInput.value;
         const isSelected = key === checkinInput.value || key === checkoutInput.value;
         const isInRange =
           checkinInput.value &&
@@ -789,17 +846,56 @@ export async function initBookingPage() {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'calendar-day';
-        button.textContent = String(day);
         button.dataset.date = key;
-        button.disabled = isPast || isOccupied;
+        button.disabled = isChoosingCheckout
+          ? !(isValidCheckout || isReplacementCheckin || canClearSelection)
+          : !canStartMinimumStay(key);
         button.classList.toggle('is-past', isPast);
-        button.classList.toggle('is-occupied', isOccupied);
+        button.classList.toggle('is-occupied', isVisuallyOccupied);
+        button.classList.toggle('is-turnover', isTurnoverDate);
+        button.classList.toggle('is-valid-checkout', isValidCheckout);
         button.classList.toggle('is-selected', isSelected);
         button.classList.toggle('is-start', key === checkinInput.value);
         button.classList.toggle('is-end', key === checkoutInput.value);
         button.classList.toggle('is-in-range', Boolean(isInRange));
         button.classList.toggle('is-today', key === minimumCheckin);
-        button.setAttribute('aria-label', key);
+
+        const priceComparison = getLimitedTimePriceComparison(PRICE_CONFIG, key);
+        const currentPrice =
+          paidAdultCount * priceComparison.effective.adultNight + children * priceComparison.effective.childNight;
+        const usualPrice =
+          paidAdultCount * priceComparison.baseline.adultNight + children * priceComparison.baseline.childNight;
+        const isDiscounted = priceComparison.adultDiscounted || (children > 0 && priceComparison.childDiscounted);
+        const dayNumber = document.createElement('span');
+        dayNumber.className = 'calendar-day-number';
+        dayNumber.textContent = String(day);
+
+        const prices = document.createElement('span');
+        prices.className = 'calendar-day-prices';
+        if (isDiscounted) {
+          prices.classList.add('is-discounted');
+          const originalPrice = document.createElement('span');
+          originalPrice.className = 'calendar-day-price-original';
+          originalPrice.textContent = formatCurrency(usualPrice);
+          prices.append(originalPrice);
+        }
+
+        const displayedPrice = document.createElement('span');
+        displayedPrice.className = 'calendar-day-price-current';
+        displayedPrice.textContent = formatCurrency(currentPrice);
+        prices.append(displayedPrice);
+        button.replaceChildren(dayNumber, prices);
+
+        const dayLabelKey = isDiscounted
+          ? 'bookingPage.availability.discountedDayPriceLabel'
+          : 'bookingPage.availability.dayPriceLabel';
+        button.setAttribute(
+          'aria-label',
+          getText(dayLabelKey)
+            .replace('{date}', key)
+            .replace('{price}', formatCurrency(currentPrice))
+            .replace('{originalPrice}', formatCurrency(usualPrice))
+        );
 
         button.addEventListener('click', () => {
           if (!checkinInput.value || (checkinInput.value && checkoutInput.value)) {
@@ -807,18 +903,20 @@ export async function initBookingPage() {
             checkoutInput.value = '';
             syncCheckoutBounds();
             setStatus(getText('bookingPage.validation.chooseCheckout'));
-          } else {
-            const [startDate, endDate] = key < checkinInput.value ? [key, checkinInput.value] : [checkinInput.value, key];
-            checkinInput.value = startDate;
-            checkoutInput.value = endDate;
+          } else if (key === checkinInput.value) {
+            checkinInput.value = '';
+            checkoutInput.value = '';
             syncCheckoutBounds();
-
-            const validationMessage = validateDateSelection(false);
-            setStatus(validationMessage);
-
-            if (validationMessage) {
-              checkoutInput.value = '';
-            }
+            setStatus('');
+          } else if (canUseAsCheckout(checkinInput.value, key)) {
+            checkoutInput.value = key;
+            syncCheckoutBounds();
+            setStatus('');
+          } else {
+            checkinInput.value = key;
+            checkoutInput.value = '';
+            syncCheckoutBounds();
+            setStatus(getText('bookingPage.validation.chooseCheckout'));
           }
 
           renderBikeDayFields();
@@ -892,6 +990,12 @@ export async function initBookingPage() {
 
       if (occupiedDates.has(checkinInput.value)) {
         const message = getText('bookingPage.validation.dateUnavailable');
+        setFieldValidity(checkinInput, message);
+        return message;
+      }
+
+      if (!canStartMinimumStay(checkinInput.value)) {
+        const message = getText('bookingPage.validation.checkinCannotFitMinimumStay');
         setFieldValidity(checkinInput, message);
         return message;
       }
@@ -1094,7 +1198,7 @@ export async function initBookingPage() {
     if (checkoutInput.value && checkoutInput.value <= checkinInput.value) {
       checkoutInput.value = '';
     }
-    setStatus('');
+    setStatus(validateSingleDateField(checkinInput));
     renderBikeDayFields();
     renderSummary();
     renderCalendar();

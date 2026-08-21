@@ -37,9 +37,26 @@ A scaffold means a made static HTML page ready for owner review/approval. A plac
 
 ### Tweaks
 
+- [c] Surface lower limited-time price overrides as automatic promotions on the public website.
+  - Note: Dated rates are now compared with the seasonal or base rate they override. Qualifying lower rates show the usual price struck through and the special price in red in `reservas.html`, plus a dated homepage announcement and a small sale badge on the floating reservation button; all signals hide automatically when no current or approaching discount applies.
+  - [c] Show the current guest-aware accommodation price beneath each day in the public availability calendar, including the crossed-out usual rate on promotional dates.
+    - [c] Reduce the calendar price labels to regular-weight gray text, keep promotional red restrained, and anchor the price stack lower in each day cell for easier scanning.
+  - [c] Keep summary prices hidden until dates provide enough context: nightly rates appear after check-in selection and the estimated total appears after the complete stay is selected.
+  - [c] Treat reservation boundaries correctly: an existing check-in date can be another stay’s checkout, and an existing checkout date can be another stay’s check-in.
+    - Note: Calendar buttons now distinguish occupied nights from valid checkout boundaries, exclude dates that cannot fit the two-night minimum as new arrivals, and let a second check-in click replace or clear a partial selection.
+    - [c] Keep arrival/departure turnover dates visually neutral; only dates that cannot serve as either reservation boundary use the red occupied treatment.
 - [~] Admin page
   - [ ] Calendar
+    - [c] Show each guest on both arrival and departure dates, with `->|` for check-in and `|->` for check-out.
+      - Note: Calendar display includes the departure boundary without treating that day as an occupied night.
+    - [c] Warn about genuine reservation overlaps beside website-request and manual reservation actions.
+      - Note: Conflict checks use the same end-exclusive stay rule as the public booking calendar, so one stay may check out on another stay's check-in date; owners still retain the existing confirmed override for exceptional cases.
     - [ ] Have a text box where they can paste the text of the booking.com email in there and the app would look for the information to fill up the field, need to use an example of email to be able to code the data scrapper.
+  - [ ] Despesas
+    - [ ] Add filters to see certain things, by type, date, etc
+    - [ ] Move the add field to the top of the page
+  - [ ] Audit/Log
+    - [ ] Should more clearly show what was changed
 
 ## Additions
 

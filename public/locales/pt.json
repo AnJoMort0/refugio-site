@@ -33,6 +33,9 @@
     "next": "Item seguinte"
   },
   "stickyBookingCta": "Reservar",
+  "promotion": {
+    "saleBadge": "Oferta"
+  },
   "home": {
     "hero": {
       "imageAlt": "Vista exterior da casa em pedra",
@@ -41,6 +44,14 @@
       "text": "Entre a tranquilidade das montanhas de Castelo de Paiva e a vista aberta sobre o Douro, cada detalhe foi pensado para que só tenha de chegar, respirar e desfrutar. Um espaço íntimo, acolhedor e totalmente seu, ideal para dias a dois ou momentos especiais em família.",
       "primaryCta": "Ver disponibilidade",
       "secondaryCta": "Explorar fotos"
+    },
+    "promotion": {
+      "label": "Oferta por tempo limitado",
+      "active": "Tarifa especial disponível até {endDate}: poupe até {discount}% face ao preço habitual.",
+      "startsTomorrow": "Uma tarifa especial começa amanhã, de {startDate} a {endDate}: poupe até {discount}%.",
+      "startsInDays": "Uma tarifa especial começa dentro de {count} dias, de {startDate} a {endDate}: poupe até {discount}%.",
+      "startsInWeeks": "Uma tarifa especial começa dentro de cerca de {weeks} semanas, de {startDate} a {endDate}: poupe até {discount}%.",
+      "cta": "Ver datas e preços"
     },
     "accommodation": {
       "eyebrow": "O Alojamento",
@@ -333,7 +344,9 @@
       "legendSelected": "Seleção",
       "todayButton": "Hoje",
       "previousMonths": "Ver meses anteriores",
-      "nextMonths": "Ver meses seguintes"
+      "nextMonths": "Ver meses seguintes",
+      "dayPriceLabel": "{date}, {price}",
+      "discountedDayPriceLabel": "{date}, preço especial {price}, preço habitual {originalPrice}"
     },
     "guests": {
       "eyebrow": "Hóspedes",
@@ -401,6 +414,7 @@
       "adultPlural": "adultos",
       "childSingular": "criança",
       "childPlural": "crianças",
+      "specialRateLabel": "Preço especial",
       "rateBikeLabel": "Bicicleta / dia",
       "depositLabel": "Depósito de segurança",
       "nightsLabel": "Noites",
@@ -431,6 +445,7 @@
       "chooseCheckout": "Agora escolha a data de check-out.",
       "datesRequired": "Selecione as datas de check-in e check-out.",
       "dateUnavailable": "A data escolhida não está disponível.",
+      "checkinCannotFitMinimumStay": "Não há duas noites consecutivas disponíveis a partir desta data. Escolha outra data de check-in.",
       "checkinTooSoon": "A primeira data disponível para chegada já teve em conta a regra de hoje / amanhã em hora de Portugal.",
       "checkoutTooSoon": "Escolha uma data de check-out válida para uma estadia mínima de 2 noites.",
       "minStay": "A estadia mínima é de 2 noites.",

@@ -38,6 +38,14 @@
       "primaryCta": "Check availability",
       "secondaryCta": "Explore photos"
     },
+    "promotion": {
+      "label": "Limited-time offer",
+      "active": "A special rate is available until {endDate}: save up to {discount}% against the usual price.",
+      "startsTomorrow": "A special rate starts tomorrow, from {startDate} to {endDate}: save up to {discount}%.",
+      "startsInDays": "A special rate starts in {count} days, from {startDate} to {endDate}: save up to {discount}%.",
+      "startsInWeeks": "A special rate starts in around {weeks} weeks, from {startDate} to {endDate}: save up to {discount}%.",
+      "cta": "View dates and prices"
+    },
     "features": {
       "pool": "Pool with a view",
       "privacy": "Premium privacy",
@@ -180,6 +188,21 @@
         "title": "Want to explore nearby?",
         "text": "Open the Local Guide for suggestions around O Refúgio."
       }
+    }
+  },
+  "promotion": {
+    "saleBadge": "Sale"
+  },
+  "bookingPage": {
+    "availability": {
+      "dayPriceLabel": "{date}, {price}",
+      "discountedDayPriceLabel": "{date}, special price {price}, usual price {originalPrice}"
+    },
+    "validation": {
+      "checkinCannotFitMinimumStay": "There are not two consecutive available nights from this date. Choose another check-in date."
+    },
+    "summary": {
+      "specialRateLabel": "Special price"
     }
   },
   "footer": {

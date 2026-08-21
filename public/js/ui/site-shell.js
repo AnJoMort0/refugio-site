@@ -102,7 +102,12 @@ function buildFooter() {
 }
 
 function buildStickyBookingCta() {
-  return `<a class="sticky-booking-cta" href="./reservas.html" data-i18n="stickyBookingCta"></a>`;
+  return `
+    <a class="sticky-booking-cta" href="./reservas.html">
+      <span data-i18n="stickyBookingCta"></span>
+      <span class="sticky-booking-sale" data-promotion-sale-badge data-i18n="promotion.saleBadge" hidden></span>
+    </a>
+  `;
 }
 
 export function renderSiteShell() {
