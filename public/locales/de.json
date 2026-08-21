@@ -1,0 +1,1212 @@
+{
+  "meta": {
+    "htmlLang": "de-DE",
+    "title": "O Refúgio | Startseite",
+    "description": "Startseite der Ferienunterkunft."
+  },
+  "brand": {
+    "name": "O Refúgio"
+  },
+  "languageSwitcher": {
+    "label": "Sprache wählen"
+  },
+  "languageNames": {
+    "pt": "Português",
+    "en": "English",
+    "fr": "Français",
+    "es": "Español"
+  },
+  "common": {
+    "backHome": "Zurück zur Startseite"
+  },
+  "nav": {
+    "toggleLabel": "Menü öffnen",
+    "toggleText": "Menü öffnen",
+    "accommodation": "Unterkunft",
+    "gallery": "Galerie",
+    "booking": "Buchungen",
+    "contact": "Kontakt",
+    "guide": "Lokaler Guide"
+  },
+  "carousel": {
+    "previous": "Vorheriger Eintrag",
+    "next": "Nächster Eintrag"
+  },
+  "stickyBookingCta": "Buchen",
+  "promotion": {
+    "saleBadge": "Angebot"
+  },
+  "home": {
+    "hero": {
+      "imageAlt": "Außenansicht des Steinhauses",
+      "eyebrow": "Ihr ländliches Refúgio",
+      "title": "Die perfekte Auszeit.",
+      "text": "Zwischen der Ruhe der Berge von Castelo de Paiva und dem offenen Blick über den Douro wurde jedes Detail so gestaltet, dass Sie nur ankommen, durchatmen und genießen müssen. Ein intimer, gemütlicher Ort ganz für Sie allein – ideal für Tage zu zweit oder besondere Momente mit der Familie.",
+      "primaryCta": "Verfügbarkeit prüfen",
+      "secondaryCta": "Fotos ansehen"
+    },
+    "promotion": {
+      "label": "Zeitlich begrenztes Angebot",
+      "active": "Sondertarif verfügbar bis {endDate}: Sparen Sie bis zu {discount}% gegenüber dem regulären Preis.",
+      "startsTomorrow": "Morgen beginnt ein Sondertarif, vom {startDate} bis {endDate}: Sparen Sie bis zu {discount}%.",
+      "startsInDays": "In {count} Tagen beginnt ein Sondertarif, vom {startDate} bis {endDate}: Sparen Sie bis zu {discount}%.",
+      "startsInWeeks": "In etwa {weeks} Wochen beginnt ein Sondertarif, vom {startDate} bis {endDate}: Sparen Sie bis zu {discount}%.",
+      "cta": "Daten und Preise ansehen"
+    },
+    "accommodation": {
+      "eyebrow": "Die Unterkunft",
+      "title": "Nur für Sie – Komfort, Natur und vollständige Privatsphäre.",
+      "text1": "O Refúgio ist für bis zu 6 Gäste ausgelegt und verbindet den ländlichen Charme der Berge mit gemütlichen Innenräumen und Gärten, die zum Entschleunigen einladen. Jeder Aufenthalt ist exklusiv: Das gesamte Haus, der Pool und die Außenbereiche stehen ausschließlich den Gästen zur Verfügung.",
+      "text2": "Vom gemütlichen Wohnzimmer und den ruhigen Schlafzimmern bis zu den Außenbereichen und gemeinsamen Mahlzeiten am Grill lädt alles dazu ein, die Zeit ohne Eile zu genießen – mit der Familie, zu zweit oder mit Freunden.",
+      "link": "Unterkunft entdecken"
+    },
+    "gallery": {
+      "eyebrow": "Galerie",
+      "title": "Entdecken Sie Licht und Details von O Refúgio.",
+      "card1": "Pool mit Panorama",
+      "card1Alt": "Pool mit Blick auf die Berge",
+      "card2": "Ruhiger Abend",
+      "card2Alt": "Abendstimmung am Pool",
+      "card3": "Landschaft und Stille",
+      "card3Alt": "Naturlandschaft in der Umgebung",
+      "card4": "Gemütliche Innenräume",
+      "card4Alt": "Gemütlicher Innenbereich der Unterkunft",
+      "link": "Vollständige Galerie ansehen"
+    },
+    "booking": {
+      "eyebrow": "Buchungen",
+      "title": "Wählen Sie Ihre Daten und sichern Sie sich Ihre Auszeit.",
+      "text": "Prüfen Sie in wenigen Augenblicken die Verfügbarkeit und fragen Sie O Refúgio für Ihren Aufenthalt an.",
+      "cta": "Buchung anfragen"
+    },
+    "local": {
+      "eyebrow": "Umgebung",
+      "title": "Zwischen Fluss, Natur und Dörfern gibt es immer mehr zu entdecken.",
+      "text1": "Von Spaziergängen am Douro über Flussstrände, traditionelle Restaurants und Aussichtspunkte bis zu Wanderwegen in den Bergen – rund um O Refúgio warten viele Erlebnisse, die jeden Aufenthalt besonders machen.",
+      "link": "Lokalen Guide ansehen",
+      "imageAlt": "Nächstgelegener Flussstrand"
+    },
+    "location": {
+      "label": "Adresse",
+      "address": "Rua da Arejinha 627, 4550-518 Pedorido",
+      "mapLink": "Standort in Google Maps öffnen"
+    },
+    "testimonials": {
+      "eyebrow": "Gästestimmen",
+      "title": "Ein Ort, an den man immer wieder zurückkehren möchte.",
+      "reviewCta": "Auf Google Maps bewerten",
+      "reviewCta2": "Feedback per Nachricht senden",
+      "quote1": "„Wir hatten zwei großartige Tage – wirklich ein Refúgio für alle, die dem Trubel entkommen möchten. Das Haus ist riesig, die Aussicht spektakulär und Pool, Garten … einfach alles außergewöhnlich. Wir kommen ganz bestimmt wieder!“",
+      "author1": "Paulo — Portugal",
+      "quote2": "„Ein wunderbarer privater Ort zum Entspannen mitten in der Natur. O Refúgio war sogar noch besser als erwartet, mit unglaublicher Aussicht, viel Privatsphäre und stets aufmerksamen Gastgebern. Wir hoffen, bald wiederzukommen :)“",
+      "author2": "Marta — Portugal",
+      "quote3": "„Unsere beste Erfahrung auf Booking. Das Haus verbindet Rustikales und Modernes perfekt, mit unglaublichem Komfort, atemberaubender Aussicht und einem perfekten Pool zum Entspannen. Alles war einfach perfekt. Wir hoffen, wiederzukommen.“",
+      "author3": "Audrey — Frankreich",
+      "quote4": "„Die Aussicht, der Empfang und die gesamte Ausstattung des Hauses. Die Gastgeberin ist äußerst aufmerksam und denkt an viele kleine Details, die den Unterschied machen.“",
+      "author4": "Alexandra — Frankreich",
+      "quote5": "„Wir suchten Ruhe und fanden noch mehr. Alles ist perfekt ausgestattet, mit wunderschönen Bereichen und einem sehr gepflegten Pool. Am besten waren ohne Zweifel die Freundlichkeit und Aufmerksamkeit der Gastgeber. Man möchte einfach wiederkommen.“",
+      "author5": "Miguel — Spanien",
+      "quote6": "„Perfekt zum Ausruhen. Fantastische Aussicht! Das Haus hat alles, was man braucht, einschließlich Pool und einem großartigen Außenbereich. Sehr freundliche Eigentümer. Wir würden gerne wiederkommen 😊“",
+      "author6": "Ingrid — Schweden",
+      "quote7": "„Das Haus ist beeindruckend: schön, komfortabel und sehr sauber. Unser Aufenthalt war eine glatte 10. Ohne Zweifel eine unserer besten Erfahrungen — wir kommen wieder.“",
+      "author7": "Sonia — Spanien",
+      "quote8": "„Perfekt für einen Familienurlaub. Großer Garten, Pool mit ganztägiger Sonne und hervorragende Lage. Wir kommen auf jeden Fall wieder.“",
+      "author8": "Raquel — Spanien"
+    },
+    "sponsors": {
+      "eyebrow": "Lokale Partner",
+      "title": "Ausgewählte Empfehlungen für Ihren Aufenthalt.",
+      "text": "Entdecken Sie Restaurants, Erlebnisse und Orte, die wir gut kennen und die dazu beitragen, diese Region besonders zu machen.",
+      "link": "Partner im lokalen Guide ansehen",
+      "card1": "Adega Ramadinha - Lokale Spezialitäten",
+      "card1Alt": "Lokales Restaurant am Fluss",
+      "card2": "Corga - Verkostungen und lokale Produkte",
+      "card2Alt": "Regionale Weine und Produkte",
+      "card3": "Café Cruzeiro - Lokale Konditorei",
+      "card3Alt": "Lokale Konditorei",
+      "card4": "Aquapura Terrace - Bar am Fluss",
+      "card4Alt": "Lokale Bar am Fluss"
+    }
+  },
+  "accommodation": {
+    "meta": {
+      "title": "O Refúgio | Unterkunft",
+      "description": "Entdecken Sie O Refúgio: ein privates Haus in Castelo de Paiva mit Pool, Gärten, Grillbereich und Bergblick."
+    },
+    "hero": {
+      "imageAlt": "Ländliches Haus O Refúgio mit Pool und Bergblick",
+      "eyebrow": "Die Unterkunft",
+      "title": "Ein ganzes Haus, nur für Sie, mitten in den Bergen.",
+      "text": "Zwischen der Ruhe der Berge von Castelo de Paiva und dem offenen Blick über den Douro wurde O Refúgio für alle geschaffen, die Privatsphäre, Komfort und Zeit zum Entschleunigen suchen.",
+      "cta": "Verfügbarkeit prüfen"
+    },
+    "overview": {
+      "eyebrow": "Privates Haus",
+      "title": "Ein privater Rückzugsort für entspannte Tage.",
+      "text1": "O Refúgio ist ein vollständig privates Haus, das ausschließlich den Gästen zur Verfügung steht, die es buchen. Mit Platz für bis zu 6 Personen ist es ideal für einen Familienurlaub, eine Auszeit zu zweit oder einen Aufenthalt mit Freunden – fern vom Trubel und umgeben von Natur.",
+      "text2": "Die Atmosphäre verbindet ländlichen Charme mit modernem Komfort und schafft einen gemütlichen, ruhigen Ort, der drinnen wie draußen ganz ohne Eile genossen werden kann.",
+      "imageAlt": "Steinfassade von O Refúgio"
+    },
+    "highlights": {
+      "eyebrow": "Highlights",
+      "title": "Alles für einen vollständig privaten Aufenthalt.",
+      "item1": "Ganzes Haus exklusiv für Sie (nicht geteilt)",
+      "item2": "Privater Pool mit Blick in die Natur",
+      "item3": "3 Schlafzimmer für bis zu 6 Personen",
+      "item4": "Geschlossener Außen-Grillbereich",
+      "item5": "Kostenloser, überwachter Parkplatz vor Ort",
+      "item6": "Kostenloses WLAN (inklusive mobilem Hotspot)"
+    },
+    "spaces": {
+      "eyebrow": "Räume",
+      "title": "Räume zum Wohnen und Ausruhen.",
+      "interiorEyebrow": "Innenbereiche",
+      "interiorTitle": "Schlafzimmer und Wohnbereiche",
+      "text1": "Das Haus verfügt über drei komfortable Schlafzimmer für unterschiedliche Aufenthalte: ein Doppelzimmer, ein Zimmer mit Etagenbett und ein Einzelzimmer.",
+      "text2": "Im Inneren finden Sie außerdem ein gemütliches Wohnzimmer mit Schlafsofa, ein Esszimmer mit ländlichem Charakter und eine vollständig ausgestattete Küche für den Alltag.",
+      "exteriorEyebrow": "Außenbereich",
+      "exteriorTitle": "Gärten, Grillbereich und Pool",
+      "text3": "Draußen bietet O Refúgio verschiedene Bereiche: Gärten, Ruheplätze, einen Außengrill und einen Grillbereich mit einem geschlossenen, verandaähnlichen Raum, in dem Innen- und Außenbereich ineinander übergehen.",
+      "text4": "Der private Pool rundet das Erlebnis ab und bietet den perfekten Ort, um den ganzen Tag über zu entspannen.",
+      "card1Title": "Doppelzimmer",
+      "card1Text": "Ein ruhiger und komfortabler Ort zum Ausruhen nach einem Tag am Pool, in den Bergen oder bei Mahlzeiten im Freien.",
+      "card1Alt": "Gemütliches Doppelzimmer",
+      "card11Title": "Zimmer mit Etagenbett",
+      "card11Text": "Ideal für Kinder, Freunde oder Familienaufenthalte – praktisch und flexibel.",
+      "card11Alt": "Zimmer mit Etagenbett",
+      "card2Title": "Einzelzimmer",
+      "card2Text": "Klein, aber komfortabel.",
+      "card2Alt": "Einzelzimmer",
+      "card3Title": "Wohnzimmer mit Schlafsofa",
+      "card3Text": "Ein gemütlicher Innenraum zum Entspannen, Unterhalten oder Fernsehen – ganz in Ruhe und mit dem Komfort eines Zuhauses.",
+      "card3Alt": "Wohnzimmer von O Refúgio",
+      "card4Title": "Rustikales Esszimmer",
+      "card4Text": "Der traditionellste Raum des Hauses, voller Geschichte, in dem sich mehrere Generationen der Familie am Tisch versammelt haben.",
+      "card4Alt": "Esszimmer von O Refúgio",
+      "card5Title": "Ausgestattete Küche",
+      "card5Text": "Vollständige Küche mit Kochfeld, Backofen, Mikrowelle und allen Utensilien, die man im Alltag benötigt.",
+      "card5Alt": "Küche von O Refúgio",
+      "card6Title": "Ruhebereiche im Freien",
+      "card6Text": "Gärten und verschiedene Ecken mit Stühlen, Tischen und Sonnenliegen zum Genießen des Außenbereichs.",
+      "card6Alt": "Freizeitbereich im Freien",
+      "card7Title": "Geschlossener Außen-Grillbereich",
+      "card7Text": "Grillbereich mit abnehmbaren Glaswänden, ausgestatteter Küche und idealem Platz für gemeinsame Familienmahlzeiten.",
+      "card7Alt": "Geschlossener Grillbereich",
+      "card8Title": "Privater Pool",
+      "card8Text": "Pool im Garten, perfekt zum Entspannen oder für gemeinsame Zeit mit der Familie während des Tages.",
+      "card8Alt": "Pool von O Refúgio",
+      "galleryLink": "Vollständige Galerie ansehen"
+    },
+    "amenities": {
+      "eyebrow": "Ausstattung",
+      "title": "Alles für einen komfortablen und sorgenfreien Aufenthalt.",
+      "comfort": {
+        "title": "Komfort",
+        "item1": "Vollständig privates Haus mit 179 m²",
+        "item2": "3 Schlafzimmer (bis zu 6 Gäste)",
+        "item3": "Gemütliches Wohnzimmer mit Schlafsofa",
+        "item4": "Heizung",
+        "item5": "Bettwäsche und Handtücher inklusive"
+      },
+      "kitchen": {
+        "title": "Küche und Essen",
+        "item1": "Vollständig ausgestattete Küche für den Alltag",
+        "item2": "Backofen, Kochfeld, Mikrowelle, Kühlschrank und Gefrierschrank",
+        "item3": "Kaffeemaschine, Wasserkocher, Toaster und Raclette-Gerät",
+        "item4": "Komplette Küchenausstattung: Teller, Besteck, Gläser und Töpfe",
+        "item5": "Grillbereich mit ausgestatteter Küche und Essplatz"
+      },
+      "bathroom": {
+        "title": "Badezimmer",
+        "item1": "2 Badezimmer mit Dusche und Bidet",
+        "item2": "1 zusätzliches WC",
+        "item3": "Haartrockner vorhanden",
+        "item4": "Waschmaschine und Trockner"
+      },
+      "exterior": {
+        "title": "Außenbereich",
+        "item1": "Privater Pool (in der warmen Jahreszeit verfügbar)",
+        "item2": "Sonnenliegen und Sonnenschirme",
+        "item3": "Gärten und mehrere Ruhebereiche",
+        "item4": "Außengrill",
+        "item5": "Bergblick und natürliche Umgebung"
+      },
+      "technology": {
+        "title": "Technik und Unterhaltung",
+        "item1": "Kostenloses WLAN mit mobilem Hotspot",
+        "item2": "Fernseher im Wohnzimmer, Grillbereich und in allen Schlafzimmern",
+        "item3": "Nationale Kabelsender"
+      },
+      "family": {
+        "title": "Familie",
+        "item1": "Einige Babyartikel verfügbar (Hochstuhl und Steckdosenschutz)",
+        "item2": "Pool-Schwimmhilfen und Freizeit-Zubehör",
+        "item3": "Großzügige Bereiche, ideal für Familien"
+      },
+      "accessibility": {
+        "title": "Barrierearmut",
+        "item1": "Das Haus liegt größtenteils auf Erdgeschossebene",
+        "item2": "Relativ einfacher Zugang für Personen mit eingeschränkter Mobilität",
+        "item3": "Ländliche Umgebung nicht vollständig für Rollstühle angepasst"
+      },
+      "services": {
+        "title": "Services",
+        "item1": "Kostenloser, überwachter Privatparkplatz",
+        "item2": "Rechnungen mit portugiesischer Steuernummer (NIF) verfügbar",
+        "item3": "Fahrradverleih verfügbar"
+      }
+    },
+    "practical": {
+      "eyebrow": "Vor der Buchung",
+      "title": "Wichtige Informationen zum Aufenthalt",
+      "stay": {
+        "title": "Aufenthalt",
+        "item1": "Maximale Belegung: 6 Gäste",
+        "item2": "Mindestaufenthalt: 2 Nächte",
+        "item3": "Vollständig privates Haus (nicht geteilt)",
+        "item4": "Kostenlose Stornierung bis 48 Stunden vor dem Check-in"
+      },
+      "checkin": {
+        "title": "Check-in und Check-out",
+        "item1": "Check-in: 15:00–19:00",
+        "item2": "Check-out: 08:00–10:00",
+        "item3": "Abweichende Zeiten nur nach vorheriger Bestätigung",
+        "note": "Bitte teilen Sie uns Ihre Ankunfts- und Abfahrtszeit mindestens 48 Stunden im Voraus mit."
+      },
+      "rules": {
+        "title": "Wichtigste Regeln",
+        "item1": "Partys oder Veranstaltungen sind nicht erlaubt",
+        "item2": "Die gebuchte Gästezahl darf nicht überschritten werden",
+        "item3": "Haustiere sind nicht erlaubt",
+        "item4": "Rauchen im Innenbereich ist nicht erlaubt"
+      },
+      "practical": {
+        "title": "Nützliche Informationen",
+        "item1": "Sicherheitskaution von 200 € beim Check-in",
+        "item2": "Ausweisdokument erforderlich",
+        "item3": "Kostenloser Parkplatz vor Ort verfügbar",
+        "item4": "Sprachen: Portugiesisch, Französisch, Englisch, Deutsch und Spanisch"
+      }
+    },
+    "location": {
+      "eyebrow": "Lage",
+      "title": "Rua da Arejinha 627 in Pedorido.",
+      "text": "Nutzen Sie die Karte, um O Refúgio in Google Maps zu finden.",
+      "fallbackLink": "In Google Maps öffnen",
+      "mapTitle": "Karte mit dem Standort von O Refúgio",
+      "guideLink": "Lokalen Guide ansehen"
+    },
+    "finalCta": {
+      "eyebrow": "Buchungen",
+      "title": "Bereit für Ihre Auszeit?",
+      "text": "Wählen Sie Ihre Daten und buchen Sie O Refúgio für einen ruhigen, privaten und unkomplizierten Aufenthalt.",
+      "cta": "Verfügbarkeit prüfen"
+    }
+  },
+  "galleryPage": {
+    "meta": {
+      "title": "O Refúgio | Galerie",
+      "description": "Vollständige Galerie von O Refúgio mit Innen- und Außenbereichen sowie der Atmosphäre des Aufenthalts."
+    },
+    "hero": {
+      "eyebrow": "Galerie",
+      "title": "Alle Bereiche von O Refúgio",
+      "text": "Entdecken Sie das Haus, die Außenbereiche, den Pool und die Details des Aufenthalts."
+    },
+    "empty": "Die Galeriebilder konnten nicht geladen werden.",
+    "lightbox": {
+      "dialogLabel": "Galerie im Vollbildmodus",
+      "imageLabel": "Galeriebild",
+      "imageAlt": "Galeriebild von O Refúgio",
+      "close": "Galerie schließen",
+      "previous": "Vorheriges Bild",
+      "next": "Nächstes Bild",
+      "zoomIn": "Bild vergrößern",
+      "zoomOut": "Bild verkleinern",
+      "zoomReset": "Zoom zurücksetzen"
+    }
+  },
+  "bookingPage": {
+    "meta": {
+      "title": "O Refúgio | Buchungen",
+      "description": "Prüfen Sie die Verfügbarkeit von O Refúgio, wählen Sie Ihre Aufenthaltsdaten und senden Sie Ihre Buchungsanfrage."
+    },
+    "hero": {
+      "eyebrow": "Buchungen",
+      "title": "Planen Sie Ihren Aufenthalt.",
+      "text": "Prüfen Sie die Verfügbarkeit von O Refúgio, wählen Sie Ihre Aufenthaltsdaten und senden Sie Ihre Buchungsanfrage."
+    },
+    "availability": {
+      "eyebrow": "Verfügbarkeit",
+      "title": "Wählen Sie die Daten Ihres Aufenthalts.",
+      "text": "Der Mindestaufenthalt beträgt 2 Nächte.",
+      "legendAvailable": "Verfügbar",
+      "legendOccupied": "Belegt",
+      "legendSelected": "Ausgewählt",
+      "todayButton": "Heute",
+      "previousMonths": "Frühere Monate anzeigen",
+      "nextMonths": "Nächste Monate anzeigen",
+      "dayPriceLabel": "{date}, {price}",
+      "discountedDayPriceLabel": "{date}, Sonderpreis {price}, regulärer Preis {originalPrice}"
+    },
+    "guests": {
+      "eyebrow": "Gäste",
+      "title": "Wer wird in O Refúgio übernachten?"
+    },
+    "details": {
+      "eyebrow": "Details",
+      "title": "Zusätzliche Informationen."
+    },
+    "form": {
+      "checkinLabel": "Check-in",
+      "checkoutLabel": "Check-out",
+      "dateHelp": "Kalender kann aktualisiert werden. Verfügbarkeit vorbehaltlich Bestätigung.",
+      "adultsLabel": "Erwachsene",
+      "kidsLabel": "Kinder",
+      "guestCountHelp": "Maximal 6 Gäste insgesamt.",
+      "guestCountHelp2": "Als Kinder gelten Personen im Alter von 0 bis 12 Jahren.",
+      "bedPreferenceTitle": "Bettenkonfiguration",
+      "bedPreferenceDouble": "Wir bevorzugen ein Doppelbett",
+      "bedPreferenceSingle": "Wir bevorzugen Einzelbetten",
+      "childAgesTitle": "Alter der Kinder",
+      "childAgesText": "Bitte geben Sie das Alter jedes Kindes zum Zeitpunkt des Aufenthalts an.",
+      "childAgeLabel": "Alter des Kindes",
+      "bikeToggleLabel": "Möchten Sie während Ihres Aufenthalts Fahrräder mieten?",
+      "bikeToggleHelp": "Sie können die Anfrage jetzt hinzufügen oder später mit uns klären.",
+      "bikeDaysTitle": "Fahrradanfrage",
+      "bikeDaysText": "Die Miete kostet 5 € pro Fahrrad und Tag. Sie können bis zu ein Fahrrad pro Gast anfragen und nur einzelne Tage des Aufenthalts auswählen.",
+      "bikeCountLabel": "Anzahl der Fahrräder",
+      "bikeRentalDaysLabel": "Miettage",
+      "contactTitle": "Kontakt und Bestätigung",
+      "contactNameLabel": "Name für die Buchung",
+      "contactNamePlaceholder": "Vollständiger Name",
+      "emailLabel": "E-Mail für die Buchung",
+      "emailPlaceholder": "name@beispiel.de",
+      "phoneLabel": "Telefon",
+      "phonePlaceholder": "+351 912 345 678",
+      "confirmationWarning": "Die Buchung wird per E-Mail bearbeitet. Dort erhalten Sie die Daten für die Überweisung. Ohne abgeschlossene Überweisung ist die Buchung nicht bestätigt.",
+      "checkinTimeLabel": "Voraussichtliche Check-in-Zeit",
+      "checkoutTimeLabel": "Voraussichtliche Check-out-Zeit",
+      "timeRangeHelp": "Check-in zwischen 15:00 und 19:00 Uhr. Check-out zwischen 08:00 und 10:00 Uhr.",
+      "timeHelp": "Falls Sie die Zeiten jetzt noch nicht angeben können, müssen Sie uns diese mindestens 48 Stunden im Voraus mitteilen, damit wir Ihren Aufenthalt vorbereiten können.",
+      "timezoneWarning": "Bitte beachten Sie die Zeitzone des portugiesischen Festlands (1 Stunde früher als in Spanien, Frankreich, der Schweiz und Schweden).",
+      "depositToggleLabel": "Ich möchte die Sicherheitskaution zusammen mit der Buchung vorab zahlen",
+      "depositToggleHelp": "Die Kaution von 200 € kann beim Check-in bar bezahlt werden, oder Sie wählen diese Option, um sie in die Überweisung für die Buchung einzubeziehen.",
+      "discountCodeLabel": "Rabattcode",
+      "discountCodePlaceholder": "Geben Sie hier Ihren Rabattcode ein",
+      "discountCodeApplied": "Code {code} angewendet: -{amount}",
+      "commentsLabel": "Kommentare oder besondere Wünsche",
+      "commentsPlaceholder": "Z. B. besondere Ankunftszeiten, Wünsche, Fragen zum Zugang...",
+      "marketingOptInLabel": "Ich möchte Neuigkeiten, Angebote und Rabatte von O Refúgio erhalten",
+      "rulesConfirmLabel": "Ich bestätige, dass ich die Hausregeln gelesen habe und akzeptiere",
+      "rulesConfirmHelp": "Bevor Sie die Anfrage senden, bestätigen Sie bitte einige wichtige Punkte, damit ein ruhiger Aufenthalt gewährleistet ist.",
+      "rulesLink": "Regeln ansehen",
+      "submitNotice": "Diese Anfrage bestätigt die Buchung nicht automatisch. Die Bestätigung, gegebenenfalls angeforderte Klarstellungen und die Überweisungsdaten werden nach Prüfung der Verfügbarkeit per E-Mail gesendet. Ohne abgeschlossene Überweisung ist die Buchung nicht bestätigt.",
+      "submit": "Buchungsanfrage senden",
+      "reset": "Auswahl löschen",
+      "resetConfirm": "Möchten Sie wirklich alle Angaben dieser Anfrage löschen?"
+    },
+    "summary": {
+      "eyebrow": "Zusammenfassung",
+      "title": "Aktuelle Kostenschätzung für den Aufenthalt.",
+      "rateAdultLabel": "Erwachsene / Nacht",
+      "rateChildLabel": "Kinder / Nacht",
+      "adultSingular": "Erwachsener",
+      "adultPlural": "Erwachsene",
+      "childSingular": "Kind",
+      "childPlural": "Kinder",
+      "specialRateLabel": "Sonderpreis",
+      "rateBikeLabel": "Fahrrad / Tag",
+      "depositLabel": "Sicherheitskaution",
+      "nightsLabel": "Nächte",
+      "guestsLabel": "Gäste",
+      "adultsLabel": "Erwachsene",
+      "kidsLabel": "Kinder",
+      "bedPreferenceLabel": "Betten",
+      "bedPreferenceDouble": "Doppelbett",
+      "bedPreferenceSingle": "Einzelbetten",
+      "bedPreferencePending": "Noch anzugeben",
+      "depositChoiceLabel": "Kaution mit Buchung",
+      "depositChoiceYes": "Ja",
+      "depositChoiceNo": "Nein",
+      "bikesLabel": "Fahrräder",
+      "bikesPattern": "{bikes} x {days} Tage",
+      "discountLabel": "Rabatt",
+      "estimatedTotalLabel": "Geschätzter Gesamtpreis",
+      "note": "Der Endbetrag kann je nach Daten, Gästezahl und möglichen zusätzlichen Bedingungen variieren.",
+      "depositNote": "Wenn Sie die Sicherheitskaution vorab zahlen, werden die 200 € beim Check-out nach Prüfung der Unterkunft zurückerstattet."
+    },
+    "contact": {
+      "eyebrow": "Kontakt",
+      "title": "Möchten Sie zuerst Details bestätigen?",
+      "text": "Wenn Sie Zeiten, Zugang oder Bedingungen klären oder eine Ausnahme anfragen möchten, können Sie uns kontaktieren.",
+      "button": "Kontaktseite öffnen"
+    },
+    "validation": {
+      "chooseCheckout": "Wählen Sie jetzt das Check-out-Datum.",
+      "datesRequired": "Wählen Sie Check-in- und Check-out-Datum.",
+      "dateUnavailable": "Das ausgewählte Datum ist nicht verfügbar.",
+      "checkinCannotFitMinimumStay": "Ab diesem Datum sind keine zwei aufeinanderfolgenden Nächte verfügbar. Wählen Sie ein anderes Check-in-Datum.",
+      "checkinTooSoon": "Das erste verfügbare Ankunftsdatum berücksichtigt bereits die Heute/Morgen-Regel nach portugiesischer Zeit.",
+      "checkoutTooSoon": "Wählen Sie ein gültiges Check-out-Datum für einen Mindestaufenthalt von 2 Nächten.",
+      "minStay": "Der Mindestaufenthalt beträgt 2 Nächte.",
+      "occupiedRange": "Der ausgewählte Zeitraum enthält belegte Daten.",
+      "minimumAdults": "Mindestens 1 Erwachsener ist erforderlich.",
+      "maxGuests": "Maximal sind insgesamt 6 Gäste erlaubt.",
+      "bikeDatesRequired": "Wählen Sie zuerst die Aufenthaltsdaten, bevor Sie Fahrräder anfragen.",
+      "bikesRequired": "Geben Sie mindestens ein Fahrrad an oder deaktivieren Sie diese Option.",
+      "bikesMax": "Pro Gast und Tag kann nur ein Fahrrad angefragt werden.",
+      "bikeDaysMax": "Die Miettage müssen innerhalb des Aufenthalts liegen.",
+      "bedPreferenceRequired": "Wählen Sie, ob Sie ein Doppelbett oder Einzelbetten bevorzugen.",
+      "contactNameRequired": "Geben Sie den Namen für die Buchung an.",
+      "emailRequired": "Geben Sie die E-Mail-Adresse für die Buchung an.",
+      "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse an.",
+      "phoneInvalid": "Geben Sie eine gültige Telefonnummer an. Sie können das portugiesische Format, +351 oder 00 verwenden.",
+      "checkinTimeInvalid": "Der Check-in muss zwischen 15:00 und 19:00 Uhr liegen. Wenn Sie eine andere Zeit benötigen, geben Sie dies in den Kommentaren an.",
+      "checkoutTimeInvalid": "Der Check-out muss zwischen 08:00 und 10:00 Uhr liegen. Wenn Sie eine andere Zeit benötigen, geben Sie dies in den Kommentaren an.",
+      "discountCodeNeedsDates": "Wählen Sie die Aufenthaltsdaten, um den Rabattcode zu prüfen.",
+      "discountCodeInvalid": "Dieser Rabattcode existiert nicht, ist abgelaufen oder nicht mehr verfügbar.",
+      "discountCodeNotApplicable": "Dieser Rabattcode gilt nicht für die ausgewählten Leistungen.",
+      "childAgeRequired": "Geben Sie das Alter jedes Kindes an.",
+      "childAgeRange": "Kinder müssen zwischen 0 und 12 Jahre alt sein.",
+      "rulesConfirmationRequired": "Bestätigen Sie, dass Sie die Hausregeln gelesen haben und akzeptieren."
+    }
+  },
+  "bookingSentPage": {
+    "meta": {
+      "title": "O Refúgio | Anfrage gesendet",
+      "description": "Zusammenfassung der an O Refúgio gesendeten Buchungsanfrage und nächste Schritte zur Bestätigung per E-Mail."
+    },
+    "hero": {
+      "eyebrow": "Anfrage gesendet",
+      "title": "Vielen Dank. Wir haben Ihre Buchungsanfrage erhalten.",
+      "text": "Wir antworten per E-Mail mit der Bestätigung, möglichen Rückfragen und den Überweisungsdaten. Der Aufenthalt ist erst nach Zahlung bestätigt."
+    },
+    "summary": {
+      "eyebrow": "Zusammenfassung",
+      "title": "Buchungsanfrage gesendet.",
+      "text": "Nachfolgend sehen Sie die wichtigsten Angaben, die wir mit Ihrer Anfrage erhalten haben.",
+      "emptyTitle": "Derzeit keine Buchungsdaten verfügbar.",
+      "emptyText": "Wenn Sie direkt auf diese Seite gelangt sind, haben wir noch keine Angaben zum Zusammenfassen erhalten. Sie können zur Buchungsseite zurückkehren und die Anfrage ausfüllen.",
+      "reservationIdLabel": "Anfragereferenz",
+      "checkinLabel": "Check-in",
+      "checkoutLabel": "Check-out",
+      "nightsLabel": "Nächte",
+      "guestsLabel": "Gäste",
+      "adultsLabel": "Erwachsene",
+      "kidsLabel": "Kinder",
+      "bedPreferenceLabel": "Betten",
+      "depositLabel": "Kaution mit Buchung",
+      "contactNameLabel": "Verantwortliche Person",
+      "emailLabel": "Kontakt-E-Mail",
+      "phoneLabel": "Telefon",
+      "checkinTimeLabel": "Voraussichtliche Check-in-Zeit",
+      "checkoutTimeLabel": "Voraussichtliche Check-out-Zeit",
+      "estimatedTotalLabel": "Geschätzter Gesamtpreis",
+      "depositNote": "Wenn Sie die Kaution vorab gezahlt haben, werden die 200 € beim Check-out nach Prüfung der Unterkunft zurückerstattet.",
+      "childAgesTitle": "Alter der Kinder",
+      "bikeDaysTitle": "Angefragte Fahrräder",
+      "bikeSummaryPattern": "{bikes} Fahrräder x {days} Tage",
+      "discountLabel": "Angewendeter Rabatt",
+      "commentsTitle": "Gesendete Kommentare"
+    },
+    "notice": {
+      "eyebrow": "Nächste Schritte",
+      "title": "Die Bestätigung erfolgt immer per E-Mail.",
+      "warningTitle": "Die Buchung ist noch nicht bestätigt.",
+      "warningText": "Wir antworten per E-Mail mit eventuellen Antworten, der Prüfung der Anfrage und den Überweisungsdaten. Die Buchung ist erst nach Zahlung bestätigt.",
+      "item1": "Verwenden Sie bei späteren Kontakten den in der Anfrage angegebenen Namen und die E-Mail-Adresse"
+    },
+    "actions": {
+      "eyebrow": "Kontakt",
+      "title": "Möchten Sie noch etwas ergänzen?",
+      "text": "Wenn Sie die Anfrage ergänzen, ein Detail klären oder eine Frage vorab stellen möchten, können Sie die Kontaktseite nutzen und angeben, wie Sie die Antwort erhalten möchten.",
+      "contact": "Kontaktseite öffnen",
+      "home": "Zurück zur Startseite",
+      "contactMessage": "Ich habe bereits eine Buchungsanfrage für {checkin} - {checkout} gesendet und möchte noch eine Information ergänzen."
+    }
+  },
+  "rulesFull": {
+    "eyebrow": "Regeln und Bedingungen",
+    "title": "Bedingungen des Aufenthalts",
+    "intro": "Bevor Sie die Anfrage senden, bestätigen Sie bitte einige wichtige Punkte, damit ein ruhiger Aufenthalt gewährleistet ist.",
+    "capacity": {
+      "title": "Kapazität und Belegung",
+      "item1": "Maximale Belegung: 6 Gäste",
+      "item2": "Die gebuchte Gästezahl darf nicht überschritten werden",
+      "item3": "Die Einhaltung kann mithilfe von Außenkameras überprüft werden",
+      "note": "Bei Nichteinhaltung können die Behörden eingeschaltet werden und eine Geldstrafe zwischen 500 € und 2.500 € verhängt werden."
+    },
+    "checkin": {
+      "title": "Check-in und Check-out",
+      "item1": "Check-in: 15:00–19:00 Uhr",
+      "item2": "Check-out: 08:00–10:00 Uhr",
+      "item3": "Ankunfts- und Abfahrtszeit müssen mindestens 48 Stunden im Voraus mitgeteilt werden",
+      "item4": "Zeiten außerhalb dieser Zeiträume können nach vorheriger Absprache möglich sein, sind aber nicht garantiert",
+      "note": "Außerhalb der festgelegten Zeiten können zusätzliche Gebühren anfallen."
+    },
+    "reservation": {
+      "title": "Buchung und Stornierung",
+      "item1": "Kostenlose Stornierung bis 48 Stunden vor der Check-in-Zeit",
+      "item2": "Nach Ablauf dieser Frist wird der gesamte Aufenthaltsbetrag berechnet",
+      "item3": "Mit der Buchung werden alle Bedingungen akzeptiert"
+    },
+    "deposit": {
+      "title": "Sicherheitskaution",
+      "item1": "Sicherheitskaution ab 200 €, beim Check-in in bar zu zahlen",
+      "item2": "Der Betrag kann je nach Gästezahl oder Umständen variieren",
+      "item3": "Rückerstattung beim Check-out nach Prüfung der Unterkunft"
+    },
+    "identification": {
+      "title": "Identifikation",
+      "item1": "Ausweisdokument für alle Gäste erforderlich",
+      "item2": "Die Daten können beim Check-in aus rechtlichen und Sicherheitsgründen erfasst werden"
+    },
+    "parking": {
+      "title": "Parken",
+      "item1": "Kostenloser, überwachter Parkplatz verfügbar",
+      "item2": "Parken innerhalb des Grundstücks ist nicht erlaubt (nur Be- und Entladen)",
+      "note": "Schäden oder Verschmutzungen durch Fahrzeuge innerhalb des Grundstücks können von der Kaution abgezogen werden"
+    },
+    "rules": {
+      "title": "Nutzungsregeln",
+      "item1": "Partys oder Veranstaltungen jeglicher Art sind VERBOTEN",
+      "item2": "Junggesellen-/Junggesellinnenabschiede und Geburtstagsfeiern sind besonders untersagt",
+      "item3": "Die Unterkunft ist für Ruhe und Erholung bestimmt",
+      "item4": "Haustiere sind nicht erlaubt"
+    },
+    "smoking": {
+      "title": "Rauchregelung",
+      "item1": "Rauchen ist in allen Gebäuden verboten",
+      "item2": "Rauchen ist nur in den durch Aschenbecher gekennzeichneten Außenbereichen erlaubt",
+      "note": "Bei Nichteinhaltung können zusätzliche Kosten und Brandgefahr entstehen."
+    },
+    "cleaning": {
+      "title": "Nutzung und Reinigung",
+      "item1": "Alle Utensilien müssen nach Gebrauch gewaschen werden",
+      "item2": "Sie müssen wieder an ihren Platz zurückgestellt werden",
+      "note": "Bei Nichteinhaltung können zusätzliche Reinigungskosten entstehen."
+    },
+    "pool": {
+      "title": "Pool",
+      "item1": "Pool in der warmen Jahreszeit verfügbar",
+      "item2": "Schwimmhilfen und Freizeit-Zubehör inklusive",
+      "note": "Die Nutzung erfolgt vollständig auf eigene Verantwortung der Gäste."
+    },
+    "security": {
+      "title": "Sicherheit und Videoüberwachung",
+      "item1": "Das Grundstück verfügt über Sicherheitskameras",
+      "item2": "Während des Aufenthalts sind alle Innenkameras deaktiviert",
+      "note": "Innenkameras dienen ausschließlich der Sicherheit der Unterkunft außerhalb der Saison."
+    },
+    "legal": {
+      "title": "Rechtliche Informationen",
+      "item1": "Alojamento-Local-Lizenz: 132647/AL",
+      "item2": "Rechnungen mit NIF auf Anfrage verfügbar"
+    }
+  },
+  "contactPage": {
+    "meta": {
+      "title": "O Refúgio | Kontakt",
+      "description": "Senden Sie O Refúgio eine Nachricht zu Buchungen, Fragen, Änderungen oder Feedback zu Ihrem Aufenthalt."
+    },
+    "hero": {
+      "eyebrow": "Kontakt",
+      "title": "Sprechen Sie vor, während oder nach Ihrem Aufenthalt mit uns.",
+      "text": "Senden Sie uns eine Nachricht und teilen Sie uns mit, wie wir Sie am liebsten zurückkontaktieren sollen.",
+      "primaryCta": "Nachricht senden",
+      "reviewCta": "Auf Google Maps bewerten"
+    },
+    "form": {
+      "eyebrow": "Nachricht",
+      "title": "Sagen Sie uns, was Sie benötigen.",
+      "text": "Je mehr Kontext Sie angeben, desto leichter kann die richtige Person über den richtigen Kanal antworten.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Vollständiger Name",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "name@beispiel.de",
+      "phoneLabel": "Telefon",
+      "phonePlaceholder": "+351 912 345 678",
+      "languageLabel": "Kontaktsprache",
+      "languagePortuguese": "Português",
+      "languageFrench": "Français",
+      "languageEnglish": "English",
+      "languageGerman": "Deutsch",
+      "languageSpanish": "Español",
+      "preferredContactLabel": "Ich möchte kontaktiert werden per",
+      "preferredEmail": "E-Mail",
+      "preferredWhatsApp": "Kontaktanfrage per WhatsApp",
+      "preferredCall": "Rückruf anfordern",
+      "contextLabel": "Kontaktkontext",
+      "contextPlaceholder": "Option wählen",
+      "contextConfirmed": "Ich habe bereits eine Buchung",
+      "contextRequested": "Ich habe eine Buchungsanfrage gesendet",
+      "contextPast": "Ich hatte bereits eine Buchung",
+      "contextNone": "Ich habe keine Buchung",
+      "topicLabel": "Betreff",
+      "topicPlaceholder": "Option wählen",
+      "topicContextFirst": "Zuerst den Kontext wählen",
+      "messageLabel": "Nachricht",
+      "messagePlaceholder": "Schreiben Sie hier Ihre Frage, Anfrage oder Ihr Feedback. Wenn Sie bereits Daten oder eine Buchungsnummer haben, geben Sie diese ebenfalls an.",
+      "attachmentsLabel": "Anhänge",
+      "attachmentsButton": "Dateien auswählen",
+      "attachmentsEmpty": "Keine Datei ausgewählt",
+      "attachmentsOne": "1 Datei ausgewählt",
+      "attachmentsMany": "{count} Dateien ausgewählt",
+      "attachmentsHelp": "Sie können hilfreiche Bilder oder Dokumente auswählen und der Anfrage beifügen.",
+      "marketingOptInLabel": "Ich möchte Neuigkeiten, Angebote und Rabatte von O Refúgio erhalten",
+      "submit": "Nachricht senden"
+    },
+    "topics": {
+      "confirmedCancel": "Buchung stornieren",
+      "confirmedChange": "Buchung ändern",
+      "confirmedQuestion": "Fragen zur Buchung",
+      "requestCancel": "Buchungsanfrage stornieren",
+      "requestChange": "Buchungsanfrage ändern",
+      "requestQuestion": "Fragen zur Buchungsanfrage",
+      "requestStatus": "Status der Anfrage prüfen",
+      "pastFeedback": "Ich war bereits hier und möchte Feedback geben",
+      "pastQuestion": "Frage zu einem früheren Aufenthalt",
+      "noReservationBooking": "Fragen zur Buchung",
+      "noReservationSpace": "Fragen zur Unterkunft",
+      "noReservationAccessibility": "Barrierearmut oder besondere Wünsche",
+      "noReservationLocalArea": "Fragen zur Umgebung",
+      "noReservationPartnerships": "Partnerschaften oder Presse",
+      "other": "Sonstiges"
+    },
+    "validation": {
+      "phoneInvalid": "Geben Sie eine gültige Telefonnummer an. Sie können das portugiesische Format, +351 oder 00 verwenden.",
+      "phoneRequiredForMethod": "Geben Sie eine Telefonnummer an, um diese Option zu verwenden."
+    },
+    "stay": {
+      "eyebrow": "Schnelle Hilfe",
+      "title": "Sie sind bereits vor Ort?",
+      "text": "Nutzen Sie den QR-Code in der Unterkunft, um direkte Kontaktmöglichkeiten aufzurufen."
+    },
+    "social": {
+      "eyebrow": "Social Media",
+      "title": "O Refúgio online finden",
+      "googleMaps": "Google Maps",
+      "facebook": "Facebook",
+      "instagram": "Instagram"
+    }
+  },
+  "notFoundPage": {
+    "meta": {
+      "title": "O Refúgio | Seite nicht gefunden",
+      "description": "Seite auf der Website von O Refúgio nicht gefunden, mit hilfreichen Links zum Weiternavigieren."
+    },
+    "hero": {
+      "eyebrow": "Fehler 404",
+      "title": "Diese Seite konnten wir nicht finden.",
+      "text": "Die Adresse hat sich möglicherweise geändert oder ist nicht mehr verfügbar. Wählen Sie unten eine Option, um Ihren Aufenthalt weiter zu planen.",
+      "homeCta": "Zurück zur Startseite"
+    },
+    "links": {
+      "label": "Nützliche Links",
+      "booking": {
+        "title": "Möchten Sie buchen?",
+        "text": "Sehen Sie Daten, Gäste und Extras und senden Sie eine Buchungsanfrage."
+      },
+      "accommodation": {
+        "title": "Suchen Sie Informationen zum Haus?",
+        "text": "Entdecken Sie Schlafzimmer, Außenbereiche, Pool und Ausstattung."
+      },
+      "contact": {
+        "title": "Möchten Sie mit uns sprechen?",
+        "text": "Senden Sie eine Nachricht bei Fragen, Änderungen oder besonderen Wünschen."
+      },
+      "guide": {
+        "title": "Möchten Sie die Umgebung entdecken?",
+        "text": "Öffnen Sie den lokalen Guide für Empfehlungen in der Nähe von O Refúgio."
+      }
+    }
+  },
+  "guidePage": {
+    "meta": {
+      "title": "O Refúgio | Lokaler Guide",
+      "description": "Lokaler Guide von O Refúgio mit Stränden, Natur, Städten, Orten, Veranstaltungen und ausgewählten Partnern nahe Pedorido und Castelo de Paiva."
+    },
+    "hero": {
+      "imageAlt": "Flusslandschaft in der Region Castelo de Paiva",
+      "eyebrow": "Lokaler Guide",
+      "title": "Die Region entdecken, ohne lange suchen zu müssen.",
+      "text": "Wir haben nahegelegene Orte, Spaziergänge, Strände, Restaurants, Einkaufsmöglichkeiten und Veranstaltungen zusammengestellt, damit Sie Ihre Tage zwischen Pedorido, Castelo de Paiva und dem Douro bestmöglich nutzen können.",
+      "primaryCta": "Empfehlungen entdecken",
+      "mapCta": "Karte öffnen"
+    },
+    "intro": {
+      "eyebrow": "In Ihrer Umgebung",
+      "title": "Von der Landschaft bis zum Tagesausflug.",
+      "text1": "Nutzen Sie die Filter, um Strände, Natur, nahegelegene Orte, Städte und Veranstaltungen zu entdecken, die sich bei einem Besuch der Region lohnen.",
+      "text2": "Die angegebenen Zeiten sind ungefähre Fahrzeiten ab O Refúgio. Öffnungszeiten, Zugänge und Bedingungen können sich ändern; prüfen Sie diese daher vor der Abfahrt direkt beim jeweiligen Ort.",
+      "quickTitle": "Nach Thema entdecken",
+      "quickBeach": "Strände",
+      "quickEvents": "Saisonale Veranstaltungen",
+      "quickNature": "Natur und Kultur",
+      "quickCities": "Städte"
+    },
+    "browser": {
+      "eyebrow": "Entdecken",
+      "title": "Finden Sie, wonach Sie suchen.",
+      "text": "Suchen Sie nach Namen oder wählen Sie eine Kategorie. Geschäftspartner erscheinen in einem eigenen Bereich und sind von redaktionellen Empfehlungen getrennt.",
+      "searchLabel": "Im lokalen Guide suchen",
+      "searchPlaceholder": "Ort, Stadt oder Aktivität suchen…",
+      "filterLabel": "Nach Kategorie filtern",
+      "all": "Alles",
+      "beaches": "Strände",
+      "nature": "Natur und Kultur",
+      "cities": "Städte",
+      "nearby": "Orte in der Nähe",
+      "events": "Veranstaltungen",
+      "favourites": "Favoriten",
+      "sortLabel": "Sortieren",
+      "sortClosest": "Am nächsten zu O Refúgio",
+      "sortAlpha": "A–Z",
+      "listView": "Liste",
+      "mapView": "Karte",
+      "useLocation": "Meinen Standort verwenden",
+      "locationReady": "Standort für Routen aktiviert",
+      "locationDenied": "Ihr Standort konnte nicht verwendet werden.",
+      "privacyNote": "Ihr Standort wird nur im Browser zur Vorbereitung von Routen verwendet und nicht vom lokalen Guide gespeichert.",
+      "loading": "Empfehlungen werden geladen…",
+      "errorTitle": "Der lokale Guide konnte nicht geladen werden.",
+      "errorText": "Sie können die direkten Links unten weiterhin verwenden oder es erneut versuchen.",
+      "noResultsTitle": "Mit diesen Filtern wurden keine Empfehlungen gefunden.",
+      "noResultsText": "Löschen Sie die Suche oder wählen Sie eine andere Kategorie.",
+      "results": "{count} Empfehlungen",
+      "result": "{count} Empfehlung"
+    },
+    "labels": {
+      "fromRefugio": "ab O Refúgio",
+      "directions": "Route öffnen",
+      "showOnMap": "Auf Karte anzeigen",
+      "favourite": "Zu Favoriten hinzufügen",
+      "removeFavourite": "Aus Favoriten entfernen",
+      "partner": "Partner",
+      "seasonal": "Saisonal",
+      "closest": "Am nächsten",
+      "confirmHours": "Prüfen Sie Öffnungszeiten und Bedingungen vor dem Besuch.",
+      "mapUnavailable": "Karte nicht verfügbar? Nutzen Sie die Routenschaltfläche auf der Karte."
+    },
+    "map": {
+      "eyebrow": "Karte",
+      "title": "Jede Empfehlung in Google Maps ansehen.",
+      "text": "Wählen Sie einen Ort aus der Liste, um die Karte darauf zu zentrieren. Die Karten bleiben als Alternative verfügbar, falls die Karte nicht geladen wird.",
+      "defaultTitle": "O Refúgio",
+      "defaultAddress": "Rua da Arejinha 627, 4550-518 Pedorido",
+      "openDefault": "O Refúgio in Google Maps öffnen"
+    },
+    "partners": {
+      "eyebrow": "Lokale Partner",
+      "title": "Partnerbetriebe klar gekennzeichnet.",
+      "text": "Geschäftspartner sind in diesem eigenen Bereich zusammengefasst und mit dem Hinweis „Partner“ gekennzeichnet. Sie werden nicht mit der redaktionellen Liste von Stränden, Ausflügen, Städten und Veranstaltungen vermischt.",
+      "offerNote": "Zeitlich begrenzte Angebote werden nur innerhalb ihres jeweiligen Gültigkeitszeitraums angezeigt.",
+      "detailsSoon": "Detaillierte Informationen werden ergänzt."
+    },
+    "events": {
+      "dateNote": "Die Daten können sich von Jahr zu Jahr ändern. Prüfen Sie vor dem Besuch immer das offizielle Programm."
+    },
+    "finalCta": {
+      "eyebrow": "O Refúgio",
+      "title": "Schon entschieden, was Sie entdecken möchten?",
+      "text": "Speichern Sie Ihre Favoriten und kehren Sie während Ihres Aufenthalts zum lokalen Guide zurück, wenn Sie eine Idee brauchen.",
+      "accommodation": "Unterkunft ansehen",
+      "booking": "Verfügbarkeit prüfen"
+    },
+    "listings": {
+      "porto": {
+        "name": "Porto",
+        "category": "Stadt / Tagesausflug",
+        "description": "Eine der empfohlenen Städte für einen Tagesausflug.",
+        "time": "~35 Min."
+      },
+      "gaia": {
+        "name": "Vila Nova de Gaia",
+        "category": "Stadt / Tagesausflug",
+        "description": "Empfohlener Besuch am Südufer des Douro, direkt gegenüber von Porto.",
+        "time": "~35 Min."
+      },
+      "aveiro": {
+        "name": "Aveiro",
+        "category": "Stadt / Tagesausflug",
+        "description": "Empfohlene Stadt für einen Tagesausflug.",
+        "time": "~55 Min."
+      },
+      "costa-nova": {
+        "name": "Costa Nova",
+        "category": "Stadt / Tagesausflug",
+        "description": "Empfehlung an der Küste, gut mit einem Besuch in der Region Aveiro kombinierbar.",
+        "time": "~1 Std. 05 Min."
+      },
+      "braga": {
+        "name": "Braga",
+        "category": "Stadt / Tagesausflug",
+        "description": "Von den Gastgebern besonders empfohlene Stadt.",
+        "time": "~1 Std. 05 Min."
+      },
+      "bom-jesus": {
+        "name": "Bom Jesus do Monte",
+        "category": "Stadt / Tagesausflug",
+        "description": "Empfohlener Besuch als Ergänzung zu einem Tag in Braga.",
+        "time": "~1 Std. 10 Min."
+      },
+      "viana": {
+        "name": "Viana do Castelo",
+        "category": "Stadt / Tagesausflug",
+        "description": "Empfohlene Stadt für einen längeren Ausflug während des Aufenthalts.",
+        "time": "~1 Std. 25 Min."
+      },
+      "castelo-paiva": {
+        "name": "Castelo de Paiva – Zentrum",
+        "category": "Ort in der Nähe",
+        "description": "Das Gemeindezentrum, praktisch für Dienstleistungen, Essen und einen Spaziergang durch die Umgebung.",
+        "time": "~17 Min."
+      },
+      "canedo": {
+        "name": "Canedo",
+        "category": "Ort in der Nähe",
+        "description": "Nahegelegener Ort mit Geschäften und Dienstleistungen.",
+        "time": "~12 Min."
+      },
+      "santa-maria-feira": {
+        "name": "Santa Maria da Feira",
+        "category": "Ort / Kultur",
+        "description": "Guter Ausgangspunkt, um Zentrum, Burg und saisonale Veranstaltungen zu verbinden.",
+        "time": "~30 Min."
+      },
+      "arouca": {
+        "name": "Arouca",
+        "category": "Ort / Natur",
+        "description": "Empfohlener Ausflug, um eine weitere Berg- und Kulturlandschaft zu entdecken.",
+        "time": "~35–40 Min."
+      },
+      "mosteiro-arouca": {
+        "name": "Mosteiro de Santa Maria de Arouca",
+        "category": "Kulturerbe / Kultur",
+        "description": "Eine der wichtigsten historischen Sehenswürdigkeiten von Arouca, ideal mit einem Spaziergang durch das Ortszentrum zu kombinieren.",
+        "time": "~35–40 Min."
+      },
+      "ponte-516-arouca": {
+        "name": "516 Arouca – Hängebrücke",
+        "category": "Natur / Erlebnis",
+        "description": "516 Meter lange Fußgänger-Hängebrücke hoch über dem Rio Paiva im Arouca Geopark.",
+        "note": "Tickets werden online verkauft; das Brückenticket umfasst die Passadiços do Paiva, wenn beide Besuche am selben Tag stattfinden."
+      },
+      "passadicos-paiva": {
+        "name": "Passadiços do Paiva",
+        "category": "Natur / Wandern",
+        "description": "Etwa 8 km langer Weg am linken Ufer des Rio Paiva zwischen Areinho und Espiunca und eines der bekanntesten Erlebnisse im Arouca Geopark.",
+        "note": "Planen Sie etwa 2 Std. 30 Min. für die Strecke ein und bereiten Sie den Besuch im Voraus vor; prüfen Sie Tickets und Bedingungen auf der offiziellen Website."
+      },
+      "serra-freita": {
+        "name": "Serra da Freita",
+        "category": "Natur / Berge",
+        "description": "Eine der sehenswertesten Regionen des Arouca Geopark mit Bergpanoramen, Dörfern und mehreren Geostätten.",
+        "note": "Die Gegend eignet sich gut, um Frecha da Mizarela und Pedras Parideiras auf demselben Ausflug zu verbinden."
+      },
+      "frecha-mizarela": {
+        "name": "Frecha da Mizarela",
+        "category": "Natur / Wasserfall",
+        "description": "Mehr als 60 Meter hoher Wasserfall in der Serra da Freita und eine der eindrucksvollsten Naturlandschaften des Arouca Geopark."
+      },
+      "pedras-parideiras": {
+        "name": "Pedras Parideiras – Castanheira",
+        "category": "Geologie / Natur",
+        "description": "Geostätte von internationaler Bedeutung, bekannt für ihren seltenen Knollengranit, mit Besucherzentrum im Dorf Castanheira."
+      },
+      "cinfaes": {
+        "name": "Cinfães",
+        "category": "Ort in der Nähe",
+        "description": "Empfehlung für einen längeren Ausflug durch die Region.",
+        "time": "~45 Min."
+      },
+      "adega-ramadinha": {
+        "name": "Adega Ramadinha – Pedorido",
+        "category": "Restaurant · Partner",
+        "description": "Lokaler Partner und eine der Empfehlungen der Gastgeber zum Essen nahe O Refúgio.",
+        "time": "~7 Min."
+      },
+      "corga": {
+        "name": "Corga",
+        "category": "Partner · Lokale Produkte",
+        "description": "Lokaler Partner rund um Verkostungen und Produkte aus der Region."
+      },
+      "cafe-cruzeiro": {
+        "name": "Café Cruzeiro",
+        "category": "Partner · Konditorei",
+        "description": "Lokaler Partner für Konditorei und Café."
+      },
+      "aquapura": {
+        "name": "Aquapura Terrace",
+        "category": "Partner · Bar",
+        "description": "Lokaler Partner am Fluss."
+      },
+      "praia-pedorido": {
+        "name": "Flussstrand von Pedorido",
+        "category": "Flussstrand",
+        "description": "Die nächstgelegene Badestelle am Fluss unter den Empfehlungen der Gastgeber.",
+        "time": "~7 Min."
+      },
+      "viver-douro": {
+        "name": "Viver o Douro – Pedorido",
+        "category": "Natur / Wandern",
+        "description": "Thematischer Wanderweg entlang des Douro-Ufers mit Brücken, Stegen und Aussichtspunkten, die von Rabelo-Booten inspiriert sind.",
+        "time": "~7 Min."
+      },
+      "ilha-amores": {
+        "name": "Ilha do Castelo / Ilha dos Amores – Castelo de Paiva",
+        "category": "Flussstrand",
+        "description": "Empfohlener Uferbereich, um den Fluss in der Region Castelo de Paiva zu genießen.",
+        "time": "~20 Min."
+      },
+      "lomba": {
+        "name": "Praia da Lomba – Gondomar",
+        "category": "Flussstrand",
+        "description": "Eine weitere Möglichkeit für einen Ausflug zu einem Flussstrand am Douro.",
+        "time": "~30 Min."
+      },
+      "espinho": {
+        "name": "Strand von Espinho",
+        "category": "Meeresstrand",
+        "description": "Atlantikstrand für einen Tag an der Küste.",
+        "time": "~35 Min."
+      },
+      "furadouro": {
+        "name": "Strand von Furadouro – Ovar",
+        "category": "Meeresstrand",
+        "description": "Empfohlener Atlantikstrand für einen Tagesausflug.",
+        "time": "~45 Min."
+      },
+      "serra-sao-domingos": {
+        "name": "Serra de São Domingos – Castelo de Paiva",
+        "category": "Natur / Landschaft",
+        "description": "Eine der nahegelegenen Landschaften, die sich zum Entdecken der Umgebung von Castelo de Paiva anbietet.",
+        "time": "~8 Min."
+      },
+      "baloico-sao-gens": {
+        "name": "Baloiço do Monte de São Gens",
+        "category": "Natur / Aussichtspunkt",
+        "description": "Empfohlener Ausflug, um die Landschaft der Region zu genießen.",
+        "time": "~15 Min."
+      },
+      "castelo-feira": {
+        "name": "Castelo de Santa Maria da Feira",
+        "category": "Denkmal",
+        "description": "Empfohlenes Denkmal, gut mit einem Besuch in Santa Maria da Feira kombinierbar.",
+        "time": "~30 Min."
+      },
+      "sao-joao-porto": {
+        "name": "São João do Porto",
+        "category": "Traditionelle Veranstaltung",
+        "description": "Eines der größten Volksfeste des Landes mit belebten Straßen, Musik, Sardinen und Feuerwerk.",
+        "time": "~35 Min.",
+        "eventDate": "Nacht vom 23. auf den 24. Juni"
+      },
+      "sao-joao-paiva": {
+        "name": "São João de Castelo de Paiva",
+        "category": "Traditionelle Veranstaltung",
+        "description": "Volksumzüge, Musik, Straßenfeste und viel Unterhaltung.",
+        "time": "~17 Min.",
+        "eventDate": "23. und 24. Juni"
+      },
+      "santos-populares": {
+        "name": "Santos Populares und lokale Straßenfeste",
+        "category": "Traditionelle Veranstaltung",
+        "description": "Im Juni finden häufig Feste in den umliegenden Dörfern und Orten statt.",
+        "eventDate": "Juni · Santo António 12./13. · São João 23./24. · São Pedro 28./29."
+      },
+      "feira-vinho-verde": {
+        "name": "Feira do Vinho Verde, do Lavrador, Gastronomia e Artesanato – Castelo de Paiva",
+        "category": "Veranstaltung / Gastronomie",
+        "description": "Eine der wichtigsten saisonalen Veranstaltungen in Castelo de Paiva.",
+        "time": "~17 Min.",
+        "eventDate": "Normalerweise Anfang Juli"
+      },
+      "viagem-medieval": {
+        "name": "Viagem Medieval – Santa Maria da Feira",
+        "category": "Veranstaltung / Kultur",
+        "description": "Eine der größten Veranstaltungen der Region und ein besonders empfehlenswerter Besuch.",
+        "time": "~30 Min.",
+        "eventDate": "Normalerweise zwischen Ende Juli und Anfang August"
+      },
+      "romaria-sao-domingos": {
+        "name": "Romaria de São Domingos – Raiva, Castelo de Paiva",
+        "category": "Wallfahrtsfest",
+        "description": "Traditionelles Fest der Region.",
+        "time": "~10 Min.",
+        "eventDate": "Üblicherweise Anfang August"
+      },
+      "nossa-senhora-amoras": {
+        "name": "Nossa Senhora das Amoras – Oliveira do Arda",
+        "category": "Wallfahrtsfest",
+        "description": "Traditionelles Fest in der Nähe von O Refúgio.",
+        "time": "~5–10 Min.",
+        "eventDate": "Üblicherweise Anfang September"
+      }
+    }
+  },
+  "thanksPage": {
+    "meta": {
+      "title": "O Refúgio | Vielen Dank",
+      "description": "Nachricht erfolgreich an O Refúgio gesendet."
+    },
+    "hero": {
+      "eyebrow": "Nachricht gesendet",
+      "title": "Vielen Dank für Ihre Nachricht.",
+      "text": "Wir haben Ihre Nachricht erhalten und antworten so bald wie möglich über die angegebenen Kontaktdaten."
+    },
+    "actions": {
+      "home": "Zurück zur Startseite"
+    }
+  },
+  "footer": {
+    "copyright": "© O Refúgio — Familie Rodrigues",
+    "googleReview": "Auf Google Maps bewerten",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "creator": "Website by André Fonseca"
+  },
+  "guestStay": {
+    "meta": {
+      "title": "O Refúgio | Während Ihres Aufenthalts",
+      "description": "Praktische Informationen für Gäste während ihres Aufenthalts in O Refúgio."
+    },
+    "hero": {
+      "eyebrow": "Während Ihres Aufenthalts",
+      "demoBadge": "Demo",
+      "genericTitle": "Willkommen bei O Refúgio.",
+      "genericText": "Alles, was Sie während Ihres Aufenthalts benötigen könnten, an einem Ort und konsequent für Mobilgeräte gedacht.",
+      "personalisedTitle": "Hallo, {name} 👋",
+      "personalisedText": "Wir hoffen, Sie genießen Ihren Aufenthalt. Hier finden Sie schnell das Wichtigste.",
+      "stayLabel": "Aufenthalt",
+      "checkoutLabel": "Check-out",
+      "guestsLabel": "Gäste",
+      "bikesLabel": "Fahrräder",
+      "noBikes": "Nicht gebucht"
+    },
+    "quick": {
+      "wifi": "WLAN",
+      "host": "Gastgeber",
+      "emergency": "Notfall",
+      "nearby": "In meiner Nähe"
+    },
+    "actions": {
+      "call": "Anrufen",
+      "whatsapp": "WhatsApp",
+      "map": "Karte",
+      "directions": "Route",
+      "directionsHome": "Zurück zu O Refúgio",
+      "copy": "Kopieren",
+      "copyAddress": "Adresse kopieren",
+      "copied": "Kopiert.",
+      "partner": "Partner"
+    },
+    "emergency": {
+      "eyebrow": "Soforthilfe",
+      "title": "Wenn Sie Hilfe benötigen",
+      "text": "Bei unmittelbarer Gefahr rufen Sie 112 an. Für nicht dringende Situationen nutzen Sie die passenden Kontakte unten.",
+      "nationalTitle": "Nationale Notrufnummer",
+      "nationalText": "Medizinischer Notfall, Feuer oder Polizei"
+    },
+    "property": {
+      "label": "Adresse der Unterkunft",
+      "emergencyHint": "Geben Sie im Notfall diese Adresse an und erklären Sie, dass Sie in O Refúgio übernachten."
+    },
+    "hosts": {
+      "eyebrow": "Wir sind in der Nähe",
+      "title": "Gastgeber kontaktieren",
+      "text": "Wählen Sie den Kontakt, der am besten zu Ihrer Sprache passt. Anruf und WhatsApp werden aktiv, sobald die Nummern eingerichtet sind.",
+      "placeholder": "Noch einzurichten",
+      "configured": "Verfügbar",
+      "placeholderNote": "Prototyp: Ersetzen Sie die Kontakte am Anfang von js/pages/qr.js, bevor diese Seite mit Gästen verwendet wird.",
+      "whatsappMessage": "Hallo! Ich übernachte in O Refúgio und brauche Hilfe."
+    },
+    "wifi": {
+      "eyebrow": "Schnell verbinden",
+      "title": "WLAN im Haus",
+      "text": "Die Zugangsdaten stehen hier zum einfachen Kopieren. Später werden sie im Admin verwaltet und über die private Informationsschicht des Aufenthalts bereitgestellt.",
+      "network": "Netzwerk",
+      "password": "Passwort",
+      "toConfigure": "Noch einzurichten",
+      "qrPlaceholderTitle": "WLAN-QR",
+      "qrPlaceholderText": "Wird automatisch erzeugt, sobald die Zugangsdaten eingerichtet sind.",
+      "qrReadyTitle": "WLAN-QR bereit zur Erzeugung",
+      "qrReadyText": "QR-Generator anbinden, sobald die ausgewählte Bibliothek freigegeben ist."
+    },
+    "health": {
+      "eyebrow": "Gesundheit",
+      "title": "Gesundheit und Hilfe",
+      "text": "Nützliche Kontakte in der Umgebung. Für nicht dringende medizinische Beratung können Sie SNS 24 anrufen; im Notfall wählen Sie 112."
+    },
+    "pharmacy": {
+      "title": "Apotheken in der Nähe",
+      "text": "Öffnungszeiten und Notdienst-Apotheken können sich ändern. Prüfen Sie dies vor der Abfahrt, besonders nachts, sonntags und an Feiertagen."
+    },
+    "nearby": {
+      "eyebrow": "Wichtiges für den Aufenthalt",
+      "title": "Essen, einkaufen und Erledigungen",
+      "text": "Praktische Empfehlungen, wenn Sie gerade etwas benötigen – getrennt vom lokalen Guide für Ausflüge und Erlebnisse.",
+      "supermarkets": "Einkaufen",
+      "food": "Essen",
+      "services": "Services",
+      "hoursNote": "Fahrzeiten sind ungefähr und Öffnungszeiten/Services können sich ändern. Nutzen Sie die Routenschaltfläche, um die Angaben aktuell zu prüfen."
+    },
+    "partners": {
+      "eyebrow": "Lokale Partner",
+      "title": "Einige Orte, die wir hervorheben möchten",
+      "text": "Partner sind klar gekennzeichnet und werden nicht als unabhängige redaktionelle Empfehlungen dargestellt.",
+      "cta": "Alle Partner im lokalen Guide ansehen"
+    },
+    "bikes": {
+      "eyebrow": "Extra während des Aufenthalts",
+      "title": "Fahrräder",
+      "availableTitle": "Fahrräder während des Aufenthalts",
+      "priceUnit": "pro Fahrrad / Tag",
+      "text": "Anfrage vorbehaltlich Verfügbarkeit und Bestätigung durch die Gastgeber. Vorgesehenes Maximum: ein Fahrrad pro Gast und Tag.",
+      "requestCta": "Per WhatsApp anfragen",
+      "whatsappMessage": "Hallo! Ich würde gerne Fahrräder für meinen Aufenthalt in O Refúgio anfragen.",
+      "alreadyBookedTitle": "Sie haben bereits {count} Fahrrad/Fahrräder in Ihrer Buchung.",
+      "alreadyBookedText": "Wir zeigen die bestehende Buchung, statt dasselbe Extra erneut anzubieten."
+    },
+    "house": {
+      "eyebrow": "Das Haus",
+      "title": "Informationen zur Unterkunft",
+      "text": "Diese Struktur ist für die endgültigen, von den Eigentümern freigegebenen Anweisungen vorbereitet. Noch nicht bestätigte Punkte werden markiert, statt erfunden zu werden.",
+      "checkoutTitle": "Check-out und Abreise",
+      "checkoutTime": "Abfahrtszeit",
+      "keys": "Wo die Schlüssel hinterlassen werden",
+      "kitchen": "Küche / Geschirr",
+      "waste": "Müll und Recycling",
+      "toConfigure": "Noch einzurichten",
+      "rulesTitle": "Kurze Regeln",
+      "rulesQuiet": "Ruhezeiten — noch zu bestätigen.",
+      "rulesSmoking": "Rauchregelung — noch zu bestätigen.",
+      "rulesVisitors": "Besucher, Feiern und Belegung — noch zu bestätigen.",
+      "rulesPool": "Poolregeln und Sicherheit — noch zu bestätigen.",
+      "howToTitle": "So nutzen Sie das Haus",
+      "heating": "Heizung / Klimatisierung — Anleitung ergänzen.",
+      "tv": "Fernseher — kurze Anleitung ergänzen.",
+      "appliances": "Wichtige Geräte — nur Geräte ergänzen, zu denen häufig Fragen entstehen.",
+      "parking": "Parken und Zugang — endgültige Anleitung ergänzen."
+    },
+    "wasp": {
+      "title": "Hinweis zu Lehmwespen — Inhalt noch ausstehend",
+      "placeholder": "Die Roadmap verlangt ruhige und korrekte Sicherheitshinweise, der Text muss jedoch noch freigegeben werden. Dieser Prototyp reserviert den Platz, ohne Anweisungen zu erfinden."
+    },
+    "guide": {
+      "eyebrow": "Region entdecken",
+      "title": "Zeit für einen Ausflug? Öffnen Sie den lokalen Guide.",
+      "text": "Strände, Natur, Arouca, Städte, Veranstaltungen und Partner – getrennt von diesen praktischen Informationen für den Aufenthalt.",
+      "cta": "Lokalen Guide öffnen"
+    },
+    "updatedLabel": "Informationen geprüft am",
+    "bottomNav": {
+      "home": "Start",
+      "help": "Hilfe",
+      "wifi": "WLAN",
+      "nearby": "In der Nähe",
+      "guide": "Guide"
+    }
+  }
+}
