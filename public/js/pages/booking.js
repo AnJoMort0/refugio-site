@@ -11,7 +11,7 @@ const PRICE_CONFIG = {
   seasons: []
 };
 const ADMIN_STORAGE_KEY = 'refugio-admin-prototype-state-v1';
-const ADMIN_DATA_VERSION = 5;
+const ADMIN_DATA_VERSION = 6;
 const ADMIN_BLOCKING_STATUSES = new Set(['awaiting_payment', 'confirmed', 'checked_in']);
 let adminPrototypeStateSnapshot = null;
 

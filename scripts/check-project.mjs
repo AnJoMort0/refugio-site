@@ -272,15 +272,52 @@ async function checkAdminModel() {
   const logicModule = await import(pathToFileURL(path.join(PUBLIC_DIRECTORY, 'js', 'admin', 'admin-logic.js')));
   const state = seedModule.createInitialAdminState(new Date('2026-08-21T12:00:00'));
 
+  const checkCoverage = (label, expectedValues, actualValues) => {
+    const actual = new Set(actualValues);
+    const missing = expectedValues.filter((value) => !actual.has(value));
+    if (missing.length) reportError(`Admin seed is missing ${label}: ${missing.join(', ')}.`);
+  };
+
   if (state.version !== seedModule.ADMIN_DATA_VERSION || !state.reservations.length) {
     reportError('Admin seed data failed its structural smoke check.');
     return;
   }
 
+  if (state.reservations.length < 15 || state.websiteRequests.length < 8) {
+    reportError('Admin showcase seed no longer contains enough reservations and requests to exercise the prototype.');
+  }
+
+  checkCoverage('reservation statuses', ['request', 'awaiting_payment', 'confirmed', 'checked_in', 'checked_out', 'cancelled', 'no_show'], state.reservations.map((reservation) => reservation.status));
+  checkCoverage('payment statuses', ['unpaid', 'awaiting_transfer', 'deposit_paid', 'paid', 'refunded'], state.reservations.map((reservation) => reservation.paymentStatus));
+  checkCoverage('reservation sources', ['booking', 'abritel', 'website', 'private', 'owner'], state.reservations.map((reservation) => reservation.source));
+  checkCoverage('guest languages', ['pt', 'fr', 'en', 'es', 'de'], state.reservations.map((reservation) => reservation.preferredLanguage));
+  checkCoverage('website request statuses', ['new', 'accepted', 'rejected'], state.websiteRequests.map((request) => request.status));
+  checkCoverage('work compensation types', ['paid', 'free', 'voluntary'], state.workSessions.map((session) => session.compensationType));
+
+  const reservationIds = new Set(state.reservations.map((reservation) => reservation.id));
+  const guestIds = new Set(state.guests.map((guest) => guest.id));
+  if (reservationIds.size !== state.reservations.length) reportError('Admin seed contains duplicate reservation IDs.');
+  if (new Set(state.websiteRequests.map((request) => request.id)).size !== state.websiteRequests.length) reportError('Admin seed contains duplicate website request IDs.');
+
   for (const reservation of state.reservations) {
     const totals = logicModule.calculateReservationTotals(reservation, state);
     if (!Number.isFinite(totals.total) || totals.total < 0) {
       reportError(`Admin reservation "${reservation.id}" produced an invalid total.`);
+    }
+    if (!guestIds.has(reservation.guestId)) {
+      reportError(`Admin reservation "${reservation.id}" references a missing guest.`);
+    }
+    if (logicModule.getGuestCount(reservation) > state.property.occupancyLimit) {
+      reportError(`Admin reservation "${reservation.id}" exceeds the property occupancy limit.`);
+    }
+    if ((reservation.guests?.childAges || []).some((age) => age < 0 || age > 12)) {
+      reportError(`Admin reservation "${reservation.id}" contains an invalid child age.`);
+    }
+  }
+
+  for (const request of state.websiteRequests.filter((candidate) => candidate.status === 'accepted')) {
+    if (!request.acceptedReservationId || !reservationIds.has(request.acceptedReservationId)) {
+      reportError(`Accepted website request "${request.id}" is not linked to a reservation.`);
     }
   }
 

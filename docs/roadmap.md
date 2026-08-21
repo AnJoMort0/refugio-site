@@ -261,6 +261,8 @@ The admin application should be designed for owners who are not highly technical
 - [x] Add a central permission map for owner and employee capabilities.
 - [x] Add a replaceable local repository/service layer so the UI is not tied directly to static JSON or page markup.
 - [x] Add stable-ID demo entities for reservations, website requests, guests, pricing, discounts, expenses, employees, work sessions, and audit log entries.
+- [c] Expand the admin demonstration seed into a complete showcase of the implemented workflows.
+  - Note: Added active, future, past, cancelled, no-show, provisional, paid, unpaid, deposit-paid, and refunded reservations across every supported source and language. The seed also includes open/accepted/rejected website requests, repeat guests, children, bicycles, discounts, extra guests, expenses, paid/free/voluntary work, and detailed audit examples spread across reporting periods.
 - [x] Add a dashboard showing current guests, next arrival/departure, pending website requests, awaiting-payment reservations, revenue, expenses, and active work sessions.
 - [x] Add a detailed month calendar with reservation status markers, selected-day details, and website request visibility.
 - [x] Add reservation search/filtering and a manual reservation form with conflict detection and owner override confirmation.
