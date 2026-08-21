@@ -485,12 +485,6 @@
   text-align: center;
 }
 
-.booking-identity-note {
-  padding: 1rem 1.05rem;
-  border-radius: 16px;
-  background: rgba(250, 248, 244, 0.78);
-}
-
 .inline-text-link {
   min-height: auto;
   margin-top: 0;

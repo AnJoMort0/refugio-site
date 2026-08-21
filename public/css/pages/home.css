@@ -19,20 +19,9 @@
   animation-delay: 270ms;
 }
 
-.intro-strip {
-  margin-top: -2rem;
-  position: relative;
-  z-index: 2;
-}
-
-.intro-grid,
 .sponsor-grid {
   display: grid;
   gap: var(--space-3);
-}
-
-.intro-grid {
-  grid-template-columns: 1fr;
 }
 
 .accommodation-intro {
@@ -130,12 +119,6 @@
   flex: 0 0 auto;
 }
 
-.home-local-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
 .sponsor-copy {
   display: grid;
   align-content: start;
@@ -168,10 +151,6 @@
 }
 
 @media (min-width: 768px) {
-  .intro-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
   .carousel {
     grid-auto-columns: minmax(34%, 440px);
   }
@@ -192,7 +171,6 @@
 
 
 .gallery-card p,
-.feature-pill,
 .testimonial-card span,
 .sponsor-card p,
 .site-nav a,

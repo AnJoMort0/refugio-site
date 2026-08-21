@@ -1,5 +1,6 @@
-const DEFAULT_LANGUAGE = 'pt';
-const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
+import { getCurrentDictionary, getNestedValue } from '../services/i18n.js';
+import { isValidPhoneNumber } from '../utils/phone.js';
+
 const TOPIC_CONFIG = {
   confirmed: ['confirmedCancel', 'confirmedChange', 'confirmedQuestion'],
   requested: ['requestCancel', 'requestChange', 'requestQuestion', 'requestStatus'],
@@ -22,52 +23,6 @@ const LANGUAGE_BY_PAGE_LANG = {
   es: 'es'
 };
 
-function getNestedValue(object, path) {
-  return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
-}
-
-function mergeDictionaries(baseDictionary, overrideDictionary) {
-  if (!baseDictionary || typeof baseDictionary !== 'object') return overrideDictionary;
-  if (!overrideDictionary || typeof overrideDictionary !== 'object') return baseDictionary;
-
-  const mergedDictionary = { ...baseDictionary };
-
-  Object.entries(overrideDictionary).forEach(([key, value]) => {
-    if (
-      value &&
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      baseDictionary[key] &&
-      typeof baseDictionary[key] === 'object' &&
-      !Array.isArray(baseDictionary[key])
-    ) {
-      mergedDictionary[key] = mergeDictionaries(baseDictionary[key], value);
-      return;
-    }
-
-    mergedDictionary[key] = value;
-  });
-
-  return mergedDictionary;
-}
-
-async function loadLocale(language) {
-  const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
-  const response = await fetch(`./locales/${safeLanguage}.json`);
-
-  if (!response.ok) throw new Error(`Could not load locale file for ${safeLanguage}`);
-  return response.json();
-}
-
-function isValidPhoneNumber(value) {
-  const trimmedValue = value.trim();
-  const digitsOnly = trimmedValue.replace(/\D/g, '');
-  const hasInternationalPrefix = /^(?:\+|00)[0-9][0-9\s()\-]{5,}$/.test(trimmedValue);
-  const hasPortugueseLocalFormat = /^(?:2|9)\d{8}$/.test(digitsOnly);
-
-  return hasInternationalPrefix || hasPortugueseLocalFormat;
-}
-
 function setFieldValidity(input, message = '') {
   input?.setCustomValidity(message);
   input?.closest('.field')?.classList.toggle('is-invalid', Boolean(message));
@@ -88,22 +43,9 @@ export async function initContactPage() {
   const attachmentSummary = form?.querySelector('#contact-attachment-summary');
   const attachmentList = form?.querySelector('#contact-attachment-list');
   const params = new URLSearchParams(window.location.search);
-  let dictionary = {};
+  let dictionary = getCurrentDictionary();
 
   const getText = (path, fallback = '') => getNestedValue(dictionary, path) || fallback;
-
-  async function loadDictionary() {
-    try {
-      const language = (localStorage.getItem('refugio-language') || DEFAULT_LANGUAGE).slice(0, 2).toLowerCase();
-      const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
-      const fallbackDictionary = await loadLocale(DEFAULT_LANGUAGE);
-      dictionary = safeLanguage === DEFAULT_LANGUAGE
-        ? fallbackDictionary
-        : mergeDictionaries(fallbackDictionary, await loadLocale(safeLanguage));
-    } catch (error) {
-      dictionary = {};
-    }
-  }
 
   function getTopicOptions(context) {
     return (TOPIC_CONFIG[context] || []).map((key) => ({
@@ -255,16 +197,15 @@ export async function initContactPage() {
     return true;
   }
 
-  await loadDictionary();
   updateLanguageDefault();
   updatePhoneDependentOptions();
   updateTopicOptions();
   applyUrlPrefill();
   renderAttachmentList();
 
-  document.addEventListener('language:changed', async () => {
+  document.addEventListener('language:changed', (event) => {
     const selectedTopic = topicSelect?.value || '';
-    await loadDictionary();
+    dictionary = event.detail?.dictionary || getCurrentDictionary();
     updateLanguageDefault();
     updatePhoneDependentOptions();
     updateTopicOptions(selectedTopic);

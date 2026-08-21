@@ -1,21 +1,6 @@
+import { addDays, formatDateKey, parseDateKey } from '../utils/date.js';
+
 export const ADMIN_DATA_VERSION = 5;
-
-function parseDateKey(value) {
-  const [year, month, day] = value.split('-').map(Number);
-  return new Date(year, month - 1, day);
-}
-
-function formatDateKey(date) {
-  const next = new Date(date);
-  next.setHours(0, 0, 0, 0);
-  return `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-${String(next.getDate()).padStart(2, '0')}`;
-}
-
-function addDays(date, amount) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + amount);
-  return next;
-}
 
 function atDate(dateKey, time = '09:00') {
   return `${dateKey}T${time}:00`;

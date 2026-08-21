@@ -1,5 +1,6 @@
-const DEFAULT_LANGUAGE = 'pt';
-const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
+import { getCurrentDictionary, getNestedValue } from '../services/i18n.js';
+import { diffCalendarDays as diffNights, parseDateKey } from '../utils/date.js';
+
 const PRICE_CONFIG = {
   adultPerNight: 70,
   minimumPaidAdults: 2,
@@ -7,54 +8,6 @@ const PRICE_CONFIG = {
   bikePerDay: 5,
   securityDeposit: 200
 };
-
-function parseDateKey(value) {
-  if (!value) return null;
-  const [year, month, day] = value.split('-').map(Number);
-  return new Date(year, month - 1, day);
-}
-
-function diffNights(checkIn, checkOut) {
-  if (!checkIn || !checkOut) return 0;
-  return Math.round((parseDateKey(checkOut) - parseDateKey(checkIn)) / 86400000);
-}
-
-function getNestedValue(object, path) {
-  return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
-}
-
-function mergeDictionaries(baseDictionary, overrideDictionary) {
-  if (!baseDictionary || typeof baseDictionary !== 'object') return overrideDictionary;
-  if (!overrideDictionary || typeof overrideDictionary !== 'object') return baseDictionary;
-
-  const mergedDictionary = { ...baseDictionary };
-
-  Object.entries(overrideDictionary).forEach(([key, value]) => {
-    if (
-      value &&
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      baseDictionary[key] &&
-      typeof baseDictionary[key] === 'object' &&
-      !Array.isArray(baseDictionary[key])
-    ) {
-      mergedDictionary[key] = mergeDictionaries(baseDictionary[key], value);
-      return;
-    }
-
-    mergedDictionary[key] = value;
-  });
-
-  return mergedDictionary;
-}
-
-async function loadLocale(language) {
-  const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
-  const response = await fetch(`./locales/${safeLanguage}.json`);
-
-  if (!response.ok) throw new Error(`Could not load locale file for ${safeLanguage}`);
-  return response.json();
-}
 
 function formatCurrency(value) {
   const amount = Math.round(Number(value || 0) * 100) / 100;
@@ -102,18 +55,7 @@ export async function initBookingSentPage() {
   const page = document.querySelector('.booking-sent-page');
   if (!page) return;
 
-  let dictionary = {};
-  try {
-    const language = (localStorage.getItem('refugio-language') || DEFAULT_LANGUAGE).slice(0, 2).toLowerCase();
-    const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
-    const fallbackDictionary = await loadLocale(DEFAULT_LANGUAGE);
-    dictionary = safeLanguage === DEFAULT_LANGUAGE
-      ? fallbackDictionary
-      : mergeDictionaries(fallbackDictionary, await loadLocale(safeLanguage));
-  } catch (error) {
-    dictionary = {};
-  }
-
+  const dictionary = getCurrentDictionary();
   const getText = (path, fallback = '') => getNestedValue(dictionary, path) || fallback;
   const params = new URLSearchParams(window.location.search);
 

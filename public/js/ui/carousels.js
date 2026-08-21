@@ -1,54 +1,4 @@
-const DEFAULT_LANGUAGE = 'pt';
-const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
-
-function getNestedValue(object, path) {
-  return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
-}
-
-function mergeDictionaries(baseDictionary, overrideDictionary) {
-  if (!baseDictionary || typeof baseDictionary !== 'object') return overrideDictionary;
-  if (!overrideDictionary || typeof overrideDictionary !== 'object') return baseDictionary;
-
-  const mergedDictionary = { ...baseDictionary };
-
-  Object.entries(overrideDictionary).forEach(([key, value]) => {
-    if (
-      value &&
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      baseDictionary[key] &&
-      typeof baseDictionary[key] === 'object' &&
-      !Array.isArray(baseDictionary[key])
-    ) {
-      mergedDictionary[key] = mergeDictionaries(baseDictionary[key], value);
-      return;
-    }
-
-    mergedDictionary[key] = value;
-  });
-
-  return mergedDictionary;
-}
-
-async function loadLocale(language) {
-  const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
-  const response = await fetch(`./locales/${safeLanguage}.json`);
-
-  if (!response.ok) throw new Error(`Could not load locale file for ${safeLanguage}`);
-  return response.json();
-}
-
-async function loadResolvedDictionary() {
-  const selectedLanguage = (localStorage.getItem('refugio-language') || document.documentElement.lang || DEFAULT_LANGUAGE)
-    .slice(0, 2)
-    .toLowerCase();
-  const safeLanguage = SUPPORTED_LANGUAGES.includes(selectedLanguage) ? selectedLanguage : DEFAULT_LANGUAGE;
-  const fallbackDictionary = await loadLocale(DEFAULT_LANGUAGE);
-
-  if (safeLanguage === DEFAULT_LANGUAGE) return fallbackDictionary;
-
-  return mergeDictionaries(fallbackDictionary, await loadLocale(safeLanguage));
-}
+import { getCurrentDictionary, getNestedValue } from '../services/i18n.js';
 
 function getText(dictionary, path) {
   return getNestedValue(dictionary, path) || '';
@@ -86,9 +36,7 @@ function createCarouselButton(direction, label) {
 }
 
 export function initCarousels() {
-  loadResolvedDictionary()
-    .then(updateCarouselControlLabels)
-    .catch(() => {});
+  updateCarouselControlLabels(getCurrentDictionary());
 
   document.addEventListener('language:changed', (event) => {
     updateCarouselControlLabels(event.detail?.dictionary || {});

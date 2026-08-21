@@ -57,7 +57,3 @@ export function requirePermission(user, permission) {
   if (can(user, permission)) return;
   throw new Error('Não tem permissão para realizar esta ação.');
 }
-
-export function getRolePermissions(role) {
-  return Array.from(ROLE_PERMISSIONS[role] || []);
-}

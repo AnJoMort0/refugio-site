@@ -92,7 +92,6 @@
 .admin-record-badges,
 .admin-button-row,
 .admin-form-actions,
-.admin-file-row,
 .admin-message-meta,
 .admin-calendar-heading {
   display: flex;
@@ -692,12 +691,6 @@ form.is-dirty::before {
 .admin-form-actions,
 .admin-message-meta {
   flex-wrap: wrap;
-}
-
-.admin-contact-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
 }
 
 .admin-contact-line {

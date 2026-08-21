@@ -34,6 +34,7 @@ import {
   getOrCreateGuest,
   getWorkDurationHours,
   makeId,
+  monthDayOrdinal,
   parseDateKey,
   reservationTouchesDate,
   summarizeDashboard
@@ -81,18 +82,6 @@ const NAV_ITEMS = [
   { id: 'reports', label: 'Estatísticas', icon: 'chartColumn', permission: 'reports:view' },
   { id: 'settings', label: 'Definições', icon: 'settings', permission: 'settings:view' }
 ];
-
-const EMPLOYEE_ROLE_LABELS = {
-  owner: 'Proprietário',
-  dev: 'Dev',
-  employee: 'Funcionário'
-};
-
-const EMPLOYEE_PROFILE_LABELS = {
-  owner: 'Proprietário',
-  dev: 'Dev',
-  employee: 'Funcionário'
-};
 
 const ICONS = {
   arrowLeft: '<path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path>',
@@ -386,14 +375,6 @@ function formatStayTimes(stay) {
   return `Entrada ${checkInTime} · Saída ${checkOutTime}`;
 }
 
-function formatGuestMix(guests = {}) {
-  const adults = Number(guests.adults || 0);
-  const children = Number(guests.children || 0);
-  const parts = [`${adults} adulto(s)`];
-  if (children) parts.push(`${children} criança(s)`);
-  return parts.join(' · ');
-}
-
 function formatGuestSummary(guests = {}) {
   const adults = Number(guests.adults || 0);
   const children = Number(guests.children || 0);
@@ -610,40 +591,6 @@ function renderMessageQuickActions(options = {}) {
   }
 
   return `<div class="admin-button-row admin-message-actions">${buttons.join('')}</div>`;
-}
-
-function renderContactActions(contact = {}) {
-  const email = String(contact.email || '').trim();
-  const phone = String(contact.phone || '').trim();
-  const name = String(contact.name || 'Contacto').trim();
-  const normalizedPhone = normalizePhoneForHref(phone);
-  const buttons = [];
-  const vcard = [
-    'BEGIN:VCARD',
-    'VERSION:3.0',
-    `FN:${name}`,
-    email ? `EMAIL:${email}` : '',
-    normalizedPhone ? `TEL:${normalizedPhone}` : '',
-    'END:VCARD'
-  ].filter(Boolean).join('\n');
-
-  if (email) {
-    buttons.push(`<a class="admin-icon-button" href="mailto:${encodeURIComponent(email)}" aria-label="Enviar email">${icon('mail')}</a>`);
-    buttons.push(`<button class="admin-icon-button" type="button" data-action="copy-text" data-copy-text="${escapeHtml(email)}" aria-label="Copiar email">${icon('copy')}</button>`);
-  }
-
-  if (normalizedPhone) {
-    buttons.push(`<a class="admin-icon-button" href="tel:${escapeHtml(normalizedPhone)}" aria-label="Telefonar">${icon('phone')}</a>`);
-    buttons.push(`<a class="admin-icon-button" href="https://wa.me/${escapeHtml(normalizedPhone.replace('+', ''))}" target="_blank" rel="noreferrer" aria-label="Abrir WhatsApp">${icon('messageCircle')}</a>`);
-    buttons.push(`<button class="admin-icon-button" type="button" data-action="copy-text" data-copy-text="${escapeHtml(phone || normalizedPhone)}" aria-label="Copiar telefone">${icon('copy')}</button>`);
-  }
-
-  if (email || normalizedPhone) {
-    buttons.push(`<a class="admin-icon-button" href="data:text/vcard;charset=utf-8,${encodeURIComponent(vcard)}" download="${escapeHtml(name.replace(/\s+/g, '-').toLowerCase())}.vcf" aria-label="Guardar contacto">${icon('userPlus')}</a>`);
-  }
-
-  if (!buttons.length) return '';
-  return `<div class="admin-contact-actions" aria-label="Ações de contacto">${buttons.join('')}</div>`;
 }
 
 function renderContactDetailRows(contact = {}) {
@@ -2076,13 +2023,6 @@ function createDiscountCode() {
   return `REF-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 }
 
-function monthDayOrdinal(monthDay) {
-  const [month, day] = String(monthDay || '').split('-').map(Number);
-  const date = new Date(2028, month - 1, day);
-  const start = new Date(2028, 0, 1);
-  return Math.round((date - start) / 86400000) + 1;
-}
-
 function getRecurringSeasonDays(season) {
   const start = monthDayOrdinal(season.startMonthDay);
   const end = monthDayOrdinal(season.endMonthDay);
@@ -2396,7 +2336,7 @@ function renderEmployeesView() {
               <div class="admin-record-main">
                 <div>
                   <strong>${escapeHtml(employee.name)}</strong>
-                  <span>${employee.active ? 'Ativo' : 'Inativo'} · ${escapeHtml(EMPLOYEE_ROLE_LABELS[employee.role] || employee.role)} · ${escapeHtml(EMPLOYEE_PROFILE_LABELS[employee.permissionsProfile] || employee.permissionsProfile)}</span>
+                  <span>${employee.active ? 'Ativo' : 'Inativo'} · ${escapeHtml(ROLE_LABELS[employee.role] || employee.role)} · ${escapeHtml(ROLE_LABELS[employee.permissionsProfile] || employee.permissionsProfile)}</span>
                 </div>
                 <div class="admin-record-badges">
                   <span class="admin-source">${renderMoney(getHourlyRate(employee))}/h</span>
@@ -3246,7 +3186,7 @@ function getAuditEntityDetailRows(entry) {
     if (!employee) return rows;
     rows.push(
       ['Nome', employee.name],
-      ['Perfil', EMPLOYEE_PROFILE_LABELS[employee.permissionsProfile] || employee.permissionsProfile],
+      ['Perfil', ROLE_LABELS[employee.permissionsProfile] || employee.permissionsProfile],
       ['Modo habitual', COMPENSATION_LABELS[getEmployeeDefaultCompensation(employee)]],
       ['Taxa atual', `${renderMoney(getHourlyRate(employee))}/h`]
     );

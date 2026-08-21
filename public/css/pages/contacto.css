@@ -14,8 +14,7 @@
 .contact-layout,
 .contact-side,
 .contact-card,
-.contact-card-header,
-.contact-list {
+.contact-card-header {
   display: grid;
   gap: var(--space-3);
 }
@@ -166,7 +165,6 @@
 
 .contact-hero-actions,
 .contact-form-actions,
-.contact-number-actions,
 .contact-social-links {
   display: flex;
   flex-wrap: wrap;
@@ -205,40 +203,10 @@
   margin-top: var(--space-3);
 }
 
-.contact-secondary-button,
-.contact-copy-button,
-.contact-mini-button {
+.contact-secondary-button {
   border: 1px solid rgba(67, 99, 75, 0.26);
   background: rgba(250, 248, 244, 0.84);
   color: var(--color-mountain-forest);
-}
-
-.contact-person-card {
-  display: grid;
-  gap: 0.85rem;
-  padding: 1rem;
-  border: 1px solid rgba(90, 75, 63, 0.12);
-  border-radius: 16px;
-  background: rgba(250, 248, 244, 0.78);
-}
-
-.contact-person-card h3 {
-  font-size: 1.35rem;
-}
-
-.contact-person-card p {
-  color: rgba(43, 38, 34, 0.74);
-}
-
-.contact-person-card a:not(.button) {
-  color: var(--color-mountain-forest);
-  font-weight: 800;
-}
-
-.contact-mini-button {
-  min-height: 2.5rem;
-  padding: 0.55rem 0.8rem;
-  font-size: 0.92rem;
 }
 
 @media (min-width: 720px) {
@@ -271,7 +239,6 @@
 @media (max-width: 767px) {
   .contact-hero-actions,
   .contact-form-actions,
-  .contact-number-actions,
   .contact-social-links {
     display: grid;
   }

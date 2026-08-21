@@ -7,8 +7,12 @@ const LANGUAGE_LABELS = {
   fr: 'Français',
   es: 'Español'
 };
+const localeRequests = new Map();
 
-function getNestedValue(object, path) {
+let activeLanguage = DEFAULT_LANGUAGE;
+let activeDictionary = {};
+
+export function getNestedValue(object, path) {
   return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
 }
 
@@ -37,15 +41,49 @@ function mergeDictionaries(baseDictionary, overrideDictionary) {
   return mergedDictionary;
 }
 
-async function loadLocale(language) {
-  const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
-  const response = await fetch(`./locales/${safeLanguage}.json`);
+function normalizeLanguage(language) {
+  return SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
+}
 
-  if (!response.ok) {
-    throw new Error(`Could not load locale file for ${safeLanguage}`);
+async function loadLocale(language) {
+  const safeLanguage = normalizeLanguage(language);
+
+  if (localeRequests.has(safeLanguage)) {
+    return localeRequests.get(safeLanguage);
   }
 
-  return response.json();
+  const localeRequest = fetch(new URL(`../../locales/${safeLanguage}.json`, import.meta.url))
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Could not load locale file for ${safeLanguage}`);
+      }
+
+      return response.json();
+    })
+    .catch((error) => {
+      localeRequests.delete(safeLanguage);
+      throw error;
+    });
+
+  localeRequests.set(safeLanguage, localeRequest);
+  return localeRequest;
+}
+
+export async function loadResolvedDictionary(language = activeLanguage) {
+  const safeLanguage = normalizeLanguage(language);
+  const dictionary = await loadLocale(safeLanguage);
+
+  if (safeLanguage === DEFAULT_LANGUAGE) return dictionary;
+
+  return mergeDictionaries(await loadLocale(DEFAULT_LANGUAGE), dictionary);
+}
+
+export function getActiveLanguage() {
+  return activeLanguage;
+}
+
+export function getCurrentDictionary() {
+  return activeDictionary;
 }
 
 function applyTextTranslations(dictionary) {
@@ -99,10 +137,11 @@ function updateDocumentLanguage(language, dictionary) {
 }
 
 export async function setLanguage(language) {
-  const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
-  const dictionary = await loadLocale(safeLanguage);
-  const fallbackDictionary = safeLanguage === DEFAULT_LANGUAGE ? dictionary : await loadLocale(DEFAULT_LANGUAGE);
-  const resolvedDictionary = mergeDictionaries(fallbackDictionary, dictionary);
+  const safeLanguage = normalizeLanguage(language);
+  const resolvedDictionary = await loadResolvedDictionary(safeLanguage);
+
+  activeLanguage = safeLanguage;
+  activeDictionary = resolvedDictionary;
 
   applyTextTranslations(resolvedDictionary);
   applyAttributeTranslations(resolvedDictionary);

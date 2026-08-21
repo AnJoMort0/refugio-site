@@ -404,14 +404,6 @@
   object-fit: cover;
 }
 
-.feature-pill {
-  padding: 1rem 1.1rem;
-  background: white;
-  border-radius: 999px;
-  box-shadow: var(--shadow-soft);
-  text-align: center;
-}
-
 .section-heading {
   margin-bottom: var(--space-5);
   text-align: left;
@@ -423,16 +415,6 @@
 
 .testimonial-card {
   padding: var(--space-4);
-}
-
-.sponsor-logo {
-  min-height: 88px;
-  display: grid;
-  place-items: center;
-  padding: var(--space-3);
-  border-radius: 20px;
-  background: rgba(255,255,255,0.7);
-  border: 1px dashed rgba(90, 75, 63, 0.24);
 }
 
 .site-footer {

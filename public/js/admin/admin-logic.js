@@ -1,4 +1,5 @@
 import { addDays, formatDateKey, parseDateKey } from './admin-seed.js';
+import { diffCalendarDays, monthDayOrdinal } from '../utils/date.js';
 
 export const LANGUAGE_LABELS = {
   pt: 'Português',
@@ -234,8 +235,7 @@ export function formatDateTime(value) {
 }
 
 export function diffNights(checkIn, checkOut) {
-  if (!checkIn || !checkOut) return 0;
-  return Math.max(0, Math.round((parseDateKey(checkOut) - parseDateKey(checkIn)) / 86400000));
+  return Math.max(0, diffCalendarDays(checkIn, checkOut));
 }
 
 export function dateRangeOverlaps(aStart, aEnd, bStart, bEnd) {
@@ -259,14 +259,6 @@ function eachNightDateKey(checkIn, checkOut) {
     cursor.setDate(cursor.getDate() + 1);
   }
   return dates;
-}
-
-function monthDayOrdinal(monthDay) {
-  const [month, day] = String(monthDay || '').split('-').map(Number);
-  const date = new Date(2028, month - 1, day);
-  const start = new Date(2028, 0, 1);
-  if (Number.isNaN(date.getTime())) return 0;
-  return Math.round((date - start) / 86400000) + 1;
 }
 
 function seasonTouchesDate(season, dateKey) {
@@ -431,52 +423,6 @@ export function getOrCreateGuest(state, contact, preferredLanguage = 'pt', natio
 
   state.guests.push(guest);
   return guest;
-}
-
-export function reservationFromWebsiteRequest(state, request, currentUser) {
-  const guest = getOrCreateGuest(state, request.contact, request.preferredLanguage, request.contact?.nationality || request.nationality || '');
-
-  return {
-    id: makeId('RES', state.reservations),
-    guestId: guest.id,
-    source: 'website',
-    sourceReference: request.id,
-    status: 'awaiting_payment',
-    paymentStatus: 'awaiting_transfer',
-    preferredLanguage: request.preferredLanguage || guest.preferredLanguage || 'pt',
-    contact: { ...request.contact },
-    stay: { ...request.stay },
-    guests: {
-      adults: Number(request.guests?.adults || 1),
-      children: Number(request.guests?.children || 0),
-      childAges: Array.isArray(request.guests?.childAges) ? [...request.guests.childAges] : []
-    },
-    pricing: {
-      adultNight: state.pricing.adultNight,
-      minimumPaidAdults: state.pricing.minimumPaidAdults || 2,
-      childNight: state.pricing.childNight,
-      bikeDay: state.pricing.bikeDay,
-      discountType: request.pricing?.discountType || 'percentage',
-      discountPercent: Number(request.pricing?.discountPercent || 0),
-      discountAmount: Number(request.pricing?.discountAmount || 0),
-      discountCode: request.pricing?.discountCode || '',
-      depositIncluded: Boolean(request.depositPrepay)
-    },
-    extras: {
-      bikes: {
-        count: Number(request.extras?.bikes?.count || 0),
-        days: Number(request.extras?.bikes?.days || 0)
-      }
-    },
-    guestAdjustments: [],
-    notes: {
-      owner: request.comments || '',
-      operational: ''
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: currentUser.id
-  };
 }
 
 export function addAudit(state, currentUser, action, entityType, entityId, details = {}) {
@@ -776,4 +722,4 @@ export function summarizeDashboard(state) {
   };
 }
 
-export { addDays, formatDateKey, parseDateKey };
+export { addDays, formatDateKey, monthDayOrdinal, parseDateKey };

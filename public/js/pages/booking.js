@@ -1,5 +1,7 @@
-const DEFAULT_LANGUAGE = 'pt';
-const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
+import { getActiveLanguage, getCurrentDictionary, getNestedValue } from '../services/i18n.js';
+import { addDays, diffCalendarDays as diffNights, formatDateKey, monthDayOrdinal, parseDateKey } from '../utils/date.js';
+import { isValidPhoneNumber } from '../utils/phone.js';
+
 const PRICE_CONFIG = {
   adultPerNight: 70,
   minimumPaidAdults: 2,
@@ -13,13 +15,6 @@ const ADMIN_DATA_VERSION = 5;
 const ADMIN_BLOCKING_STATUSES = new Set(['awaiting_payment', 'confirmed', 'checked_in']);
 let adminPrototypeStateSnapshot = null;
 
-function formatDateKey(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
 function createWebsiteReservationId() {
   const now = new Date();
   const year = now.getFullYear();
@@ -27,24 +22,6 @@ function createWebsiteReservationId() {
   const compactTime = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
   const randomPart = Math.random().toString(36).slice(2, 6).toUpperCase();
   return `WEB-${compactDate}-${compactTime}-${randomPart}`;
-}
-
-function parseDateKey(value) {
-  if (!value) return null;
-  const [year, month, day] = value.split('-').map(Number);
-  return new Date(year, month - 1, day);
-}
-
-function addDays(date, amount) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + amount);
-  return next;
-}
-
-function diffNights(checkIn, checkOut) {
-  if (!checkIn || !checkOut) return 0;
-  const milliseconds = parseDateKey(checkOut) - parseDateKey(checkIn);
-  return Math.round(milliseconds / 86400000);
 }
 
 function eachDate(start, endExclusive) {
@@ -57,14 +34,6 @@ function eachDate(start, endExclusive) {
   }
 
   return dates;
-}
-
-function monthDayOrdinal(monthDay) {
-  const [month, day] = String(monthDay || '').split('-').map(Number);
-  const date = new Date(2028, month - 1, day);
-  const start = new Date(2028, 0, 1);
-  if (Number.isNaN(date.getTime())) return 0;
-  return Math.round((date - start) / 86400000) + 1;
 }
 
 function seasonTouchesDate(season, dateKey) {
@@ -146,43 +115,6 @@ function formatRateRange(values) {
 function formatGuestRateLabel({ amountText, count, singularLabel, pluralLabel }) {
   const label = count === 1 ? singularLabel : pluralLabel;
   return `${amountText} (${count} ${label})`;
-}
-
-function getNestedValue(object, path) {
-  return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), object);
-}
-
-function mergeDictionaries(baseDictionary, overrideDictionary) {
-  if (!baseDictionary || typeof baseDictionary !== 'object') return overrideDictionary;
-  if (!overrideDictionary || typeof overrideDictionary !== 'object') return baseDictionary;
-
-  const mergedDictionary = { ...baseDictionary };
-
-  Object.entries(overrideDictionary).forEach(([key, value]) => {
-    if (
-      value &&
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      baseDictionary[key] &&
-      typeof baseDictionary[key] === 'object' &&
-      !Array.isArray(baseDictionary[key])
-    ) {
-      mergedDictionary[key] = mergeDictionaries(baseDictionary[key], value);
-      return;
-    }
-
-    mergedDictionary[key] = value;
-  });
-
-  return mergedDictionary;
-}
-
-async function loadLocale(language) {
-  const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
-  const response = await fetch(`./locales/${safeLanguage}.json`);
-
-  if (!response.ok) throw new Error(`Could not load locale file for ${safeLanguage}`);
-  return response.json();
 }
 
 function formatCurrency(value) {
@@ -365,15 +297,6 @@ function buildOccupiedRanges(adminState) {
     .filter(({ start, end }) => start && end);
 }
 
-function isValidPhoneNumber(value) {
-  const trimmedValue = value.trim();
-  const digitsOnly = trimmedValue.replace(/\D/g, '');
-  const hasInternationalPrefix = /^(?:\+|00)[0-9][0-9\s()\-]{5,}$/.test(trimmedValue);
-  const hasPortugueseLocalFormat = /^(?:2|9)\d{8}$/.test(digitsOnly);
-
-  return hasInternationalPrefix || hasPortugueseLocalFormat;
-}
-
 function usesPortugueseTimezone() {
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const portugueseTimezones = new Set(['Europe/Lisbon', 'Atlantic/Azores', 'Atlantic/Madeira']);
@@ -474,7 +397,7 @@ export async function initBookingPage() {
   const weekdayFormatter = () =>
     new Intl.DateTimeFormat(document.documentElement.lang || 'pt-PT', { weekday: 'short' });
 
-  let dictionary = {};
+  let dictionary = getCurrentDictionary();
   let visibleMonthOffset = 0;
 
   occupiedRanges.forEach(({ start, end }) => {
@@ -501,19 +424,6 @@ export async function initBookingPage() {
 
   function requiredLabel(text) {
     return `${text}<span class="required-mark" aria-hidden="true">*</span>`;
-  }
-
-  async function loadDictionary() {
-    try {
-      const language = (localStorage.getItem('refugio-language') || DEFAULT_LANGUAGE).slice(0, 2).toLowerCase();
-      const safeLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
-      const fallbackDictionary = await loadLocale(DEFAULT_LANGUAGE);
-      dictionary = safeLanguage === DEFAULT_LANGUAGE
-        ? fallbackDictionary
-        : mergeDictionaries(fallbackDictionary, await loadLocale(safeLanguage));
-    } catch (error) {
-      dictionary = {};
-    }
   }
 
   function getGuestCounts() {
@@ -1175,7 +1085,6 @@ export async function initBookingPage() {
     renderCalendar();
   }
 
-  await loadDictionary();
   renderTimezoneWarning();
   rerenderDynamicContent();
   setStatus('');
@@ -1351,7 +1260,7 @@ export async function initBookingPage() {
     const action = form.getAttribute('action') || './reserva-enviada.html';
     const commentsInput = form.querySelector('#reservation-comments');
     const reservationId = createWebsiteReservationId();
-    const preferredLanguage = (localStorage.getItem('refugio-language') || document.documentElement.lang || DEFAULT_LANGUAGE).slice(0, 2).toLowerCase();
+    const preferredLanguage = getActiveLanguage();
     const childAges = Array.from(childAgeFields.querySelectorAll('input'))
       .map((input) => input.value.trim())
       .filter(Boolean)
@@ -1464,8 +1373,8 @@ export async function initBookingPage() {
     window.location.href = `${action}?${params.toString()}`;
   });
 
-  document.addEventListener('language:changed', async () => {
-    await loadDictionary();
+  document.addEventListener('language:changed', (event) => {
+    dictionary = event.detail?.dictionary || getCurrentDictionary();
     rerenderDynamicContent();
   });
 }
