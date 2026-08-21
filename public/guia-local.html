@@ -5,25 +5,210 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
   <title data-i18n="guidePage.meta.title"></title>
+  <meta name="description" content="" data-i18n-attr='{"content":"guidePage.meta.description"}' />
   <link rel="stylesheet" href="./css/reset.css" />
   <link rel="stylesheet" href="./css/variables.css" />
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/layout.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/mobile.css" />
+  <link rel="stylesheet" href="./css/pages/guia-local.css" />
 </head>
 <body data-page="guide">
   <div data-site-header></div>
-  <main class="simple-page">
-    <div class="container narrow">
-      <p class="eyebrow" data-i18n="guidePage.hero.eyebrow"></p>
-      <h1 data-i18n="guidePage.hero.title"></h1>
-      <p data-i18n="guidePage.hero.text"></p>
-      <a class="button button-primary" href="./index.html" data-i18n="common.backHome"></a>
-    </div>
+
+  <main>
+    <section class="hero guide-hero">
+      <div class="hero-media">
+        <img
+          src="./assets/images/guide/lomba.jpg"
+          alt=""
+          data-i18n-attr='{"alt":"guidePage.hero.imageAlt"}'
+        />
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="container hero-content">
+        <p class="eyebrow" data-i18n="guidePage.hero.eyebrow"></p>
+        <h1 data-i18n="guidePage.hero.title"></h1>
+        <p class="hero-text" data-i18n="guidePage.hero.text"></p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#descobrir" data-i18n="guidePage.hero.primaryCta"></a>
+          <a class="button button-secondary" href="#mapa" data-guide-open-map data-i18n="guidePage.hero.mapCta"></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section guide-intro">
+      <div class="container two-column">
+        <div>
+          <p class="eyebrow" data-i18n="guidePage.intro.eyebrow"></p>
+          <h2 data-i18n="guidePage.intro.title"></h2>
+          <p data-i18n="guidePage.intro.text1"></p>
+          <p data-i18n="guidePage.intro.text2"></p>
+        </div>
+        <aside class="card guide-quick-card" aria-labelledby="guide-quick-title">
+          <h3 id="guide-quick-title" data-i18n="guidePage.intro.quickTitle"></h3>
+          <div class="guide-quick-links">
+            <button type="button" class="guide-quick-link" data-guide-filter-jump="beaches" data-i18n="guidePage.intro.quickBeach"></button>
+            <button type="button" class="guide-quick-link" data-guide-filter-jump="nature" data-i18n="guidePage.intro.quickNature"></button>
+            <button type="button" class="guide-quick-link" data-guide-filter-jump="cities" data-i18n="guidePage.intro.quickCities"></button>
+            <button type="button" class="guide-quick-link" data-guide-filter-jump="events" data-i18n="guidePage.intro.quickEvents"></button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+
+    <section class="section guide-browser-section" id="descobrir">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow" data-i18n="guidePage.browser.eyebrow"></p>
+          <h2 data-i18n="guidePage.browser.title"></h2>
+          <p data-i18n="guidePage.browser.text"></p>
+        </div>
+
+        <div class="guide-toolbar" data-guide-toolbar>
+          <label class="guide-search">
+            <span class="sr-only" data-i18n="guidePage.browser.searchLabel"></span>
+            <svg class="lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+            <input type="search" data-guide-search data-i18n-attr='{"placeholder":"guidePage.browser.searchPlaceholder","aria-label":"guidePage.browser.searchLabel"}' />
+          </label>
+
+          <label class="guide-sort">
+            <span data-i18n="guidePage.browser.sortLabel"></span>
+            <select data-guide-sort>
+              <option value="closest" data-i18n="guidePage.browser.sortClosest"></option>
+              <option value="alpha" data-i18n="guidePage.browser.sortAlpha"></option>
+            </select>
+          </label>
+
+          <button type="button" class="guide-location-button" data-guide-location>
+            <svg class="lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a8 8 0 1 0-4.4 4.4"></path>
+              <path d="M22 22 18 18"></path>
+            </svg>
+            <span data-guide-location-label data-i18n="guidePage.browser.useLocation"></span>
+          </button>
+        </div>
+
+        <p class="guide-privacy-note" data-i18n="guidePage.browser.privacyNote"></p>
+        <p class="guide-location-status" data-guide-location-status role="status" aria-live="polite"></p>
+
+        <div class="guide-filter-row" role="group" data-i18n-attr='{"aria-label":"guidePage.browser.filterLabel"}'>
+          <button type="button" class="guide-filter is-active" data-guide-filter="all" aria-pressed="true" data-i18n="guidePage.browser.all"></button>
+          <button type="button" class="guide-filter" data-guide-filter="beaches" aria-pressed="false" data-i18n="guidePage.browser.beaches"></button>
+          <button type="button" class="guide-filter" data-guide-filter="nature" aria-pressed="false" data-i18n="guidePage.browser.nature"></button>
+          <button type="button" class="guide-filter" data-guide-filter="cities" aria-pressed="false" data-i18n="guidePage.browser.cities"></button>
+          <button type="button" class="guide-filter" data-guide-filter="nearby" aria-pressed="false" data-i18n="guidePage.browser.nearby"></button>
+          <button type="button" class="guide-filter" data-guide-filter="events" aria-pressed="false" data-i18n="guidePage.browser.events"></button>
+          <button type="button" class="guide-filter" data-guide-filter="favourites" aria-pressed="false" data-i18n="guidePage.browser.favourites"></button>
+        </div>
+
+        <div class="guide-browser-meta">
+          <p data-guide-results-count aria-live="polite"></p>
+          <div class="guide-view-toggle" role="group" aria-label="Vista do guia">
+            <button type="button" class="guide-view-button" data-guide-view="list" aria-pressed="false">
+              <svg class="lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M8 6h13"></path><path d="M8 12h13"></path><path d="M8 18h13"></path>
+                <path d="M3 6h.01"></path><path d="M3 12h.01"></path><path d="M3 18h.01"></path>
+              </svg>
+              <span data-i18n="guidePage.browser.listView"></span>
+            </button>
+            <button type="button" class="guide-view-button is-active" data-guide-view="map" aria-pressed="true">
+              <svg class="lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m9 18-6 3V6l6-3 6 3 6-3v15l-6 3-6-3Z"></path>
+                <path d="M9 3v15"></path><path d="M15 6v15"></path>
+              </svg>
+              <span data-i18n="guidePage.browser.mapView"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="guide-browser is-map-view" data-guide-browser>
+          <div class="guide-list-pane">
+            <div class="guide-list" data-guide-results>
+              <p class="guide-loading" data-i18n="guidePage.browser.loading"></p>
+            </div>
+            <div class="guide-empty card" data-guide-empty hidden>
+              <h3 data-i18n="guidePage.browser.noResultsTitle"></h3>
+              <p data-i18n="guidePage.browser.noResultsText"></p>
+            </div>
+          </div>
+
+          <aside class="guide-map-card card" id="mapa" data-guide-map>
+            <div class="guide-map-copy">
+              <p class="eyebrow" data-i18n="guidePage.map.eyebrow"></p>
+              <h3 data-guide-map-title data-i18n="guidePage.map.title"></h3>
+              <p data-i18n="guidePage.map.text"></p>
+            </div>
+            <div class="guide-map-frame">
+              <iframe
+                title=""
+                src="https://www.google.com/maps?q=Rua%20da%20Arejinha%20627%2C%204550-518%20Pedorido&output=embed"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                data-guide-map-frame
+                data-i18n-attr='{"title":"guidePage.map.defaultTitle"}'
+              ></iframe>
+            </div>
+            <div class="guide-map-actions">
+              <a
+                class="button button-primary"
+                href="https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0205166,-8.3828538,108m/data=!3m1!1e3!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu"
+                target="_blank"
+                rel="noopener"
+                data-guide-map-link
+                data-i18n="guidePage.map.openDefault"
+              ></a>
+              <p data-i18n="guidePage.labels.mapUnavailable"></p>
+            </div>
+          </aside>
+        </div>
+
+        <p class="guide-event-note" data-i18n="guidePage.events.dateNote"></p>
+
+        <noscript>
+          <div class="card guide-noscript">
+            <p>Ative JavaScript para usar a pesquisa, os filtros, os favoritos e o mapa interativo. Os links do Google Maps continuam disponíveis na mensagem de boas-vindas enviada pelos anfitriões.</p>
+          </div>
+        </noscript>
+      </div>
+    </section>
+
+    <section class="section section-alt guide-partners-section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow" data-i18n="guidePage.partners.eyebrow"></p>
+          <h2 data-i18n="guidePage.partners.title"></h2>
+          <p data-i18n="guidePage.partners.text"></p>
+        </div>
+        <div class="guide-partner-grid" data-guide-partners></div>
+        <p class="guide-partner-note" data-i18n="guidePage.partners.offerNote"></p>
+      </div>
+    </section>
+
+    <section class="section guide-final-section">
+      <div class="container card guide-final-card">
+        <div>
+          <p class="eyebrow" data-i18n="guidePage.finalCta.eyebrow"></p>
+          <h2 data-i18n="guidePage.finalCta.title"></h2>
+          <p data-i18n="guidePage.finalCta.text"></p>
+        </div>
+        <div class="guide-final-actions">
+          <a class="text-link" href="./alojamento.html" data-i18n="guidePage.finalCta.accommodation"></a>
+          <a class="button button-primary" href="./reservas.html" data-i18n="guidePage.finalCta.booking"></a>
+        </div>
+      </div>
+    </section>
   </main>
+
   <div data-site-footer></div>
   <div data-sticky-booking></div>
+
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>

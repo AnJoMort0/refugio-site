@@ -8,6 +8,8 @@ const PAGE_INITIALIZERS = {
   'booking-sent': () => import('./pages/booking-sent.js').then(({ initBookingSentPage }) => initBookingSentPage()),
   contact: () => import('./pages/contact.js').then(({ initContactPage }) => initContactPage()),
   gallery: () => import('./pages/gallery.js').then(({ initGalleryPage }) => initGalleryPage()),
+  guide: () => import('./pages/guide.js').then(({ initGuidePage }) => initGuidePage()),
+  'guest-stay': () => import('./pages/qr.js').then(({ initGuestStayPage }) => initGuestStayPage()),
   home: () => import('./pages/home.js').then(({ initHomePage }) => initHomePage())
 };
 

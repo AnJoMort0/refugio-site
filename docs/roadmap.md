@@ -30,7 +30,7 @@ A scaffold means a made static HTML page ready for owner review/approval. A plac
 - [x] Contacto page
 - [x] Obrigado.html
 - [ ] Guia Local page
-- [ ] Guest Stay page for QR/NFC access
+- [c] Guest Stay prototype scaffold at `qr.html` for QR/NFC access
 - [x] Custom `404.html` page
 
 ## 1.2 Immediate content and consistency fixes
@@ -97,19 +97,18 @@ The current `contacto.html` page already has a usable prototype flow: structured
 
 ### Purpose and scope
 
-The Guia Local is a public page for people planning a stay and guests who want to explore the surrounding area. It should focus on **what is nearby, what to do, and selected sponsors or partners**.
+The Guia Local is a public page for people planning a stay and guests who want to explore the surrounding area. It should focus on **places to discover, day trips, nature, beaches, culture, events, and selected sponsors or partners**.
 
-It should not contain private reservation details, Wi-Fi credentials, house rules, or stay-specific emergency instructions. Those belong on the Guest Stay page.
+Practical during-the-stay recommendations such as supermarkets, routine food options, emergency contacts, Wi-Fi credentials, house rules, or stay-specific instructions belong on the Guest Stay page. Commercial partners may still appear publicly in a clearly separated partner section, but should not be mixed into the editorial discovery list.
 
 ### Content categories
 
-- [ ] Restaurants, cafés, bakeries, and bars.
 - [ ] Attractions, walks, nature, beaches, culture, and entertainment.
-- [ ] Nearby supermarkets, grocery shops, pharmacies, fuel stations, and other practical stores.
-- [ ] Transport options, parking, taxis, and useful travel services.
-- [ ] Family-friendly, rainy-day, accessible, and seasonal suggestions.
-- [ ] Sponsored businesses, partners, offers, or discount codes.
-- [ ] A short “essentials nearby” section for guests who need practical services rather than entertainment.
+- [ ] Nearby towns, cities, viewpoints, monuments, and day-trip ideas.
+- [ ] Seasonal events and traditional festivities.
+- [ ] Family-friendly, rainy-day, accessible, and seasonal suggestions where confirmed.
+- [ ] Sponsored businesses, partners, offers, or discount codes in a clearly separated partner section.
+- [ ] Keep routine supermarkets, restaurants, pharmacies, fuel, transport, and other practical stay services on the Guest Stay / QR page rather than in the editorial discovery list.
 
 ### Listing information
 
@@ -138,12 +137,23 @@ Where available, each listing should include:
 ### Guia Local acceptance criteria
 
 - The page remains useful to visitors who are not currently staying at O Refúgio.
-- Nearby stores and practical services are as easy to find as entertainment.
-- Sponsored content is clearly identified and does not imitate an independent recommendation.
+- The editorial list stays focused on places and experiences worth discovering rather than routine stay logistics.
+- Sponsored content is clearly identified, separated from the editorial list, and does not imitate an independent recommendation.
 - Listings can be updated or unpublished from the admin application without editing code.
 - External opening hours and prices are not presented as guaranteed unless they are actively maintained.
 
 ## 4.2 Guest Stay page — QR/NFC guest hub
+
+### Prototype implementation note — `qr.html`
+
+- [c] Add a mobile-first `qr.html` prototype that remains useful without personalised reservation data.
+- [c] Add a dedicated guest-page data-provider boundary so the UI is not coupled to the admin page, DOM, or browser `localStorage`.
+- [c] Add placeholder host contacts with language labels and call/WhatsApp actions that stay disabled until real numbers are configured.
+- [c] Add one-tap emergency, health, pharmacy, supermarket, restaurant, transport, fuel, property-location, partner, bicycle, Wi-Fi, and house-information sections.
+- [c] Keep safety/house-rule content that has not been approved visibly marked as pending rather than inventing operational guidance.
+- [!] Production migration: move reservations and guest-only content to a **private server-side database** behind authenticated APIs. Personalised QR/direct links should carry an unguessable expiring/revocable stay token; the guest endpoint validates it server-side and returns only the minimum guest-facing projection (first name, stay dates/times, guest count, preferred language, and relevant extras). Never expose payment information, owner notes, other reservations, the guest directory, or raw admin state.
+- [!] The static property QR/NFC tag should continue to support a generic guest view; personalised information should unlock only through the secure stay token or another approved verification flow.
+- [!] Before launch, replace the prototype adapter, owner placeholders, Wi-Fi placeholders, house/check-out placeholders, and unapproved safety copy with admin-managed production data.
 
 ### Purpose
 
@@ -153,6 +163,7 @@ The page should provide the information a guest may need during the stay without
 
 ### Access and personalisation
 
+- [c] Prototype bridge: `qr.html` reads the current active reservation from the same-origin `refugio-admin-prototype-state-v1` browser localStorage through an isolated `guest-stay-provider.js` service. It mirrors the admin active-stay rule and returns only a guest-safe projection (name, stay dates/times, guest count, language, bicycles). This is same-browser prototype behaviour only and must be replaced by the private database + expiring/revocable stay-token API before real guest deployment.
 - [ ] Check active reservation data and greet current guests by first name.
 - [ ] Show only information related to the active stay.
 - [ ] Use an expiring signed link, stay code, or equivalent secure token for personalised content.
@@ -212,6 +223,15 @@ The page should provide the information a guest may need during the stay without
 - [ ] Explain whether the request is immediately confirmed or requires host approval.
 - [ ] Notify staff and add approved bicycle rentals to the reservation record and daily inventory.
 
+#### Nearby essentials during the stay
+
+- [ ] Show supermarkets and grocery shops with approximate travel time and one-tap directions.
+- [ ] Show practical restaurant / takeaway suggestions supplied by the hosts.
+- [ ] Keep commercial partners clearly labelled when they also appear in this practical guest list.
+- [ ] Include pharmacies, fuel, taxis/transport, and other practical services once their details are confirmed.
+- [ ] Keep opening hours and availability clearly non-guaranteed unless actively maintained.
+- [ ] Keep these practical listings mobile-first and easy to scan from the property QR/NFC page.
+
 #### House rules and property information
 
 - [ ] House rules in a short, scannable format.
@@ -226,7 +246,7 @@ The page should provide the information a guest may need during the stay without
 #### Guia Local call to action
 
 - [ ] Add a prominent link to Guia Local.
-- [ ] Explain that it includes activities, food, nearby shops, practical services, and sponsored recommendations.
+- [ ] Explain that it includes places to explore, day trips, beaches, nature, events, and clearly labelled partner recommendations.
 - [ ] Preserve the guest’s selected language when moving between the two pages.
 - [ ] Provide a clear route back to the Guest Stay page.
 

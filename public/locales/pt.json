@@ -724,12 +724,326 @@
   },
   "guidePage": {
     "meta": {
-      "title": "O Refúgio | Guia Local"
+      "title": "O Refúgio | Guia Local",
+      "description": "Guia local do Refúgio com praias, natureza, cidades, localidades, eventos e parceiros selecionados perto de Pedorido e Castelo de Paiva."
     },
     "hero": {
-      "eyebrow": "Placeholder",
-      "title": "guest-guide",
-      "text": "Esta página será construída numa etapa seguinte."
+      "imageAlt": "Paisagem junto ao rio na região de Castelo de Paiva",
+      "eyebrow": "Guia Local",
+      "title": "Descobrir a região, sem perder tempo a procurar.",
+      "text": "Reunimos lugares próximos, passeios, praias, restaurantes, compras e eventos para ajudar a aproveitar melhor os dias entre Pedorido, Castelo de Paiva e o Douro.",
+      "primaryCta": "Explorar sugestões",
+      "mapCta": "Abrir mapa"
+    },
+    "intro": {
+      "eyebrow": "À sua volta",
+      "title": "Da paisagem ao passeio de um dia.",
+      "text1": "Use os filtros para descobrir praias, natureza, localidades próximas, cidades e eventos que vale a pena explorar durante uma visita à região.",
+      "text2": "Os tempos indicados são aproximados a partir do Refúgio. Programação, acessos e condições podem mudar, por isso recomendamos confirmar diretamente com cada local antes de sair.",
+      "quickTitle": "Explorar por tema",
+      "quickBeach": "Praias",
+      "quickEvents": "Eventos sazonais",
+      "quickNature": "Natureza e cultura",
+      "quickCities": "Cidades"
+    },
+    "browser": {
+      "eyebrow": "Explorar",
+      "title": "Encontre o que procura.",
+      "text": "Pesquise por nome ou escolha uma categoria. Os parceiros comerciais aparecem numa secção própria, separados das sugestões editoriais.",
+      "searchLabel": "Pesquisar no Guia Local",
+      "searchPlaceholder": "Pesquisar um local, cidade ou atividade…",
+      "filterLabel": "Filtrar por categoria",
+      "all": "Tudo",
+      "beaches": "Praias",
+      "nature": "Natureza e cultura",
+      "cities": "Cidades",
+      "nearby": "Localidades próximas",
+      "events": "Eventos",
+      "favourites": "Favoritos",
+      "sortLabel": "Ordenar",
+      "sortClosest": "Mais perto do Refúgio",
+      "sortAlpha": "A–Z",
+      "listView": "Lista",
+      "mapView": "Mapa",
+      "useLocation": "Usar a minha localização",
+      "locationReady": "Localização ativa para direções",
+      "locationDenied": "Não foi possível usar a sua localização.",
+      "privacyNote": "A sua localização é usada apenas no navegador para preparar direções e não é guardada pelo Guia Local.",
+      "loading": "A carregar sugestões…",
+      "errorTitle": "Não foi possível carregar o Guia Local.",
+      "errorText": "Pode continuar a usar os links diretos abaixo ou tentar novamente.",
+      "noResultsTitle": "Não encontrámos sugestões com esses filtros.",
+      "noResultsText": "Experimente limpar a pesquisa ou escolher outra categoria.",
+      "results": "{count} sugestões",
+      "result": "{count} sugestão"
+    },
+    "labels": {
+      "fromRefugio": "do Refúgio",
+      "directions": "Abrir direções",
+      "showOnMap": "Ver no mapa",
+      "favourite": "Guardar nos favoritos",
+      "removeFavourite": "Remover dos favoritos",
+      "partner": "Parceiro",
+      "seasonal": "Sazonal",
+      "closest": "Mais próximo",
+      "confirmHours": "Confirme horários e condições antes da visita.",
+      "mapUnavailable": "Mapa indisponível? Use o botão de direções no cartão."
+    },
+    "map": {
+      "eyebrow": "Mapa",
+      "title": "Veja cada sugestão no Google Maps.",
+      "text": "Selecione um local na lista para centrar o mapa. Os cartões continuam disponíveis como alternativa caso o mapa não carregue.",
+      "defaultTitle": "O Refúgio",
+      "defaultAddress": "Rua da Arejinha 627, 4550-518 Pedorido",
+      "openDefault": "Abrir O Refúgio no Google Maps"
+    },
+    "partners": {
+      "eyebrow": "Parceiros locais",
+      "title": "Locais parceiros identificados de forma clara.",
+      "text": "Os parceiros comerciais ficam reunidos nesta secção própria e identificados com a etiqueta “Parceiro”. Não aparecem misturados na lista editorial de praias, passeios, cidades e eventos.",
+      "offerNote": "Ofertas temporárias só serão mostradas enquanto estiverem dentro da respetiva data de validade.",
+      "detailsSoon": "Informação detalhada a completar."
+    },
+    "events": {
+      "dateNote": "As datas podem variar de ano para ano. Confirme sempre o programa oficial antes da visita."
+    },
+    "finalCta": {
+      "eyebrow": "O Refúgio",
+      "title": "Já escolheu o que quer descobrir?",
+      "text": "Guarde os seus favoritos e volte ao Guia Local durante a estadia sempre que precisar de uma ideia.",
+      "accommodation": "Ver o alojamento",
+      "booking": "Ver disponibilidade"
+    },
+    "listings": {
+      "porto": {
+        "name": "Porto",
+        "category": "Cidade / passeio",
+        "description": "Uma das cidades recomendadas para um passeio de dia.",
+        "time": "~35 min"
+      },
+      "gaia": {
+        "name": "Vila Nova de Gaia",
+        "category": "Cidade / passeio",
+        "description": "Sugestão de visita na margem sul do Douro, junto ao Porto.",
+        "time": "~35 min"
+      },
+      "aveiro": {
+        "name": "Aveiro",
+        "category": "Cidade / passeio",
+        "description": "Cidade sugerida para um passeio de dia.",
+        "time": "~55 min"
+      },
+      "costa-nova": {
+        "name": "Costa Nova",
+        "category": "Cidade / passeio",
+        "description": "Sugestão junto ao litoral para combinar com uma visita à zona de Aveiro.",
+        "time": "~1h05"
+      },
+      "braga": {
+        "name": "Braga",
+        "category": "Cidade / passeio",
+        "description": "Cidade especialmente recomendada pelos anfitriões.",
+        "time": "~1h05"
+      },
+      "bom-jesus": {
+        "name": "Bom Jesus do Monte",
+        "category": "Cidade / passeio",
+        "description": "Visita recomendada para complementar um dia em Braga.",
+        "time": "~1h10"
+      },
+      "viana": {
+        "name": "Viana do Castelo",
+        "category": "Cidade / passeio",
+        "description": "Cidade sugerida para uma visita mais longa durante a estadia.",
+        "time": "~1h25"
+      },
+      "castelo-paiva": {
+        "name": "Castelo de Paiva – centro",
+        "category": "Localidade próxima",
+        "description": "O centro do concelho, útil para serviços, refeições e um passeio pela zona.",
+        "time": "~17 min"
+      },
+      "canedo": {
+        "name": "Canedo",
+        "category": "Localidade próxima",
+        "description": "Localidade próxima com comércio e serviços.",
+        "time": "~12 min"
+      },
+      "santa-maria-feira": {
+        "name": "Santa Maria da Feira",
+        "category": "Localidade / cultura",
+        "description": "Boa base para combinar o centro da cidade, o castelo e eventos sazonais.",
+        "time": "~30 min"
+      },
+      "arouca": {
+        "name": "Arouca",
+        "category": "Localidade / natureza",
+        "description": "Sugestão de passeio para explorar outra zona de serra e património.",
+        "time": "~35–40 min"
+      },
+      "mosteiro-arouca": {
+        "name": "Mosteiro de Santa Maria de Arouca",
+        "category": "Património / cultura",
+        "description": "Um dos principais marcos históricos de Arouca, ideal para combinar com um passeio pelo centro da vila.",
+        "time": "~35–40 min"
+      },
+      "ponte-516-arouca": {
+        "name": "516 Arouca – Ponte Suspensa",
+        "category": "Natureza / experiência",
+        "description": "Ponte pedonal suspensa com 516 metros, elevada sobre o Rio Paiva, em pleno Arouca Geopark.",
+        "note": "Os bilhetes são vendidos online; o bilhete da ponte inclui os Passadiços do Paiva quando ambas as visitas são feitas no mesmo dia."
+      },
+      "passadicos-paiva": {
+        "name": "Passadiços do Paiva",
+        "category": "Natureza / caminhada",
+        "description": "Percurso de cerca de 8 km junto à margem esquerda do Rio Paiva, entre Areinho e Espiunca, e uma das experiências mais emblemáticas do Arouca Geopark.",
+        "note": "Conte com cerca de 2h30 de percurso e prepare a visita com antecedência; confirme bilhetes e condições no site oficial."
+      },
+      "serra-freita": {
+        "name": "Serra da Freita",
+        "category": "Natureza / serra",
+        "description": "Uma das zonas de visita obrigatória do Arouca Geopark, com panorâmicas de montanha, aldeias e vários geossítios.",
+        "note": "É uma boa zona para combinar a Frecha da Mizarela e as Pedras Parideiras no mesmo passeio."
+      },
+      "frecha-mizarela": {
+        "name": "Frecha da Mizarela",
+        "category": "Natureza / cascata",
+        "description": "Queda de água com mais de 60 metros na Serra da Freita, uma das paisagens naturais mais marcantes do Arouca Geopark."
+      },
+      "pedras-parideiras": {
+        "name": "Pedras Parideiras – Castanheira",
+        "category": "Geologia / natureza",
+        "description": "Geossítio de relevância internacional, conhecido pelo raro granito nodular, com centro de interpretação na aldeia da Castanheira."
+      },
+      "cinfaes": {
+        "name": "Cinfães",
+        "category": "Localidade próxima",
+        "description": "Sugestão para um passeio mais longo pela região.",
+        "time": "~45 min"
+      },
+      "adega-ramadinha": {
+        "name": "Adega Ramadinha – Pedorido",
+        "category": "Restaurante · Parceiro",
+        "description": "Parceiro local e uma das sugestões dos anfitriões para comer perto do Refúgio.",
+        "time": "~7 min"
+      },
+      "corga": {
+        "name": "Corga",
+        "category": "Parceiro · Produtos locais",
+        "description": "Parceiro local associado a provas e produtos da região."
+      },
+      "cafe-cruzeiro": {
+        "name": "Café Cruzeiro",
+        "category": "Parceiro · Pastelaria",
+        "description": "Parceiro local de pastelaria."
+      },
+      "aquapura": {
+        "name": "Aquapura Terrace",
+        "category": "Parceiro · Bar",
+        "description": "Parceiro local junto ao rio."
+      },
+      "praia-pedorido": {
+        "name": "Praia fluvial de Pedorido",
+        "category": "Praia fluvial",
+        "description": "A opção balnear fluvial mais próxima entre as sugestões dos anfitriões.",
+        "time": "~7 min"
+      },
+      "viver-douro": {
+        "name": "Viver o Douro – Pedorido",
+        "category": "Natureza / caminhada",
+        "description": "Percurso pedestre temático ao longo da frente ribeirinha do Douro, com pontes, passadiços e miradouros inspirados em barcos rabelos.",
+        "time": "~7 min"
+      },
+      "ilha-amores": {
+        "name": "Ilha do Castelo / Ilha dos Amores – Castelo de Paiva",
+        "category": "Praia fluvial",
+        "description": "Zona fluvial sugerida para aproveitar o rio na região de Castelo de Paiva.",
+        "time": "~20 min"
+      },
+      "lomba": {
+        "name": "Praia da Lomba – Gondomar",
+        "category": "Praia fluvial",
+        "description": "Outra opção de praia fluvial para um passeio junto ao Douro.",
+        "time": "~30 min"
+      },
+      "espinho": {
+        "name": "Praia de Espinho",
+        "category": "Praia marítima",
+        "description": "Opção de praia atlântica para um dia no litoral.",
+        "time": "~35 min"
+      },
+      "furadouro": {
+        "name": "Praia do Furadouro – Ovar",
+        "category": "Praia marítima",
+        "description": "Praia atlântica sugerida para um passeio de dia.",
+        "time": "~45 min"
+      },
+      "serra-sao-domingos": {
+        "name": "Serra de São Domingos – Castelo de Paiva",
+        "category": "Natureza / paisagem",
+        "description": "Uma das paisagens próximas sugeridas para descobrir a envolvente de Castelo de Paiva.",
+        "time": "~8 min"
+      },
+      "baloico-sao-gens": {
+        "name": "Baloiço do Monte de São Gens",
+        "category": "Natureza / miradouro",
+        "description": "Sugestão de passeio para apreciar a paisagem da região.",
+        "time": "~15 min"
+      },
+      "castelo-feira": {
+        "name": "Castelo de Santa Maria da Feira",
+        "category": "Monumento",
+        "description": "Monumento recomendado para combinar com uma visita a Santa Maria da Feira.",
+        "time": "~30 min"
+      },
+      "sao-joao-porto": {
+        "name": "São João do Porto",
+        "category": "Evento tradicional",
+        "description": "Uma das maiores festas populares do país, com animação nas ruas, música, sardinhas e fogo de artifício.",
+        "time": "~35 min",
+        "eventDate": "Noite de 23 para 24 de junho"
+      },
+      "sao-joao-paiva": {
+        "name": "São João de Castelo de Paiva",
+        "category": "Evento tradicional",
+        "description": "Marchas populares, música, arraiais e muita animação.",
+        "time": "~17 min",
+        "eventDate": "23 e 24 de junho"
+      },
+      "santos-populares": {
+        "name": "Santos Populares e arraiais locais",
+        "category": "Evento tradicional",
+        "description": "É frequente encontrar festas nas aldeias e localidades próximas durante junho.",
+        "eventDate": "Junho · Santo António 12/13 · São João 23/24 · São Pedro 28/29"
+      },
+      "feira-vinho-verde": {
+        "name": "Feira do Vinho Verde, do Lavrador, Gastronomia e Artesanato – Castelo de Paiva",
+        "category": "Evento / gastronomia",
+        "description": "Um dos principais eventos sazonais de Castelo de Paiva.",
+        "time": "~17 min",
+        "eventDate": "Normalmente no início de julho"
+      },
+      "viagem-medieval": {
+        "name": "Viagem Medieval – Santa Maria da Feira",
+        "category": "Evento / cultura",
+        "description": "Um dos maiores eventos da região e uma visita especialmente recomendada.",
+        "time": "~30 min",
+        "eventDate": "Normalmente entre o final de julho e o início de agosto"
+      },
+      "romaria-sao-domingos": {
+        "name": "Romaria de São Domingos – Raiva, Castelo de Paiva",
+        "category": "Romaria",
+        "description": "Festa tradicional da região.",
+        "time": "~10 min",
+        "eventDate": "Habitualmente no início de agosto"
+      },
+      "nossa-senhora-amoras": {
+        "name": "Nossa Senhora das Amoras – Oliveira do Arda",
+        "category": "Romaria",
+        "description": "Festa tradicional próxima do Refúgio.",
+        "time": "~5–10 min",
+        "eventDate": "Habitualmente no início de setembro"
+      }
     }
   },
   "thanksPage": {
@@ -752,5 +1066,147 @@
     "facebook": "Facebook",
     "instagram": "Instagram",
     "creator": "Website by André Fonseca"
+  },
+  "guestStay": {
+    "meta": {
+      "title": "O Refúgio | Durante a sua estadia",
+      "description": "Informação prática para hóspedes durante a estadia em O Refúgio."
+    },
+    "hero": {
+      "eyebrow": "Durante a sua estadia",
+      "demoBadge": "Demonstração",
+      "genericTitle": "Bem-vindo ao O Refúgio.",
+      "genericText": "Tudo o que pode precisar durante a estadia, num só lugar e pensado primeiro para o telemóvel.",
+      "personalisedTitle": "Olá, {name} 👋",
+      "personalisedText": "Esperamos que esteja a desfrutar da estadia. Aqui encontra rapidamente o essencial.",
+      "stayLabel": "Estadia",
+      "checkoutLabel": "Check-out",
+      "guestsLabel": "Hóspedes",
+      "bikesLabel": "Bicicletas",
+      "noBikes": "Não reservadas"
+    },
+    "quick": {
+      "wifi": "Wi-Fi",
+      "host": "Anfitriões",
+      "emergency": "Emergência",
+      "nearby": "Perto de mim"
+    },
+    "actions": {
+      "call": "Ligar",
+      "whatsapp": "WhatsApp",
+      "map": "Mapa",
+      "directions": "Como chegar",
+      "directionsHome": "Voltar ao Refúgio",
+      "copy": "Copiar",
+      "copyAddress": "Copiar morada",
+      "copied": "Copiado.",
+      "partner": "Parceiro"
+    },
+    "emergency": {
+      "eyebrow": "Ajuda imediata",
+      "title": "Em caso de necessidade",
+      "text": "Em perigo imediato, ligue 112. Para situações não emergentes, use os contactos adequados abaixo.",
+      "nationalTitle": "Número Nacional de Emergência",
+      "nationalText": "Emergência médica, incêndio ou polícia"
+    },
+    "property": {
+      "label": "Morada do alojamento",
+      "emergencyHint": "Em caso de emergência, indique esta morada e explique que está hospedado no Refúgio."
+    },
+    "hosts": {
+      "eyebrow": "Estamos por perto",
+      "title": "Contactar os anfitriões",
+      "text": "Escolha o contacto mais confortável para o seu idioma. Chamada e WhatsApp ficam ativos assim que os números forem configurados.",
+      "placeholder": "A configurar",
+      "configured": "Disponível",
+      "placeholderNote": "Protótipo: substitua os contactos no início de js/pages/qr.js antes de utilizar esta página com hóspedes.",
+      "whatsappMessage": "Olá! Estou hospedado no Refúgio e preciso de ajuda."
+    },
+    "wifi": {
+      "eyebrow": "Ligação rápida",
+      "title": "Wi-Fi da casa",
+      "text": "As credenciais ficam aqui para copiar facilmente. No futuro serão geridas no admin e entregues pela camada privada de informação da estadia.",
+      "network": "Rede",
+      "password": "Palavra-passe",
+      "toConfigure": "A configurar",
+      "qrPlaceholderTitle": "QR Wi-Fi",
+      "qrPlaceholderText": "Será gerado automaticamente quando as credenciais forem configuradas.",
+      "qrReadyTitle": "QR Wi-Fi pronto para gerar",
+      "qrReadyText": "Ligar o gerador de QR quando a biblioteca escolhida estiver aprovada."
+    },
+    "health": {
+      "eyebrow": "Saúde",
+      "title": "Saúde e assistência",
+      "text": "Contactos úteis na zona. Para orientação clínica não urgente pode ligar SNS 24; em emergência ligue 112."
+    },
+    "pharmacy": {
+      "title": "Farmácias próximas",
+      "text": "Os horários e farmácias de serviço podem mudar. Confirme antes de sair, especialmente à noite, domingos e feriados."
+    },
+    "nearby": {
+      "eyebrow": "Essenciais da estadia",
+      "title": "Comer, comprar e resolver",
+      "text": "Sugestões práticas para quando precisa de alguma coisa agora, separadas do Guia Local de passeios e experiências.",
+      "supermarkets": "Compras",
+      "food": "Comer",
+      "services": "Serviços",
+      "hoursNote": "Tempos de viagem são aproximados e horários/serviços podem mudar. Use o botão Como chegar para confirmar no momento."
+    },
+    "partners": {
+      "eyebrow": "Parceiros locais",
+      "title": "Alguns sítios que queremos destacar",
+      "text": "Parceiros identificados de forma clara, sem os misturar com uma recomendação editorial independente.",
+      "cta": "Ver todos os parceiros no Guia Local"
+    },
+    "bikes": {
+      "eyebrow": "Extra durante a estadia",
+      "title": "Bicicletas",
+      "availableTitle": "Bicicletas durante a estadia",
+      "priceUnit": "por bicicleta / dia",
+      "text": "Pedido sujeito a disponibilidade e confirmação do anfitrião. Máximo previsto: uma bicicleta por hóspede e por dia.",
+      "requestCta": "Pedir por WhatsApp",
+      "whatsappMessage": "Olá! Gostaria de pedir bicicletas durante a minha estadia no Refúgio.",
+      "alreadyBookedTitle": "Já tem {count} bicicleta(s) na reserva.",
+      "alreadyBookedText": "Mostramos a reserva existente em vez de voltar a apresentar o mesmo extra."
+    },
+    "house": {
+      "eyebrow": "A casa",
+      "title": "Informação do alojamento",
+      "text": "Estrutura pronta para receber as instruções finais aprovadas pelos proprietários. Os pontos ainda não confirmados ficam marcados em vez de serem inventados.",
+      "checkoutTitle": "Check-out e saída",
+      "checkoutTime": "Hora de saída",
+      "keys": "Onde deixar as chaves",
+      "kitchen": "Cozinha / loiça",
+      "waste": "Lixo e reciclagem",
+      "toConfigure": "A configurar",
+      "rulesTitle": "Regras rápidas",
+      "rulesQuiet": "Horário de silêncio — a confirmar.",
+      "rulesSmoking": "Política de fumar — a confirmar.",
+      "rulesVisitors": "Visitantes, festas e ocupação — a confirmar.",
+      "rulesPool": "Regras e segurança da piscina — a confirmar.",
+      "howToTitle": "Como usar a casa",
+      "heating": "Aquecimento / climatização — adicionar instruções.",
+      "tv": "Televisão — adicionar instruções simples.",
+      "appliances": "Eletrodomésticos importantes — adicionar apenas os que geram dúvidas.",
+      "parking": "Estacionamento e acesso — adicionar instruções finais."
+    },
+    "wasp": {
+      "title": "Aviso sobre vespas de barro — conteúdo pendente",
+      "placeholder": "O roadmap exige orientação calma e correta, mas o texto de segurança ainda precisa de aprovação. Este protótipo reserva o espaço sem inventar instruções."
+    },
+    "guide": {
+      "eyebrow": "Explorar a região",
+      "title": "Tem tempo para passear? Abra o Guia Local.",
+      "text": "Praias, natureza, Arouca, cidades, eventos e parceiros — sem misturar esta informação prática da estadia com a parte de descoberta.",
+      "cta": "Abrir Guia Local"
+    },
+    "updatedLabel": "Informação revista em",
+    "bottomNav": {
+      "home": "Início",
+      "help": "Ajuda",
+      "wifi": "Wi-Fi",
+      "nearby": "Perto",
+      "guide": "Guia"
+    }
   }
 }

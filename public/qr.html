@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+  <title data-i18n="guestStay.meta.title"></title>
+  <meta name="description" content="" data-i18n-attr='{"content":"guestStay.meta.description"}' />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <link rel="stylesheet" href="./css/reset.css" />
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/layout.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/mobile.css" />
+  <link rel="stylesheet" href="./css/pages/qr.css" />
+</head>
+<body class="qr-body" data-page="guest-stay">
+  <div data-site-header></div>
+
+  <!--
+    PROTOTYPE + FUTURE PRODUCTION DATA ARCHITECTURE
+    ------------------------------------------------
+    PROTOTYPE:
+      qr.js now reads the CURRENT reservation through ./js/services/guest-stay-provider.js.
+      That provider reads the same same-origin localStorage state used by the admin prototype:
+      "refugio-admin-prototype-state-v1".
+
+      It selects the active reservation using the same rule as the admin dashboard:
+      status is confirmed/checked_in, check-in <= today, and check-out > today.
+      It then exposes only a small guest-facing projection to this page: guest name,
+      stay/check-out dates and times, guest count, preferred language, and bicycle extras.
+
+      This only works when admin.html and qr.html are served from the SAME ORIGIN and opened
+      in the SAME BROWSER PROFILE. It is intentionally a prototype bridge, not production security.
+
+    PRODUCTION:
+      1. Move reservation data to a private server-side database.
+      2. Give each stay an unguessable, expiring/revocable token (or signed link).
+      3. Replace the internals of guest-stay-provider.js with a call to a guest-safe API.
+      4. The API validates the stay and returns ONLY the minimal guest-facing projection.
+      5. Never return payment data, owner/internal notes, other reservations, admin data,
+         contact history, or the guest directory.
+      6. A static QR/NFC tag can continue to open a generic version when no valid stay token exists.
+
+    Keeping the provider isolated means the future database migration should not require
+    redesigning this page or its rendering logic.
+  -->
+
+  <main class="qr-main" data-qr-page>
+    <section class="qr-welcome" id="inicio" aria-labelledby="qr-welcome-title">
+      <div class="container qr-container">
+        <div class="qr-welcome-topline">
+          <p class="eyebrow" data-i18n="guestStay.hero.eyebrow"></p>
+          <span class="qr-demo-badge" data-qr-demo-badge hidden data-i18n="guestStay.hero.demoBadge"></span>
+        </div>
+        <div data-qr-stay-summary>
+          <h1 id="qr-welcome-title" data-i18n="guestStay.hero.genericTitle"></h1>
+          <p class="qr-lead" data-i18n="guestStay.hero.genericText"></p>
+        </div>
+
+        <div class="qr-quick-grid" aria-label="Ações rápidas">
+          <a class="qr-quick-action" href="#wifi">
+            <span class="qr-action-icon" aria-hidden="true">⌁</span>
+            <span data-i18n="guestStay.quick.wifi"></span>
+          </a>
+          <a class="qr-quick-action" href="#contactos">
+            <span class="qr-action-icon" aria-hidden="true">☎</span>
+            <span data-i18n="guestStay.quick.host"></span>
+          </a>
+          <a class="qr-quick-action qr-quick-action-danger" href="#emergencia">
+            <span class="qr-action-icon" aria-hidden="true">!</span>
+            <span data-i18n="guestStay.quick.emergency"></span>
+          </a>
+          <a class="qr-quick-action" href="#perto">
+            <span class="qr-action-icon" aria-hidden="true">⌖</span>
+            <span data-i18n="guestStay.quick.nearby"></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="qr-section qr-emergency-section" id="emergencia" aria-labelledby="qr-emergency-title">
+      <div class="container qr-container">
+        <div class="qr-section-heading">
+          <p class="eyebrow" data-i18n="guestStay.emergency.eyebrow"></p>
+          <h2 id="qr-emergency-title" data-i18n="guestStay.emergency.title"></h2>
+          <p data-i18n="guestStay.emergency.text"></p>
+        </div>
+
+        <a class="qr-emergency-primary" href="tel:112">
+          <span class="qr-emergency-number">112</span>
+          <span>
+            <strong data-i18n="guestStay.emergency.nationalTitle"></strong>
+            <small data-i18n="guestStay.emergency.nationalText"></small>
+          </span>
+          <span class="qr-call-chip" data-i18n="guestStay.actions.call"></span>
+        </a>
+
+        <div class="qr-card-list" data-qr-emergency-list></div>
+
+        <div class="qr-property-location card">
+          <div>
+            <span class="qr-kicker" data-i18n="guestStay.property.label"></span>
+            <strong>Rua da Arejinha 627, 4550-518 Pedorido</strong>
+            <small data-i18n="guestStay.property.emergencyHint"></small>
+          </div>
+          <div class="qr-inline-actions">
+            <button class="qr-mini-button" type="button" data-copy-value="Rua da Arejinha 627, 4550-518 Pedorido" data-i18n="guestStay.actions.copyAddress"></button>
+            <a class="qr-mini-button" href="https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0205166,-8.3828538,108m/data=!3m1!1e3!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu" target="_blank" rel="noopener" data-i18n="guestStay.actions.directionsHome"></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="qr-section" id="contactos" aria-labelledby="qr-hosts-title">
+      <div class="container qr-container">
+        <div class="qr-section-heading">
+          <p class="eyebrow" data-i18n="guestStay.hosts.eyebrow"></p>
+          <h2 id="qr-hosts-title" data-i18n="guestStay.hosts.title"></h2>
+          <p data-i18n="guestStay.hosts.text"></p>
+        </div>
+        <div class="qr-host-grid" data-qr-hosts></div>
+        <p class="qr-config-note" data-i18n="guestStay.hosts.placeholderNote"></p>
+      </div>
+    </section>
+
+    <section class="qr-section qr-alt" id="wifi" aria-labelledby="qr-wifi-title">
+      <div class="container qr-container">
+        <div class="qr-section-heading">
+          <p class="eyebrow" data-i18n="guestStay.wifi.eyebrow"></p>
+          <h2 id="qr-wifi-title" data-i18n="guestStay.wifi.title"></h2>
+          <p data-i18n="guestStay.wifi.text"></p>
+        </div>
+        <div class="qr-wifi-card card" data-qr-wifi></div>
+      </div>
+    </section>
+
+    <section class="qr-section" id="saude" aria-labelledby="qr-health-title">
+      <div class="container qr-container">
+        <div class="qr-section-heading">
+          <p class="eyebrow" data-i18n="guestStay.health.eyebrow"></p>
+          <h2 id="qr-health-title" data-i18n="guestStay.health.title"></h2>
+          <p data-i18n="guestStay.health.text"></p>
+        </div>
+        <div class="qr-card-list" data-qr-health-list></div>
+
+        <details class="qr-details card" open>
+          <summary data-i18n="guestStay.pharmacy.title"></summary>
+          <p class="qr-details-intro" data-i18n="guestStay.pharmacy.text"></p>
+          <div class="qr-card-list qr-card-list-compact" data-qr-pharmacy-list></div>
+        </details>
+      </div>
+    </section>
+
+    <section class="qr-section qr-alt" id="perto" aria-labelledby="qr-nearby-title">
+      <div class="container qr-container">
+        <div class="qr-section-heading">
+          <p class="eyebrow" data-i18n="guestStay.nearby.eyebrow"></p>
+          <h2 id="qr-nearby-title" data-i18n="guestStay.nearby.title"></h2>
+          <p data-i18n="guestStay.nearby.text"></p>
+        </div>
+
+        <div class="qr-nearby-switcher" role="tablist" aria-label="Essenciais perto">
+          <button class="qr-tab is-active" type="button" role="tab" aria-selected="true" data-qr-tab="supermarkets" data-i18n="guestStay.nearby.supermarkets"></button>
+          <button class="qr-tab" type="button" role="tab" aria-selected="false" data-qr-tab="food" data-i18n="guestStay.nearby.food"></button>
+          <button class="qr-tab" type="button" role="tab" aria-selected="false" data-qr-tab="services" data-i18n="guestStay.nearby.services"></button>
+        </div>
+
+        <div class="qr-nearby-panel" data-qr-panel="supermarkets">
+          <div class="qr-place-list" data-qr-supermarkets></div>
+        </div>
+        <div class="qr-nearby-panel" data-qr-panel="food" hidden>
+          <div class="qr-place-list" data-qr-food></div>
+        </div>
+        <div class="qr-nearby-panel" data-qr-panel="services" hidden>
+          <div class="qr-place-list" data-qr-services></div>
+        </div>
+
+        <p class="qr-muted-note" data-i18n="guestStay.nearby.hoursNote"></p>
+      </div>
+    </section>
+
+    <section class="qr-section qr-partners-section" id="parceiros" aria-labelledby="qr-partners-title">
+      <div class="container qr-container">
+        <div class="qr-section-heading">
+          <p class="eyebrow" data-i18n="guestStay.partners.eyebrow"></p>
+          <h2 id="qr-partners-title" data-i18n="guestStay.partners.title"></h2>
+          <p data-i18n="guestStay.partners.text"></p>
+        </div>
+      </div>
+      <div class="qr-partner-rail" data-qr-sponsors></div>
+      <div class="container qr-container">
+        <a class="button button-primary qr-wide-button" href="./guia-local.html#parceiros" data-i18n="guestStay.partners.cta"></a>
+      </div>
+    </section>
+
+    <section class="qr-section qr-alt" id="bicicletas" aria-labelledby="qr-bikes-title">
+      <div class="container qr-container">
+        <div class="qr-section-heading">
+          <p class="eyebrow" data-i18n="guestStay.bikes.eyebrow"></p>
+          <h2 id="qr-bikes-title" data-i18n="guestStay.bikes.title"></h2>
+        </div>
+        <div class="qr-bike-card card" data-qr-bike></div>
+      </div>
+    </section>
+
+    <section class="qr-section" id="casa" aria-labelledby="qr-house-title">
+      <div class="container qr-container">
+        <div class="qr-section-heading">
+          <p class="eyebrow" data-i18n="guestStay.house.eyebrow"></p>
+          <h2 id="qr-house-title" data-i18n="guestStay.house.title"></h2>
+          <p data-i18n="guestStay.house.text"></p>
+        </div>
+
+        <div class="qr-details-stack">
+          <details class="qr-details card" open>
+            <summary data-i18n="guestStay.house.checkoutTitle"></summary>
+            <div class="qr-placeholder-grid">
+              <div><span data-i18n="guestStay.house.checkoutTime"></span><strong data-qr-checkout-time>—</strong></div>
+              <div><span data-i18n="guestStay.house.keys"></span><strong data-i18n="guestStay.house.toConfigure"></strong></div>
+              <div><span data-i18n="guestStay.house.kitchen"></span><strong data-i18n="guestStay.house.toConfigure"></strong></div>
+              <div><span data-i18n="guestStay.house.waste"></span><strong data-i18n="guestStay.house.toConfigure"></strong></div>
+            </div>
+          </details>
+
+          <details class="qr-details card">
+            <summary data-i18n="guestStay.house.rulesTitle"></summary>
+            <ul class="qr-placeholder-list">
+              <li data-i18n="guestStay.house.rulesQuiet"></li>
+              <li data-i18n="guestStay.house.rulesSmoking"></li>
+              <li data-i18n="guestStay.house.rulesVisitors"></li>
+              <li data-i18n="guestStay.house.rulesPool"></li>
+            </ul>
+          </details>
+
+          <details class="qr-details card">
+            <summary data-i18n="guestStay.house.howToTitle"></summary>
+            <ul class="qr-placeholder-list">
+              <li data-i18n="guestStay.house.heating"></li>
+              <li data-i18n="guestStay.house.tv"></li>
+              <li data-i18n="guestStay.house.appliances"></li>
+              <li data-i18n="guestStay.house.parking"></li>
+            </ul>
+          </details>
+        </div>
+
+        <div class="qr-warning-placeholder card">
+          <strong data-i18n="guestStay.wasp.title"></strong>
+          <p data-i18n="guestStay.wasp.placeholder"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="qr-section qr-guide-cta" id="guia" aria-labelledby="qr-guide-title">
+      <div class="container qr-container">
+        <p class="eyebrow" data-i18n="guestStay.guide.eyebrow"></p>
+        <h2 id="qr-guide-title" data-i18n="guestStay.guide.title"></h2>
+        <p data-i18n="guestStay.guide.text"></p>
+        <a class="button button-primary qr-wide-button" href="./guia-local.html" data-i18n="guestStay.guide.cta"></a>
+        <p class="qr-updated"><span data-i18n="guestStay.updatedLabel"></span> <time datetime="2026-08-21">21/08/2026</time></p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="qr-bottom-nav" aria-label="Navegação da estadia">
+    <a href="#inicio"><span aria-hidden="true">⌂</span><small data-i18n="guestStay.bottomNav.home"></small></a>
+    <a href="#emergencia"><span aria-hidden="true">!</span><small data-i18n="guestStay.bottomNav.help"></small></a>
+    <a href="#wifi"><span aria-hidden="true">⌁</span><small data-i18n="guestStay.bottomNav.wifi"></small></a>
+    <a href="#perto"><span aria-hidden="true">⌖</span><small data-i18n="guestStay.bottomNav.nearby"></small></a>
+    <a href="#guia"><span aria-hidden="true">↗</span><small data-i18n="guestStay.bottomNav.guide"></small></a>
+  </nav>
+
+  <div data-site-footer></div>
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
