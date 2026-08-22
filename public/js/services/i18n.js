@@ -1,11 +1,12 @@
 const DEFAULT_LANGUAGE = 'pt';
-const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
+const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es', 'de'];
 const STORAGE_KEY = 'refugio-language';
 const LANGUAGE_LABELS = {
   pt: 'Português',
   en: 'English',
   fr: 'Français',
-  es: 'Español'
+  es: 'Español',
+  de: 'Deutsch'
 };
 const localeRequests = new Map();
 

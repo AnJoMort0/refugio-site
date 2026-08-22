@@ -174,6 +174,20 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+const LUCIDE_PATHS = {
+  phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.32 1.78.59 2.63a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.45-1.16a2 2 0 0 1 2.11-.45c.85.27 1.73.47 2.63.59A2 2 0 0 1 22 16.92"></path>',
+  message: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"></path>',
+  mapPin: '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle>',
+  navigation: '<polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>',
+  copy: '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>',
+  arrowRight: '<path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>'
+};
+
+function lucideIcon(name) {
+  const paths = LUCIDE_PATHS[name] || '';
+  return `<svg class="lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+}
+
 function formatTemplate(template, values = {}) {
   return Object.entries(values).reduce(
     (text, [key, value]) => text.replaceAll(`{${key}}`, String(value ?? '')),
@@ -206,9 +220,10 @@ function whatsappHref(phone, message = '') {
   return `https://wa.me/${digits}${message ? `?text=${encodeURIComponent(message)}` : ''}`;
 }
 
-function actionLink({ href, label, className = 'qr-mini-button', target = '' }) {
-  if (!href) return `<button class="${className} is-disabled" type="button" disabled>${escapeHtml(label)}</button>`;
-  return `<a class="${className}" href="${escapeHtml(href)}"${target ? ` target="${target}" rel="noopener"` : ''}>${escapeHtml(label)}</a>`;
+function actionLink({ href, label, iconName = '', className = 'qr-mini-button', target = '' }) {
+  const content = `${iconName ? lucideIcon(iconName) : ''}<span>${escapeHtml(label)}</span>`;
+  if (!href) return `<button class="${className} is-disabled" type="button" disabled>${content}</button>`;
+  return `<a class="${className}" href="${escapeHtml(href)}"${target ? ` target="${target}" rel="noopener"` : ''}>${content}</a>`;
 }
 
 function renderStaySummary() {
@@ -238,7 +253,7 @@ function renderStaySummary() {
     <h1 id="qr-welcome-title">${escapeHtml(title)}</h1>
     <p class="qr-lead">${escapeHtml(t('hero.personalisedText', 'Esperamos que esteja a desfrutar da estadia. Aqui encontra rapidamente o essencial.'))}</p>
     <div class="qr-stay-facts">
-      <div class="qr-stay-fact"><span>${escapeHtml(t('hero.stayLabel', 'Estadia'))}</span><strong>${escapeHtml(formatDate(stay.checkIn))} → ${escapeHtml(formatDate(stay.checkOut))}</strong></div>
+      <div class="qr-stay-fact"><span>${escapeHtml(t('hero.stayLabel', 'Estadia'))}</span><strong class="qr-stay-date-range">${escapeHtml(formatDate(stay.checkIn))}${lucideIcon('arrowRight')}${escapeHtml(formatDate(stay.checkOut))}</strong></div>
       <div class="qr-stay-fact"><span>${escapeHtml(t('hero.checkoutLabel', 'Check-out'))}</span><strong>${escapeHtml(formatDate(stay.checkOut))} · ${escapeHtml(stay.checkOutTime || '—')}</strong></div>
       <div class="qr-stay-fact"><span>${escapeHtml(t('hero.guestsLabel', 'Hóspedes'))}</span><strong>${guestCount || '—'}</strong></div>
       <div class="qr-stay-fact"><span>${escapeHtml(t('hero.bikesLabel', 'Bicicletas'))}</span><strong>${bikes ? escapeHtml(String(bikes)) : escapeHtml(t('hero.noBikes', 'Não reservadas'))}</strong></div>
@@ -264,8 +279,8 @@ function renderHosts() {
       </div>
       <div class="qr-language-row">${host.languages.map((lang) => `<span class="qr-language-chip">${escapeHtml(lang)}</span>`).join('')}</div>
       <div class="qr-host-actions">
-        ${actionLink({ href: telHref(host.phone), label: t('actions.call', 'Ligar') })}
-        ${actionLink({ href: whatsappHref(host.whatsapp, message), label: t('actions.whatsapp', 'WhatsApp'), target: '_blank' })}
+        ${actionLink({ href: telHref(host.phone), label: t('actions.call', 'Ligar'), iconName: 'phone' })}
+        ${actionLink({ href: whatsappHref(host.whatsapp, message), label: t('actions.whatsapp', 'WhatsApp'), iconName: 'message', target: '_blank' })}
       </div>
     </article>
   `).join('');
@@ -281,9 +296,9 @@ function renderServiceList(selector, items) {
         ${item.detail ? `<small>${escapeHtml(item.detail)}</small>` : ''}
       </div>
       <div class="qr-service-actions">
-        ${item.phone ? actionLink({ href: telHref(item.phone), label: t('actions.call', 'Ligar') }) : ''}
-        ${item.whatsapp ? actionLink({ href: whatsappHref(item.whatsapp), label: t('actions.whatsapp', 'WhatsApp'), target: '_blank' }) : ''}
-        ${item.mapUrl ? actionLink({ href: item.mapUrl, label: t('actions.map', 'Mapa'), target: '_blank' }) : ''}
+        ${item.phone ? actionLink({ href: telHref(item.phone), label: t('actions.call', 'Ligar'), iconName: 'phone' }) : ''}
+        ${item.whatsapp ? actionLink({ href: whatsappHref(item.whatsapp), label: t('actions.whatsapp', 'WhatsApp'), iconName: 'message', target: '_blank' }) : ''}
+        ${item.mapUrl ? actionLink({ href: item.mapUrl, label: t('actions.map', 'Mapa'), iconName: 'mapPin', target: '_blank' }) : ''}
       </div>
     </article>
   `).join('');
@@ -297,11 +312,11 @@ function renderWifi() {
     <div class="qr-wifi-fields">
       <div class="qr-wifi-field">
         <div><span>${escapeHtml(t('wifi.network', 'Rede'))}</span><strong>${escapeHtml(WIFI_CONFIG.ssid || t('wifi.toConfigure', 'A configurar'))}</strong></div>
-        <button class="qr-mini-button${hasWifi ? '' : ' is-disabled'}" type="button"${hasWifi ? ` data-copy-value="${escapeHtml(WIFI_CONFIG.ssid)}"` : ' disabled'}>${escapeHtml(t('actions.copy', 'Copiar'))}</button>
+        <button class="qr-mini-button${hasWifi ? '' : ' is-disabled'}" type="button"${hasWifi ? ` data-copy-value="${escapeHtml(WIFI_CONFIG.ssid)}"` : ' disabled'}>${lucideIcon('copy')}<span>${escapeHtml(t('actions.copy', 'Copiar'))}</span></button>
       </div>
       <div class="qr-wifi-field">
         <div><span>${escapeHtml(t('wifi.password', 'Palavra-passe'))}</span><strong>${escapeHtml(hasWifi ? WIFI_CONFIG.password : t('wifi.toConfigure', 'A configurar'))}</strong></div>
-        <button class="qr-mini-button${hasWifi ? '' : ' is-disabled'}" type="button"${hasWifi ? ` data-copy-value="${escapeHtml(WIFI_CONFIG.password)}"` : ' disabled'}>${escapeHtml(t('actions.copy', 'Copiar'))}</button>
+        <button class="qr-mini-button${hasWifi ? '' : ' is-disabled'}" type="button"${hasWifi ? ` data-copy-value="${escapeHtml(WIFI_CONFIG.password)}"` : ' disabled'}>${lucideIcon('copy')}<span>${escapeHtml(t('actions.copy', 'Copiar'))}</span></button>
       </div>
     </div>
     <div class="qr-wifi-qr-placeholder">
@@ -329,9 +344,9 @@ function renderPlaces(selector, items) {
         </div>
       </div>
       <div class="qr-place-actions">
-        ${item.phone ? actionLink({ href: telHref(item.phone), label: t('actions.call', 'Ligar') }) : ''}
-        ${item.whatsapp ? actionLink({ href: whatsappHref(item.whatsapp), label: t('actions.whatsapp', 'WhatsApp'), target: '_blank' }) : ''}
-        ${item.mapUrl ? actionLink({ href: item.mapUrl, label: t('actions.directions', 'Como chegar'), target: '_blank' }) : ''}
+        ${item.phone ? actionLink({ href: telHref(item.phone), label: t('actions.call', 'Ligar'), iconName: 'phone' }) : ''}
+        ${item.whatsapp ? actionLink({ href: whatsappHref(item.whatsapp), label: t('actions.whatsapp', 'WhatsApp'), iconName: 'message', target: '_blank' }) : ''}
+        ${item.mapUrl ? actionLink({ href: item.mapUrl, label: t('actions.directions', 'Como chegar'), iconName: 'navigation', target: '_blank' }) : ''}
       </div>
     </article>
   `).join('');
@@ -347,7 +362,7 @@ function renderSponsors() {
         <span class="qr-partner-chip">${escapeHtml(t('actions.partner', 'Parceiro'))}</span>
         <strong>${escapeHtml(sponsor.name)}</strong>
         <p>${escapeHtml(sponsor.text)}</p>
-        ${actionLink({ href: sponsor.mapUrl, label: t('actions.directions', 'Como chegar'), target: '_blank' })}
+        ${actionLink({ href: sponsor.mapUrl, label: t('actions.directions', 'Como chegar'), iconName: 'navigation', target: '_blank' })}
       </div>
     </article>
   `).join('');
@@ -377,7 +392,7 @@ function renderBikeCard() {
     <div class="qr-bike-price"><strong>€5</strong><span>${escapeHtml(t('bikes.priceUnit', 'por bicicleta / dia'))}</span></div>
     <p>${escapeHtml(t('bikes.text', 'Pedido sujeito a disponibilidade e confirmação do anfitrião. Máximo previsto: uma bicicleta por hóspede e por dia.'))}</p>
     <div class="qr-host-actions">
-      ${actionLink({ href: host?.whatsapp ? whatsappHref(host.whatsapp, requestMessage) : '', label: t('bikes.requestCta', 'Pedir por WhatsApp'), target: '_blank' })}
+      ${actionLink({ href: host?.whatsapp ? whatsappHref(host.whatsapp, requestMessage) : '', label: t('bikes.requestCta', 'Pedir por WhatsApp'), iconName: 'message', target: '_blank' })}
     </div>
   `;
 }
@@ -452,7 +467,7 @@ async function refreshStayContext({ syncReservationLanguage = false } = {}) {
   stayContext = await loadGuestStayContext();
 
   const reservationLanguage = stayContext.stay?.preferredLanguage;
-  const supportedReservationLanguages = new Set(['pt', 'en', 'fr', 'es']);
+  const supportedReservationLanguages = new Set(['pt', 'en', 'fr', 'es', 'de']);
 
   if (
     syncReservationLanguage &&

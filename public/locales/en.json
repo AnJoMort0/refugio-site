@@ -735,21 +735,9 @@
       "primaryCta": "Explore suggestions",
       "mapCta": "Open map"
     },
-    "intro": {
-      "eyebrow": "Around you",
-      "title": "From scenery to a full day out.",
-      "text1": "Use the filters to discover beaches, nature, nearby towns, cities and events worth exploring during a visit to the region.",
-      "text2": "The times shown are approximate from O Refúgio. Schedules, access and conditions can change, so we recommend checking directly with each place before leaving.",
-      "quickTitle": "Explore by theme",
-      "quickBeach": "Beaches",
-      "quickEvents": "Seasonal events",
-      "quickNature": "Nature and culture",
-      "quickCities": "Cities"
-    },
     "browser": {
       "eyebrow": "Explore",
       "title": "Find what you're looking for.",
-      "text": "Search by name or choose a category. Commercial partners appear in their own section, separate from editorial suggestions.",
       "searchLabel": "Search the Local Guide",
       "searchPlaceholder": "Search for a place, city or activity…",
       "filterLabel": "Filter by category",
@@ -775,7 +763,9 @@
       "noResultsTitle": "We couldn't find suggestions matching those filters.",
       "noResultsText": "Try clearing your search or choosing another category.",
       "results": "{count} suggestions",
-      "result": "{count} suggestion"
+      "result": "{count} suggestion",
+      "text1": "Search by name or choose a category.",
+      "text2": "The times shown are approximate from O Refúgio. Schedules, access and conditions may change, so we recommend checking directly with each place before setting off."
     },
     "labels": {
       "fromRefugio": "from O Refúgio",
@@ -792,17 +782,16 @@
     "map": {
       "eyebrow": "Map",
       "title": "View each suggestion on Google Maps.",
-      "text": "Select a place from the list to centre the map. The cards remain available as a fallback if the map does not load.",
+      "text": "Select a place from the list to centre the map.",
       "defaultTitle": "O Refúgio",
       "defaultAddress": "Rua da Arejinha 627, 4550-518 Pedorido",
       "openDefault": "Open O Refúgio in Google Maps"
     },
     "partners": {
       "eyebrow": "Local partners",
-      "title": "Partner businesses clearly identified.",
-      "text": "Commercial partners are grouped in their own section and identified with the “Partner” label. They are not mixed into the editorial list of beaches, walks, cities and events.",
-      "offerNote": "Temporary offers will only be shown while they are within their validity period.",
-      "detailsSoon": "Detailed information to be added."
+      "title": "Discover who we trust",
+      "text": "See our selection of partners and places we recommend visiting during your stay.",
+      "offerNote": "Temporary offers will be updated regularly."
     },
     "events": {
       "dateNote": "Dates may vary from year to year. Always check the official programme before visiting."
@@ -909,11 +898,6 @@
         "name": "Frecha da Mizarela",
         "category": "Nature / waterfall",
         "description": "A waterfall of more than 60 metres in Serra da Freita, one of the Arouca Geopark's most striking natural landscapes."
-      },
-      "pedras-parideiras": {
-        "name": "Pedras Parideiras – Castanheira",
-        "category": "Geology / nature",
-        "description": "A geosite of international importance, known for its rare nodular granite, with an interpretation centre in the village of Castanheira."
       },
       "cinfaes": {
         "name": "Cinfães",
@@ -1119,7 +1103,6 @@
       "text": "Choose the contact that best suits your language. Call and WhatsApp become active as soon as the numbers are configured.",
       "placeholder": "To be configured",
       "configured": "Available",
-      "placeholderNote": "Prototype: replace the contacts at the start of js/pages/qr.js before using this page with guests.",
       "whatsappMessage": "Hello! I'm staying at O Refúgio and I need some help."
     },
     "wifi": {
@@ -1190,14 +1173,10 @@
       "appliances": "Important appliances — add only those that commonly raise questions.",
       "parking": "Parking and access — add final instructions."
     },
-    "wasp": {
-      "title": "Mud-wasp warning — content pending",
-      "placeholder": "The roadmap requires calm and accurate guidance, but the safety text still needs approval. This prototype reserves the space without inventing instructions."
-    },
     "guide": {
       "eyebrow": "Explore the region",
       "title": "Have time to explore? Open the Local Guide.",
-      "text": "Beaches, nature, Arouca, cities, events and partners — without mixing this practical stay information with the discovery section.",
+      "text": "Beaches, nature, cities and events.",
       "cta": "Open Local Guide"
     },
     "updatedLabel": "Information reviewed on",

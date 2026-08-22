@@ -735,21 +735,9 @@
       "primaryCta": "Empfehlungen entdecken",
       "mapCta": "Karte öffnen"
     },
-    "intro": {
-      "eyebrow": "In Ihrer Umgebung",
-      "title": "Von der Landschaft bis zum Tagesausflug.",
-      "text1": "Nutzen Sie die Filter, um Strände, Natur, nahegelegene Orte, Städte und Veranstaltungen zu entdecken, die sich bei einem Besuch der Region lohnen.",
-      "text2": "Die angegebenen Zeiten sind ungefähre Fahrzeiten ab O Refúgio. Öffnungszeiten, Zugänge und Bedingungen können sich ändern; prüfen Sie diese daher vor der Abfahrt direkt beim jeweiligen Ort.",
-      "quickTitle": "Nach Thema entdecken",
-      "quickBeach": "Strände",
-      "quickEvents": "Saisonale Veranstaltungen",
-      "quickNature": "Natur und Kultur",
-      "quickCities": "Städte"
-    },
     "browser": {
       "eyebrow": "Entdecken",
       "title": "Finden Sie, wonach Sie suchen.",
-      "text": "Suchen Sie nach Namen oder wählen Sie eine Kategorie. Geschäftspartner erscheinen in einem eigenen Bereich und sind von redaktionellen Empfehlungen getrennt.",
       "searchLabel": "Im lokalen Guide suchen",
       "searchPlaceholder": "Ort, Stadt oder Aktivität suchen…",
       "filterLabel": "Nach Kategorie filtern",
@@ -775,7 +763,9 @@
       "noResultsTitle": "Mit diesen Filtern wurden keine Empfehlungen gefunden.",
       "noResultsText": "Löschen Sie die Suche oder wählen Sie eine andere Kategorie.",
       "results": "{count} Empfehlungen",
-      "result": "{count} Empfehlung"
+      "result": "{count} Empfehlung",
+      "text1": "Suchen Sie nach Namen oder wählen Sie eine Kategorie.",
+      "text2": "Die angegebenen Zeiten sind ungefähre Fahrzeiten ab O Refúgio. Öffnungszeiten, Zugänge und Bedingungen können sich ändern; prüfen Sie diese daher vor der Abfahrt direkt beim jeweiligen Ort."
     },
     "labels": {
       "fromRefugio": "ab O Refúgio",
@@ -792,17 +782,16 @@
     "map": {
       "eyebrow": "Karte",
       "title": "Jede Empfehlung in Google Maps ansehen.",
-      "text": "Wählen Sie einen Ort aus der Liste, um die Karte darauf zu zentrieren. Die Karten bleiben als Alternative verfügbar, falls die Karte nicht geladen wird.",
+      "text": "Wählen Sie einen Ort aus der Liste, um die Karte darauf zu zentrieren.",
       "defaultTitle": "O Refúgio",
       "defaultAddress": "Rua da Arejinha 627, 4550-518 Pedorido",
       "openDefault": "O Refúgio in Google Maps öffnen"
     },
     "partners": {
       "eyebrow": "Lokale Partner",
-      "title": "Partnerbetriebe klar gekennzeichnet.",
-      "text": "Geschäftspartner sind in diesem eigenen Bereich zusammengefasst und mit dem Hinweis „Partner“ gekennzeichnet. Sie werden nicht mit der redaktionellen Liste von Stränden, Ausflügen, Städten und Veranstaltungen vermischt.",
-      "offerNote": "Zeitlich begrenzte Angebote werden nur innerhalb ihres jeweiligen Gültigkeitszeitraums angezeigt.",
-      "detailsSoon": "Detaillierte Informationen werden ergänzt."
+      "title": "Entdecken Sie, wem wir vertrauen",
+      "text": "Entdecken Sie unsere Auswahl an Partnern und Empfehlungen für Ausflüge während Ihres Aufenthalts.",
+      "offerNote": "Zeitlich begrenzte Angebote werden regelmäßig aktualisiert."
     },
     "events": {
       "dateNote": "Die Daten können sich von Jahr zu Jahr ändern. Prüfen Sie vor dem Besuch immer das offizielle Programm."
@@ -909,11 +898,6 @@
         "name": "Frecha da Mizarela",
         "category": "Natur / Wasserfall",
         "description": "Mehr als 60 Meter hoher Wasserfall in der Serra da Freita und eine der eindrucksvollsten Naturlandschaften des Arouca Geopark."
-      },
-      "pedras-parideiras": {
-        "name": "Pedras Parideiras – Castanheira",
-        "category": "Geologie / Natur",
-        "description": "Geostätte von internationaler Bedeutung, bekannt für ihren seltenen Knollengranit, mit Besucherzentrum im Dorf Castanheira."
       },
       "cinfaes": {
         "name": "Cinfães",
@@ -1119,7 +1103,6 @@
       "text": "Wählen Sie den Kontakt, der am besten zu Ihrer Sprache passt. Anruf und WhatsApp werden aktiv, sobald die Nummern eingerichtet sind.",
       "placeholder": "Noch einzurichten",
       "configured": "Verfügbar",
-      "placeholderNote": "Prototyp: Ersetzen Sie die Kontakte am Anfang von js/pages/qr.js, bevor diese Seite mit Gästen verwendet wird.",
       "whatsappMessage": "Hallo! Ich übernachte in O Refúgio und brauche Hilfe."
     },
     "wifi": {
@@ -1190,14 +1173,10 @@
       "appliances": "Wichtige Geräte — nur Geräte ergänzen, zu denen häufig Fragen entstehen.",
       "parking": "Parken und Zugang — endgültige Anleitung ergänzen."
     },
-    "wasp": {
-      "title": "Hinweis zu Lehmwespen — Inhalt noch ausstehend",
-      "placeholder": "Die Roadmap verlangt ruhige und korrekte Sicherheitshinweise, der Text muss jedoch noch freigegeben werden. Dieser Prototyp reserviert den Platz, ohne Anweisungen zu erfinden."
-    },
     "guide": {
       "eyebrow": "Region entdecken",
       "title": "Zeit für einen Ausflug? Öffnen Sie den lokalen Guide.",
-      "text": "Strände, Natur, Arouca, Städte, Veranstaltungen und Partner – getrennt von diesen praktischen Informationen für den Aufenthalt.",
+      "text": "Strände, Natur, Städte und Veranstaltungen.",
       "cta": "Lokalen Guide öffnen"
     },
     "updatedLabel": "Informationen geprüft am",

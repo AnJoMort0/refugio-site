@@ -37,34 +37,13 @@
         </div>
       </div>
     </section>
-
-    <section class="section guide-intro">
-      <div class="container two-column">
-        <div>
-          <p class="eyebrow" data-i18n="guidePage.intro.eyebrow"></p>
-          <h2 data-i18n="guidePage.intro.title"></h2>
-          <p data-i18n="guidePage.intro.text1"></p>
-          <p data-i18n="guidePage.intro.text2"></p>
-        </div>
-        <aside class="card guide-quick-card" aria-labelledby="guide-quick-title">
-          <h3 id="guide-quick-title" data-i18n="guidePage.intro.quickTitle"></h3>
-          <div class="guide-quick-links">
-            <button type="button" class="guide-quick-link" data-guide-filter-jump="beaches" data-i18n="guidePage.intro.quickBeach"></button>
-            <button type="button" class="guide-quick-link" data-guide-filter-jump="nature" data-i18n="guidePage.intro.quickNature"></button>
-            <button type="button" class="guide-quick-link" data-guide-filter-jump="cities" data-i18n="guidePage.intro.quickCities"></button>
-            <button type="button" class="guide-quick-link" data-guide-filter-jump="events" data-i18n="guidePage.intro.quickEvents"></button>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-
     <section class="section guide-browser-section" id="descobrir">
       <div class="container">
         <div class="section-heading">
           <p class="eyebrow" data-i18n="guidePage.browser.eyebrow"></p>
           <h2 data-i18n="guidePage.browser.title"></h2>
-          <p data-i18n="guidePage.browser.text"></p>
+          <p data-i18n="guidePage.browser.text1"></p>
+          <p data-i18n="guidePage.browser.text2"></p>
         </div>
 
         <div class="guide-toolbar" data-guide-toolbar>
@@ -77,36 +56,38 @@
             <input type="search" data-guide-search data-i18n-attr='{"placeholder":"guidePage.browser.searchPlaceholder","aria-label":"guidePage.browser.searchLabel"}' />
           </label>
 
-          <label class="guide-sort">
-            <span data-i18n="guidePage.browser.sortLabel"></span>
-            <select data-guide-sort>
-              <option value="closest" data-i18n="guidePage.browser.sortClosest"></option>
-              <option value="alpha" data-i18n="guidePage.browser.sortAlpha"></option>
-            </select>
-          </label>
+          <div class="guide-filter-row" role="group" data-i18n-attr='{"aria-label":"guidePage.browser.filterLabel"}'>
+            <button type="button" class="guide-filter is-active" data-guide-filter="all" aria-pressed="true" data-i18n="guidePage.browser.all"></button>
+            <button type="button" class="guide-filter" data-guide-filter="beaches" aria-pressed="false" data-i18n="guidePage.browser.beaches"></button>
+            <button type="button" class="guide-filter" data-guide-filter="nature" aria-pressed="false" data-i18n="guidePage.browser.nature"></button>
+            <button type="button" class="guide-filter" data-guide-filter="cities" aria-pressed="false" data-i18n="guidePage.browser.cities"></button>
+            <button type="button" class="guide-filter" data-guide-filter="nearby" aria-pressed="false" data-i18n="guidePage.browser.nearby"></button>
+            <button type="button" class="guide-filter" data-guide-filter="events" aria-pressed="false" data-i18n="guidePage.browser.events"></button>
+            <button type="button" class="guide-filter" data-guide-filter="favourites" aria-pressed="false" data-i18n="guidePage.browser.favourites"></button>
+          </div>
 
-          <button type="button" class="guide-location-button" data-guide-location>
-            <svg class="lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a8 8 0 1 0-4.4 4.4"></path>
-              <path d="M22 22 18 18"></path>
-            </svg>
-            <span data-guide-location-label data-i18n="guidePage.browser.useLocation"></span>
-          </button>
+          <div class="guide-toolbar-controls">
+            <label class="guide-sort">
+              <span data-i18n="guidePage.browser.sortLabel"></span>
+              <select data-guide-sort>
+                <option value="closest" data-i18n="guidePage.browser.sortClosest"></option>
+                <option value="alpha" data-i18n="guidePage.browser.sortAlpha"></option>
+              </select>
+            </label>
+
+            <button type="button" class="guide-location-button" data-guide-location>
+              <svg class="lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a8 8 0 1 0-4.4 4.4"></path>
+                <path d="M22 22 18 18"></path>
+              </svg>
+              <span data-guide-location-label data-i18n="guidePage.browser.useLocation"></span>
+            </button>
+          </div>
         </div>
 
         <p class="guide-privacy-note" data-i18n="guidePage.browser.privacyNote"></p>
         <p class="guide-location-status" data-guide-location-status role="status" aria-live="polite"></p>
-
-        <div class="guide-filter-row" role="group" data-i18n-attr='{"aria-label":"guidePage.browser.filterLabel"}'>
-          <button type="button" class="guide-filter is-active" data-guide-filter="all" aria-pressed="true" data-i18n="guidePage.browser.all"></button>
-          <button type="button" class="guide-filter" data-guide-filter="beaches" aria-pressed="false" data-i18n="guidePage.browser.beaches"></button>
-          <button type="button" class="guide-filter" data-guide-filter="nature" aria-pressed="false" data-i18n="guidePage.browser.nature"></button>
-          <button type="button" class="guide-filter" data-guide-filter="cities" aria-pressed="false" data-i18n="guidePage.browser.cities"></button>
-          <button type="button" class="guide-filter" data-guide-filter="nearby" aria-pressed="false" data-i18n="guidePage.browser.nearby"></button>
-          <button type="button" class="guide-filter" data-guide-filter="events" aria-pressed="false" data-i18n="guidePage.browser.events"></button>
-          <button type="button" class="guide-filter" data-guide-filter="favourites" aria-pressed="false" data-i18n="guidePage.browser.favourites"></button>
-        </div>
 
         <div class="guide-browser-meta">
           <p data-guide-results-count aria-live="polite"></p>

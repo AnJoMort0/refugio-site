@@ -450,6 +450,9 @@ function icon(name) {
     map: '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle>',
     route: '<circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle>',
     clock: '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>',
+    waves: '<path d="M2 6c.6.5 1.2 1 2.5 1S6.4 6 7.7 6s1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.5 1"></path><path d="M2 12c.6.5 1.2 1 2.5 1s1.9-1 3.2-1 1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.5 1"></path><path d="M2 18c.6.5 1.2 1 2.5 1s1.9-1 3.2-1 1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.5 1"></path>',
+    mountain: '<path d="m8 3 4 8 3-4 6 10H3Z"></path><path d="m8 3 2.2 4.4L8.8 8.8 7.2 7.6 6 9"></path>',
+    sparkles: '<path d="m12 3-1.5 3.5L7 8l3.5 1.5L12 13l1.5-3.5L17 8l-3.5-1.5Z"></path><path d="m5 14-.8 1.8L2.5 16.5l1.7.7L5 19l.8-1.8 1.7-.7-1.7-.7Z"></path><path d="m19 14-1 2.3-2.3 1 2.3 1L19 21l1-2.7 2.3-1-2.3-1Z"></path>',
   };
   return `<svg class="lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || ''}</svg>`;
 }
@@ -477,6 +480,21 @@ function guideImageUrl(definition) {
   return `./assets/images/guide/${definition.id}.jpg`;
 }
 
+function guideFallbackTheme(definition) {
+  const tags = Array.isArray(definition.tags) ? definition.tags : [];
+  if (tags.includes('events')) return 'event';
+  if (tags.includes('beaches')) return 'water';
+  if (tags.includes('nature')) return 'nature';
+  return 'place';
+}
+
+function guideFallbackIcon(theme) {
+  if (theme === 'event') return icon('sparkles');
+  if (theme === 'water') return icon('waves');
+  if (theme === 'nature') return icon('mountain');
+  return icon('map');
+}
+
 function replaceCount(template, count) {
   return String(template || '').replace('{count}', String(count));
 }
@@ -492,7 +510,6 @@ export function initGuidePage() {
   const sortSelect = document.querySelector('[data-guide-sort]');
   const filterButtons = [...document.querySelectorAll('[data-guide-filter]')];
   const viewButtons = [...document.querySelectorAll('[data-guide-view]')];
-  const filterJumps = [...document.querySelectorAll('[data-guide-filter-jump]')];
   const openMapButtons = [...document.querySelectorAll('[data-guide-open-map]')];
   const locationButton = document.querySelector('[data-guide-location]');
   const locationLabel = document.querySelector('[data-guide-location-label]');
@@ -578,8 +595,14 @@ export function initGuidePage() {
       : '';
 
     const directions = directionsUrl(item, locationOrigin);
+    const fallbackTheme = guideFallbackTheme(item);
     const imageMarkup = `
-      <div class="guide-card-media">
+      <div class="guide-card-media guide-card-media--${escapeHtml(fallbackTheme)}" data-guide-card-media>
+        <div class="guide-card-fallback" aria-hidden="true">
+          <span class="guide-card-fallback-brand">${escapeHtml(getText('brand.name', 'O Refúgio'))}</span>
+          <span class="guide-card-fallback-icon">${guideFallbackIcon(fallbackTheme)}</span>
+          <span class="guide-card-fallback-label">${escapeHtml(item.text.category)}</span>
+        </div>
         <img
           class="guide-card-image"
           src="${escapeHtml(guideImageUrl(item))}"
@@ -632,11 +655,25 @@ export function initGuidePage() {
 
   function bindCardImages() {
     results.querySelectorAll('[data-guide-card-image]').forEach((image) => {
-      const removeMissingImage = () => image.closest('.guide-card-media')?.remove();
-      image.addEventListener('error', removeMissingImage, { once: true });
+      const media = image.closest('[data-guide-card-media]');
+      const useFallback = () => {
+        media?.classList.add('is-fallback');
+        image.hidden = true;
+      };
 
-      // Cached 404s can finish before the listener is attached.
-      if (image.complete && image.naturalWidth === 0) removeMissingImage();
+      const showImage = () => {
+        media?.classList.remove('is-fallback');
+        image.hidden = false;
+      };
+
+      image.addEventListener('error', useFallback, { once: true });
+      image.addEventListener('load', showImage, { once: true });
+
+      // Cached responses can finish before listeners are attached.
+      if (image.complete) {
+        if (image.naturalWidth > 0) showImage();
+        else useFallback();
+      }
     });
   }
 
@@ -825,13 +862,6 @@ export function initGuidePage() {
     button.addEventListener('click', () => setView(button.dataset.guideView || 'list'));
   });
 
-  filterJumps.forEach((button) => {
-    button.addEventListener('click', () => {
-      setFilter(button.dataset.guideFilterJump || 'all');
-      document.querySelector('#descobrir')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  });
-
   openMapButtons.forEach((button) => {
     button.addEventListener('click', () => {
       setView('map');
@@ -877,7 +907,7 @@ export function initGuidePage() {
   // Keeping that section immediately visible also prevents the sticky Google Map from
   // being trapped inside an opacity/transform reveal state.
   initScrollReveal(
-    '.guide-intro, .guide-partners-section, .guide-final-section, .guide-note-card, .guide-partner-card',
+    '.guide-partners-section, .guide-final-section, .guide-note-card, .guide-partner-card',
     0.12
   );
 }

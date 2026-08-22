@@ -735,21 +735,9 @@
       "primaryCta": "Explorar sugerencias",
       "mapCta": "Abrir mapa"
     },
-    "intro": {
-      "eyebrow": "A tu alrededor",
-      "title": "Del paisaje a una excursión de día completo.",
-      "text1": "Usa los filtros para descubrir playas, naturaleza, localidades cercanas, ciudades y eventos que merece la pena explorar durante una visita a la región.",
-      "text2": "Los tiempos indicados son aproximados desde O Refúgio. Horarios, accesos y condiciones pueden cambiar, por lo que recomendamos confirmar directamente con cada lugar antes de salir.",
-      "quickTitle": "Explorar por tema",
-      "quickBeach": "Playas",
-      "quickEvents": "Eventos de temporada",
-      "quickNature": "Naturaleza y cultura",
-      "quickCities": "Ciudades"
-    },
     "browser": {
       "eyebrow": "Explorar",
       "title": "Encuentra lo que buscas.",
-      "text": "Busca por nombre o elige una categoría. Los socios comerciales aparecen en una sección propia, separados de las sugerencias editoriales.",
       "searchLabel": "Buscar en la Guía Local",
       "searchPlaceholder": "Buscar un lugar, ciudad o actividad…",
       "filterLabel": "Filtrar por categoría",
@@ -775,7 +763,9 @@
       "noResultsTitle": "No hemos encontrado sugerencias con esos filtros.",
       "noResultsText": "Prueba a borrar la búsqueda o elegir otra categoría.",
       "results": "{count} sugerencias",
-      "result": "{count} sugerencia"
+      "result": "{count} sugerencia",
+      "text1": "Busca por nombre o elige una categoría.",
+      "text2": "Los tiempos indicados son aproximados desde O Refúgio. Los horarios, accesos y condiciones pueden cambiar, por lo que recomendamos confirmar directamente con cada lugar antes de salir."
     },
     "labels": {
       "fromRefugio": "desde O Refúgio",
@@ -792,17 +782,16 @@
     "map": {
       "eyebrow": "Mapa",
       "title": "Consulta cada sugerencia en Google Maps.",
-      "text": "Selecciona un lugar de la lista para centrar el mapa. Las tarjetas siguen disponibles como alternativa si el mapa no carga.",
+      "text": "Selecciona un lugar de la lista para centrar el mapa.",
       "defaultTitle": "O Refúgio",
       "defaultAddress": "Rua da Arejinha 627, 4550-518 Pedorido",
       "openDefault": "Abrir O Refúgio en Google Maps"
     },
     "partners": {
       "eyebrow": "Socios locales",
-      "title": "Lugares asociados claramente identificados.",
-      "text": "Los socios comerciales se agrupan en esta sección propia y se identifican con la etiqueta «Socio». No se mezclan con la lista editorial de playas, paseos, ciudades y eventos.",
-      "offerNote": "Las ofertas temporales solo se mostrarán mientras estén dentro de su periodo de validez.",
-      "detailsSoon": "Información detallada pendiente de completar."
+      "title": "Descubre en quién confiamos",
+      "text": "Descubre nuestra selección de colaboradores y recomendaciones para visitar durante tu estancia.",
+      "offerNote": "Las ofertas temporales se actualizarán regularmente."
     },
     "events": {
       "dateNote": "Las fechas pueden variar de un año a otro. Confirma siempre el programa oficial antes de la visita."
@@ -909,11 +898,6 @@
         "name": "Frecha da Mizarela",
         "category": "Naturaleza / cascada",
         "description": "Cascada de más de 60 metros en Serra da Freita, uno de los paisajes naturales más impresionantes del Arouca Geopark."
-      },
-      "pedras-parideiras": {
-        "name": "Pedras Parideiras – Castanheira",
-        "category": "Geología / naturaleza",
-        "description": "Geositio de relevancia internacional, conocido por su raro granito nodular, con centro de interpretación en la aldea de Castanheira."
       },
       "cinfaes": {
         "name": "Cinfães",
@@ -1119,7 +1103,6 @@
       "text": "Elige el contacto que te resulte más cómodo según tu idioma. Las llamadas y WhatsApp se activarán en cuanto se configuren los números.",
       "placeholder": "Pendiente de configurar",
       "configured": "Disponible",
-      "placeholderNote": "Prototipo: sustituye los contactos al inicio de js/pages/qr.js antes de usar esta página con huéspedes.",
       "whatsappMessage": "¡Hola! Estoy alojado en O Refúgio y necesito ayuda."
     },
     "wifi": {
@@ -1190,14 +1173,10 @@
       "appliances": "Electrodomésticos importantes — añadir solo los que suelen generar dudas.",
       "parking": "Aparcamiento y acceso — añadir instrucciones finales."
     },
-    "wasp": {
-      "title": "Aviso sobre avispas de barro — contenido pendiente",
-      "placeholder": "La hoja de ruta exige una orientación tranquila y correcta, pero el texto de seguridad todavía necesita aprobación. Este prototipo reserva el espacio sin inventar instrucciones."
-    },
     "guide": {
       "eyebrow": "Explorar la región",
       "title": "¿Tienes tiempo para pasear? Abre la Guía Local.",
-      "text": "Playas, naturaleza, Arouca, ciudades, eventos y socios, sin mezclar esta información práctica de la estancia con la parte de descubrimiento.",
+      "text": "Playas, naturaleza, ciudades y eventos.",
       "cta": "Abrir Guía Local"
     },
     "updatedLabel": "Información revisada el",

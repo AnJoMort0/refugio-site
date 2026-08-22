@@ -725,31 +725,19 @@
   "guidePage": {
     "meta": {
       "title": "O Refúgio | Guia Local",
-      "description": "Guia local do Refúgio com praias, natureza, cidades, localidades, eventos e parceiros selecionados perto de Pedorido e Castelo de Paiva."
+      "description": "Guia local do Refúgio com praias, natureza, cidades, localidades e eventos."
     },
     "hero": {
       "imageAlt": "Paisagem junto ao rio na região de Castelo de Paiva",
       "eyebrow": "Guia Local",
       "title": "Descobrir a região, sem perder tempo a procurar.",
-      "text": "Reunimos lugares próximos, passeios, praias, restaurantes, compras e eventos para ajudar a aproveitar melhor os dias entre Pedorido, Castelo de Paiva e o Douro.",
+      "text": "Reunimos lugares próximos, passeios, praias e eventos para ajudar a aproveitar melhor os dias entre Pedorido, Castelo de Paiva e o Douro.",
       "primaryCta": "Explorar sugestões",
       "mapCta": "Abrir mapa"
-    },
-    "intro": {
-      "eyebrow": "À sua volta",
-      "title": "Da paisagem ao passeio de um dia.",
-      "text1": "Use os filtros para descobrir praias, natureza, localidades próximas, cidades e eventos que vale a pena explorar durante uma visita à região.",
-      "text2": "Os tempos indicados são aproximados a partir do Refúgio. Programação, acessos e condições podem mudar, por isso recomendamos confirmar diretamente com cada local antes de sair.",
-      "quickTitle": "Explorar por tema",
-      "quickBeach": "Praias",
-      "quickEvents": "Eventos sazonais",
-      "quickNature": "Natureza e cultura",
-      "quickCities": "Cidades"
     },
     "browser": {
       "eyebrow": "Explorar",
       "title": "Encontre o que procura.",
-      "text": "Pesquise por nome ou escolha uma categoria. Os parceiros comerciais aparecem numa secção própria, separados das sugestões editoriais.",
       "searchLabel": "Pesquisar no Guia Local",
       "searchPlaceholder": "Pesquisar um local, cidade ou atividade…",
       "filterLabel": "Filtrar por categoria",
@@ -775,7 +763,9 @@
       "noResultsTitle": "Não encontrámos sugestões com esses filtros.",
       "noResultsText": "Experimente limpar a pesquisa ou escolher outra categoria.",
       "results": "{count} sugestões",
-      "result": "{count} sugestão"
+      "result": "{count} sugestão",
+      "text1": "Pesquise por nome ou escolha uma categoria.",
+      "text2": "Os tempos indicados são aproximados a partir do Refúgio. Programação, acessos e condições podem mudar, por isso recomendamos confirmar diretamente com cada local antes de sair."
     },
     "labels": {
       "fromRefugio": "do Refúgio",
@@ -792,17 +782,16 @@
     "map": {
       "eyebrow": "Mapa",
       "title": "Veja cada sugestão no Google Maps.",
-      "text": "Selecione um local na lista para centrar o mapa. Os cartões continuam disponíveis como alternativa caso o mapa não carregue.",
+      "text": "Selecione um local na lista para centrar o mapa.",
       "defaultTitle": "O Refúgio",
       "defaultAddress": "Rua da Arejinha 627, 4550-518 Pedorido",
       "openDefault": "Abrir O Refúgio no Google Maps"
     },
     "partners": {
       "eyebrow": "Parceiros locais",
-      "title": "Locais parceiros identificados de forma clara.",
-      "text": "Os parceiros comerciais ficam reunidos nesta secção própria e identificados com a etiqueta “Parceiro”. Não aparecem misturados na lista editorial de praias, passeios, cidades e eventos.",
-      "offerNote": "Ofertas temporárias só serão mostradas enquanto estiverem dentro da respetiva data de validade.",
-      "detailsSoon": "Informação detalhada a completar."
+      "title": "Descobra a quem nós fazemos confiança",
+      "text": "Veja a nossa seleção de parceiros e recomendações de visita durante a sua estadia",
+      "offerNote": "Ofertas temporárias serão atualizadas regularmente."
     },
     "events": {
       "dateNote": "As datas podem variar de ano para ano. Confirme sempre o programa oficial antes da visita."
@@ -909,11 +898,6 @@
         "name": "Frecha da Mizarela",
         "category": "Natureza / cascata",
         "description": "Queda de água com mais de 60 metros na Serra da Freita, uma das paisagens naturais mais marcantes do Arouca Geopark."
-      },
-      "pedras-parideiras": {
-        "name": "Pedras Parideiras – Castanheira",
-        "category": "Geologia / natureza",
-        "description": "Geossítio de relevância internacional, conhecido pelo raro granito nodular, com centro de interpretação na aldeia da Castanheira."
       },
       "cinfaes": {
         "name": "Cinfães",
@@ -1119,7 +1103,6 @@
       "text": "Escolha o contacto mais confortável para o seu idioma. Chamada e WhatsApp ficam ativos assim que os números forem configurados.",
       "placeholder": "A configurar",
       "configured": "Disponível",
-      "placeholderNote": "Protótipo: substitua os contactos no início de js/pages/qr.js antes de utilizar esta página com hóspedes.",
       "whatsappMessage": "Olá! Estou hospedado no Refúgio e preciso de ajuda."
     },
     "wifi": {
@@ -1190,14 +1173,10 @@
       "appliances": "Eletrodomésticos importantes — adicionar apenas os que geram dúvidas.",
       "parking": "Estacionamento e acesso — adicionar instruções finais."
     },
-    "wasp": {
-      "title": "Aviso sobre vespas de barro — conteúdo pendente",
-      "placeholder": "O roadmap exige orientação calma e correta, mas o texto de segurança ainda precisa de aprovação. Este protótipo reserva o espaço sem inventar instruções."
-    },
     "guide": {
       "eyebrow": "Explorar a região",
       "title": "Tem tempo para passear? Abra o Guia Local.",
-      "text": "Praias, natureza, Arouca, cidades, eventos e parceiros — sem misturar esta informação prática da estadia com a parte de descoberta.",
+      "text": "Praias, natureza, cidades e eventos.",
       "cta": "Abrir Guia Local"
     },
     "updatedLabel": "Informação revista em",

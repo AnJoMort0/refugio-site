@@ -766,3 +766,258 @@
     transition: none !important;
   }
 }
+
+/* =========================================================
+   RESPONSIVE POLISH — Guest Stay / QR
+   Prioritises fast scanning on phones and avoids cramped tablet grids.
+   ========================================================= */
+
+.qr-service-card,
+.qr-host-card,
+.qr-place-card,
+.qr-partner-card {
+  align-self: start;
+}
+
+.qr-mini-button {
+  min-height: 44px;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+/* Small tablets / landscape phones:
+   detailed information remains one-column and easy to scan. */
+@media (min-width: 640px) and (max-width: 899px) {
+  .qr-quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .qr-host-grid,
+  .qr-card-list:not(.qr-card-list-compact),
+  .qr-place-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .qr-partner-rail {
+    grid-auto-columns: minmax(60%, 340px);
+  }
+}
+
+/* Very small phones: move secondary actions below the text rather than squeezing them. */
+@media (max-width: 520px) {
+  .qr-container {
+    width: min(calc(100% - 1rem), 760px);
+  }
+
+  .qr-section {
+    padding: 1.65rem 0;
+  }
+
+  .qr-service-card {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .qr-service-actions {
+    justify-content: flex-start;
+  }
+
+  .qr-place-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .qr-place-meta {
+    justify-content: flex-start;
+  }
+
+  .qr-service-actions .qr-mini-button,
+  .qr-place-actions .qr-mini-button,
+  .qr-host-actions .qr-mini-button,
+  .qr-inline-actions .qr-mini-button {
+    flex: 1 1 8.5rem;
+  }
+
+  .qr-emergency-primary {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .qr-emergency-primary .qr-call-chip {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .qr-placeholder-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Desktop QR view should still feel like a guest hub, not a dense admin dashboard. */
+@media (min-width: 900px) {
+  .qr-host-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .qr-card-list:not(.qr-card-list-compact),
+  .qr-place-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .qr-partner-rail {
+    grid-auto-flow: row;
+    grid-auto-columns: unset;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .qr-host-actions .qr-mini-button,
+  .qr-place-actions .qr-mini-button,
+  .qr-service-actions .qr-mini-button {
+    min-width: 6.5rem;
+  }
+}
+
+/* =========================================================
+   LUCIDE ICON CONSISTENCY
+   All QR/Guest Stay UI iconography uses the same Lucide SVG
+   language already used by 404.html and the rest of the site.
+   ========================================================= */
+
+.qr-action-icon .lucide-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.qr-call-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.qr-call-chip .lucide-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.qr-mini-button {
+  gap: 0.4rem;
+}
+
+.qr-mini-button .lucide-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.qr-stay-date-range {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.qr-stay-date-range .lucide-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  opacity: 0.72;
+}
+
+.qr-bottom-nav-icon {
+  display: grid;
+  place-items: center;
+}
+
+.qr-bottom-nav-icon .lucide-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* The old rule targeted text glyphs in bottom navigation. */
+.qr-bottom-nav span {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/* =========================================================
+   PARTNER LAYOUT
+   Do not keep forcing the sponsor cards into a horizontal rail
+   as soon as the screen becomes tablet-sized. They now reflow
+   into a real responsive grid.
+   ========================================================= */
+
+.qr-partner-rail {
+  width: min(calc(100% - 1.25rem), 760px);
+  margin-inline: auto;
+  padding: 0.15rem 0 1rem;
+  grid-auto-flow: row;
+  grid-auto-columns: unset;
+  grid-template-columns: minmax(0, 1fr);
+  overflow: visible;
+  overscroll-behavior-inline: auto;
+  scroll-snap-type: none;
+}
+
+.qr-partner-card {
+  min-width: 0;
+  width: 100%;
+  scroll-snap-align: none;
+}
+
+.qr-partner-content {
+  min-width: 0;
+}
+
+.qr-partner-content > strong {
+  display: block;
+  margin-top: 0.15rem;
+  overflow-wrap: anywhere;
+}
+
+.qr-partner-content p {
+  overflow-wrap: anywhere;
+}
+
+/* Tablet / narrow landscape:
+   one partner per row, but use a compact horizontal card so
+   images do not become excessively tall. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .qr-partner-rail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .qr-partner-card {
+    display: grid;
+    grid-template-columns: minmax(220px, 42%) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .qr-partner-card img {
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    aspect-ratio: auto;
+    object-fit: cover;
+  }
+
+  .qr-partner-content {
+    align-self: center;
+    padding: 1rem;
+  }
+}
+
+/* Wide screens: two balanced partner cards per row. */
+@media (min-width: 1024px) {
+  .qr-partner-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .qr-partner-card {
+    display: block;
+  }
+
+  .qr-partner-card img {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+  }
+}
+
