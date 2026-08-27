@@ -155,13 +155,13 @@
     {
       "id": "news",
       "label": {
-        "pt": "Novidades de O Refúgio",
+        "pt": "Novidades do Refúgio",
         "fr": "Nouvelles de O Refúgio",
         "en": "News from O Refúgio",
         "es": "Novedades de O Refúgio"
       },
       "subject": {
-        "pt": "Novidades de O Refúgio",
+        "pt": "Novidades do Refúgio",
         "fr": "Nouvelles de O Refúgio",
         "en": "News from O Refúgio",
         "es": "Novedades de O Refúgio"
@@ -182,7 +182,7 @@
         "es": "Oferta o descuento"
       },
       "subject": {
-        "pt": "Uma oferta especial de O Refúgio",
+        "pt": "Uma oferta especial do Refúgio",
         "fr": "Une offre spéciale de O Refúgio",
         "en": "A special offer from O Refúgio",
         "es": "Una oferta especial de O Refúgio"

@@ -2,7 +2,7 @@
   "id": "./admin.html",
   "name": "O Refúgio Gestão",
   "short_name": "O Refúgio",
-  "description": "Gestão de reservas, hóspedes e operações de O Refúgio.",
+  "description": "Gestão de reservas, hóspedes e operações do Refúgio.",
   "lang": "pt-PT",
   "start_url": "./admin.html?source=pwa",
   "scope": "./",
