@@ -1,2 +1,6 @@
 name = "alojamento-rural-site"
 compatibility_date = "2026-04-15"
+
+[assets]
+directory = "./public"
+not_found_handling = "404-page"

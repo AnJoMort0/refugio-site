@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_DIRECTORY = path.resolve(SCRIPT_DIRECTORY, '..');
 const PUBLIC_DIRECTORY = path.join(PROJECT_DIRECTORY, 'public');
-const REQUIRED_MESSAGE_LANGUAGES = ['pt', 'fr', 'en', 'es', 'de'];
+const REQUIRED_MESSAGE_LANGUAGES = ['pt', 'fr', 'en', 'es'];
 const errors = [];
 
 async function walk(directory) {
@@ -60,6 +60,52 @@ async function checkJsonFiles(jsonFiles) {
   }
 }
 
+function collectSchema(value, keyPath = '', schema = new Map()) {
+  const valueType = Array.isArray(value) ? 'array' : value === null ? 'null' : typeof value;
+  schema.set(keyPath || '<root>', valueType);
+
+  if (Array.isArray(value)) {
+    value.forEach((childValue, index) => {
+      collectSchema(childValue, `${keyPath}[${index}]`, schema);
+    });
+  } else if (value && typeof value === 'object') {
+    Object.entries(value).forEach(([key, childValue]) => {
+      collectSchema(childValue, keyPath ? `${keyPath}.${key}` : key, schema);
+    });
+  }
+
+  return schema;
+}
+
+async function checkLocaleSchemas() {
+  const localeDirectory = path.join(PUBLIC_DIRECTORY, 'locales');
+  const source = JSON.parse(await readFile(path.join(localeDirectory, 'pt.json'), 'utf8'));
+  const sourceSchema = collectSchema(source);
+
+  for (const language of ['en', 'fr', 'es']) {
+    const target = JSON.parse(await readFile(path.join(localeDirectory, `${language}.json`), 'utf8'));
+    const targetSchema = collectSchema(target);
+
+    for (const [key, expectedType] of sourceSchema) {
+      if (!targetSchema.has(key)) {
+        reportError(`public/locales/${language}.json is missing Portuguese source key "${key}".`);
+      } else if (targetSchema.get(key) !== expectedType) {
+        reportError(`public/locales/${language}.json has the wrong value type at "${key}".`);
+      }
+    }
+
+    for (const key of targetSchema.keys()) {
+      if (!sourceSchema.has(key)) {
+        reportError(`public/locales/${language}.json contains "${key}", which was removed from pt.json.`);
+      }
+    }
+
+    if (JSON.stringify([...targetSchema.keys()]) !== JSON.stringify([...sourceSchema.keys()])) {
+      reportError(`public/locales/${language}.json does not follow pt.json key ordering. Run npm run locales:sync.`);
+    }
+  }
+}
+
 function checkJavaScriptSyntax(javaScriptFiles) {
   for (const file of javaScriptFiles) {
     const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
@@ -79,13 +125,25 @@ async function checkHtmlFiles(htmlFiles) {
     const source = await readFile(file, 'utf8');
     const ids = new Set();
 
+    if (path.basename(file) !== 'admin.html') {
+      for (const match of source.matchAll(/<([a-z][\w-]*)\b[^>]*\bdata-i18n\s*=\s*(["'])[^"']+\2[^>]*>([\s\S]*?)<\/\1>/gi)) {
+        const fallbackText = match[3]
+          .replace(/<[^>]+>/g, '')
+          .replace(/&(?:[a-z]+|#\d+|#x[\da-f]+);/gi, ' ')
+          .trim();
+        if (fallbackText) {
+          reportError(`${relative(file)} contains hardcoded fallback text inside a data-i18n element: "${fallbackText}".`);
+        }
+      }
+    }
+
     for (const match of source.matchAll(/\bid\s*=\s*(["'])([^"']+)\1/g)) {
       const id = match[2];
       if (ids.has(id)) reportError(`${relative(file)} contains the duplicate id "${id}".`);
       ids.add(id);
     }
 
-    for (const match of source.matchAll(/\b(?:action|href|src)\s*=\s*(["'])([^"']+)\1/g)) {
+    for (const match of source.matchAll(/(?:^|[\s<])(?:action|href|src)\s*=\s*(["'])([^"']+)\1/g)) {
       const reference = cleanReference(match[2]);
       if (!reference || isExternalReference(reference)) continue;
 
@@ -288,11 +346,19 @@ async function checkAdminModel() {
   }
 
   checkCoverage('reservation statuses', ['request', 'awaiting_payment', 'confirmed', 'checked_in', 'checked_out', 'cancelled', 'no_show'], state.reservations.map((reservation) => reservation.status));
-  checkCoverage('payment statuses', ['unpaid', 'awaiting_transfer', 'deposit_paid', 'paid', 'refunded'], state.reservations.map((reservation) => reservation.paymentStatus));
+  checkCoverage('payment statuses', ['unpaid', 'awaiting_transfer', 'paid', 'refunded'], state.reservations.map((reservation) => reservation.paymentStatus));
   checkCoverage('reservation sources', ['booking', 'abritel', 'website', 'private', 'owner'], state.reservations.map((reservation) => reservation.source));
-  checkCoverage('guest languages', ['pt', 'fr', 'en', 'es', 'de'], state.reservations.map((reservation) => reservation.preferredLanguage));
+  checkCoverage('guest languages', ['pt', 'fr', 'en', 'es'], state.reservations.map((reservation) => reservation.preferredLanguage));
   checkCoverage('website request statuses', ['new', 'accepted', 'rejected'], state.websiteRequests.map((request) => request.status));
   checkCoverage('work compensation types', ['paid', 'free', 'voluntary'], state.workSessions.map((session) => session.compensationType));
+
+  if (!state.reservations.some((reservation) => reservation.securityDepositPaid === true)) {
+    reportError('Admin seed is missing a reservation with the security deposit marked as received.');
+  }
+
+  if (!state.guests.some((guest) => guest.nif && guest.identityDocumentType && guest.identityDocumentNumber)) {
+    reportError('Admin seed is missing the guest tax/identity fields used by the reservation editor.');
+  }
 
   const reservationIds = new Set(state.reservations.map((reservation) => reservation.id));
   const guestIds = new Set(state.guests.map((guest) => guest.id));
@@ -336,6 +402,7 @@ const jsonFiles = publicFiles.filter((file) => file.endsWith('.json'));
 const translationSourceFiles = [...htmlFiles, ...publicFiles.filter((file) => file.endsWith('.js'))];
 
 await checkJsonFiles(jsonFiles);
+await checkLocaleSchemas();
 checkJavaScriptSyntax(javaScriptFiles);
 await checkHtmlFiles(htmlFiles);
 await checkModuleReferences(javaScriptFiles);

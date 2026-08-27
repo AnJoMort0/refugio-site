@@ -20,9 +20,7 @@
 
 .qr-welcome {
   padding: 1.15rem 0 1.35rem;
-  background:
-    radial-gradient(circle at 90% 10%, rgba(200, 154, 75, 0.2), transparent 34%),
-    linear-gradient(180deg, rgba(57, 69, 52, 0.98), rgba(67, 99, 75, 0.94));
+  background: var(--color-mountain-forest);
   color: var(--color-soft-ivory);
 }
 
@@ -33,7 +31,7 @@
 .qr-welcome h1 {
   max-width: 13ch;
   margin-top: 0.25rem;
-  font-size: clamp(2.35rem, 10vw, 3.5rem);
+  font-size: 3.25rem;
 }
 
 .qr-lead {
@@ -83,8 +81,16 @@
   min-width: 0;
   padding: 0.8rem;
   border: 1px solid rgba(250, 248, 244, 0.15);
-  border-radius: 18px;
+  border-radius: 8px;
   background: rgba(250, 248, 244, 0.08);
+  color: inherit;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.qr-stay-fact:hover,
+.qr-stay-fact:focus-visible {
+  border-color: rgba(250, 248, 244, 0.36);
+  background: rgba(250, 248, 244, 0.15);
 }
 
 .qr-stay-fact span,
@@ -115,7 +121,7 @@
   min-height: 58px;
   padding: 0.75rem 0.85rem;
   border: 1px solid rgba(250, 248, 244, 0.18);
-  border-radius: 18px;
+  border-radius: 8px;
   background: rgba(250, 248, 244, 0.1);
   color: var(--color-soft-ivory);
   font-weight: 800;
@@ -154,7 +160,7 @@
 }
 
 .qr-section-heading h2 {
-  font-size: clamp(1.8rem, 8vw, 2.45rem);
+  font-size: 2.35rem;
 }
 
 .qr-section-heading p:last-child {
@@ -164,7 +170,7 @@
 
 .qr-emergency-section {
   padding-top: 1.45rem;
-  background: linear-gradient(180deg, rgba(255, 245, 242, 0.98), rgba(250, 248, 244, 0.96));
+  background: rgba(255, 247, 244, 0.96);
 }
 
 .qr-emergency-primary {
@@ -174,7 +180,7 @@
   gap: 0.8rem;
   min-height: 78px;
   padding: 0.85rem;
-  border-radius: 22px;
+  border-radius: 8px;
   background: var(--color-promotion-red);
   color: white;
   box-shadow: var(--shadow-soft);
@@ -185,7 +191,7 @@
   place-items: center;
   width: 3.2rem;
   height: 3.2rem;
-  border-radius: 18px;
+  border-radius: 8px;
   background: rgba(255,255,255,0.14);
   font-size: 1.25rem;
   font-weight: 900;
@@ -227,7 +233,7 @@
 .qr-host-card,
 .qr-place-card {
   border: 1px solid rgba(90, 75, 63, 0.11);
-  border-radius: 20px;
+  border-radius: 8px;
   background: rgba(255,255,255,0.86);
   box-shadow: 0 8px 22px rgba(43, 38, 34, 0.07);
 }
@@ -370,7 +376,7 @@
   align-items: center;
   padding: 0.75rem;
   border: 1px solid rgba(90, 75, 63, 0.1);
-  border-radius: 16px;
+  border-radius: 8px;
   background: rgba(250, 248, 244, 0.72);
 }
 
@@ -395,7 +401,7 @@
   min-height: 150px;
   padding: 1rem;
   border: 1px dashed rgba(67, 99, 75, 0.3);
-  border-radius: 18px;
+  border-radius: 8px;
   background: rgba(67, 99, 75, 0.05);
   color: rgba(43, 38, 34, 0.66);
   text-align: center;
@@ -435,7 +441,7 @@
   gap: 0.4rem;
   margin-bottom: 0.8rem;
   padding: 0.35rem;
-  border-radius: 18px;
+  border-radius: 8px;
   background: rgba(90, 75, 63, 0.08);
 }
 
@@ -443,7 +449,7 @@
   min-height: 46px;
   padding: 0.55rem 0.35rem;
   border: 0;
-  border-radius: 14px;
+  border-radius: 8px;
   background: transparent;
   color: rgba(43, 38, 34, 0.68);
   font: inherit;
@@ -513,7 +519,7 @@
 .qr-partner-card {
   scroll-snap-align: start;
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: 8px;
   background: white;
   box-shadow: var(--shadow-soft);
 }
@@ -577,7 +583,7 @@
 .qr-placeholder-grid div {
   min-width: 0;
   padding: 0.7rem;
-  border-radius: 14px;
+  border-radius: 8px;
   background: rgba(216,203,184,0.15);
 }
 
@@ -664,15 +670,21 @@
   align-content: center;
   gap: 0.1rem;
   min-height: 3.8rem;
-  border-radius: 14px;
+  border-radius: 8px;
   color: rgba(43,38,34,0.7);
   text-align: center;
 }
 
 .qr-bottom-nav a:active,
-.qr-bottom-nav a:focus-visible {
+.qr-bottom-nav a:focus-visible,
+.qr-bottom-nav a.is-active {
   background: rgba(67,99,75,0.1);
   color: var(--color-mountain-forest);
+}
+
+.qr-section,
+.qr-welcome {
+  scroll-margin-top: 1rem;
 }
 
 .qr-bottom-nav span {
@@ -1021,3 +1033,131 @@
   }
 }
 
+.qr-medical-details {
+  margin-top: 0.8rem;
+}
+
+.qr-place-image {
+  width: calc(100% + 1.8rem);
+  max-width: none;
+  aspect-ratio: 16 / 7;
+  margin: -0.9rem -0.9rem 0.85rem;
+  object-fit: cover;
+}
+
+.qr-partner-card {
+  color: inherit;
+  text-decoration: none;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.qr-partner-card:hover,
+.qr-partner-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(43, 38, 34, 0.14);
+}
+
+.qr-partner-link,
+.qr-section-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  color: var(--color-mountain-forest);
+  font-size: 0.86rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.qr-partner-link {
+  margin-top: 0.75rem;
+}
+
+.qr-partner-link .lucide-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.qr-section-link {
+  margin-top: 0.75rem;
+}
+
+.qr-instruction-list {
+  display: grid;
+  gap: 0.7rem;
+  padding: 1rem 1rem 1rem 2.1rem;
+  color: rgba(43, 38, 34, 0.78);
+}
+
+.qr-instruction-list li::marker,
+.qr-full-rules li::marker {
+  color: var(--color-sunset-gold);
+}
+
+.qr-instruction-list strong {
+  margin-right: 0.35rem;
+}
+
+.qr-instruction-list a {
+  color: var(--color-mountain-forest);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.qr-full-rules {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.qr-rule-group {
+  display: grid;
+  gap: 0.55rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(90, 75, 63, 0.12);
+}
+
+.qr-rule-group:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.qr-rule-group h3 {
+  font-size: 1.08rem;
+}
+
+.qr-rule-group ul {
+  display: grid;
+  gap: 0.35rem;
+  padding-left: 1.2rem;
+  color: rgba(43, 38, 34, 0.76);
+  font-size: 0.9rem;
+}
+
+.qr-rule-group p {
+  padding: 0.55rem 0.65rem;
+  border-left: 3px solid rgba(200, 154, 75, 0.62);
+  background: rgba(200, 154, 75, 0.08);
+  color: rgba(43, 38, 34, 0.72);
+  font-size: 0.86rem;
+}
+
+.qr-wifi-card {
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 520px) {
+  .qr-welcome h1 {
+    font-size: 2.35rem;
+  }
+
+  .qr-section-heading h2 {
+    font-size: 1.85rem;
+  }
+
+  .qr-place-image {
+    aspect-ratio: 16 / 8;
+  }
+}

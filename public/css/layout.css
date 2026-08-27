@@ -27,3 +27,14 @@
   place-items: center;
   padding: var(--space-6) 0;
 }
+
+@media (max-width: 767px) {
+  .section {
+    padding: 2.75rem 0;
+  }
+
+  .container,
+  .container.narrow {
+    width: min(calc(100% - 1.5rem), var(--container-width));
+  }
+}

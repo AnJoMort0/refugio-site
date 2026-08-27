@@ -25,7 +25,7 @@
 
 .contact-card {
   padding: clamp(1.2rem, 1.1rem + 0.6vw, 1.9rem);
-  border-radius: 18px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.76);
   box-shadow: var(--shadow-soft);
 }
@@ -72,6 +72,19 @@
   background: rgba(250, 248, 244, 0.96);
   color: var(--color-charcoal-earth);
   font: inherit;
+}
+
+.contact-page .field .custom-select-trigger {
+  min-height: 3rem;
+  padding: 0.8rem 0.95rem;
+  border-color: rgba(90, 75, 63, 0.16);
+  border-radius: 14px;
+  background: rgba(250, 248, 244, 0.96);
+  box-shadow: none;
+}
+
+.contact-page .field .custom-select-popover {
+  border-radius: 12px;
 }
 
 .contact-page .field textarea {
@@ -130,7 +143,7 @@
 .contact-attachment-list li {
   padding: 0.45rem 0.65rem;
   border: 1px solid rgba(90, 75, 63, 0.12);
-  border-radius: 10px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.68);
   color: rgba(43, 38, 34, 0.78);
   font-size: 0.92rem;
@@ -177,7 +190,7 @@
   align-items: flex-start;
   padding: 0.9rem 1rem;
   border: 1px solid rgba(90, 75, 63, 0.12);
-  border-radius: 14px;
+  border-radius: 8px;
   background: rgba(250, 248, 244, 0.78);
 }
 

@@ -37,6 +37,7 @@ export async function initGalleryPage() {
   let panX = 0;
   let panY = 0;
   let panStart = null;
+  let swipeStart = null;
   let resizeFrame = null;
 
   const clampPan = () => {
@@ -213,7 +214,17 @@ export async function initGalleryPage() {
   });
 
   lightboxViewport?.addEventListener('pointerdown', (event) => {
-    if (zoom <= 1 || event.button !== 0) return;
+    if (event.button !== 0) return;
+
+    if (zoom <= 1) {
+      swipeStart = {
+        pointerId: event.pointerId,
+        clientX: event.clientX,
+        clientY: event.clientY
+      };
+      lightboxViewport.setPointerCapture(event.pointerId);
+      return;
+    }
 
     event.preventDefault();
     panStart = {
@@ -238,6 +249,16 @@ export async function initGalleryPage() {
 
   ['pointerup', 'pointercancel'].forEach((eventName) => {
     lightboxViewport?.addEventListener(eventName, (event) => {
+      if (swipeStart?.pointerId === event.pointerId) {
+        const deltaX = event.clientX - swipeStart.clientX;
+        const deltaY = event.clientY - swipeStart.clientY;
+        const shouldNavigate = eventName === 'pointerup'
+          && Math.abs(deltaX) >= 48
+          && Math.abs(deltaX) > Math.abs(deltaY) * 1.2;
+        swipeStart = null;
+        if (shouldNavigate) goTo(deltaX < 0 ? 1 : -1);
+      }
+
       if (!panStart || panStart.pointerId !== event.pointerId) return;
 
       panStart = null;

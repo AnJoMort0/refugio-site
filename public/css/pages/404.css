@@ -46,7 +46,7 @@
   min-height: 100%;
   padding: 1rem;
   border: 1px solid rgba(90, 75, 63, 0.12);
-  border-radius: 14px;
+  border-radius: 8px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(250, 248, 244, 0.82)),
     rgba(255, 255, 255, 0.76);

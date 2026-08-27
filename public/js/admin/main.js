@@ -1,9 +1,11 @@
 import { getAvailableUsers, getStoredSession, login, logout } from './admin-auth.js';
 import { can, requirePermission, ROLE_LABELS } from './admin-permissions.js';
 import { createAdminRepository } from './admin-store.js';
+import { initCustomSelects } from '../ui/custom-selects.js';
 import {
   COMPENSATION_LABELS,
   EXPENSE_LABELS,
+  IDENTITY_DOCUMENT_LABELS,
   LANGUAGE_LABELS,
   PAYMENT_LABELS,
   SOURCE_LABELS,
@@ -44,7 +46,11 @@ const app = document.querySelector('#admin-app');
 const repository = createAdminRepository();
 const LAST_LOGIN_USERNAME_KEY = 'refugio-admin-last-username-v1';
 const MESSAGE_CATALOG_URL = new URL('../../locales/messages.json', import.meta.url);
+const ADMIN_LIST_PAGE_SIZE = 8;
+const AUDIT_LIST_PAGE_SIZE = 12;
+const PAYMENT_HOLD_HOURS = 48;
 const ACTIVE_RESERVATION_FILTER_STATUSES = ['awaiting_payment', 'confirmed', 'checked_in'];
+const RESERVATION_PAYMENT_STATUSES = ['unpaid', 'awaiting_transfer', 'paid', 'refunded'];
 const EXTRA_GUEST_PAYMENT_STATUSES = ['awaiting_transfer', 'paid'];
 const MESSAGE_TEMPLATE_ALIASES = {
   checkinInfo: 'preArrivalInfo',
@@ -55,7 +61,7 @@ const MESSAGE_TEMPLATE_ALIASES = {
 const UNSAVED_FORM_TYPES = new Set([
   'create-reservation',
   'pricing',
-  'service-pricing',
+  'service',
   'season',
   'group-discount',
   'discount',
@@ -73,8 +79,9 @@ const NAV_ITEMS = [
   { id: 'dashboard', label: 'Painel', icon: 'layoutDashboard', permission: 'dashboard:view' },
   { id: 'calendar', label: 'Calendário', icon: 'calendarDays', permission: 'calendar:view' },
   { id: 'reservations', label: 'Reservas', icon: 'bedDouble', permission: 'reservations:view' },
-  { id: 'requests', label: 'Pedidos do website', icon: 'inbox', permission: 'requests:view' },
+  { id: 'requests', label: 'Pedidos do website', mobileLabel: 'Pedidos', icon: 'inbox', permission: 'requests:view' },
   { id: 'pricing', label: 'Preços e descontos', icon: 'badgeEuro', permission: 'pricing:view' },
+  { id: 'services', label: 'Serviços', icon: 'package', permission: 'pricing:view' },
   { id: 'expenses', label: 'Despesas', icon: 'receipt', permission: 'expenses:view' },
   { id: 'employees', label: 'Funcionários', icon: 'users', permission: 'employees:view' },
   { id: 'work', label: 'O meu trabalho', icon: 'timer', permission: 'work:own' },
@@ -101,7 +108,10 @@ const ICONS = {
   layoutDashboard: '<rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect>',
   logOut: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line>',
   mail: '<rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>',
+  menu: '<path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path>',
   messageCircle: '<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8Z"></path>',
+  moreHorizontal: '<circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle>',
+  package: '<path d="m7.5 4.3 9 5.2"></path><path d="M21 8a2 2 0 0 0-1-1.7l-6-3.5a2 2 0 0 0-2 0l-6 3.5A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path>',
   phone: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2.1Z"></path>',
   plus: '<path d="M5 12h14"></path><path d="M12 5v14"></path>',
   receipt: '<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"></path><path d="M16 8h-6"></path><path d="M16 12h-6"></path><path d="M16 16h-6"></path>',
@@ -111,7 +121,8 @@ const ICONS = {
   triangleAlert: '<path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path>',
   trash: '<path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path>',
   userPlus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M19 8v6"></path><path d="M22 11h-6"></path>',
-  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>'
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
+  x: '<path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>'
 };
 
 const ui = {
@@ -121,7 +132,13 @@ const ui = {
   reservationFilters: {
     search: '',
     status: 'all',
-    source: 'all'
+    source: 'all',
+    payment: 'all'
+  },
+  expenseFilters: {
+    search: '',
+    category: 'all',
+    month: 'all'
   },
   expandedReservationIds: new Set(),
   expandedEmployeeIds: new Set(),
@@ -132,6 +149,8 @@ const ui = {
   selectedMessageReservationId: '',
   selectedMessageTemplate: 'paymentInstructions',
   selectedMessageLanguage: 'pt',
+  selectedMarketingTemplate: 'news',
+  selectedMarketingLanguage: 'pt',
   editingSeasonId: '',
   editingDiscountId: '',
   editingExpenseId: '',
@@ -147,8 +166,14 @@ const ui = {
     endDate: ''
   },
   showExtraGuestForm: false,
+  showReservationForm: false,
   showManualWorkForm: false,
+  showWorkStartChooser: false,
   showPastReservations: false,
+  reservationLimit: ADMIN_LIST_PAGE_SIZE,
+  pastReservationLimit: ADMIN_LIST_PAGE_SIZE,
+  auditLimit: AUDIT_LIST_PAGE_SIZE,
+  mobileMenuOpen: false,
   hasUnsavedChanges: false,
   notice: '',
   noticeType: 'success'
@@ -157,6 +182,7 @@ const ui = {
 let currentUser = null;
 let state = null;
 let messageCatalog = { templates: [], requestReplies: [] };
+let adminCalendarSwipeStart = null;
 
 function icon(name) {
   return `<svg class="admin-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
@@ -176,6 +202,14 @@ function renderSourceBadge(source) {
 
 function renderLanguageBadge(language) {
   return `<span class="admin-source">${escapeHtml(LANGUAGE_LABELS[language] || language || '-')}</span>`;
+}
+
+function renderIdentityDocument(guest) {
+  const type = String(guest?.identityDocumentType || '');
+  const number = String(guest?.identityDocumentNumber || '').trim();
+  if (!type && !number) return '-';
+  const label = IDENTITY_DOCUMENT_LABELS[type] || type || 'Documento';
+  return number ? `${label} · ${number}` : label;
 }
 
 function stayTouchesCalendarDate(stay, dateKey) {
@@ -264,6 +298,20 @@ function renderDashboardMessageButton(reservation, context) {
   `;
 }
 
+function renderDashboardContactActions(reservation, context) {
+  if (!reservation) return '';
+  const phone = String(reservation.contact?.phone || '').trim();
+  const normalizedPhone = phone.replace(/\D/g, '');
+  const messageButton = renderDashboardMessageButton(reservation, context);
+  const callButton = phone ? `
+    <a class="admin-icon-button admin-kpi-action" href="tel:${escapeHtml(phone)}" title="Ligar para ${escapeHtml(reservation.contact.name)}" aria-label="Ligar para ${escapeHtml(reservation.contact.name)}">${icon('phone')}</a>
+  ` : '';
+  const whatsappButton = normalizedPhone ? `
+    <a class="admin-icon-button admin-kpi-action" href="https://wa.me/${escapeHtml(normalizedPhone)}" target="_blank" rel="noopener" title="WhatsApp de ${escapeHtml(reservation.contact.name)}" aria-label="Abrir WhatsApp de ${escapeHtml(reservation.contact.name)}">${icon('messageCircle')}</a>
+  ` : '';
+  return `<span class="admin-kpi-actions">${callButton}${whatsappButton}${messageButton}</span>`;
+}
+
 function renderDashboardWorkButton() {
   if (!can(currentUser, 'work:own')) return '';
   const employee = getEmployeeForUser(state, currentUser);
@@ -275,6 +323,42 @@ function renderDashboardWorkButton() {
   }
 
   return `<button class="button admin-secondary-button admin-small-button" type="button" data-action="quick-start-work">${icon('timer')} Iniciar trabalho</button>`;
+}
+
+function getService(serviceId) {
+  return (state?.services || []).find((service) => service.id === serviceId);
+}
+
+function getBikeServicePrice() {
+  return Number(getService('bikes')?.price ?? state?.pricing?.bikeDay ?? 0);
+}
+
+function renderWorkStartChooser() {
+  if (!ui.showWorkStartChooser) return '';
+  const employee = getEmployeeForUser(state, currentUser);
+  if (!employee) return '';
+
+  return `
+    <div class="admin-dialog-layer">
+      <button class="admin-dialog-backdrop" type="button" data-action="close-work-start-chooser" aria-label="Fechar"></button>
+      <section class="admin-dialog" role="dialog" aria-modal="true" aria-labelledby="work-start-title" data-dialog-panel>
+        <div class="admin-panel-heading">
+          <div>
+            <p class="admin-eyebrow">Relógio de trabalho</p>
+            <h2 id="work-start-title">O que vai fazer?</h2>
+          </div>
+          <button class="admin-icon-button" type="button" data-action="close-work-start-chooser" aria-label="Fechar">${icon('x')}</button>
+        </div>
+        <form class="admin-form-grid" data-form="work-start">
+          ${renderWorkTaskFields(employee)}
+          <div class="admin-form-actions">
+            <button class="button button-primary" type="submit">${icon('timer')} Iniciar trabalho</button>
+            <button class="button admin-secondary-button" type="button" data-action="close-work-start-chooser">Cancelar</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  `;
 }
 
 function renderMoney(value) {
@@ -525,17 +609,17 @@ function renderGuestAdjustmentsList(reservation) {
         <tbody>
           ${totals.map(({ adjustment, total, discount }) => `
             <tr>
-              <td>${escapeHtml(getExtraGuestDateText(reservation, adjustment))}</td>
-              <td>${escapeHtml(getExtraGuestNumberText(adjustment))}</td>
-              <td>${escapeHtml(getExtraGuestAgeText(adjustment))}</td>
-              <td>${escapeHtml(formatExtraGuestDiscount(adjustment, { discount }))}</td>
-              <td>${renderMoney(total)}</td>
-              <td>
+              <td data-label="Datas">${escapeHtml(getExtraGuestDateText(reservation, adjustment))}</td>
+              <td data-label="Número">${escapeHtml(getExtraGuestNumberText(adjustment))}</td>
+              <td data-label="Idades">${escapeHtml(getExtraGuestAgeText(adjustment))}</td>
+              <td data-label="Desconto">${escapeHtml(formatExtraGuestDiscount(adjustment, { discount }))}</td>
+              <td data-label="Valor a pagar">${renderMoney(total)}</td>
+              <td data-label="Pagamento">
                 <select class="admin-table-select" name="${escapeHtml(getExtraGuestPaymentFieldName(adjustment))}" aria-label="Estado do pagamento dos hóspedes extra">
                   ${EXTRA_GUEST_PAYMENT_STATUSES.map((value) => renderOption(value, PAYMENT_LABELS[value], normalizeExtraGuestPaymentStatus(adjustment.paymentStatus))).join('')}
                 </select>
               </td>
-              <td>
+              <td data-label="Ações">
                 <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-guest-adjustment" data-reservation-id="${escapeHtml(reservation.id)}" data-adjustment-id="${escapeHtml(adjustment.id || '')}">${icon('trash')} Remover</button>
               </td>
             </tr>
@@ -688,13 +772,18 @@ function renderReservationExpandedDetails(reservation, totals) {
 
   return `
     <div><dt>Nacionalidade</dt><dd>${escapeHtml(guest?.nationality || '-')}</dd></div>
+    <div><dt>NIF</dt><dd>${escapeHtml(guest?.nif || '-')}</dd></div>
+    <div><dt>Documento de identificação</dt><dd>${escapeHtml(renderIdentityDocument(guest))}</dd></div>
     <div><dt>Idades das crianças</dt><dd>${escapeHtml(getChildAgeText(reservation.guests))}</dd></div>
     <div><dt>Preferência de camas</dt><dd>${escapeHtml(getBedPreferenceText(reservation))}</dd></div>
     <div><dt>Bicicletas</dt><dd>${escapeHtml(getBikeText(reservation))}</dd></div>
     <div><dt>Referência externa</dt><dd>${escapeHtml(sourceReference)}</dd></div>
+    ${reservation.paymentDeadlineAt && reservation.status === 'awaiting_payment' ? `<div><dt>Limite para pagamento</dt><dd>${escapeHtml(formatDateTime(reservation.paymentDeadlineAt))}</dd></div>` : ''}
+    ${reservation.cancellationReason === 'payment_timeout' ? '<div><dt>Motivo do cancelamento</dt><dd>Pagamento não recebido em 48 horas</dd></div>' : ''}
     <div><dt>Alojamento</dt><dd>${renderMoney(totals.accommodation)}</dd></div>
     <div><dt>Serviços</dt><dd>${renderMoney(totals.services)}</dd></div>
-    <div><dt>Depósito</dt><dd>${renderMoney(totals.deposit)}</dd></div>
+    <div><dt>Caução incluída no total</dt><dd>${reservation.pricing?.depositIncluded ? `Sim · ${renderMoney(totals.deposit)}` : 'Não'}</dd></div>
+    <div><dt>Caução recebida</dt><dd>${reservation.securityDepositPaid ? 'Sim' : 'Não'}</dd></div>
     <div><dt>Desconto</dt><dd>${renderMoney(totals.discount)}</dd></div>
     ${renderGuestAdjustmentsDetails(reservation)}
     <div><dt>Notas internas</dt><dd>${escapeHtml(ownerNotes)}</dd></div>
@@ -873,12 +962,39 @@ async function loadSessionAndState() {
 
   currentUser = session.user;
   state = await repository.load();
+  if (expireOverduePaymentReservations()) state = await repository.save(state);
   await loadMessageCatalog();
   renderApp();
 }
 
+function expireOverduePaymentReservations() {
+  const now = Date.now();
+  let expiredCount = 0;
+
+  state.reservations.forEach((reservation) => {
+    if (
+      reservation.status !== 'awaiting_payment' ||
+      !reservation.paymentDeadlineAt ||
+      new Date(reservation.paymentDeadlineAt).getTime() > now
+    ) return;
+
+    reservation.previousStatusBeforeCancel = reservation.status;
+    reservation.status = 'cancelled';
+    reservation.cancellationReason = 'payment_timeout';
+    reservation.updatedAt = new Date().toISOString();
+    addAudit(state, null, 'Reserva cancelada automaticamente por falta de pagamento', 'reservation', reservation.id, {
+      prazo: `${PAYMENT_HOLD_HOURS} horas`,
+      estado: 'A aguardar pagamento -> Cancelada'
+    });
+    expiredCount += 1;
+  });
+
+  return expiredCount;
+}
+
 function renderApp() {
   ensureAccessibleView();
+  const activeNavItem = NAV_ITEMS.find((item) => item.id === ui.activeView) || NAV_ITEMS[0];
   const dashboardCreateReservationButton = ui.activeView === 'dashboard' && can(currentUser, 'reservations:write')
     ? `<button class="button button-primary admin-small-button" type="button" data-action="open-create-reservation">${icon('plus')} Criar reserva</button>`
     : '';
@@ -891,28 +1007,62 @@ function renderApp() {
       </button>
     `)
     .join('');
+  const accessibleNavItems = getAccessibleNavItems();
+  const preferredMobileViews = currentUser?.role === 'employee'
+    ? ['dashboard', 'calendar', 'reservations', 'work']
+    : ['dashboard', 'calendar', 'reservations', 'requests'];
+  const mobileNavItems = preferredMobileViews
+    .map((id) => accessibleNavItems.find((item) => item.id === id))
+    .filter(Boolean);
+  const isSecondaryMobileView = !mobileNavItems.some((item) => item.id === ui.activeView);
+  const mobilePrimaryNav = mobileNavItems.map((item) => `
+    <button class="admin-mobile-nav-item${ui.activeView === item.id ? ' is-active' : ''}" type="button" data-action="set-view" data-view="${item.id}"${ui.activeView === item.id ? ' aria-current="page"' : ''}>
+      ${icon(item.icon)}
+      <span>${escapeHtml(item.mobileLabel || item.label)}</span>
+    </button>
+  `).join('');
 
   app.innerHTML = `
     <div class="admin-shell">
-      <aside class="admin-sidebar">
-        <div class="admin-brand">
+      <header class="admin-mobile-header">
+        <div class="admin-mobile-brand">
           <span class="admin-brand-mark">OR</span>
-          <div>
-            <strong>O Refúgio</strong>
-            <span>Administração</span>
+          <div><strong>O Refúgio</strong><span>${escapeHtml(activeNavItem.label)}</span></div>
+        </div>
+        <button class="admin-icon-button" type="button" data-action="toggle-admin-menu" aria-label="Abrir menu" aria-expanded="${String(ui.mobileMenuOpen)}" aria-controls="admin-sidebar">${icon('menu')}</button>
+      </header>
+      <button class="admin-sidebar-backdrop${ui.mobileMenuOpen ? ' is-visible' : ''}" type="button" data-action="close-admin-menu" aria-label="Fechar menu" tabindex="${ui.mobileMenuOpen ? '0' : '-1'}"></button>
+      <aside class="admin-sidebar${ui.mobileMenuOpen ? ' is-open' : ''}" id="admin-sidebar">
+        <div class="admin-sidebar-heading">
+          <div class="admin-brand">
+            <span class="admin-brand-mark">OR</span>
+            <div>
+              <strong>O Refúgio</strong>
+              <span>Administração</span>
+            </div>
           </div>
+          <button class="admin-icon-button admin-sidebar-close" type="button" data-action="close-admin-menu" aria-label="Fechar menu">${icon('x')}</button>
         </div>
         <nav class="admin-nav" aria-label="Navegação de administração">
           ${navItems}
         </nav>
-        <a class="admin-public-link" href="./index.html">Abrir site público</a>
+        <div class="admin-sidebar-footer">
+          <div class="admin-user-box admin-sidebar-user">
+            <div>
+              <strong>${escapeHtml(currentUser.displayName)}</strong>
+              <span>${escapeHtml(currentUser.roleLabel)}</span>
+            </div>
+            <button class="admin-icon-button" type="button" data-action="logout" aria-label="Sair">${icon('logOut')}</button>
+          </div>
+          <a class="admin-public-link" href="./index.html">Abrir site público</a>
+        </div>
       </aside>
 
       <main class="admin-main">
         <header class="admin-topbar">
           <div>
             <p class="admin-eyebrow">Área de gestão</p>
-            <h1>${escapeHtml(NAV_ITEMS.find((item) => item.id === ui.activeView)?.label || 'Painel')}</h1>
+            <h1>${escapeHtml(activeNavItem.label || 'Painel')}</h1>
           </div>
           <div class="admin-topbar-actions">
             ${dashboardCreateReservationButton}
@@ -931,8 +1081,30 @@ function renderApp() {
           ${renderActiveView()}
         </section>
       </main>
+      <nav class="admin-mobile-nav" aria-label="Navegação rápida">
+        ${mobilePrimaryNav}
+        <button class="admin-mobile-nav-item${isSecondaryMobileView || ui.mobileMenuOpen ? ' is-active' : ''}" type="button" data-action="toggle-admin-menu" aria-expanded="${String(ui.mobileMenuOpen)}" aria-controls="admin-sidebar">
+          ${icon('moreHorizontal')}
+          <span>Mais</span>
+        </button>
+      </nav>
+      ${renderWorkStartChooser()}
     </div>
   `;
+  document.body.classList.toggle('admin-menu-open', ui.mobileMenuOpen);
+  enhanceDisclosures();
+}
+
+function enhanceDisclosures() {
+  app.querySelectorAll('details').forEach((details) => {
+    if (details.querySelector(':scope > .admin-auto-collapse')) return;
+    const button = document.createElement('button');
+    button.className = 'button admin-secondary-button admin-small-button admin-auto-collapse';
+    button.type = 'button';
+    button.dataset.action = 'close-disclosure';
+    button.innerHTML = `${icon('chevronUp')} Fechar`;
+    details.append(button);
+  });
 }
 
 function renderActiveView() {
@@ -945,6 +1117,8 @@ function renderActiveView() {
       return renderRequestsView();
     case 'pricing':
       return renderPricingView();
+    case 'services':
+      return renderServicesView();
     case 'expenses':
       return renderExpensesView();
     case 'employees':
@@ -990,7 +1164,7 @@ function renderDashboardView() {
     String(summary.activeReservations.length),
     activeGuestText,
     'tone-green',
-    renderDashboardMessageButton(summary.activeReservations[0], 'current')
+    renderDashboardContactActions(summary.activeReservations[0], 'current')
   );
   const nextArrivalMetric = renderMetric(
     'Próxima chegada',
@@ -1010,24 +1184,27 @@ function renderDashboardView() {
     ? `${nextDepartureMetric}${nextArrivalMetric}`
     : `${nextArrivalMetric}${nextDepartureMetric}`;
 
+  const firstRequest = summary.openRequests[0];
+  const firstAwaitingPayment = summary.awaitingPayment[0];
   const attentionItems = [
-    ...summary.openRequests.map((request) => ({
-      title: `Pedido novo · ${request.contact.name}`,
-      text: `${formatDate(request.stay.checkIn)} a ${formatDate(request.stay.checkOut)}`,
+    summary.openRequests.length ? {
+      title: `${summary.openRequests.length} pedido(s) por rever`,
+      text: firstRequest ? `Mais próximo: ${firstRequest.contact.name} · ${formatDate(firstRequest.stay.checkIn)}` : '',
       view: 'requests'
-    })),
-    ...summary.awaitingPayment.map((reservation) => ({
-      title: `Pagamento em falta · ${reservation.contact.name}`,
-      text: `${reservation.id} · ${formatDate(reservation.stay.checkIn)}`,
-      view: 'reservations'
-    }))
-  ];
+    } : null,
+    summary.awaitingPayment.length ? {
+      title: `${summary.awaitingPayment.length} pagamento(s) pendente(s)`,
+      text: firstAwaitingPayment ? `${firstAwaitingPayment.contact.name} · ${formatDate(firstAwaitingPayment.stay.checkIn)}` : '',
+      view: 'reservations',
+      payment: 'pending'
+    } : null
+  ].filter(Boolean);
 
   return `
     <div class="admin-kpi-grid">
       ${currentGuestsMetric}
       ${timelineMetrics}
-      ${renderMetric('Receita prevista', renderMoney(summary.confirmedRevenue), 'Reservas ativas e históricas', 'tone-gold')}
+      ${renderMetric('Pedidos por rever', String(summary.openRequests.length), firstRequest ? `${firstRequest.contact.name} · ${formatDate(firstRequest.stay.checkIn)}` : 'Sem pedidos novos', summary.openRequests.length ? 'tone-gold' : '')}
     </div>
 
     <div class="admin-dashboard-grid">
@@ -1041,9 +1218,9 @@ function renderDashboardView() {
         ${attentionItems.length ? `
           <div class="admin-task-list">
             ${attentionItems.map((item) => `
-              <button class="admin-task" type="button" data-action="set-view" data-view="${item.view}">
-                <strong>${escapeHtml(item.title)}</strong>
-                <span>${escapeHtml(item.text)}</span>
+              <button class="admin-task" type="button" data-action="set-view" data-view="${item.view}"${item.payment ? ` data-payment-filter="${item.payment}"` : ''}>
+                <span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.text)}</small></span>
+                ${icon('arrowRight')}
               </button>
             `).join('')}
           </div>
@@ -1058,11 +1235,11 @@ function renderDashboardView() {
           </div>
         </div>
         <dl class="admin-definition-list">
-          <div><dt>Pedidos novos</dt><dd>${summary.openRequests.length}</dd></div>
-          <div><dt>A aguardar pagamento</dt><dd>${summary.awaitingPayment.length}</dd></div>
+          <div><dt>Receita prevista</dt><dd>${renderMoney(summary.confirmedRevenue)}</dd></div>
           <div><dt>Funcionário com horário iniciado</dt><dd>${escapeHtml(workerName)}</dd></div>
           <div><dt>Despesas registadas</dt><dd>${renderMoney(summary.expenses)}</dd></div>
           <div><dt>Custo de trabalho estimado</dt><dd>${renderMoney(summary.employeeCosts)}</dd></div>
+          <div><dt>Resultado estimado</dt><dd>${renderMoney(summary.confirmedRevenue - summary.expenses - summary.employeeCosts)}</dd></div>
         </dl>
       </section>
     </div>
@@ -1108,13 +1285,10 @@ function renderEmployeeDashboardView() {
         ${activeSession ? `
           ${renderActiveWorkDetailsForm(employee, activeSession)}
         ` : `
-          <form class="admin-form-grid" data-form="work-start">
-            ${renderWorkTaskFields(employee)}
-            <div class="admin-form-actions">
-              <button class="button button-primary" type="submit">${icon('timer')} Iniciar trabalho</button>
-              <button class="button admin-secondary-button" type="button" data-action="set-view" data-view="work">Ver histórico</button>
-            </div>
-          </form>
+          <div class="admin-work-start-row">
+            <button class="button button-primary" type="button" data-action="quick-start-work">${icon('timer')} Iniciar trabalho</button>
+            <button class="button admin-secondary-button" type="button" data-action="set-view" data-view="work">Ver histórico</button>
+          </div>
         `}
       </section>
 
@@ -1153,6 +1327,15 @@ function getCalendarDays(monthDate) {
   });
 }
 
+function changeCalendarMonth(offset) {
+  ui.calendarMonth = new Date(
+    ui.calendarMonth.getFullYear(),
+    ui.calendarMonth.getMonth() + offset,
+    1
+  );
+  renderApp();
+}
+
 function renderCalendarView() {
   const monthLabel = new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(ui.calendarMonth);
   const todayKey = formatDateKey(new Date());
@@ -1180,7 +1363,7 @@ function renderCalendarView() {
       <p class="admin-calendar-today-note">Hoje: ${formatCompactDate(todayKey)}</p>
       <div class="admin-calendar-legend">
         ${Object.entries(STATUS_LABELS).filter(([status]) => ['awaiting_payment', 'confirmed', 'checked_in', 'cancelled'].includes(status)).map(([status, label]) => `
-          <span>${renderStatusBadge(status)} ${escapeHtml(label)}</span>
+          <span>${renderStatusBadge(status)}</span>
         `).join('')}
         <span><b class="calendar-boundary-marker">-&gt;|</b> Check-in</span>
         <span><b class="calendar-boundary-marker">|-&gt;</b> Check-out</span>
@@ -1192,8 +1375,9 @@ function renderCalendarView() {
           const entries = state.reservations.filter((reservation) => stayTouchesCalendarDate(reservation.stay, dateKey));
           const requests = state.websiteRequests.filter((request) => request.status === 'new' && stayTouchesCalendarDate(request.stay, dateKey));
           const isOutsideMonth = day.getMonth() !== ui.calendarMonth.getMonth();
+          const isPast = dateKey < todayKey;
           return `
-            <button class="admin-calendar-day${dateKey === ui.selectedDate ? ' is-selected' : ''}${dateKey === todayKey ? ' is-today' : ''}${isOutsideMonth ? ' is-muted' : ''}" type="button" data-action="select-date" data-date="${dateKey}">
+            <button class="admin-calendar-day${dateKey === ui.selectedDate ? ' is-selected' : ''}${dateKey === todayKey ? ' is-today' : ''}${isOutsideMonth ? ' is-muted' : ''}${isPast ? ' is-past' : ''}" type="button" data-action="select-date" data-date="${dateKey}">
               <span class="admin-calendar-number">${day.getDate()}</span>
               <span class="admin-calendar-items">
                 ${entries.slice(0, 2).map((reservation) => renderCalendarReservationDot(reservation, dateKey)).join('')}
@@ -1232,7 +1416,7 @@ function renderReservationSummary(reservation, options = {}) {
   ].filter(Boolean).join(' ');
 
   return `
-    <article class="${recordClass}">
+    <article class="${recordClass}" id="admin-reservation-${escapeHtml(reservation.id)}">
       <div class="admin-record-main">
         <div>
           <strong>${escapeHtml(reservation.contact.name)}</strong>
@@ -1246,10 +1430,9 @@ function renderReservationSummary(reservation, options = {}) {
       </div>
       <dl class="admin-record-details">
         <div><dt>Hóspedes</dt><dd>${escapeHtml(formatGuestSummary(reservation.guests))}</dd></div>
-        ${renderContactDetailRows(reservation.contact)}
         <div><dt>Total</dt><dd>${renderMoney(totals.total)}</dd></div>
-        <div><dt>Pagamento</dt><dd>${escapeHtml(PAYMENT_LABELS[reservation.paymentStatus] || reservation.paymentStatus)}</dd></div>
-        ${isExpanded ? renderReservationExpandedDetails(reservation, totals) : ''}
+        <div><dt>Estado do pagamento</dt><dd>${escapeHtml(PAYMENT_LABELS[reservation.paymentStatus] || reservation.paymentStatus)}</dd></div>
+        ${isExpanded ? `${renderContactDetailRows(reservation.contact)}${renderReservationExpandedDetails(reservation, totals)}` : ''}
       </dl>
       ${renderReservationActions(reservation, options)}
     </article>
@@ -1273,17 +1456,22 @@ function renderRequestSummary(request) {
           <span class="admin-source">${escapeHtml(LANGUAGE_LABELS[request.preferredLanguage] || request.preferredLanguage)}</span>
         </div>
       </div>
-      <dl class="admin-record-details">
+      <dl class="admin-record-details admin-record-overview">
         <div><dt>Hóspedes</dt><dd>${escapeHtml(formatGuestSummary(request.guests))}</dd></div>
-        <div><dt>Idades das crianças</dt><dd>${escapeHtml(getChildAgeText(request.guests))}</dd></div>
-        <div><dt>Bicicletas</dt><dd>${escapeHtml(getBikeText(request))}</dd></div>
         <div><dt>Depósito</dt><dd>${escapeHtml(getDepositRequestText(request))}</dd></div>
-        ${getRequestDiscountText(request) ? `<div><dt>Desconto</dt><dd>${escapeHtml(getRequestDiscountText(request))}</dd></div>` : ''}
-        ${renderContactDetailRows(request.contact)}
         <div><dt>Total estimado</dt><dd>${renderMoney(request.estimatedTotal || 0)}</dd></div>
-        <div><dt>Marketing</dt><dd>${request.marketingOptIn ? 'Sim' : 'Não'}</dd></div>
       </dl>
-      <p>${escapeHtml(request.comments || 'Sem comentários adicionais.')}</p>
+      <p class="admin-request-comment">${escapeHtml(request.comments || 'Sem comentários adicionais.')}</p>
+      <details class="admin-record-disclosure">
+        <summary>Detalhes e contacto</summary>
+        <dl class="admin-record-details">
+          ${Number(request.guests?.children || 0) ? `<div><dt>Idades das crianças</dt><dd>${escapeHtml(getChildAgeText(request.guests))}</dd></div>` : ''}
+          ${Number(request.extras?.bikes?.count || 0) ? `<div><dt>Bicicletas</dt><dd>${escapeHtml(getBikeText(request))}</dd></div>` : ''}
+          ${getRequestDiscountText(request) ? `<div><dt>Desconto</dt><dd>${escapeHtml(getRequestDiscountText(request))}</dd></div>` : ''}
+          ${renderContactDetailRows(request.contact)}
+          <div><dt>Marketing</dt><dd>${request.marketingOptIn ? 'Sim' : 'Não'}</dd></div>
+        </dl>
+      </details>
       ${can(currentUser, 'requests:manage') ? `
         <div class="admin-button-row">
           ${request.status === 'new' ? `
@@ -1343,18 +1531,18 @@ function renderReservationActions(reservation, options = {}) {
   return `
     <div class="admin-button-row">
       <button class="button admin-secondary-button admin-small-button" type="button" data-action="toggle-reservation-details" data-reservation-id="${reservation.id}">
-        ${isExpanded ? 'Ver menos' : 'Ver mais'}
+        ${icon(isExpanded ? 'chevronUp' : 'chevronDown')} ${isExpanded ? 'Fechar detalhes' : 'Ver detalhes'}
       </button>
       ${isCalendar ? '' : manageButton}
-      ${canWriteReservations && reservation.status === 'awaiting_payment' ? `
+      ${canWriteReservations && ['unpaid', 'awaiting_transfer'].includes(reservation.paymentStatus) ? `
         <button class="button button-primary admin-small-button" type="button" data-action="mark-paid" data-reservation-id="${reservation.id}">${icon('check')} Pagamento recebido</button>
       ` : ''}
       <button class="button admin-secondary-button admin-small-button" type="button" data-action="message-for-reservation" data-reservation-id="${reservation.id}">${icon('mail')} Gerar mensagem</button>
       ${isCalendar ? manageButton : ''}
-      ${canWriteReservations && reservation.status === 'cancelled' ? `
+      ${canWriteReservations && isExpanded && reservation.status === 'cancelled' ? `
         <button class="button admin-secondary-button admin-small-button" type="button" data-action="restore-reservation" data-reservation-id="${reservation.id}">${icon('rotateCcw')} Restaurar</button>
       ` : ''}
-      ${canWriteReservations && !isCalendar && !['cancelled', 'checked_out'].includes(reservation.status) ? `
+      ${canWriteReservations && isExpanded && !isCalendar && !['cancelled', 'checked_out'].includes(reservation.status) ? `
         <button class="button admin-danger-button admin-small-button" type="button" data-action="cancel-reservation" data-reservation-id="${reservation.id}">${icon('trash')} Cancelar</button>
       ` : ''}
     </div>
@@ -1384,9 +1572,9 @@ function renderReservationsView() {
           <input name="search" type="search" value="${escapeHtml(ui.reservationFilters.search)}" placeholder="Nome, email, telefone ou ID" />
         </label>
         <label class="admin-field">
-          <span>Estado</span>
+          <span>Estado da reserva</span>
           <select name="status">
-            ${renderOption('all', 'Todos ativos/futuros', statusFilterValue)}
+            ${renderOption('all', 'Ativas/futuras', statusFilterValue)}
             ${ACTIVE_RESERVATION_FILTER_STATUSES.map((value) => renderOption(value, STATUS_LABELS[value], statusFilterValue)).join('')}
           </select>
         </label>
@@ -1397,19 +1585,34 @@ function renderReservationsView() {
             ${Object.entries(SOURCE_LABELS).map(([value, label]) => renderOption(value, label, ui.reservationFilters.source)).join('')}
           </select>
         </label>
+        <label class="admin-field">
+          <span>Estado do pagamento</span>
+          <select name="payment">
+            ${renderOption('all', 'Todos', ui.reservationFilters.payment)}
+            ${renderOption('pending', 'Pendente', ui.reservationFilters.payment)}
+            ${renderOption('paid', 'Pago', ui.reservationFilters.payment)}
+            ${renderOption('refunded', 'Reembolsado', ui.reservationFilters.payment)}
+          </select>
+        </label>
         <button class="button admin-secondary-button" type="button" data-action="clear-reservation-filters">Limpar</button>
       </form>
-      <div class="admin-record-list" data-reservation-list>
-        ${filteredReservations.length ? filteredReservations.map(renderReservationSummary).join('') : '<p class="admin-empty">Nenhuma reserva corresponde aos filtros.</p>'}
-      </div>
+      <div data-reservation-list>${renderReservationListContents(filteredReservations)}</div>
     </section>
 
-    ${can(currentUser, 'reservations:write') ? renderCreateReservationForm() : can(currentUser, 'reservations:operations') ? renderReservationOperationsPanel() : `
-      <section class="admin-panel">
-        <p class="admin-empty">Pode consultar reservas e informação operacional, mas só um proprietário pode criar ou alterar dados financeiros.</p>
-      </section>
-    `}
+    ${can(currentUser, 'reservations:write')
+      ? (ui.showReservationForm || ui.editingReservationId || ui.requestDraftId ? renderCreateReservationForm() : '')
+      : can(currentUser, 'reservations:operations') && ui.editingReservationId ? renderReservationOperationsPanel() : ''}
     ${renderPastReservationsSection()}
+  `;
+}
+
+function renderReservationListContents(reservations = getFilteredReservations()) {
+  if (!reservations.length) return '<p class="admin-empty">Nenhuma reserva corresponde aos filtros.</p>';
+  const visibleReservations = reservations.slice(0, ui.reservationLimit);
+  const remaining = reservations.length - visibleReservations.length;
+  return `
+    <div class="admin-record-list">${visibleReservations.map(renderReservationSummary).join('')}</div>
+    ${remaining > 0 ? `<button class="button admin-secondary-button admin-load-more" type="button" data-action="show-more-reservations">Mostrar mais (${remaining})</button>` : ''}
   `;
 }
 
@@ -1443,8 +1646,9 @@ function renderPastReservationsSection() {
       </div>
       ${ui.showPastReservations ? `
         <div class="admin-record-list">
-          ${pastReservations.length ? pastReservations.map(renderPastReservationSummary).join('') : '<p class="admin-empty">Ainda não há reservas passadas, canceladas ou no-show.</p>'}
+          ${pastReservations.length ? pastReservations.slice(0, ui.pastReservationLimit).map(renderPastReservationSummary).join('') : '<p class="admin-empty">Ainda não há reservas passadas, canceladas ou no-show.</p>'}
         </div>
+        ${pastReservations.length > ui.pastReservationLimit ? `<button class="button admin-secondary-button admin-load-more" type="button" data-action="show-more-past-reservations">Mostrar mais (${pastReservations.length - ui.pastReservationLimit})</button>` : ''}
       ` : ''}
     </section>
   `;
@@ -1462,7 +1666,7 @@ function renderPastReservationSummary(reservation) {
   ].filter(Boolean).join(' ');
 
   return `
-    <article class="${recordClass}">
+    <article class="${recordClass}" id="admin-reservation-${escapeHtml(reservation.id)}">
       <div class="admin-record-main">
         <div>
           <strong>${escapeHtml(reservation.contact.name)}</strong>
@@ -1482,7 +1686,7 @@ function renderPastReservationSummary(reservation) {
         <dl class="admin-record-details">
           <div><dt>Hóspedes</dt><dd>${escapeHtml(formatGuestSummary(reservation.guests))}</dd></div>
           ${renderContactDetailRows(reservation.contact)}
-          <div><dt>Pagamento</dt><dd>${escapeHtml(PAYMENT_LABELS[reservation.paymentStatus] || reservation.paymentStatus)}</dd></div>
+          <div><dt>Estado do pagamento</dt><dd>${escapeHtml(PAYMENT_LABELS[reservation.paymentStatus] || reservation.paymentStatus)}</dd></div>
           <div><dt>Total</dt><dd>${renderMoney(totals.total)}</dd></div>
           ${renderReservationExpandedDetails(reservation, totals)}
         </dl>
@@ -1491,6 +1695,9 @@ function renderPastReservationSummary(reservation) {
             <button class="button admin-secondary-button admin-small-button" type="button" data-action="restore-reservation" data-reservation-id="${reservation.id}">${icon('rotateCcw')} Restaurar</button>
           </div>
         ` : ''}
+        <div class="admin-button-row admin-record-collapse-row">
+          <button class="button admin-secondary-button admin-small-button" type="button" data-action="close-reservation-details" data-reservation-id="${reservation.id}">${icon('chevronUp')} Fechar detalhes</button>
+        </div>
       ` : ''}
     </article>
   `;
@@ -1508,10 +1715,12 @@ function renderReservationOperationsPanel() {
             <h2>Atualizar uma reserva</h2>
           </div>
         </div>
-        <p class="admin-empty">Escolha “Operação” numa reserva para ajustar horários, idioma ou estado do pagamento/depósito.</p>
+        <p class="admin-empty">Escolha “Operação” numa reserva para ajustar horários, idioma, identificação, pagamento ou caução.</p>
       </section>
     `;
   }
+
+  const guest = getReservationGuest(reservation);
 
   return `
     <section class="admin-panel" id="reservation-operations">
@@ -1522,30 +1731,68 @@ function renderReservationOperationsPanel() {
         </div>
       </div>
       <p class="admin-alert admin-alert-warning">
-        Área limitada para funcionários. Preços, datas da estadia, hóspedes e dados financeiros completos continuam reservados aos proprietários.
+        Área limitada para funcionários. Preços, datas da estadia, composição do grupo e dados financeiros completos continuam reservados aos proprietários.
       </p>
       <form class="admin-form-grid" data-form="reservation-operations">
         <input type="hidden" name="reservationId" value="${escapeHtml(reservation.id)}" />
-        <label class="admin-field">
-          <span>Hora de check-in</span>
-          <input name="checkInTime" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(reservation.stay?.checkInTime || state.property.defaultCheckInTime)}" placeholder="HH:MM" pattern="(?:[01]\\d|2[0-3]):[0-5]\\d" />
-        </label>
-        <label class="admin-field">
-          <span>Hora de check-out</span>
-          <input name="checkOutTime" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(reservation.stay?.checkOutTime || state.property.defaultCheckOutTime)}" placeholder="HH:MM" pattern="(?:[01]\\d|2[0-3]):[0-5]\\d" />
-        </label>
-        <label class="admin-field">
-          <span>Idioma preferido</span>
-          <select name="preferredLanguage">
-            ${Object.entries(LANGUAGE_LABELS).map(([value, label]) => renderOption(value, label, reservation.preferredLanguage || 'pt')).join('')}
-          </select>
-        </label>
-        <label class="admin-field">
-          <span>Pagamento / depósito</span>
-          <select name="paymentStatus">
-            ${['awaiting_transfer', 'deposit_paid', 'paid'].map((value) => renderOption(value, PAYMENT_LABELS[value], reservation.paymentStatus || 'awaiting_transfer')).join('')}
-          </select>
-        </label>
+        <fieldset class="admin-form-section">
+          <legend>Chegada e comunicação</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field">
+              <span>Hora de check-in</span>
+              <input name="checkInTime" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(reservation.stay?.checkInTime || state.property.defaultCheckInTime)}" placeholder="HH:MM" pattern="(?:[01]\\d|2[0-3]):[0-5]\\d" />
+            </label>
+            <label class="admin-field">
+              <span>Hora de check-out</span>
+              <input name="checkOutTime" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(reservation.stay?.checkOutTime || state.property.defaultCheckOutTime)}" placeholder="HH:MM" pattern="(?:[01]\\d|2[0-3]):[0-5]\\d" />
+            </label>
+            <label class="admin-field">
+              <span>Idioma preferido</span>
+              <select name="preferredLanguage">
+                ${Object.entries(LANGUAGE_LABELS).map(([value, label]) => renderOption(value, label, reservation.preferredLanguage || 'pt')).join('')}
+              </select>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Identificação do hóspede</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field">
+              <span>Nacionalidade</span>
+              <input name="nationality" type="text" autocomplete="country-name" value="${escapeHtml(guest?.nationality || '')}" placeholder="Ex.: Portugal, França, Espanha" />
+            </label>
+            <label class="admin-field">
+              <span>NIF</span>
+              <input name="nif" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(guest?.nif || '')}" />
+            </label>
+            <label class="admin-field">
+              <span>Tipo de documento</span>
+              <select name="identityDocumentType">
+                ${renderOption('', 'Não indicado', guest?.identityDocumentType || '')}
+                ${Object.entries(IDENTITY_DOCUMENT_LABELS).map(([value, label]) => renderOption(value, label, guest?.identityDocumentType || '')).join('')}
+              </select>
+            </label>
+            <label class="admin-field">
+              <span>Número do documento</span>
+              <input name="identityDocumentNumber" type="text" autocomplete="off" value="${escapeHtml(guest?.identityDocumentNumber || '')}" />
+            </label>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Pagamento e caução</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field">
+              <span>Estado do pagamento da reserva</span>
+              <select name="paymentStatus">
+                ${RESERVATION_PAYMENT_STATUSES.map((value) => renderOption(value, PAYMENT_LABELS[value], reservation.paymentStatus || 'awaiting_transfer')).join('')}
+              </select>
+            </label>
+            <label class="admin-checkbox admin-checkbox-compact">
+              <input name="securityDepositPaid" type="checkbox" ${reservation.securityDepositPaid ? 'checked' : ''} />
+              <span>Caução recebida</span>
+            </label>
+          </div>
+        </fieldset>
         <div class="admin-form-actions">
           <button class="button button-primary" type="submit">${icon('check')} Guardar operação</button>
           <button class="button admin-secondary-button" type="button" data-action="cancel-reservation-edit">Cancelar</button>
@@ -1564,6 +1811,12 @@ function getFilteredReservations() {
     .filter((reservation) => !isPastReservation(reservation))
     .filter((reservation) => statusFilter === 'all' || reservation.status === statusFilter)
     .filter((reservation) => ui.reservationFilters.source === 'all' || reservation.source === ui.reservationFilters.source)
+    .filter((reservation) => {
+      if (ui.reservationFilters.payment === 'paid') return reservation.paymentStatus === 'paid';
+      if (ui.reservationFilters.payment === 'pending') return ['unpaid', 'awaiting_transfer'].includes(reservation.paymentStatus);
+      if (ui.reservationFilters.payment === 'refunded') return reservation.paymentStatus === 'refunded';
+      return true;
+    })
     .filter((reservation) => {
       if (!search) return true;
       return [
@@ -1590,6 +1843,9 @@ function renderCreateReservationForm() {
     email: editingReservation?.contact?.email || draftRequest?.contact?.email || '',
     phone: editingReservation?.contact?.phone || draftRequest?.contact?.phone || '',
     nationality: editingGuest?.nationality || draftRequest?.contact?.nationality || draftRequest?.nationality || '',
+    nif: editingGuest?.nif || '',
+    identityDocumentType: editingGuest?.identityDocumentType || '',
+    identityDocumentNumber: editingGuest?.identityDocumentNumber || '',
     checkIn: editingReservation?.stay?.checkIn || draftRequest?.stay?.checkIn || today,
     checkOut: editingReservation?.stay?.checkOut || draftRequest?.stay?.checkOut || tomorrow,
     checkInTime: editingReservation?.stay?.checkInTime || draftRequest?.stay?.checkInTime || state.property.defaultCheckInTime,
@@ -1603,6 +1859,7 @@ function renderCreateReservationForm() {
       : Array.isArray(draftRequest?.guests?.childAges) ? draftRequest.guests.childAges.join(', ') : '',
     preferredLanguage: editingReservation?.preferredLanguage || draftRequest?.preferredLanguage || 'pt',
     status: editingReservation?.status || 'awaiting_payment',
+    paymentStatus: editingReservation?.paymentStatus || 'awaiting_transfer',
     bedPreference: editingReservation?.preferences?.bed || editingReservation?.guests?.bedPreference || draftRequest?.preferences?.bed || draftRequest?.guests?.bedPreference || '',
     bikeCount: Number(editingReservation?.extras?.bikes?.count || draftRequest?.extras?.bikes?.count || 0),
     bikeDays: Number(editingReservation?.extras?.bikes?.days || draftRequest?.extras?.bikes?.days || 0),
@@ -1611,6 +1868,7 @@ function renderCreateReservationForm() {
     discountAmount: Number(editingReservation?.pricing?.discountAmount || draftRequest?.pricing?.discountAmount || 0),
     discountCode: editingReservation?.pricing?.discountCode || draftRequest?.pricing?.discountCode || '',
     depositIncluded: Boolean(editingReservation?.pricing?.depositIncluded || draftRequest?.depositPrepay || draftRequest?.pricing?.depositIncluded),
+    securityDepositPaid: Boolean(editingReservation?.securityDepositPaid),
     ownerNotes: editingReservation?.notes?.owner || draftRequest?.comments || '',
     operationalNotes: editingReservation?.notes?.operational || '',
     marketingOptIn: Boolean(editingReservation?.marketingOptIn || draftRequest?.marketingOptIn)
@@ -1639,115 +1897,60 @@ function renderCreateReservationForm() {
         <input name="websiteRequestId" type="hidden" value="${escapeHtml(defaults.websiteRequestId)}" />
         <input name="reservationId" type="hidden" value="${escapeHtml(defaults.reservationId)}" />
         <input name="discountCode" type="hidden" value="${escapeHtml(defaults.discountCode)}" />
-        <label class="admin-field">
-          <span>Nome do hóspede *</span>
-          <input name="guestName" type="text" value="${escapeHtml(defaults.guestName)}" required />
-        </label>
-        <label class="admin-field">
-          <span>Email *</span>
-          <input name="email" type="email" value="${escapeHtml(defaults.email)}" required />
-        </label>
-        <label class="admin-field">
-          <span>Telefone</span>
-          <input name="phone" type="tel" value="${escapeHtml(defaults.phone)}" />
-        </label>
-        <label class="admin-field">
-          <span>Nacionalidade</span>
-          <input name="nationality" type="text" value="${escapeHtml(defaults.nationality)}" placeholder="Ex.: Portugal, França, Alemanha" />
-        </label>
-        <label class="admin-field">
-          <span>Check-in *</span>
-          ${renderAdminDateControl({ name: 'checkIn', value: formatDateInputValue(defaults.checkIn), required: true })}
-        </label>
-        <label class="admin-field">
-          <span>Check-out *</span>
-          ${renderAdminDateControl({ name: 'checkOut', value: formatDateInputValue(defaults.checkOut), required: true })}
-        </label>
-        <label class="admin-field">
-          <span>Referência externa</span>
-          <input name="sourceReference" type="text" value="${escapeHtml(defaults.sourceReference)}" placeholder="Ex.: pedido website ou Booking.com" />
-        </label>
-        <label class="admin-field">
-          <span>Hora de check-in</span>
-          <input name="checkInTime" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(defaults.checkInTime)}" placeholder="HH:MM" pattern="(?:[01]\\d|2[0-3]):[0-5]\\d" />
-        </label>
-        <label class="admin-field">
-          <span>Hora de check-out</span>
-          <input name="checkOutTime" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(defaults.checkOutTime)}" placeholder="HH:MM" pattern="(?:[01]\\d|2[0-3]):[0-5]\\d" />
-        </label>
-        <label class="admin-field">
-          <span>Origem</span>
-          <select name="source">
-            ${Object.entries(SOURCE_LABELS).map(([value, label]) => renderOption(value, label, defaults.source)).join('')}
-          </select>
-        </label>
-        <label class="admin-field">
-          <span>Adultos</span>
-          <input name="adults" type="number" min="1" max="${state.property.occupancyLimit}" value="${defaults.adults}" required />
-        </label>
-        <label class="admin-field">
-          <span>Crianças</span>
-          <input name="children" type="number" min="0" max="${state.property.occupancyLimit - 1}" value="${defaults.children}" />
-        </label>
-        <label class="admin-field">
-          <span>Idades das crianças</span>
-          <input name="childAges" type="text" value="${escapeHtml(defaults.childAges)}" placeholder="Ex.: 4, 9" />
-        </label>
-        <label class="admin-field">
-          <span>Idioma do hóspede</span>
-          <select name="preferredLanguage">
-            ${Object.entries(LANGUAGE_LABELS).map(([value, label]) => renderOption(value, label, defaults.preferredLanguage)).join('')}
-          </select>
-        </label>
-        <label class="admin-field">
-          <span>Estado</span>
-          <select name="status">
-            ${['awaiting_payment', 'confirmed', 'checked_in', 'checked_out', 'cancelled', 'no_show', 'request'].map((value) => renderOption(value, STATUS_LABELS[value], defaults.status)).join('')}
-          </select>
-        </label>
-        <label class="admin-field">
-          <span>Preferência de camas</span>
-          <select name="bedPreference">
-            ${renderOption('', 'Sem preferência registada', defaults.bedPreference)}
-            ${renderOption('double', 'Cama de casal', defaults.bedPreference)}
-            ${renderOption('single', 'Camas individuais', defaults.bedPreference)}
-          </select>
-        </label>
-        <label class="admin-field">
-          <span>Bicicletas</span>
-          <input name="bikeCount" type="number" min="0" max="6" value="${defaults.bikeCount}" />
-        </label>
-        <label class="admin-field">
-          <span>Dias de bicicleta</span>
-          <input name="bikeDays" type="number" min="0" value="${defaults.bikeDays}" />
-        </label>
-        <label class="admin-field">
-          <span>Tipo de desconto</span>
-          <select name="discountType">
-            ${renderOption('percentage', 'Percentagem', defaults.discountType)}
-            ${renderOption('amount', 'Valor fixo', defaults.discountType)}
-          </select>
-        </label>
-        <label class="admin-field">
-          <span>Desconto</span>
-          <input name="discountValue" type="number" min="0" ${defaults.discountType === 'percentage' ? 'max="100"' : ''} step="1" value="${defaults.discountType === 'amount' ? defaults.discountAmount : defaults.discountPercent}" data-reservation-discount-value-input placeholder="${defaults.discountType === 'amount' ? 'Valor em euros' : 'Percentagem'}" />
-        </label>
-        <label class="admin-checkbox">
-          <input name="depositIncluded" type="checkbox" ${defaults.depositIncluded ? 'checked' : ''} />
-          <span>Incluir depósito de segurança no valor a transferir</span>
-        </label>
-        <label class="admin-checkbox">
-          <input name="marketingOptIn" type="checkbox" ${defaults.marketingOptIn ? 'checked' : ''} />
-          <span>Hóspede aceitou receber novidades, ofertas e descontos</span>
-        </label>
-        <label class="admin-field admin-field-full">
-          <span>Notas internas</span>
-          <textarea name="ownerNotes" rows="3">${escapeHtml(defaults.ownerNotes)}</textarea>
-        </label>
-        <label class="admin-field admin-field-full">
-          <span>Notas operacionais</span>
-          <textarea name="operationalNotes" rows="2">${escapeHtml(defaults.operationalNotes)}</textarea>
-        </label>
+        <fieldset class="admin-form-section">
+          <legend>Hóspede e identificação</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field"><span>Nome do hóspede *</span><input name="guestName" type="text" value="${escapeHtml(defaults.guestName)}" required /></label>
+            <label class="admin-field"><span>Email *</span><input name="email" type="email" value="${escapeHtml(defaults.email)}" required /></label>
+            <label class="admin-field"><span>Telefone</span><input name="phone" type="tel" value="${escapeHtml(defaults.phone)}" /></label>
+            <label class="admin-field"><span>Idioma do hóspede</span><select name="preferredLanguage">${Object.entries(LANGUAGE_LABELS).map(([value, label]) => renderOption(value, label, defaults.preferredLanguage)).join('')}</select></label>
+            <label class="admin-field"><span>Nacionalidade</span><input name="nationality" type="text" autocomplete="country-name" value="${escapeHtml(defaults.nationality)}" placeholder="Ex.: Portugal, França, Espanha" /></label>
+            <label class="admin-field"><span>NIF</span><input name="nif" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(defaults.nif)}" /></label>
+            <label class="admin-field"><span>Tipo de documento</span><select name="identityDocumentType">${renderOption('', 'Não indicado', defaults.identityDocumentType)}${Object.entries(IDENTITY_DOCUMENT_LABELS).map(([value, label]) => renderOption(value, label, defaults.identityDocumentType)).join('')}</select></label>
+            <label class="admin-field"><span>Número do documento</span><input name="identityDocumentNumber" type="text" autocomplete="off" value="${escapeHtml(defaults.identityDocumentNumber)}" /></label>
+            <label class="admin-checkbox admin-checkbox-compact"><input name="marketingOptIn" type="checkbox" ${defaults.marketingOptIn ? 'checked' : ''} /><span>Hóspede aceitou receber novidades, ofertas e descontos</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Estadia e hóspedes</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field"><span>Check-in *</span>${renderAdminDateControl({ name: 'checkIn', value: formatDateInputValue(defaults.checkIn), required: true })}</label>
+            <label class="admin-field"><span>Hora de check-in</span><input name="checkInTime" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(defaults.checkInTime)}" placeholder="HH:MM" pattern="(?:[01]\\d|2[0-3]):[0-5]\\d" /></label>
+            <label class="admin-field"><span>Check-out *</span>${renderAdminDateControl({ name: 'checkOut', value: formatDateInputValue(defaults.checkOut), required: true })}</label>
+            <label class="admin-field"><span>Hora de check-out</span><input name="checkOutTime" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(defaults.checkOutTime)}" placeholder="HH:MM" pattern="(?:[01]\\d|2[0-3]):[0-5]\\d" /></label>
+            <label class="admin-field"><span>Adultos</span><input name="adults" type="number" min="1" max="${state.property.occupancyLimit}" value="${defaults.adults}" required /></label>
+            <label class="admin-field"><span>Crianças</span><input name="children" type="number" min="0" max="${state.property.occupancyLimit - 1}" value="${defaults.children}" /></label>
+            <label class="admin-field"><span>Idades das crianças</span><input name="childAges" type="text" value="${escapeHtml(defaults.childAges)}" placeholder="Ex.: 4, 9" /></label>
+            <label class="admin-field"><span>Preferência de camas</span><select name="bedPreference">${renderOption('', 'Sem preferência registada', defaults.bedPreference)}${renderOption('double', 'Cama de casal', defaults.bedPreference)}${renderOption('single', 'Camas individuais', defaults.bedPreference)}</select></label>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Origem, estado e pagamento</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field"><span>Origem</span><select name="source">${Object.entries(SOURCE_LABELS).map(([value, label]) => renderOption(value, label, defaults.source)).join('')}</select></label>
+            <label class="admin-field"><span>Referência externa</span><input name="sourceReference" type="text" value="${escapeHtml(defaults.sourceReference)}" placeholder="Ex.: pedido website ou Booking.com" /></label>
+            <label class="admin-field"><span>Estado da reserva</span><select name="status">${['awaiting_payment', 'confirmed', 'checked_in', 'checked_out', 'cancelled', 'no_show', 'request'].map((value) => renderOption(value, STATUS_LABELS[value], defaults.status)).join('')}</select></label>
+            <label class="admin-field"><span>Estado do pagamento</span><select name="paymentStatus">${RESERVATION_PAYMENT_STATUSES.map((value) => renderOption(value, PAYMENT_LABELS[value], defaults.paymentStatus)).join('')}</select></label>
+            <label class="admin-checkbox admin-checkbox-compact"><input name="depositIncluded" type="checkbox" ${defaults.depositIncluded ? 'checked' : ''} /><span>Incluir caução no valor a transferir</span></label>
+            <label class="admin-checkbox admin-checkbox-compact"><input name="securityDepositPaid" type="checkbox" ${defaults.securityDepositPaid ? 'checked' : ''} /><span>Caução recebida</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Serviços e desconto</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field"><span>Bicicletas</span><input name="bikeCount" type="number" min="0" max="6" value="${defaults.bikeCount}" /></label>
+            <label class="admin-field"><span>Dias de bicicleta</span><input name="bikeDays" type="number" min="0" value="${defaults.bikeDays}" /></label>
+            <label class="admin-field"><span>Tipo de desconto</span><select name="discountType">${renderOption('percentage', 'Percentagem', defaults.discountType)}${renderOption('amount', 'Valor fixo', defaults.discountType)}</select></label>
+            <label class="admin-field"><span>Desconto</span><input name="discountValue" type="number" min="0" ${defaults.discountType === 'percentage' ? 'max="100"' : ''} step="1" value="${defaults.discountType === 'amount' ? defaults.discountAmount : defaults.discountPercent}" data-reservation-discount-value-input placeholder="${defaults.discountType === 'amount' ? 'Valor em euros' : 'Percentagem'}" /></label>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Notas</legend>
+          <div class="admin-form-section-grid admin-form-section-grid-notes">
+            <label class="admin-field admin-field-full"><span>Notas internas</span><textarea name="ownerNotes" rows="3">${escapeHtml(defaults.ownerNotes)}</textarea></label>
+            <label class="admin-field admin-field-full"><span>Notas operacionais</span><textarea name="operationalNotes" rows="2">${escapeHtml(defaults.operationalNotes)}</textarea></label>
+          </div>
+        </fieldset>
         ${editingReservation ? `
           <div class="admin-field admin-field-full" id="extra-guests-editor">
             ${getGuestAdjustments(editingReservation).length ? renderGuestAdjustmentsList(editingReservation) : ''}
@@ -1823,16 +2026,16 @@ function renderRequestsView() {
         <div class="admin-record-list">${openRequests.map(renderRequestSummary).join('')}</div>
       ` : '<p class="admin-empty">Não há pedidos novos do website.</p>'}
     </section>
-    <section class="admin-panel">
-      <div class="admin-panel-heading">
-        <div>
-          <p class="admin-eyebrow">Histórico</p>
-          <h2>Pedidos já tratados</h2>
-        </div>
-      </div>
-      ${closedRequests.length ? `
-        <div class="admin-record-list">${closedRequests.map(renderRequestHistorySummary).join('')}</div>
-      ` : '<p class="admin-empty">Ainda não há histórico de pedidos tratados.</p>'}
+    <section class="admin-panel admin-collapsible-panel">
+      <details class="admin-panel-disclosure">
+        <summary>
+          <span><span class="admin-eyebrow">Histórico</span><strong>Pedidos já tratados</strong></span>
+          <span class="admin-disclosure-summary-meta"><span class="admin-source">${closedRequests.length}</span>${icon('chevronDown')}</span>
+        </summary>
+        ${closedRequests.length ? `
+          <div class="admin-record-list">${closedRequests.map(renderRequestHistorySummary).join('')}</div>
+        ` : '<p class="admin-empty">Ainda não há histórico de pedidos tratados.</p>'}
+      </details>
     </section>
   `;
 }
@@ -1857,26 +2060,39 @@ function renderPricingView() {
           : `Ativo hoje: preço base (${renderMoney(state.pricing.adultNight)}/adulto/noite, mínimo cobrado ${state.pricing.minimumPaidAdults || 2} adultos; ${renderMoney(state.pricing.childNight)}/criança/noite).`}
         ${hasFullRecurringCoverage ? 'As épocas anuais cobrem o ano inteiro; o preço base fica apenas como segurança.' : 'O preço base é obrigatório porque as épocas anuais não cobrem o ano inteiro.'}
       </p>
-      <form class="admin-form-grid" data-form="pricing">
-        <label class="admin-field">
-          <span>Preço base adulto/noite</span>
-          <input name="adultNight" type="number" min="0" step="0.01" value="${state.pricing.adultNight}" ${can(currentUser, 'pricing:write') ? '' : 'disabled'} />
-        </label>
-        <label class="admin-field">
-          <span>Mínimo cobrado de adultos</span>
-          <input name="minimumPaidAdults" type="number" min="1" step="1" value="${state.pricing.minimumPaidAdults || 2}" ${can(currentUser, 'pricing:write') ? '' : 'disabled'} />
-        </label>
-        <label class="admin-field">
-          <span>Preço base criança/noite</span>
-          <input name="childNight" type="number" min="0" step="0.01" value="${state.pricing.childNight}" ${can(currentUser, 'pricing:write') ? '' : 'disabled'} />
-        </label>
-        ${can(currentUser, 'pricing:write') ? `
-          <div class="admin-form-actions">
-            <button class="button button-primary" type="submit">${icon('check')} Guardar preço base</button>
-          </div>
-        ` : ''}
-      </form>
-      ${renderSeasonList(seasons)}
+      <dl class="admin-record-details admin-pricing-summary">
+        <div><dt>Base adulto/noite</dt><dd>${renderMoney(state.pricing.adultNight)}</dd></div>
+        <div><dt>Mínimo cobrado</dt><dd>${state.pricing.minimumPaidAdults || 2} adultos</dd></div>
+        <div><dt>Base criança/noite</dt><dd>${renderMoney(state.pricing.childNight)}</dd></div>
+        <div><dt>Caução</dt><dd>${renderMoney(state.pricing.securityDeposit)}</dd></div>
+      </dl>
+      ${can(currentUser, 'pricing:write') ? `
+        <details class="admin-editor-disclosure">
+          <summary>${icon('edit')} Editar preço base</summary>
+          <form class="admin-form-grid admin-subform" data-form="pricing">
+            <label class="admin-field">
+              <span>Preço base adulto/noite</span>
+              <input name="adultNight" type="number" min="0" step="0.01" value="${state.pricing.adultNight}" />
+            </label>
+            <label class="admin-field">
+              <span>Mínimo cobrado de adultos</span>
+              <input name="minimumPaidAdults" type="number" min="1" step="1" value="${state.pricing.minimumPaidAdults || 2}" />
+            </label>
+            <label class="admin-field">
+              <span>Preço base criança/noite</span>
+              <input name="childNight" type="number" min="0" step="0.01" value="${state.pricing.childNight}" />
+            </label>
+            <label class="admin-field">
+              <span>Caução</span>
+              <input name="securityDeposit" type="number" min="0" step="1" value="${state.pricing.securityDeposit}" />
+            </label>
+            <div class="admin-form-actions">
+              <button class="button button-primary" type="submit">${icon('check')} Guardar preço base</button>
+            </div>
+          </form>
+        </details>
+      ` : ''}
+      ${renderSeasonList(seasons, activeRule)}
       ${can(currentUser, 'pricing:write') ? renderSeasonForm() : ''}
     </section>
 
@@ -1894,30 +2110,6 @@ function renderPricingView() {
     <section class="admin-panel">
       <div class="admin-panel-heading">
         <div>
-          <p class="admin-eyebrow">Serviços e extras</p>
-          <h2>Valores separados</h2>
-        </div>
-      </div>
-      <form class="admin-form-grid" data-form="service-pricing">
-        <label class="admin-field">
-          <span>Bicicleta/dia</span>
-          <input name="bikeDay" type="number" min="0" step="1" value="${state.pricing.bikeDay}" ${can(currentUser, 'pricing:write') ? '' : 'disabled'} />
-        </label>
-        <label class="admin-field">
-          <span>Depósito</span>
-          <input name="securityDeposit" type="number" min="0" step="1" value="${state.pricing.securityDeposit}" ${can(currentUser, 'pricing:write') ? '' : 'disabled'} />
-        </label>
-        ${can(currentUser, 'pricing:write') ? `
-          <div class="admin-form-actions">
-            <button class="button button-primary" type="submit">${icon('check')} Guardar serviços</button>
-          </div>
-        ` : ''}
-      </form>
-    </section>
-
-    <section class="admin-panel">
-      <div class="admin-panel-heading">
-        <div>
           <p class="admin-eyebrow">Promoções</p>
           <h2>Descontos e códigos</h2>
         </div>
@@ -1928,35 +2120,124 @@ function renderPricingView() {
   `;
 }
 
-function renderSeasonList(seasons) {
+function renderServiceEditor(service = null) {
+  const isExisting = Boolean(service);
+  return `
+    <form class="admin-form-grid admin-subform" data-form="service">
+      <input name="serviceId" type="hidden" value="${escapeHtml(service?.id || '')}" />
+      <label class="admin-field">
+        <span>Nome</span>
+        <input name="name" type="text" value="${escapeHtml(service?.name || '')}" required />
+      </label>
+      <label class="admin-field">
+        <span>Preço</span>
+        <input name="price" type="number" min="0" step="0.01" value="${Number(service?.price || 0)}" required />
+      </label>
+      <label class="admin-field">
+        <span>Unidade</span>
+        <input name="unit" type="text" value="${escapeHtml(service?.unit || '')}" placeholder="Ex.: pessoa / dia" required />
+      </label>
+      <label class="admin-field admin-field-full">
+        <span>Descrição</span>
+        <input name="description" type="text" value="${escapeHtml(service?.description || '')}" />
+      </label>
+      <label class="admin-checkbox">
+        <input name="enabled" type="checkbox" ${service?.enabled === false ? '' : 'checked'} />
+        <span>Serviço ativo</span>
+      </label>
+      <label class="admin-checkbox">
+        <input name="showOnBooking" type="checkbox" ${service?.showOnBooking === false ? '' : 'checked'} />
+        <span>Mostrar na reserva</span>
+      </label>
+      <label class="admin-checkbox">
+        <input name="showOnGuestStay" type="checkbox" ${service?.showOnGuestStay === false ? '' : 'checked'} />
+        <span>Mostrar na área do hóspede</span>
+      </label>
+      <div class="admin-form-actions">
+        <button class="button button-primary" type="submit">${icon(isExisting ? 'check' : 'plus')} ${isExisting ? 'Guardar serviço' : 'Adicionar serviço'}</button>
+      </div>
+    </form>
+  `;
+}
+
+function renderServicesView() {
+  requirePermission(currentUser, 'pricing:view');
+  const services = state.services || [];
+
+  return `
+    <section class="admin-panel">
+      <div class="admin-panel-heading">
+        <div>
+          <p class="admin-eyebrow">Catálogo</p>
+          <h2>Serviços aos hóspedes</h2>
+        </div>
+      </div>
+      <div class="admin-disclosure-list">
+        ${services.map((service) => `
+          <details class="admin-list-disclosure">
+            <summary>
+              <span><strong>${escapeHtml(service.name)}</strong><small>${renderMoney(service.price)} / ${escapeHtml(service.unit)}</small></span>
+              <span class="admin-status ${service.enabled ? 'status-confirmed' : ''}">${service.enabled ? 'Ativo' : 'Desativado'}</span>
+            </summary>
+            <div class="admin-list-disclosure-body">
+              <p>${escapeHtml(service.description || 'Sem descrição.')}</p>
+              ${can(currentUser, 'pricing:write') ? renderServiceEditor(service) : ''}
+            </div>
+          </details>
+        `).join('')}
+      </div>
+      ${can(currentUser, 'pricing:write') ? `
+        <details class="admin-editor-disclosure">
+          <summary>${icon('plus')} Adicionar serviço</summary>
+          ${renderServiceEditor()}
+        </details>
+      ` : ''}
+    </section>
+  `;
+}
+
+function getSeasonDisplayStatus(season, activeRule) {
+  if (!isSeasonActiveToday(season)) {
+    return { label: 'Inativa', className: 'admin-source' };
+  }
+
+  if (activeRule?.id === season.id) {
+    return { label: 'Ativa hoje', className: 'admin-status status-confirmed' };
+  }
+
+  return { label: 'Sobreposta hoje', className: 'admin-status admin-status-overridden' };
+}
+
+function renderSeasonList(seasons, activeRule = getActivePricingRule()) {
   if (!seasons.length) return '<p class="admin-empty">Ainda não há preços sazonais configurados.</p>';
 
   return `
-    <div class="admin-table-wrap">
-      <table class="admin-table">
-        <thead><tr><th>Nome</th><th>Tipo</th><th>Período</th><th>Adulto/noite</th><th>Criança/noite</th><th>Estado</th><th>Notas</th><th></th></tr></thead>
-        <tbody>
-          ${seasons.map((season) => `
-            <tr>
-              <td>${escapeHtml(season.title)}</td>
-              <td>${(season.kind || 'dated') === 'recurring' ? 'Anual' : 'Data específica'}</td>
-              <td>${escapeHtml(formatSeasonPeriod(season))}</td>
-              <td>${renderMoney(season.adultNight)}</td>
-              <td>${renderMoney(season.childNight)}</td>
-              <td>${isSeasonActiveToday(season) ? '<span class="admin-status status-confirmed">Ativa hoje</span>' : '<span class="admin-source">Inativa hoje</span>'}</td>
-              <td>${escapeHtml(season.notes || '-')}</td>
-              <td>
-                ${can(currentUser, 'pricing:write') ? `
-                  <div class="admin-button-row">
-                    <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-season" data-season-id="${season.id}">${icon('edit')} Editar</button>
-                    <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-season" data-season-id="${season.id}">${icon('trash')} Remover</button>
-                  </div>
-                ` : ''}
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+    <div class="admin-disclosure-list">
+      ${seasons.map((season) => {
+        const displayStatus = getSeasonDisplayStatus(season, activeRule);
+        return `
+          <details class="admin-list-disclosure">
+            <summary>
+              <span><strong>${escapeHtml(season.title)}</strong><small>${escapeHtml(formatSeasonPeriod(season))}</small></span>
+              <span class="${displayStatus.className}">${displayStatus.label}</span>
+            </summary>
+          <div class="admin-list-disclosure-body">
+            <dl class="admin-record-details">
+              <div><dt>Tipo</dt><dd>${(season.kind || 'dated') === 'recurring' ? 'Anual' : 'Data específica'}</dd></div>
+              <div><dt>Adulto/noite</dt><dd>${renderMoney(season.adultNight)}</dd></div>
+              <div><dt>Criança/noite</dt><dd>${renderMoney(season.childNight)}</dd></div>
+              <div><dt>Notas</dt><dd>${escapeHtml(season.notes || '-')}</dd></div>
+            </dl>
+            ${can(currentUser, 'pricing:write') ? `
+              <div class="admin-button-row">
+                <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-season" data-season-id="${season.id}">${icon('edit')} Editar</button>
+                <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-season" data-season-id="${season.id}">${icon('trash')} Remover</button>
+              </div>
+            ` : ''}
+          </div>
+          </details>
+        `;
+      }).join('')}
     </div>
   `;
 }
@@ -1972,7 +2253,9 @@ function renderSeasonForm() {
     : formatMonthDay(editingSeason?.endMonthDay || '09-30');
 
   return `
-    <form class="admin-form-grid admin-subform" data-form="season">
+    <details class="admin-editor-disclosure"${editingSeason ? ' open' : ''}>
+      <summary>${icon(editingSeason ? 'edit' : 'plus')} ${editingSeason ? 'Editar época' : 'Adicionar época'}</summary>
+      <form class="admin-form-grid admin-subform" data-form="season">
       <input name="seasonId" type="hidden" value="${escapeHtml(editingSeason?.id || '')}" />
       <label class="admin-field">
         <span>Nome da época</span>
@@ -2010,7 +2293,8 @@ function renderSeasonForm() {
         <button class="button admin-secondary-button" type="submit">${editingSeason ? `${icon('check')} Guardar época` : `${icon('plus')} Adicionar época`}</button>
         ${editingSeason ? '<button class="button admin-secondary-button" type="button" data-action="cancel-season-edit">Cancelar edição</button>' : ''}
       </div>
-    </form>
+      </form>
+    </details>
   `;
 }
 
@@ -2019,31 +2303,31 @@ function renderGroupDiscountList() {
   if (!discounts.length) return '<p class="admin-empty">Ainda não há reduções por tamanho do grupo.</p>';
 
   return `
-    <div class="admin-table-wrap">
-      <table class="admin-table">
-        <thead><tr><th>A partir de</th><th>Redução/noite</th><th>Estado</th><th></th></tr></thead>
-        <tbody>
-          ${discounts.map((discount) => `
-            <tr>
-              <td>${Number(discount.minGuests || 0)} hóspedes</td>
-              <td>${renderMoney(discount.amountPerNight)}</td>
-              <td>${discount.active === false ? 'Inativa' : 'Ativa'}</td>
-              <td>
-                ${can(currentUser, 'pricing:write') ? `
-                  <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-group-discount" data-group-discount-id="${discount.id}">${icon('trash')} Remover</button>
-                ` : ''}
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+    <div class="admin-disclosure-list">
+      ${discounts.map((discount) => `
+        <details class="admin-list-disclosure">
+          <summary>
+            <span><strong>A partir de ${Number(discount.minGuests || 0)} hóspedes</strong><small>${discount.active === false ? 'Inativa' : 'Ativa'}</small></span>
+            <strong>-${renderMoney(discount.amountPerNight)}/noite</strong>
+          </summary>
+          ${can(currentUser, 'pricing:write') ? `
+            <div class="admin-list-disclosure-body">
+              <div class="admin-button-row">
+                <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-group-discount" data-group-discount-id="${discount.id}">${icon('trash')} Remover</button>
+              </div>
+            </div>
+          ` : ''}
+        </details>
+      `).join('')}
     </div>
   `;
 }
 
 function renderGroupDiscountForm() {
   return `
-    <form class="admin-form-grid admin-subform" data-form="group-discount">
+    <details class="admin-editor-disclosure">
+      <summary>${icon('plus')} Adicionar redução</summary>
+      <form class="admin-form-grid admin-subform" data-form="group-discount">
       <label class="admin-field">
         <span>A partir de quantos hóspedes</span>
         <input name="minGuests" type="number" min="2" max="${state.property.occupancyLimit}" value="4" required />
@@ -2059,7 +2343,8 @@ function renderGroupDiscountForm() {
       <div class="admin-form-actions">
         <button class="button admin-secondary-button" type="submit">${icon('plus')} Adicionar redução</button>
       </div>
-    </form>
+      </form>
+    </details>
   `;
 }
 
@@ -2176,30 +2461,27 @@ function renderDiscountList() {
   if (!state.pricing.discounts.length) return '<p class="admin-empty">Ainda não há descontos configurados.</p>';
 
   return `
-    <div class="admin-table-wrap">
-      <table class="admin-table">
-        <thead><tr><th>Nome</th><th>Código</th><th>Período</th><th>Desconto</th><th>Usos</th><th>Estado</th><th></th></tr></thead>
-        <tbody>
-          ${state.pricing.discounts.map((discount) => `
-            <tr>
-              <td>${escapeHtml(discount.title)}</td>
-              <td><code>${escapeHtml(discount.code || '-')}</code></td>
-              <td>${escapeHtml(renderDiscountPeriod(discount))}</td>
-              <td>${renderDiscountValue(discount)}</td>
-              <td>${renderDiscountUses(discount)}</td>
-              <td>${discount.active ? 'Ativo' : 'Inativo'}</td>
-              <td>
-                ${can(currentUser, 'pricing:write') ? `
-                  <div class="admin-button-row">
-                    <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-discount" data-discount-id="${discount.id}">${icon('edit')} Editar</button>
-                    <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-discount" data-discount-id="${discount.id}">${icon('trash')} Remover</button>
-                  </div>
-                ` : ''}
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+    <div class="admin-disclosure-list">
+      ${state.pricing.discounts.map((discount) => `
+        <details class="admin-list-disclosure">
+          <summary>
+            <span><strong>${escapeHtml(discount.title)}</strong><small>${escapeHtml(renderDiscountPeriod(discount))} · ${discount.active ? 'Ativo' : 'Inativo'}</small></span>
+            <strong>${renderDiscountValue(discount)}</strong>
+          </summary>
+          <div class="admin-list-disclosure-body">
+            <dl class="admin-record-details">
+              <div><dt>Código</dt><dd><code>${escapeHtml(discount.code || '-')}</code></dd></div>
+              <div><dt>Usos</dt><dd>${renderDiscountUses(discount)}</dd></div>
+            </dl>
+            ${can(currentUser, 'pricing:write') ? `
+              <div class="admin-button-row">
+                <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-discount" data-discount-id="${discount.id}">${icon('edit')} Editar</button>
+                <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-discount" data-discount-id="${discount.id}">${icon('trash')} Remover</button>
+              </div>
+            ` : ''}
+          </div>
+        </details>
+      `).join('')}
     </div>
   `;
 }
@@ -2212,7 +2494,9 @@ function renderDiscountForm() {
     : Number(editingDiscount?.percentage || 10);
 
   return `
-    <form class="admin-form-grid admin-subform" data-form="discount">
+    <details class="admin-editor-disclosure"${editingDiscount ? ' open' : ''}>
+      <summary>${icon(editingDiscount ? 'edit' : 'plus')} ${editingDiscount ? 'Editar desconto' : 'Adicionar desconto'}</summary>
+      <form class="admin-form-grid admin-subform" data-form="discount">
       <input name="discountId" type="hidden" value="${escapeHtml(editingDiscount?.id || '')}" />
       <label class="admin-field">
         <span>Nome</span>
@@ -2264,7 +2548,8 @@ function renderDiscountForm() {
         <button class="button button-primary" type="submit">${editingDiscount ? `${icon('check')} Guardar desconto` : `${icon('plus')} Adicionar desconto`}</button>
         ${editingDiscount ? `<button class="button admin-secondary-button" type="button" data-action="cancel-discount-edit">Cancelar edição</button>` : ''}
       </div>
-    </form>
+      </form>
+    </details>
   `;
 }
 
@@ -2285,39 +2570,84 @@ function renderExpensesView() {
           <h2>Registos manuais</h2>
         </div>
       </div>
-      ${renderExpenseTable()}
       ${can(currentUser, 'expenses:write') ? renderExpenseForm() : ''}
+      ${renderExpenseFilters()}
+      ${renderExpenseTable()}
     </section>
   `;
 }
 
+function getFilteredExpenses() {
+  const search = ui.expenseFilters.search.trim().toLowerCase();
+  return state.expenses
+    .filter((expense) => ui.expenseFilters.category === 'all' || expense.category === ui.expenseFilters.category)
+    .filter((expense) => {
+      if (ui.expenseFilters.month === 'all') return true;
+      const period = ui.expenseFilters.month.replace(/^year:/, '');
+      return String(expense.date || '').startsWith(period);
+    })
+    .filter((expense) => !search || [expense.description, expense.notes, EXPENSE_LABELS[expense.category]]
+      .some((value) => String(value || '').toLowerCase().includes(search)))
+    .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+}
+
+function renderExpenseFilters() {
+  const months = [...new Set(state.expenses.map((expense) => String(expense.date || '').slice(0, 7)).filter(Boolean))]
+    .sort((a, b) => b.localeCompare(a));
+  const years = [...new Set(months.map((month) => month.slice(0, 4)))];
+  return `
+    <form class="admin-filter-bar admin-expense-filters" data-form="expense-filters">
+      <label class="admin-field">
+        <span>Pesquisar despesas</span>
+        <input name="search" type="search" value="${escapeHtml(ui.expenseFilters.search)}" placeholder="Descrição ou notas" />
+      </label>
+      <label class="admin-field">
+        <span>Categoria</span>
+        <select name="category">
+          ${renderOption('all', 'Todas', ui.expenseFilters.category)}
+          ${Object.entries(EXPENSE_LABELS).map(([value, label]) => renderOption(value, label, ui.expenseFilters.category)).join('')}
+        </select>
+      </label>
+      <label class="admin-field">
+        <span>Período</span>
+        <select name="month">
+          ${renderOption('all', 'Todos', ui.expenseFilters.month)}
+          ${years.map((year) => renderOption(`year:${year}`, `Ano ${year}`, ui.expenseFilters.month)).join('')}
+          ${months.map((month) => {
+            const [year, monthNumber] = month.split('-').map(Number);
+            const label = new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(new Date(year, monthNumber - 1, 1));
+            return renderOption(month, label, ui.expenseFilters.month);
+          }).join('')}
+        </select>
+      </label>
+      <button class="button admin-secondary-button" type="button" data-action="clear-expense-filters">Limpar</button>
+    </form>
+  `;
+}
+
 function renderExpenseTable() {
-  if (!state.expenses.length) return '<p class="admin-empty">Ainda não há despesas registadas.</p>';
+  const expenses = getFilteredExpenses();
+  if (!expenses.length) return '<p class="admin-empty" data-expense-list>Nenhuma despesa corresponde aos filtros.</p>';
 
   return `
-    <div class="admin-table-wrap">
-      <table class="admin-table">
-        <thead><tr><th>Data</th><th>Categoria</th><th>Descrição</th><th>Notas</th><th>Valor</th><th></th></tr></thead>
-        <tbody>
-          ${state.expenses.map((expense) => `
-            <tr>
-              <td>${formatDate(expense.date)}</td>
-              <td>${escapeHtml(EXPENSE_LABELS[expense.category] || expense.category)}</td>
-              <td>${escapeHtml(expense.description)}</td>
-              <td>${escapeHtml(expense.notes || '-')}</td>
-              <td>${renderMoney(expense.amount)}</td>
-              <td>
-                ${can(currentUser, 'expenses:write') ? `
-                  <div class="admin-button-row">
-                    <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-expense" data-expense-id="${expense.id}">${icon('edit')} Editar</button>
-                    <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-expense" data-expense-id="${expense.id}">${icon('trash')} Remover</button>
-                  </div>
-                ` : ''}
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+    <div class="admin-disclosure-list" data-expense-list>
+      ${expenses.map((expense) => `
+        <details class="admin-list-disclosure">
+          <summary>
+            <span><strong>${escapeHtml(expense.description)}</strong><small>${formatDate(expense.date)} · ${escapeHtml(EXPENSE_LABELS[expense.category] || expense.category)}</small></span>
+            <strong>${renderMoney(expense.amount)}</strong>
+          </summary>
+          <div class="admin-list-disclosure-body">
+            <p><strong>Notas:</strong> ${escapeHtml(expense.notes || 'Sem notas.')}</p>
+            ${can(currentUser, 'expenses:write') ? `
+              <div class="admin-button-row">
+                <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-expense" data-expense-id="${expense.id}">${icon('edit')} Editar</button>
+                <button class="button admin-danger-button admin-small-button" type="button" data-action="remove-expense" data-expense-id="${expense.id}">${icon('trash')} Remover</button>
+              </div>
+            ` : ''}
+          </div>
+        </details>
+      `).join('')}
     </div>
   `;
 }
@@ -2326,7 +2656,9 @@ function renderExpenseForm() {
   const editingExpense = state.expenses.find((expense) => expense.id === ui.editingExpenseId);
 
   return `
-    <form class="admin-form-grid admin-subform" data-form="expense">
+    <details class="admin-editor-disclosure"${editingExpense ? ' open' : ''}>
+      <summary>${icon(editingExpense ? 'edit' : 'plus')} ${editingExpense ? 'Editar despesa' : 'Adicionar despesa'}</summary>
+      <form class="admin-form-grid admin-subform" data-form="expense">
       <input name="expenseId" type="hidden" value="${escapeHtml(editingExpense?.id || '')}" />
       <label class="admin-field">
         <span>Data</span>
@@ -2352,7 +2684,8 @@ function renderExpenseForm() {
         <button class="button admin-secondary-button" type="submit">${editingExpense ? `${icon('check')} Guardar despesa` : `${icon('plus')} Adicionar despesa`}</button>
         ${editingExpense ? '<button class="button admin-secondary-button" type="button" data-action="cancel-expense-edit">Cancelar edição</button>' : ''}
       </div>
-    </form>
+      </form>
+    </details>
   `;
 }
 
@@ -2375,12 +2708,15 @@ function renderEmployeesView() {
           const activeSession = state.workSessions.find((session) => session.employeeId === employee.id && !session.end);
           const sessionCount = state.workSessions.filter((session) => session.employeeId === employee.id).length;
           const isExpanded = ui.expandedEmployeeIds.has(employee.id);
+          const roleLabel = ROLE_LABELS[employee.role] || employee.role;
+          const permissionsLabel = ROLE_LABELS[employee.permissionsProfile] || employee.permissionsProfile;
+          const roleSummary = roleLabel === permissionsLabel ? roleLabel : `${roleLabel} · acesso ${permissionsLabel}`;
           return `
             <article class="admin-record">
               <div class="admin-record-main">
                 <div>
                   <strong>${escapeHtml(employee.name)}</strong>
-                  <span>${employee.active ? 'Ativo' : 'Inativo'} · ${escapeHtml(ROLE_LABELS[employee.role] || employee.role)} · ${escapeHtml(ROLE_LABELS[employee.permissionsProfile] || employee.permissionsProfile)}</span>
+                  <span>${employee.active ? 'Ativo' : 'Inativo'} · ${escapeHtml(roleSummary)}</span>
                 </div>
                 <div class="admin-record-badges">
                   <span class="admin-source">${renderMoney(getHourlyRate(employee))}/h</span>
@@ -2392,12 +2728,14 @@ function renderEmployeesView() {
               </div>
               <dl class="admin-record-details">
                 <div><dt>Horas este mês</dt><dd>${monthHours.toFixed(1)} h</dd></div>
-                <div><dt>Ganhos este mês</dt><dd>${renderMoney(monthEarnings)}</dd></div>
                 <div><dt>Modo habitual</dt><dd>${escapeHtml(COMPENSATION_LABELS[getEmployeeDefaultCompensation(employee)])}</dd></div>
-                <div><dt>Sessões registadas</dt><dd>${sessionCount}</dd></div>
               </dl>
               ${isExpanded ? `
                 <div class="admin-employee-details">
+                  <dl class="admin-record-details admin-record-details-secondary">
+                    <div><dt>Ganhos este mês</dt><dd>${renderMoney(monthEarnings)}</dd></div>
+                    <div><dt>Sessões registadas</dt><dd>${sessionCount}</dd></div>
+                  </dl>
                   ${can(currentUser, 'employees:manage') ? `
                     <div class="admin-employee-control-grid">
                       ${renderEmployeeProfileForm(employee)}
@@ -2423,6 +2761,7 @@ function renderEmployeesView() {
                   </div>
                   ${renderEmployeeSessionSummary(employee)}
                   ${can(currentUser, 'employees:manage') ? renderEmployeeWorkCorrectionForm(employee) : ''}
+                  <button class="button admin-secondary-button admin-small-button admin-collapse-button" type="button" data-action="toggle-employee-details" data-employee-id="${employee.id}">${icon('chevronUp')} Fechar detalhes</button>
                 </div>
               ` : ''}
             </article>
@@ -2612,12 +2951,10 @@ function renderWorkView() {
       ${activeSession ? `
         ${renderActiveWorkDetailsForm(employee, activeSession)}
       ` : ui.showManualWorkForm ? '' : `
-        <form class="admin-form-grid" data-form="work-start">
-          ${renderWorkTaskFields(employee)}
-          <div class="admin-form-actions">
-            <button class="button button-primary" type="submit">${icon('timer')} Iniciar trabalho</button>
-          </div>
-        </form>
+        <div class="admin-work-start-row">
+          <span class="admin-status">Relógio parado</span>
+          <button class="button button-primary" type="button" data-action="quick-start-work">${icon('timer')} Iniciar trabalho</button>
+        </div>
       `}
       ${editingOwnSession ? '' : `
         <div class="admin-work-manual-row">
@@ -2676,15 +3013,15 @@ function renderWorkTable(sessions, options = {}) {
         <tbody>
           ${sessions.map((session) => `
             <tr>
-              <td>${formatDate(session.date)}</td>
-              <td>${formatDateTime(session.start)}</td>
-              <td>${session.end ? formatDateTime(session.end) : 'Em curso'}</td>
-              <td>${getWorkDurationHours(session).toFixed(1)} h</td>
-              <td>${escapeHtml(COMPENSATION_LABELS[session.compensationType || 'paid'] || session.compensationType)}</td>
-              <td>${escapeHtml(renderSessionTasks(session))}</td>
-              <td>${renderMoney(getWorkSessionCost(session))}</td>
+              <td data-label="Data">${formatDate(session.date)}</td>
+              <td data-label="Início">${formatDateTime(session.start)}</td>
+              <td data-label="Fim">${session.end ? formatDateTime(session.end) : 'Em curso'}</td>
+              <td data-label="Duração">${getWorkDurationHours(session).toFixed(1)} h</td>
+              <td data-label="Tipo">${escapeHtml(COMPENSATION_LABELS[session.compensationType || 'paid'] || session.compensationType)}</td>
+              <td data-label="Tarefas">${escapeHtml(renderSessionTasks(session))}</td>
+              <td data-label="Valor">${renderMoney(getWorkSessionCost(session))}</td>
               ${showActions ? `
-                <td>
+                <td data-label="Ações">
                   <div class="admin-button-row">
                     ${options.own ? `
                       <button class="button admin-secondary-button admin-small-button" type="button" data-action="edit-own-work-session" data-work-session-id="${session.id}">${icon('edit')} ${session.end ? 'Editar' : 'Atualizar'}</button>
@@ -2700,6 +3037,81 @@ function renderWorkTable(sessions, options = {}) {
         </tbody>
       </table>
     </div>
+  `;
+}
+
+function getMarketingContacts(language) {
+  const contacts = new Map();
+  [...state.reservations, ...state.websiteRequests]
+    .filter((entry) => entry.marketingOptIn && entry.contact?.email)
+    .forEach((entry) => {
+      const email = String(entry.contact.email).trim();
+      const key = email.toLowerCase();
+      contacts.set(key, {
+        name: entry.contact.name || email,
+        email,
+        language: entry.preferredLanguage || 'pt'
+      });
+    });
+
+  return [...contacts.values()]
+    .filter((contact) => contact.language === language)
+    .sort((a, b) => a.name.localeCompare(b.name, 'pt'));
+}
+
+function renderMarketingWorkspace() {
+  const templates = Array.isArray(messageCatalog.marketingTemplates) ? messageCatalog.marketingTemplates : [];
+  const template = templates.find((candidate) => candidate.id === ui.selectedMarketingTemplate) || templates[0];
+  if (template && template.id !== ui.selectedMarketingTemplate) ui.selectedMarketingTemplate = template.id;
+  const contacts = getMarketingContacts(ui.selectedMarketingLanguage);
+  const bcc = contacts.map((contact) => contact.email).join(',');
+  const subject = template?.subject?.[ui.selectedMarketingLanguage] || '';
+  const body = template?.body?.[ui.selectedMarketingLanguage] || '';
+
+  return `
+    <section class="admin-panel">
+      <div class="admin-panel-heading">
+        <div>
+          <p class="admin-eyebrow">Marketing</p>
+          <h2>Contactos com consentimento</h2>
+        </div>
+        <span class="admin-source">${contacts.length} contacto(s)</span>
+      </div>
+      <form class="admin-form-grid" data-form="marketing-message">
+        <label class="admin-field">
+          <span>Idioma</span>
+          <select name="language">
+            ${Object.entries(LANGUAGE_LABELS).map(([value, label]) => renderOption(value, label, ui.selectedMarketingLanguage)).join('')}
+          </select>
+        </label>
+        <label class="admin-field">
+          <span>Modelo</span>
+          <select name="template" ${templates.length ? '' : 'disabled'}>
+            ${templates.map((candidate) => renderOption(candidate.id, candidate.label?.[ui.selectedMarketingLanguage] || candidate.id, ui.selectedMarketingTemplate)).join('')}
+          </select>
+        </label>
+      </form>
+      ${contacts.length ? `
+        <div class="admin-marketing-contact-list">
+          ${contacts.map((contact) => `<span title="${escapeHtml(contact.email)}">${escapeHtml(contact.name)}</span>`).join('')}
+        </div>
+      ` : '<p class="admin-empty">Ainda não há contactos com consentimento neste idioma.</p>'}
+      ${template ? `
+        <label class="admin-field admin-field-full">
+          <span>Assunto</span>
+          <input data-marketing-subject type="text" value="${escapeHtml(subject)}" />
+        </label>
+        <label class="admin-field admin-field-full">
+          <span>Mensagem</span>
+          <textarea class="admin-message-output" data-marketing-output>${escapeHtml(body)}</textarea>
+        </label>
+        <div class="admin-button-row">
+          <button class="button admin-secondary-button admin-small-button" type="button" data-action="copy-text" data-copy-text="${escapeHtml(bcc)}" ${contacts.length ? '' : 'disabled'}>${icon('copy')} Copiar lista CCI</button>
+          <button class="button admin-secondary-button admin-small-button" type="button" data-action="copy-marketing-message">${icon('copy')} Copiar mensagem</button>
+          <button class="button button-primary admin-small-button" type="button" data-action="send-marketing-email" data-bcc="${escapeHtml(bcc)}" ${contacts.length ? '' : 'disabled'}>${icon('mail')} Abrir email</button>
+        </div>
+      ` : '<p class="admin-empty">Adicione modelos em locales/messages.json para preparar campanhas.</p>'}
+    </section>
   `;
 }
 
@@ -2778,9 +3190,6 @@ function renderMessagesView() {
             ${Object.entries(LANGUAGE_LABELS).map(([value, label]) => renderOption(value, label, ui.selectedMessageLanguage)).join('')}
           </select>
         </label>
-        <div class="admin-form-actions">
-          <button class="button admin-secondary-button" type="submit">${icon('check')} Atualizar mensagem</button>
-        </div>
       </form>
       ${!templates.length ? '<p class="admin-empty">Não há modelos configurados em locales/messages.json.</p>' : selectedReservation || isStandaloneMessage ? `
         <div class="admin-message-meta">
@@ -2796,11 +3205,13 @@ function renderMessagesView() {
         })}
       ` : draft ? '' : '<p class="admin-empty">Ainda não há reservas para gerar mensagens.</p>'}
     </section>
+    ${renderMarketingWorkspace()}
   `;
 }
 
 function renderReportsView() {
   const report = buildReportData();
+  const reportSectionsOpen = '';
 
   return `
     <section class="admin-panel">
@@ -2844,8 +3255,8 @@ function renderReportsView() {
     </div>
 
     <section class="admin-dashboard-grid">
-      <article class="admin-panel">
-        <div class="admin-panel-heading"><div><p class="admin-eyebrow">Reservas</p><h2>Operação</h2></div></div>
+      <details class="admin-panel admin-report-disclosure"${reportSectionsOpen}>
+        <summary><span><span class="admin-eyebrow">Reservas</span><strong>Operação</strong></span></summary>
         <dl class="admin-definition-list">
           <div><dt>Duração média</dt><dd>${report.reservations.averageStay} noite(s)</dd></div>
           <div><dt>Lead time médio</dt><dd>${report.reservations.averageLeadTime} dia(s)</dd></div>
@@ -2854,21 +3265,23 @@ function renderReportsView() {
           <div><dt>Período mais ocupado</dt><dd>${escapeHtml(report.reservations.busiestPeriod)}</dd></div>
           <div><dt>Reservas repetidas</dt><dd>${report.guests.repeatBookings}</dd></div>
         </dl>
-      </article>
-      <article class="admin-panel">
-        <div class="admin-panel-heading"><div><p class="admin-eyebrow">Hóspedes</p><h2>Perfil</h2></div></div>
+        <button class="button admin-secondary-button admin-small-button" type="button" data-action="export-report" data-report="reservations">${icon('download')} Exportar reservas</button>
+      </details>
+      <details class="admin-panel admin-report-disclosure"${reportSectionsOpen}>
+        <summary><span><span class="admin-eyebrow">Hóspedes</span><strong>Perfil</strong></span></summary>
         <dl class="admin-definition-list">
           <div><dt>Total de hóspedes</dt><dd>${report.guests.total}</dd></div>
           <div><dt>Tamanho médio do grupo</dt><dd>${report.guests.averageGroupSize}</dd></div>
           <div><dt>Novos vs repetidos</dt><dd>${report.guests.newGuests} novos · ${report.guests.returningGuests} repetidos</dd></div>
         </dl>
         ${renderCountList(report.guests.groupSizes, {})}
-      </article>
+        <button class="button admin-secondary-button admin-small-button" type="button" data-action="export-report" data-report="guests">${icon('download')} Exportar hóspedes</button>
+      </details>
     </section>
 
     <section class="admin-dashboard-grid">
-      <article class="admin-panel">
-        <div class="admin-panel-heading"><div><p class="admin-eyebrow">Receita</p><h2>Origem do valor</h2></div></div>
+      <details class="admin-panel admin-report-disclosure"${reportSectionsOpen}>
+        <summary><span><span class="admin-eyebrow">Receita</span><strong>Origem do valor</strong></span></summary>
         <dl class="admin-definition-list">
           <div><dt>Alojamento</dt><dd>${renderMoney(report.revenue.accommodation)}</dd></div>
           <div><dt>Serviços</dt><dd>${renderMoney(report.revenue.services)}</dd></div>
@@ -2876,42 +3289,34 @@ function renderReportsView() {
           <div><dt>Valor médio/reserva</dt><dd>${renderMoney(report.revenue.averageReservation)}</dd></div>
         </dl>
         ${renderCountList(report.reservations.bySource, SOURCE_LABELS)}
-      </article>
-      <article class="admin-panel">
-        <div class="admin-panel-heading"><div><p class="admin-eyebrow">Despesas</p><h2>Custos e resultado</h2></div></div>
+        <button class="button admin-secondary-button admin-small-button" type="button" data-action="export-report" data-report="summary">${icon('download')} Exportar resumo</button>
+      </details>
+      <details class="admin-panel admin-report-disclosure"${reportSectionsOpen}>
+        <summary><span><span class="admin-eyebrow">Despesas</span><strong>Custos e resultado</strong></span></summary>
         <dl class="admin-definition-list">
           <div><dt>Total de despesas</dt><dd>${renderMoney(report.expenses.total)}</dd></div>
           <div><dt>Custos de trabalho</dt><dd>${renderMoney(report.expenses.employeeCosts)}</dd></div>
           <div><dt>Resultado estimado</dt><dd>${renderMoney(report.performance.profit)}</dd></div>
         </dl>
         ${renderCountList(report.expenses.byCategory, EXPENSE_LABELS)}
-      </article>
+        <div class="admin-button-row">
+          <button class="button admin-secondary-button admin-small-button" type="button" data-action="export-report" data-report="expenses">${icon('download')} Exportar despesas</button>
+          <button class="button admin-secondary-button admin-small-button" type="button" data-action="export-report" data-report="work">${icon('download')} Exportar trabalho</button>
+        </div>
+      </details>
     </section>
 
     <section class="admin-dashboard-grid">
-      <article class="admin-panel">
-        <div class="admin-panel-heading"><div><p class="admin-eyebrow">Idiomas</p><h2>Preferência dos hóspedes</h2></div></div>
+      <details class="admin-panel admin-report-disclosure"${reportSectionsOpen}>
+        <summary><span><span class="admin-eyebrow">Idiomas</span><strong>Preferência dos hóspedes</strong></span></summary>
         ${renderCountList(report.guests.byLanguage, LANGUAGE_LABELS)}
-      </article>
-      <article class="admin-panel">
-        <div class="admin-panel-heading"><div><p class="admin-eyebrow">Nacionalidade</p><h2>Registos conhecidos</h2></div></div>
+        <button class="button admin-secondary-button admin-small-button" type="button" data-action="export-report" data-report="guests">${icon('download')} Exportar hóspedes</button>
+      </details>
+      <details class="admin-panel admin-report-disclosure"${reportSectionsOpen}>
+        <summary><span><span class="admin-eyebrow">Nacionalidade</span><strong>Registos conhecidos</strong></span></summary>
         ${renderCountList(report.guests.byNationality, {})}
-      </article>
-    </section>
-
-    <section class="admin-panel">
-      <div class="admin-panel-heading">
-        <div>
-          <p class="admin-eyebrow">Exportar</p>
-          <h2>Relatórios CSV</h2>
-        </div>
-      </div>
-      <div class="admin-button-row">
-        <button class="button admin-secondary-button" type="button" data-action="export-report" data-report="reservations">${icon('download')} Reservas</button>
-        <button class="button admin-secondary-button" type="button" data-action="export-report" data-report="expenses">${icon('download')} Despesas</button>
-        <button class="button admin-secondary-button" type="button" data-action="export-report" data-report="work">${icon('download')} Horas e custos</button>
-        <button class="button admin-secondary-button" type="button" data-action="export-report" data-report="summary">${icon('download')} Resumo financeiro</button>
-      </div>
+        <button class="button admin-secondary-button admin-small-button" type="button" data-action="export-report" data-report="guests">${icon('download')} Exportar hóspedes</button>
+      </details>
     </section>
   `;
 }
@@ -3088,29 +3493,29 @@ function renderSettingsView() {
     <section class="admin-panel">
       <div class="admin-panel-heading">
         <div>
-          <p class="admin-eyebrow">Protótipo</p>
-          <h2>Limites e próximos passos</h2>
-        </div>
-      </div>
-      <div class="admin-note-list">
-        <p><strong>Admin em português:</strong> esta área não usa os ficheiros públicos de i18n.</p>
-        <p><strong>Dados:</strong> a UI fala com uma camada de repositório. Neste protótipo, o repositório usa localStorage; em produção, deve ser trocado por APIs autenticadas.</p>
-        <p><strong>Segurança:</strong> não coloque dados reais, documentos de identificação ou informação financeira sensível neste modo local.</p>
-      </div>
-      <div class="admin-button-row">
-        ${can(currentUser, 'data:export') ? `<button class="button admin-secondary-button" type="button" data-action="export-data">${icon('download')} Exportar dados JSON</button>` : ''}
-        ${can(currentUser, 'data:reset') ? `<button class="button admin-danger-button" type="button" data-action="reset-demo">${icon('trash')} Repor dados de demonstração</button>` : ''}
-      </div>
-    </section>
-    <section class="admin-panel">
-      <div class="admin-panel-heading">
-        <div>
           <p class="admin-eyebrow">Log</p>
           <h2>Histórico de alterações</h2>
         </div>
       </div>
       ${renderAuditFilters()}
       ${renderAuditList()}
+    </section>
+    <section class="admin-panel admin-collapsible-panel">
+      <details class="admin-panel-disclosure">
+        <summary>
+          <span><span class="admin-eyebrow">Protótipo</span><strong>Dados e segurança</strong></span>
+          <span class="admin-source">Avançado</span>
+        </summary>
+        <div class="admin-note-list">
+          <p><strong>Admin em português:</strong> esta área não usa os ficheiros públicos de i18n.</p>
+          <p><strong>Dados:</strong> a UI fala com uma camada de repositório. Neste protótipo, o repositório usa localStorage; em produção, deve ser trocado por APIs autenticadas.</p>
+          <p><strong>Segurança:</strong> não coloque dados reais, documentos de identificação ou informação financeira sensível neste modo local.</p>
+        </div>
+        <div class="admin-button-row">
+          ${can(currentUser, 'data:export') ? `<button class="button admin-secondary-button" type="button" data-action="export-data">${icon('download')} Exportar dados JSON</button>` : ''}
+          ${can(currentUser, 'data:reset') ? `<button class="button admin-danger-button" type="button" data-action="reset-demo">${icon('trash')} Repor dados de demonstração</button>` : ''}
+        </div>
+      </details>
     </section>
   `;
 }
@@ -3174,95 +3579,52 @@ function humanizeAuditDetailKey(key) {
 }
 
 function getAuditEntityDetailRows(entry) {
-  const rows = [];
-
-  Object.entries(entry.details || {}).forEach(([key, value]) => {
-    rows.push([humanizeAuditDetailKey(key), formatAuditValue(value)]);
-  });
+  const rows = Object.entries(entry.details || {}).map(([key, value]) => [
+    humanizeAuditDetailKey(key),
+    formatAuditValue(value)
+  ]);
 
   if (entry.entityType === 'reservation') {
     const reservation = state.reservations.find((candidate) => candidate.id === entry.entityId);
     if (!reservation) return rows;
-    const totals = calculateReservationTotals(reservation, state);
-    rows.push(
+    rows.unshift(
       ['Hóspede', reservation.contact?.name || '-'],
-      ['Datas', formatStayRange(reservation.stay)],
-      ['Estado atual', STATUS_LABELS[reservation.status] || reservation.status],
-      ['Pagamento atual', PAYMENT_LABELS[reservation.paymentStatus] || reservation.paymentStatus],
-      ['Hóspedes', formatGuestSummary(reservation.guests)],
-      ['Hóspedes extra', renderGuestAdjustmentsSummary(reservation)],
-      ['Total atual', renderMoney(totals.total)]
+      ['Datas', formatStayRange(reservation.stay)]
     );
   } else if (entry.entityType === 'websiteRequest') {
     const request = state.websiteRequests.find((candidate) => candidate.id === entry.entityId);
     if (!request) return rows;
-    rows.push(
-      ['Contacto', request.contact?.name || '-'],
-      ['Datas', formatStayRange(request.stay)],
-      ['Estado atual', getRequestStatusLabel(request.status)],
-      ['Depósito', getDepositRequestText(request)],
-      ['Total estimado', renderMoney(request.estimatedTotal || 0)]
+    rows.unshift(
+      ['Hóspede', request.contact?.name || '-'],
+      ['Datas', formatStayRange(request.stay)]
     );
   } else if (entry.entityType === 'expense') {
     const expense = state.expenses.find((candidate) => candidate.id === entry.entityId);
     if (!expense) return rows;
-    rows.push(
+    rows.unshift(
       ['Data', formatCompactDate(expense.date)],
-      ['Categoria', EXPENSE_LABELS[expense.category] || expense.category],
-      ['Descrição', expense.description],
-      ['Valor', renderMoney(expense.amount)],
-      ['Notas', expense.notes || '-']
+      ['Despesa', expense.description]
     );
   } else if (entry.entityType === 'workSession') {
     const session = state.workSessions.find((candidate) => candidate.id === entry.entityId);
     const employee = state.employees.find((candidate) => candidate.id === session?.employeeId);
     if (!session) return rows;
-    rows.push(
+    rows.unshift(
       ['Pessoa', employee?.name || session.employeeId],
-      ['Início', formatDateTime(session.start)],
-      ['Fim', session.end ? formatDateTime(session.end) : 'Em curso'],
-      ['Tipo', COMPENSATION_LABELS[session.compensationType || 'paid'] || session.compensationType],
-      ['Tarefas', renderSessionTasks(session)],
-      ['Custo', renderMoney(getWorkSessionCost(session))]
+      ['Data', formatCompactDate(session.date)]
     );
   } else if (entry.entityType === 'employee') {
     const employee = state.employees.find((candidate) => candidate.id === entry.entityId);
     if (!employee) return rows;
-    rows.push(
-      ['Nome', employee.name],
-      ['Perfil', ROLE_LABELS[employee.permissionsProfile] || employee.permissionsProfile],
-      ['Modo habitual', COMPENSATION_LABELS[getEmployeeDefaultCompensation(employee)]],
-      ['Taxa atual', `${renderMoney(getHourlyRate(employee))}/h`]
-    );
+    rows.unshift(['Pessoa', employee.name]);
   } else if (entry.entityType === 'pricing') {
     const season = (state.pricing.seasons || []).find((candidate) => candidate.id === entry.entityId);
     const discount = (state.pricing.discounts || []).find((candidate) => candidate.id === entry.entityId);
-    if (season) {
-      rows.push(
-        ['Época', season.title],
-        ['Período', formatSeasonPeriod(season)],
-        ['Adulto/noite', renderMoney(season.adultNight)],
-        ['Criança/noite', renderMoney(season.childNight)]
-      );
-    } else if (discount) {
-      rows.push(
-        ['Desconto', discount.title],
-        ['Código', discount.code || '-'],
-        ['Valor', renderDiscountValue(discount)],
-        ['Período', renderDiscountPeriod(discount)]
-      );
-    } else if (entry.entityId === 'base') {
-      rows.push(
-        ['Adulto/noite base', renderMoney(state.pricing.adultNight)],
-        ['Mínimo cobrado', `${state.pricing.minimumPaidAdults || 2} adulto(s)`],
-        ['Criança/noite base', renderMoney(state.pricing.childNight)]
-      );
-    } else if (entry.entityId === 'services') {
-      rows.push(
-        ['Bicicleta/dia', renderMoney(state.pricing.bikeDay)],
-        ['Depósito', renderMoney(state.pricing.securityDeposit)]
-      );
-    }
+    if (season) rows.unshift(['Época', season.title]);
+    if (discount) rows.unshift(['Desconto', discount.title]);
+  } else if (entry.entityType === 'service') {
+    const service = state.services.find((candidate) => candidate.id === entry.entityId);
+    if (service) rows.unshift(['Serviço', service.name]);
   }
 
   return rows;
@@ -3278,16 +3640,22 @@ function renderAuditEntryDetails(entry) {
 
 function renderAuditList() {
   const entries = getFilteredAuditLog();
+  const visibleEntries = entries.slice(0, ui.auditLimit);
+  const remaining = entries.length - visibleEntries.length;
 
   return `
     <div class="admin-record-list" data-audit-list>
-      ${entries.length ? entries.map((entry) => {
+      ${entries.length ? visibleEntries.map((entry) => {
         const isExpanded = ui.expandedAuditIds.has(entry.id);
+        const changePreview = Object.entries(entry.details || {}).slice(0, 2)
+          .map(([key, value]) => `${humanizeAuditDetailKey(key)}: ${formatAuditValue(value)}`)
+          .join(' · ');
         return `
           <article class="admin-record admin-record-compact">
             <button class="admin-audit-row" type="button" data-action="toggle-audit" data-audit-id="${entry.id}">
               <strong>${escapeHtml(formatDateTime(entry.at))}</strong>
               <span>${escapeHtml(entry.actorName)} · ${escapeHtml(entry.action)} · ${escapeHtml(entry.entityType)} ${escapeHtml(entry.entityId)}</span>
+              ${changePreview ? `<small>${escapeHtml(changePreview)}</small>` : ''}
             </button>
             ${isExpanded ? `
               <dl class="admin-record-details">
@@ -3297,10 +3665,12 @@ function renderAuditList() {
                 <div><dt>Quando</dt><dd>${escapeHtml(formatDateTime(entry.at))}</dd></div>
                 ${renderAuditEntryDetails(entry)}
               </dl>
+              <button class="button admin-secondary-button admin-small-button admin-collapse-button" type="button" data-action="toggle-audit" data-audit-id="${entry.id}">${icon('chevronUp')} Fechar detalhes</button>
             ` : ''}
           </article>
         `;
       }).join('') : '<p class="admin-empty">Nenhuma alteração corresponde aos filtros.</p>'}
+      ${remaining > 0 ? `<button class="button admin-secondary-button admin-load-more" type="button" data-action="show-more-audit">Mostrar mais (${remaining})</button>` : ''}
     </div>
   `;
 }
@@ -3399,6 +3769,9 @@ function buildReservationFromForm(form) {
     phone: String(data.get('phone') || '').trim()
   };
   const guestNationality = String(data.get('nationality') || '').trim();
+  const guestNif = String(data.get('nif') || '').trim();
+  const guestIdentityDocumentType = String(data.get('identityDocumentType') || '').trim();
+  const guestIdentityDocumentNumber = String(data.get('identityDocumentNumber') || '').trim();
   const websiteRequestId = String(data.get('websiteRequestId') || '').trim();
   const preferredLanguage = String(data.get('preferredLanguage') || 'pt');
   const status = String(data.get('status') || 'awaiting_payment');
@@ -3406,9 +3779,15 @@ function buildReservationFromForm(form) {
   const checkOutTime = normalizeAdminTime(data.get('checkOutTime') || state.property.defaultCheckOutTime, 'Hora de check-out');
   const discountType = String(data.get('discountType') || 'percentage');
   const discountValue = Math.max(0, Number(data.get('discountValue') || 0));
-  const paymentStatus = status === 'confirmed'
-    ? 'paid'
-    : existingReservation?.paymentStatus || 'awaiting_transfer';
+  const paymentStatus = String(data.get('paymentStatus') || existingReservation?.paymentStatus || 'awaiting_transfer');
+
+  if (!RESERVATION_PAYMENT_STATUSES.includes(paymentStatus)) {
+    throw new Error('Escolha um estado de pagamento válido.');
+  }
+
+  if (guestIdentityDocumentType && !IDENTITY_DOCUMENT_LABELS[guestIdentityDocumentType]) {
+    throw new Error('Escolha um tipo de documento de identificação válido.');
+  }
 
   return {
     id: reservationId || makeId('RES', state.reservations),
@@ -3417,6 +3796,11 @@ function buildReservationFromForm(form) {
     sourceReference: String(data.get('sourceReference') || websiteRequestId || '').trim(),
     status,
     paymentStatus,
+    securityDepositPaid: data.get('securityDepositPaid') === 'on',
+    paymentDeadlineAt: status === 'awaiting_payment'
+      ? existingReservation?.paymentDeadlineAt || new Date(Date.now() + PAYMENT_HOLD_HOURS * 60 * 60 * 1000).toISOString()
+      : '',
+    cancellationReason: existingReservation?.cancellationReason || '',
     preferredLanguage,
     contact,
     stay: {
@@ -3437,7 +3821,7 @@ function buildReservationFromForm(form) {
       adultNight: state.pricing.adultNight,
       minimumPaidAdults: state.pricing.minimumPaidAdults || 2,
       childNight: state.pricing.childNight,
-      bikeDay: state.pricing.bikeDay,
+      bikeDay: getBikeServicePrice(),
       discountType,
       discountPercent: discountType === 'percentage' ? Math.min(100, discountValue) : 0,
       discountAmount: discountType === 'amount' ? discountValue : 0,
@@ -3452,7 +3836,12 @@ function buildReservationFromForm(form) {
     },
     guestAdjustments: existingGuestAdjustments,
     marketingOptIn: data.get('marketingOptIn') === 'on',
-    guestNationality,
+    guestProfile: {
+      nationality: guestNationality,
+      nif: guestNif,
+      identityDocumentType: guestIdentityDocumentType,
+      identityDocumentNumber: guestIdentityDocumentNumber
+    },
     websiteRequestId,
     notes: {
       owner: String(data.get('ownerNotes') || '').trim(),
@@ -3474,12 +3863,39 @@ function handleLoginSubmit(form) {
     .catch((error) => renderLogin(error.message));
 }
 
+function getReservationAuditChanges(previousReservation, reservation, previousGuest = {}, guest = {}) {
+  const changes = {};
+  const addChange = (label, before, after) => {
+    if (String(before ?? '') !== String(after ?? '')) changes[label] = `${before || '-'} -> ${after || '-'}`;
+  };
+
+  addChange('Estado', STATUS_LABELS[previousReservation.status] || previousReservation.status, STATUS_LABELS[reservation.status] || reservation.status);
+  addChange('Pagamento', PAYMENT_LABELS[previousReservation.paymentStatus] || previousReservation.paymentStatus, PAYMENT_LABELS[reservation.paymentStatus] || reservation.paymentStatus);
+  addChange('Datas', formatStayRange(previousReservation.stay), formatStayRange(reservation.stay));
+  addChange('Horários', formatStayTimes(previousReservation.stay), formatStayTimes(reservation.stay));
+  addChange('Hóspedes', formatGuestSummary(previousReservation.guests), formatGuestSummary(reservation.guests));
+  addChange('Idioma', LANGUAGE_LABELS[previousReservation.preferredLanguage] || previousReservation.preferredLanguage, LANGUAGE_LABELS[reservation.preferredLanguage] || reservation.preferredLanguage);
+  addChange('Origem', SOURCE_LABELS[previousReservation.source] || previousReservation.source, SOURCE_LABELS[reservation.source] || reservation.source);
+  addChange('Nome', previousReservation.contact?.name, reservation.contact?.name);
+  addChange('Email', previousReservation.contact?.email, reservation.contact?.email);
+  addChange('Telefone', previousReservation.contact?.phone, reservation.contact?.phone);
+  addChange('Nacionalidade', previousGuest.nationality, guest.nationality);
+  addChange('NIF', previousGuest.nif, guest.nif);
+  addChange('Tipo de documento', IDENTITY_DOCUMENT_LABELS[previousGuest.identityDocumentType] || previousGuest.identityDocumentType, IDENTITY_DOCUMENT_LABELS[guest.identityDocumentType] || guest.identityDocumentType);
+  addChange('Número do documento', previousGuest.identityDocumentNumber, guest.identityDocumentNumber);
+  addChange('Caução recebida', previousReservation.securityDepositPaid ? 'Sim' : 'Não', reservation.securityDepositPaid ? 'Sim' : 'Não');
+  addChange('Notas operacionais', previousReservation.notes?.operational, reservation.notes?.operational);
+
+  return changes;
+}
+
 async function handleCreateReservation(form) {
   requirePermission(currentUser, 'reservations:write');
   const reservation = buildReservationFromForm(form);
   const existingIndex = state.reservations.findIndex((candidate) => candidate.id === reservation.id);
   const isEditing = existingIndex >= 0;
   const previousReservation = isEditing ? state.reservations[existingIndex] : null;
+  const previousGuest = isEditing ? { ...(getReservationGuest(previousReservation) || {}) } : {};
   const extraGuestPaymentStatusChanges = isEditing
     ? getExtraGuestPaymentStatusChanges(previousReservation, reservation)
     : [];
@@ -3491,14 +3907,19 @@ async function handleCreateReservation(form) {
     if (!confirmed) return;
   }
 
-  const guest = getOrCreateGuest(state, reservation.contact, reservation.preferredLanguage, reservation.guestNationality);
+  const guestProfile = reservation.guestProfile || {};
+  const guest = getOrCreateGuest(state, reservation.contact, reservation.preferredLanguage, guestProfile.nationality);
+  guest.nationality = String(guestProfile.nationality || '');
+  guest.nif = String(guestProfile.nif || '');
+  guest.identityDocumentType = String(guestProfile.identityDocumentType || '');
+  guest.identityDocumentNumber = String(guestProfile.identityDocumentNumber || '');
   reservation.guestId = guest.id;
-  delete reservation.guestNationality;
+  delete reservation.guestProfile;
   if (isEditing) {
     state.reservations[existingIndex] = reservation;
-    addAudit(state, currentUser, 'Reserva editada', 'reservation', reservation.id, extraGuestPaymentStatusChanges.length ? {
-      'Pagamento dos hóspedes extra': extraGuestPaymentStatusChanges
-    } : {});
+    const changes = getReservationAuditChanges(previousReservation, reservation, previousGuest, guest);
+    if (extraGuestPaymentStatusChanges.length) changes['Pagamento dos hóspedes extra'] = extraGuestPaymentStatusChanges;
+    addAudit(state, currentUser, 'Reserva editada', 'reservation', reservation.id, changes);
   } else {
     state.reservations.push(reservation);
   }
@@ -3518,13 +3939,21 @@ async function handleCreateReservation(form) {
   ui.messageDraft = null;
   ui.requestDraftId = '';
   ui.editingReservationId = '';
+  ui.showReservationForm = false;
   ui.reservationFilters.search = '';
-  if (!isEditing) {
+  if (!isEditing && ['website', 'private'].includes(reservation.source)) {
     ui.selectedMessageReservationId = reservation.id;
-    ui.selectedMessageTemplate = resolveMessageTemplateId('paymentInstructions');
+    ui.selectedMessageTemplate = resolveMessageTemplateId(
+      ['unpaid', 'awaiting_transfer'].includes(reservation.paymentStatus) || reservation.status === 'awaiting_payment'
+        ? 'paymentInstructions'
+        : 'bookingConfirmation'
+    );
     ui.activeView = 'messages';
+  } else {
+    ui.activeView = 'reservations';
   }
   await persist(isEditing ? `Reserva ${reservation.id} atualizada.` : `Reserva ${reservation.id} criada.`);
+  scrollToAdminViewTop();
 }
 
 async function handleAcceptRequest(requestId) {
@@ -3558,6 +3987,7 @@ async function handleRejectRequest(requestId) {
   ui.selectedMessageReservationId = '';
   ui.activeView = 'messages';
   await persist(`Pedido ${request.id} rejeitado.`);
+  scrollToAdminViewTop();
 }
 
 async function handleMarkPaid(reservationId) {
@@ -3566,8 +3996,11 @@ async function handleMarkPaid(reservationId) {
   if (!reservation) return;
   reservation.status = 'confirmed';
   reservation.paymentStatus = 'paid';
+  reservation.paymentDeadlineAt = '';
   reservation.updatedAt = new Date().toISOString();
-  addAudit(state, currentUser, 'Pagamento marcado como recebido', 'reservation', reservation.id);
+  addAudit(state, currentUser, 'Pagamento marcado como recebido', 'reservation', reservation.id, {
+    pagamento: 'A aguardar -> Pago'
+  });
   ui.selectedMessageReservationId = reservation.id;
   await persist(`Pagamento de ${reservation.id} marcado como recebido.`);
 }
@@ -3579,18 +4012,66 @@ async function handleReservationOperationsSubmit(form) {
 
   if (!reservation) throw new Error('Reserva não encontrada.');
 
+  const guest = getReservationGuest(reservation)
+    || getOrCreateGuest(state, reservation.contact, reservation.preferredLanguage);
+
+  const before = {
+    checkInTime: reservation.stay.checkInTime,
+    checkOutTime: reservation.stay.checkOutTime,
+    language: reservation.preferredLanguage,
+    nationality: guest.nationality || '',
+    nif: guest.nif || '',
+    identityDocumentType: guest.identityDocumentType || '',
+    identityDocumentNumber: guest.identityDocumentNumber || '',
+    payment: reservation.paymentStatus,
+    securityDepositPaid: Boolean(reservation.securityDepositPaid)
+  };
+
   reservation.stay.checkInTime = normalizeAdminTime(data.get('checkInTime') || state.property.defaultCheckInTime, 'Hora de check-in');
   reservation.stay.checkOutTime = normalizeAdminTime(data.get('checkOutTime') || state.property.defaultCheckOutTime, 'Hora de check-out');
+  const paymentStatus = String(data.get('paymentStatus') || reservation.paymentStatus || 'awaiting_transfer');
+  const identityDocumentType = String(data.get('identityDocumentType') ?? guest.identityDocumentType ?? '').trim();
+  if (!RESERVATION_PAYMENT_STATUSES.includes(paymentStatus)) {
+    throw new Error('Escolha um estado de pagamento válido.');
+  }
+  if (identityDocumentType && !IDENTITY_DOCUMENT_LABELS[identityDocumentType]) {
+    throw new Error('Escolha um tipo de documento de identificação válido.');
+  }
+
   reservation.preferredLanguage = String(data.get('preferredLanguage') || reservation.preferredLanguage || 'pt');
-  reservation.paymentStatus = String(data.get('paymentStatus') || reservation.paymentStatus || 'awaiting_transfer');
+  reservation.paymentStatus = paymentStatus;
+  reservation.securityDepositPaid = data.get('securityDepositPaid') === 'on';
+  guest.preferredLanguage = reservation.preferredLanguage;
+  guest.nationality = String(data.get('nationality') ?? guest.nationality ?? '').trim();
+  guest.nif = String(data.get('nif') ?? guest.nif ?? '').trim();
+  guest.identityDocumentType = identityDocumentType;
+  guest.identityDocumentNumber = String(data.get('identityDocumentNumber') ?? guest.identityDocumentNumber ?? '').trim();
+  reservation.guestId = guest.id;
 
   if (reservation.paymentStatus === 'paid' && reservation.status === 'awaiting_payment') {
     reservation.status = 'confirmed';
+    reservation.paymentDeadlineAt = '';
   }
 
   reservation.updatedAt = new Date().toISOString();
   ui.editingReservationId = '';
-  addAudit(state, currentUser, 'Dados operacionais da reserva atualizados', 'reservation', reservation.id);
+  const changes = {};
+  const addChange = (key, previousValue, nextValue, labels = {}) => {
+    if (previousValue === nextValue) return;
+    changes[key] = `${labels[previousValue] || previousValue || '-'} -> ${labels[nextValue] || nextValue || '-'}`;
+  };
+  addChange('horário check-in', before.checkInTime, reservation.stay.checkInTime);
+  addChange('horário check-out', before.checkOutTime, reservation.stay.checkOutTime);
+  addChange('idioma', before.language, reservation.preferredLanguage, LANGUAGE_LABELS);
+  addChange('nacionalidade', before.nationality, guest.nationality);
+  addChange('NIF', before.nif, guest.nif);
+  addChange('tipo de documento', before.identityDocumentType, guest.identityDocumentType, IDENTITY_DOCUMENT_LABELS);
+  addChange('número do documento', before.identityDocumentNumber, guest.identityDocumentNumber);
+  addChange('pagamento', before.payment, reservation.paymentStatus, PAYMENT_LABELS);
+  addChange('caução recebida', before.securityDepositPaid ? 'Sim' : 'Não', reservation.securityDepositPaid ? 'Sim' : 'Não');
+  if (Object.keys(changes).length) {
+    addAudit(state, currentUser, 'Dados operacionais da reserva atualizados', 'reservation', reservation.id, changes);
+  }
   await persist(`Operação de ${reservation.id} guardada.`);
 }
 
@@ -3619,6 +4100,10 @@ async function handleRestoreReservation(reservationId) {
 
   reservation.status = reservation.previousStatusBeforeCancel || 'awaiting_payment';
   delete reservation.previousStatusBeforeCancel;
+  delete reservation.cancellationReason;
+  if (reservation.status === 'awaiting_payment') {
+    reservation.paymentDeadlineAt = new Date(Date.now() + PAYMENT_HOLD_HOURS * 60 * 60 * 1000).toISOString();
+  }
   reservation.updatedAt = new Date().toISOString();
   addAudit(state, currentUser, 'Reserva restaurada', 'reservation', reservation.id);
   await persist(`Reserva ${reservation.id} restaurada.`);
@@ -3630,17 +4115,51 @@ async function handlePricingSubmit(form) {
   state.pricing.adultNight = Math.max(0, Number(data.get('adultNight') || 0));
   state.pricing.minimumPaidAdults = Math.max(1, Number(data.get('minimumPaidAdults') || 2));
   state.pricing.childNight = Math.max(0, Number(data.get('childNight') || 0));
-  addAudit(state, currentUser, 'Preços de alojamento atualizados', 'pricing', 'base');
+  state.pricing.securityDeposit = Math.max(0, Number(data.get('securityDeposit') || 0));
+  addAudit(state, currentUser, 'Preços de alojamento atualizados', 'pricing', 'base', {
+    adultoNoite: state.pricing.adultNight,
+    criancaNoite: state.pricing.childNight,
+    caucao: state.pricing.securityDeposit
+  });
   await persist('Preços de alojamento guardados.');
 }
 
-async function handleServicePricingSubmit(form) {
+async function handleServiceSubmit(form) {
   requirePermission(currentUser, 'pricing:write');
   const data = new FormData(form);
-  state.pricing.bikeDay = Math.max(0, Number(data.get('bikeDay') || 0));
-  state.pricing.securityDeposit = Math.max(0, Number(data.get('securityDeposit') || 0));
-  addAudit(state, currentUser, 'Preços de serviços atualizados', 'pricing', 'services');
-  await persist('Preços de serviços guardados.');
+  const serviceId = String(data.get('serviceId') || '').trim();
+  const existingService = state.services.find((service) => service.id === serviceId);
+  const name = String(data.get('name') || '').trim();
+  const generatedId = name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '') || makeId('SERVICE', state.services);
+  const service = existingService || { id: generatedId };
+
+  if (!existingService && state.services.some((candidate) => candidate.id === service.id)) {
+    throw new Error('Já existe um serviço com este nome.');
+  }
+
+  Object.assign(service, {
+    name,
+    description: String(data.get('description') || '').trim(),
+    price: Math.max(0, Number(data.get('price') || 0)),
+    unit: String(data.get('unit') || '').trim(),
+    enabled: data.get('enabled') === 'on',
+    showOnBooking: data.get('showOnBooking') === 'on',
+    showOnGuestStay: data.get('showOnGuestStay') === 'on'
+  });
+
+  if (!existingService) state.services.push(service);
+  if (service.id === 'bikes') state.pricing.bikeDay = service.price;
+  addAudit(state, currentUser, existingService ? 'Serviço atualizado' : 'Serviço criado', 'service', service.id, {
+    estado: service.enabled ? 'Ativo' : 'Desativado',
+    preco: service.price,
+    unidade: service.unit
+  });
+  await persist(existingService ? 'Serviço atualizado.' : 'Serviço adicionado.');
 }
 
 async function handleSeasonSubmit(form) {
@@ -3977,35 +4496,8 @@ async function handleStartWork(form) {
     notes: ''
   });
   ui.showManualWorkForm = false;
+  ui.showWorkStartChooser = false;
   addAudit(state, currentUser, 'Horário iniciado', 'workSession', state.workSessions[0].id);
-  await persist('Horário iniciado.');
-}
-
-async function handleQuickStartWork() {
-  requirePermission(currentUser, 'work:own');
-  const employee = getEmployeeForUser(state, currentUser);
-  if (!employee) throw new Error('Não existe funcionário ligado a este utilizador.');
-
-  if (state.workSessions.some((session) => session.employeeId === employee.id && !session.end)) {
-    throw new Error('Já existe um horário iniciado.');
-  }
-
-  const now = new Date();
-  const date = formatDateKey(now);
-  const compensationType = getEmployeeDefaultCompensation(employee);
-  state.workSessions.unshift({
-    id: makeId('WORK', state.workSessions),
-    employeeId: employee.id,
-    date,
-    start: now.toISOString(),
-    end: null,
-    rateSnapshot: compensationType === 'paid' ? getHourlyRate(employee, date) : 0,
-    compensationType,
-    tasks: ['other'],
-    otherDetails: 'Iniciado no painel',
-    notes: ''
-  });
-  addAudit(state, currentUser, 'Horário iniciado no painel', 'workSession', state.workSessions[0].id);
   await persist('Horário iniciado.');
 }
 
@@ -4030,6 +4522,28 @@ function syncReservationFiltersFromForm(form) {
   ui.reservationFilters.search = String(data.get('search') || '');
   ui.reservationFilters.status = String(data.get('status') || 'all');
   ui.reservationFilters.source = String(data.get('source') || 'all');
+  ui.reservationFilters.payment = String(data.get('payment') || 'all');
+  ui.reservationLimit = ADMIN_LIST_PAGE_SIZE;
+}
+
+function syncExpenseFiltersFromForm(form) {
+  const data = new FormData(form);
+  ui.expenseFilters.search = String(data.get('search') || '');
+  ui.expenseFilters.category = String(data.get('category') || 'all');
+  ui.expenseFilters.month = String(data.get('month') || 'all');
+}
+
+function updateExpenseList() {
+  const list = app.querySelector('[data-expense-list]');
+  if (!list) return;
+  list.outerHTML = renderExpenseTable();
+}
+
+function clearExpenseFilters() {
+  ui.expenseFilters.search = '';
+  ui.expenseFilters.category = 'all';
+  ui.expenseFilters.month = 'all';
+  renderApp();
 }
 
 function updateReservationList() {
@@ -4037,9 +4551,7 @@ function updateReservationList() {
   if (!list) return;
 
   const filteredReservations = getFilteredReservations();
-  list.innerHTML = filteredReservations.length
-    ? filteredReservations.map(renderReservationSummary).join('')
-    : '<p class="admin-empty">Nenhuma reserva corresponde aos filtros.</p>';
+  list.innerHTML = renderReservationListContents(filteredReservations);
 }
 
 function handleReservationFilters(form) {
@@ -4051,6 +4563,8 @@ function clearReservationFilters() {
   ui.reservationFilters.search = '';
   ui.reservationFilters.status = 'all';
   ui.reservationFilters.source = 'all';
+  ui.reservationFilters.payment = 'all';
+  ui.reservationLimit = ADMIN_LIST_PAGE_SIZE;
   renderApp();
 }
 
@@ -4059,6 +4573,7 @@ function syncAuditFiltersFromForm(form) {
   ui.auditFilters.search = String(data.get('search') || '');
   ui.auditFilters.entityType = String(data.get('entityType') || 'all');
   ui.auditFilters.actor = String(data.get('actor') || 'all');
+  ui.auditLimit = AUDIT_LIST_PAGE_SIZE;
 }
 
 function updateAuditList() {
@@ -4071,6 +4586,7 @@ function clearAuditFilters() {
   ui.auditFilters.search = '';
   ui.auditFilters.entityType = 'all';
   ui.auditFilters.actor = 'all';
+  ui.auditLimit = AUDIT_LIST_PAGE_SIZE;
   renderApp();
 }
 
@@ -4098,8 +4614,21 @@ function toggleEmployeeDetails(employeeId) {
   renderApp();
 }
 
+function scrollToAdminTarget(targetOrSelector = '.admin-main', behavior = 'auto') {
+  window.requestAnimationFrame(() => {
+    const target = typeof targetOrSelector === 'string'
+      ? document.querySelector(targetOrSelector)
+      : targetOrSelector;
+    target?.scrollIntoView({ behavior, block: 'start', inline: 'nearest' });
+  });
+}
+
+function scrollToAdminViewTop() {
+  scrollToAdminTarget('.admin-main');
+}
+
 function scrollToAdminEditor(selector) {
-  document.querySelector(selector)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  scrollToAdminTarget(selector);
 }
 
 function editWorkSession(sessionId) {
@@ -4150,6 +4679,7 @@ function cancelOwnWorkSessionEdit() {
 function openCreateReservation(requestId = '') {
   ui.requestDraftId = requestId;
   ui.editingReservationId = '';
+  ui.showReservationForm = true;
   ui.showExtraGuestForm = false;
   ui.activeView = 'reservations';
   renderApp();
@@ -4159,6 +4689,7 @@ function openCreateReservation(requestId = '') {
 function manageReservation(reservationId) {
   ui.activeView = 'reservations';
   ui.editingReservationId = reservationId;
+  ui.showReservationForm = true;
   ui.showExtraGuestForm = false;
   ui.requestDraftId = '';
   ui.reservationFilters.search = reservationId;
@@ -4171,6 +4702,7 @@ function manageReservation(reservationId) {
 
 function cancelReservationEdit() {
   ui.editingReservationId = '';
+  ui.showReservationForm = false;
   ui.showExtraGuestForm = false;
   ui.reservationFilters.search = '';
   renderApp();
@@ -4188,6 +4720,7 @@ function toggleReservationDetails(reservationId) {
 
 function togglePastReservations() {
   ui.showPastReservations = !ui.showPastReservations;
+  if (ui.showPastReservations) ui.pastReservationLimit = ADMIN_LIST_PAGE_SIZE;
   renderApp();
 }
 
@@ -4279,6 +4812,7 @@ function handleMessageForRequest(requestId) {
   ui.selectedMessageReservationId = '';
   ui.activeView = 'messages';
   renderApp();
+  scrollToAdminViewTop();
 }
 
 async function copyText(text) {
@@ -4425,6 +4959,28 @@ function handleMessageSubmit(form) {
   renderApp();
 }
 
+function handleMarketingMessageChange(form) {
+  const data = new FormData(form);
+  ui.selectedMarketingLanguage = String(data.get('language') || 'pt');
+  ui.selectedMarketingTemplate = String(data.get('template') || ui.selectedMarketingTemplate);
+  renderApp();
+}
+
+async function copyMarketingMessage() {
+  const output = app.querySelector('[data-marketing-output]');
+  if (output instanceof HTMLTextAreaElement) await copyText(output.value);
+}
+
+function sendMarketingEmail(target) {
+  const bcc = String(target.dataset.bcc || '').trim();
+  if (!bcc) return;
+  const subjectInput = app.querySelector('[data-marketing-subject]');
+  const output = app.querySelector('[data-marketing-output]');
+  const subject = subjectInput instanceof HTMLInputElement ? subjectInput.value : 'O Refúgio';
+  const body = output instanceof HTMLTextAreaElement ? output.value : '';
+  window.location.href = `mailto:?bcc=${encodeURIComponent(bcc)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 function handleReportFilters(form) {
   const data = new FormData(form);
   const period = String(data.get('period') || 'all');
@@ -4530,6 +5086,28 @@ function exportReport(type) {
     return;
   }
 
+  if (type === 'guests') {
+    const guests = new Map();
+    report.countedReservations.forEach((reservation) => {
+      const guest = state.guests.find((candidate) => candidate.id === reservation.guestId);
+      const key = reservation.guestId || reservation.contact.email || reservation.id;
+      guests.set(key, {
+        id: reservation.guestId || '',
+        name: reservation.contact.name,
+        email: reservation.contact.email || '',
+        phone: reservation.contact.phone || '',
+        language: LANGUAGE_LABELS[reservation.preferredLanguage] || reservation.preferredLanguage,
+        nationality: guest?.nationality || '',
+        marketing: reservation.marketingOptIn ? 'Sim' : 'Não'
+      });
+    });
+    downloadCsv(`refugio-hospedes-${suffix}`, [
+      ['ID', 'Nome', 'Email', 'Telefone', 'Idioma', 'Nacionalidade', 'Marketing'],
+      ...[...guests.values()].map((guest) => [guest.id, guest.name, guest.email, guest.phone, guest.language, guest.nationality, guest.marketing])
+    ]);
+    return;
+  }
+
   if (type === 'expenses') {
     downloadCsv(`refugio-despesas-${suffix}`, [
       ['Data', 'Categoria', 'Descrição', 'Notas', 'Valor'],
@@ -4578,6 +5156,26 @@ function exportReport(type) {
   ]);
 }
 
+function resetViewUi(viewId) {
+  ui.expandedReservationIds.clear();
+  ui.expandedEmployeeIds.clear();
+  ui.expandedAuditIds.clear();
+  ui.showPastReservations = false;
+  ui.reservationLimit = ADMIN_LIST_PAGE_SIZE;
+  ui.pastReservationLimit = ADMIN_LIST_PAGE_SIZE;
+  ui.auditLimit = AUDIT_LIST_PAGE_SIZE;
+
+  if (viewId === 'reservations') {
+    ui.reservationFilters = { search: '', status: 'all', source: 'all', payment: 'all' };
+  }
+  if (viewId === 'expenses') {
+    ui.expenseFilters = { search: '', category: 'all', month: 'all' };
+  }
+  if (viewId === 'settings') {
+    ui.auditFilters = { search: '', entityType: 'all', actor: 'all' };
+  }
+}
+
 async function handleClick(event) {
   const target = event.target.closest('[data-action]');
   if (!target) return;
@@ -4586,11 +5184,54 @@ async function handleClick(event) {
   const action = target.dataset.action;
 
   try {
+    if (action === 'toggle-admin-menu') {
+      ui.mobileMenuOpen = !ui.mobileMenuOpen;
+      renderApp();
+      return;
+    }
+
+    if (action === 'close-admin-menu') {
+      ui.mobileMenuOpen = false;
+      renderApp();
+      return;
+    }
+
+    if (action === 'close-work-start-chooser') {
+      ui.showWorkStartChooser = false;
+      clearUnsavedChanges();
+      renderApp();
+      return;
+    }
+
+    if (action === 'close-disclosure') {
+      const details = target.closest('details');
+      const summary = details?.querySelector(':scope > summary');
+      if (details) details.open = false;
+      if (summary?.id) {
+        scrollToAdminTarget(`#${CSS.escape(summary.id)}`, 'smooth');
+      } else {
+        scrollToAdminTarget(details || summary, 'smooth');
+      }
+      return;
+    }
+
     if (action === 'set-view') {
       const nextView = target.dataset.view || 'dashboard';
       if (nextView !== ui.activeView && !confirmDiscardUnsavedChanges()) return;
+      if (nextView === ui.activeView) resetViewUi(nextView);
+      if (ui.activeView === 'reservations' && nextView !== 'reservations') {
+        ui.editingReservationId = '';
+        ui.requestDraftId = '';
+        ui.showReservationForm = false;
+      }
+      if (target.dataset.paymentFilter) {
+        resetViewUi('reservations');
+        ui.reservationFilters.payment = target.dataset.paymentFilter;
+      }
       ui.activeView = nextView;
+      ui.mobileMenuOpen = false;
       renderApp();
+      scrollToAdminViewTop();
       return;
     }
 
@@ -4605,8 +5246,31 @@ async function handleClick(event) {
       return;
     }
 
+    if (action === 'clear-expense-filters') {
+      clearExpenseFilters();
+      return;
+    }
+
     if (action === 'clear-audit-filters') {
       clearAuditFilters();
+      return;
+    }
+
+    if (action === 'show-more-reservations') {
+      ui.reservationLimit += ADMIN_LIST_PAGE_SIZE;
+      renderApp();
+      return;
+    }
+
+    if (action === 'show-more-past-reservations') {
+      ui.pastReservationLimit += ADMIN_LIST_PAGE_SIZE;
+      renderApp();
+      return;
+    }
+
+    if (action === 'show-more-audit') {
+      ui.auditLimit += AUDIT_LIST_PAGE_SIZE;
+      renderApp();
       return;
     }
 
@@ -4647,6 +5311,14 @@ async function handleClick(event) {
 
     if (action === 'toggle-reservation-details') {
       toggleReservationDetails(target.dataset.reservationId || '');
+      return;
+    }
+
+    if (action === 'close-reservation-details') {
+      const reservationId = target.dataset.reservationId || '';
+      ui.expandedReservationIds.delete(reservationId);
+      renderApp();
+      scrollToAdminTarget(`#admin-reservation-${CSS.escape(reservationId)}`, 'smooth');
       return;
     }
 
@@ -4731,14 +5403,12 @@ async function handleClick(event) {
     }
 
     if (action === 'calendar-prev') {
-      ui.calendarMonth.setMonth(ui.calendarMonth.getMonth() - 1);
-      renderApp();
+      changeCalendarMonth(-1);
       return;
     }
 
     if (action === 'calendar-next') {
-      ui.calendarMonth.setMonth(ui.calendarMonth.getMonth() + 1);
-      renderApp();
+      changeCalendarMonth(1);
       return;
     }
 
@@ -4769,13 +5439,19 @@ async function handleClick(event) {
       ui.messageDraft = null;
       ui.activeView = 'messages';
       renderApp();
+      scrollToAdminViewTop();
     }
-    if (action === 'quick-start-work') await handleQuickStartWork();
+    if (action === 'quick-start-work') {
+      ui.showWorkStartChooser = true;
+      renderApp();
+    }
     if (action === 'stop-work') await handleStopWork();
     if (action === 'copy-message') await copyMessage(target);
     if (action === 'copy-draft-message') await copyMessage(target);
+    if (action === 'copy-marketing-message') await copyMarketingMessage();
     if (action === 'send-message-email') sendMessageEmail(target);
     if (action === 'send-message-whatsapp') sendMessageWhatsapp(target);
+    if (action === 'send-marketing-email') sendMarketingEmail(target);
     if (action === 'remove-season') await removeSeason(target.dataset.seasonId);
     if (action === 'remove-guest-adjustment') await removeGuestAdjustment(target.dataset.reservationId, target.dataset.adjustmentId);
     if (action === 'remove-discount') await removeDiscount(target.dataset.discountId);
@@ -4808,7 +5484,7 @@ async function handleSubmit(event) {
     if (formType === 'reservation-operations') await handleReservationOperationsSubmit(form);
     if (formType === 'reservation-filters') handleReservationFilters(form);
     if (formType === 'pricing') await handlePricingSubmit(form);
-    if (formType === 'service-pricing') await handleServicePricingSubmit(form);
+    if (formType === 'service') await handleServiceSubmit(form);
     if (formType === 'season') await handleSeasonSubmit(form);
     if (formType === 'group-discount') await handleGroupDiscountSubmit(form);
     if (formType === 'discount') await handleDiscountSubmit(form);
@@ -4862,6 +5538,25 @@ function handleChange(event) {
     return;
   }
 
+  const expenseFilterForm = target.closest('form[data-form="expense-filters"]');
+  if (expenseFilterForm) {
+    syncExpenseFiltersFromForm(expenseFilterForm);
+    updateExpenseList();
+    return;
+  }
+
+  const messageForm = target.closest('form[data-form="message"]');
+  if (messageForm) {
+    handleMessageSubmit(messageForm);
+    return;
+  }
+
+  const marketingMessageForm = target.closest('form[data-form="marketing-message"]');
+  if (marketingMessageForm) {
+    handleMarketingMessageChange(marketingMessageForm);
+    return;
+  }
+
   const typedDiscountForm = target.closest('form[data-form="create-reservation"], form[data-form="discount"]');
   if (typedDiscountForm && (target.name === 'discountType' || target.name === 'type')) {
     updateTypedDiscountField(typedDiscountForm);
@@ -4897,6 +5592,13 @@ function handleInput(event) {
     return;
   }
 
+  const expenseFilterForm = target.closest('form[data-form="expense-filters"]');
+  if (expenseFilterForm) {
+    syncExpenseFiltersFromForm(expenseFilterForm);
+    updateExpenseList();
+    return;
+  }
+
   const changedForm = target.closest('form[data-form]');
   if (changedForm) {
     markFormDirty(changedForm);
@@ -4908,10 +5610,30 @@ app.addEventListener('click', handleClick);
 app.addEventListener('submit', handleSubmit);
 app.addEventListener('change', handleChange);
 app.addEventListener('input', handleInput);
+app.addEventListener('touchstart', (event) => {
+  if (event.touches.length !== 1 || !event.target.closest('.admin-calendar-grid')) return;
+  adminCalendarSwipeStart = {
+    x: event.touches[0].clientX,
+    y: event.touches[0].clientY
+  };
+}, { passive: true });
+app.addEventListener('touchend', (event) => {
+  if (!adminCalendarSwipeStart || event.changedTouches.length !== 1) return;
+
+  const deltaX = event.changedTouches[0].clientX - adminCalendarSwipeStart.x;
+  const deltaY = event.changedTouches[0].clientY - adminCalendarSwipeStart.y;
+  adminCalendarSwipeStart = null;
+
+  if (Math.abs(deltaX) < 52 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.2) return;
+
+  event.preventDefault();
+  changeCalendarMonth(deltaX < 0 ? 1 : -1);
+});
 window.addEventListener('beforeunload', (event) => {
   if (!ui.hasUnsavedChanges) return;
   event.preventDefault();
   event.returnValue = '';
 });
 
+initCustomSelects();
 loadSessionAndState();

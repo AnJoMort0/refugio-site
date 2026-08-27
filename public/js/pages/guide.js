@@ -1,5 +1,6 @@
 import { getActiveLanguage, getCurrentDictionary, getNestedValue } from '../services/i18n.js';
 import { initScrollReveal } from '../ui/scroll-reveal.js';
+import { SITE_CONFIG } from '../config/site-config.js';
 
 const FAVOURITES_STORAGE_KEY = 'refugio-guide-favourites-v1';
 const GUIDE_OVERRIDE_STORAGE_KEY = 'refugio-guide-listings-v1';
@@ -374,8 +375,57 @@ const GUIDE_LISTING_DEFS = [
   }
 ];
 
-const MAP_DEFAULT_QUERY = 'Rua da Arejinha 627, 4550-518 Pedorido';
-const MAP_DEFAULT_URL = 'https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0205166,-8.3828538,108m/data=!3m1!1e3!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu';
+const MAP_DEFAULT_URL = SITE_CONFIG.property.mapsUrl;
+const GUIDE_COORDINATES = Object.freeze({
+  porto: [41.1502195, -8.6103497],
+  gaia: [41.1292264, -8.6057396],
+  aveiro: [40.640496, -8.6537841],
+  'costa-nova': [40.6125817, -8.7495432],
+  braga: [41.5510583, -8.4280045],
+  'bom-jesus': [41.5544749, -8.377812],
+  viana: [41.6935131, -8.828277],
+  'castelo-paiva': [41.0410042, -8.271775],
+  canedo: [41.017568, -8.4518566],
+  'santa-maria-feira': [40.9254179, -8.5426688],
+  arouca: [40.9289214, -8.2441746],
+  'mosteiro-arouca': [40.9298, -8.2456],
+  'ponte-516-arouca': [40.9643992, -8.1746438],
+  'passadicos-paiva': [40.9529102, -8.1769093],
+  'serra-freita': [40.8669768, -8.2669369],
+  'frecha-mizarela': [40.8629785, -8.2826679],
+  'pedras-parideiras': [40.8508952, -8.2825686],
+  cinfaes: [41.0326798, -8.1080075],
+  'adega-ramadinha': [41.0474029, -8.3751374],
+  corga: [40.9828736, -8.309872],
+  'cafe-cruzeiro': [41.0352, -8.3778],
+  aquapura: [41.04835, -8.37675],
+  'praia-pedorido': [41.0486021, -8.3762132],
+  'viver-douro': [41.0447985, -8.3637114],
+  'ilha-amores': [41.0665323, -8.2623658],
+  lomba: [41.069751, -8.4130696],
+  espinho: [41.0158379, -8.645921],
+  furadouro: [40.8751527, -8.6767972],
+  'serra-sao-domingos': [41.0268748, -8.3510589],
+  'baloico-sao-gens': [41.0457017, -8.2995017],
+  'castelo-feira': [40.9209023, -8.5426938],
+  'sao-joao-porto': [41.1502195, -8.6103497],
+  'sao-joao-paiva': [41.0410042, -8.271775],
+  'santos-populares': [41.0410042, -8.271775],
+  'feira-vinho-verde': [41.0410042, -8.271775],
+  'viagem-medieval': [40.9254179, -8.5426688],
+  'romaria-sao-domingos': [41.0269394, -8.3497193],
+  'nossa-senhora-amoras': [41.0357339, -8.3547737]
+});
+const MAP_CATEGORY_STYLES = Object.freeze({
+  property: { color: '#24452f', shape: 'house', labelKey: 'guidePage.map.propertyLabel' },
+  beaches: { color: '#0077b6', shape: 'circle', labelKey: 'guidePage.browser.beaches' },
+  nature: { color: '#2f7d32', shape: 'triangle', labelKey: 'guidePage.browser.nature' },
+  cities: { color: '#c74432', shape: 'square', labelKey: 'guidePage.browser.cities' },
+  nearby: { color: '#d28a00', shape: 'pin', labelKey: 'guidePage.browser.nearby' },
+  events: { color: '#9b2f65', shape: 'diamond', labelKey: 'guidePage.browser.events' },
+  partners: { color: '#65412f', shape: 'hexagon', labelKey: 'guidePage.labels.partner' }
+});
+const MAP_CATEGORY_PRIORITY = ['events', 'partners', 'beaches', 'nature', 'cities', 'nearby'];
 
 function escapeHtml(value = '') {
   return String(value)
@@ -428,16 +478,20 @@ function resolveDefinitions() {
   return GUIDE_LISTING_DEFS
     .map((definition) => {
       const override = overrides?.[definition.id];
-      return override && typeof override === 'object'
+      const resolved = override && typeof override === 'object'
         ? { ...definition, ...override }
         : { ...definition };
+      return {
+        ...resolved,
+        coordinates: resolved.coordinates || GUIDE_COORDINATES[definition.id] || null
+      };
     })
     .filter((definition) => definition.published !== false && !isExpired(definition));
 }
 
-function getText(path, fallback = '') {
+function getText(path) {
   const value = getNestedValue(getCurrentDictionary(), path);
-  return value === undefined || value === null ? fallback : String(value);
+  return value === undefined || value === null ? '' : String(value);
 }
 
 function listingText(id) {
@@ -450,16 +504,14 @@ function icon(name) {
     map: '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle>',
     route: '<circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle>',
     clock: '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>',
+    chevronDown: '<path d="m6 9 6 6 6-6"></path>',
+    check: '<path d="M20 6 9 17l-5-5"></path>',
+    external: '<path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>',
     waves: '<path d="M2 6c.6.5 1.2 1 2.5 1S6.4 6 7.7 6s1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.5 1"></path><path d="M2 12c.6.5 1.2 1 2.5 1s1.9-1 3.2-1 1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.5 1"></path><path d="M2 18c.6.5 1.2 1 2.5 1s1.9-1 3.2-1 1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.2 1 1.9-1 3.2-1 1.9 1 3.5 1"></path>',
     mountain: '<path d="m8 3 4 8 3-4 6 10H3Z"></path><path d="m8 3 2.2 4.4L8.8 8.8 7.2 7.6 6 9"></path>',
     sparkles: '<path d="m12 3-1.5 3.5L7 8l3.5 1.5L12 13l1.5-3.5L17 8l-3.5-1.5Z"></path><path d="m5 14-.8 1.8L2.5 16.5l1.7.7L5 19l.8-1.8 1.7-.7-1.7-.7Z"></path><path d="m19 14-1 2.3-2.3 1 2.3 1L19 21l1-2.7 2.3-1-2.3-1Z"></path>',
   };
   return `<svg class="lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || ''}</svg>`;
-}
-
-function mapEmbedUrl(query) {
-  const language = encodeURIComponent(getActiveLanguage() || 'pt');
-  return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed&hl=${language}`;
 }
 
 function genericMapUrl(query) {
@@ -514,10 +566,17 @@ export function initGuidePage() {
   const locationButton = document.querySelector('[data-guide-location]');
   const locationLabel = document.querySelector('[data-guide-location-label]');
   const locationStatus = document.querySelector('[data-guide-location-status]');
-  const mapFrame = document.querySelector('[data-guide-map-frame]');
+  const mapCanvas = document.querySelector('[data-guide-map-canvas]');
+  const mapLegend = document.querySelector('[data-guide-map-legend]');
+  const mapFallback = document.querySelector('[data-guide-map-fallback]');
   const mapTitle = document.querySelector('[data-guide-map-title]');
   const mapLink = document.querySelector('[data-guide-map-link]');
   const partnerRoot = document.querySelector('[data-guide-partners]');
+  const loadMoreWrap = document.querySelector('[data-guide-load-more-wrap]');
+  const loadMoreButton = document.querySelector('[data-guide-load-more]');
+  const compactGuideQuery = window.matchMedia('(max-width: 767px)');
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const compactPageSize = 6;
 
   let definitions = resolveDefinitions();
   let favourites = readFavourites();
@@ -527,6 +586,15 @@ export function initGuidePage() {
   let selectedId = null;
   let locationOrigin = null;
   let viewMode = window.matchMedia('(max-width: 767px)').matches ? 'list' : 'map';
+  let visibleLimit = compactGuideQuery.matches ? compactPageSize : Number.POSITIVE_INFINITY;
+  let expandedPartnerId = null;
+  let guideMap = null;
+  let guideMarkerLayer = null;
+  let mapMarkers = new Map();
+
+  function resetVisibleLimit() {
+    visibleLimit = compactGuideQuery.matches ? compactPageSize : Number.POSITIVE_INFINITY;
+  }
 
   function translated(definition) {
     const text = listingText(definition.id);
@@ -534,27 +602,32 @@ export function initGuidePage() {
     return { ...definition, text };
   }
 
-  function visibleListings() {
+  function matchesCurrentCriteria(item) {
     const normalizedNeedle = normalizeSearch(searchTerm);
+    if (activeFilter === 'favourites' && !favourites.has(item.id)) return false;
+    if (activeFilter !== 'all' && activeFilter !== 'favourites' && !item.tags.includes(activeFilter)) return false;
+    if (!normalizedNeedle) return true;
 
-    const items = definitions
-      .filter((definition) => definition.list !== false)
+    const haystack = normalizeSearch([
+      item.text.name,
+      item.text.category,
+      item.text.description,
+      item.text.note,
+      item.text.eventDate
+    ].filter(Boolean).join(' '));
+    return haystack.includes(normalizedNeedle);
+  }
+
+  function filteredListings({ includePartners = false } = {}) {
+    return definitions
+      .filter((definition) => includePartners || definition.list !== false)
       .map(translated)
       .filter(Boolean)
-      .filter((item) => {
-        if (activeFilter === 'favourites' && !favourites.has(item.id)) return false;
-        if (activeFilter !== 'all' && activeFilter !== 'favourites' && !item.tags.includes(activeFilter)) return false;
+      .filter(matchesCurrentCriteria);
+  }
 
-        if (!normalizedNeedle) return true;
-        const haystack = normalizeSearch([
-          item.text.name,
-          item.text.category,
-          item.text.description,
-          item.text.note,
-          item.text.eventDate
-        ].filter(Boolean).join(' '));
-        return haystack.includes(normalizedNeedle);
-      });
+  function visibleListings() {
+    const items = filteredListings();
 
     items.sort((a, b) => {
       if (sortMode === 'alpha') {
@@ -573,17 +646,17 @@ export function initGuidePage() {
   function cardMarkup(item) {
     const isFavourite = favourites.has(item.id);
     const partnerBadge = item.partner
-      ? `<span class="guide-badge partner">${escapeHtml(getText('guidePage.labels.partner', 'Parceiro'))}</span>`
+      ? `<span class="guide-badge partner">${escapeHtml(getText('guidePage.labels.partner'))}</span>`
       : '';
     const seasonalBadge = item.seasonal
-      ? `<span class="guide-badge seasonal">${escapeHtml(getText('guidePage.labels.seasonal', 'Sazonal'))}</span>`
+      ? `<span class="guide-badge seasonal">${escapeHtml(getText('guidePage.labels.seasonal'))}</span>`
       : '';
     const closestBadge = item.featured === 'closest'
-      ? `<span class="guide-badge">${escapeHtml(getText('guidePage.labels.closest', 'Mais próximo'))}</span>`
+      ? `<span class="guide-badge">${escapeHtml(getText('guidePage.labels.closest'))}</span>`
       : '';
 
     const timeMarkup = item.text.time
-      ? `<span>${icon('clock')}${escapeHtml(item.text.time)} ${escapeHtml(getText('guidePage.labels.fromRefugio', 'de O Refúgio'))}</span>`
+      ? `<span>${icon('clock')}${escapeHtml(item.text.time)} ${escapeHtml(getText('guidePage.labels.fromRefugio'))}</span>`
       : '';
 
     const noteMarkup = item.text.note
@@ -599,7 +672,7 @@ export function initGuidePage() {
     const imageMarkup = `
       <div class="guide-card-media guide-card-media--${escapeHtml(fallbackTheme)}" data-guide-card-media>
         <div class="guide-card-fallback" aria-hidden="true">
-          <span class="guide-card-fallback-brand">${escapeHtml(getText('brand.name', 'O Refúgio'))}</span>
+          <span class="guide-card-fallback-brand">${escapeHtml(getText('brand.name'))}</span>
           <span class="guide-card-fallback-icon">${guideFallbackIcon(fallbackTheme)}</span>
           <span class="guide-card-fallback-label">${escapeHtml(item.text.category)}</span>
         </div>
@@ -617,6 +690,16 @@ export function initGuidePage() {
     return `
       <article class="card guide-card${selectedId === item.id ? ' is-selected' : ''}" id="guia-${escapeHtml(item.id)}" data-guide-card="${escapeHtml(item.id)}">
         ${imageMarkup}
+        <button
+          type="button"
+          class="guide-card-action guide-favourite-button${isFavourite ? ' is-favourite' : ''}"
+          data-guide-favourite="${escapeHtml(item.id)}"
+          aria-pressed="${String(isFavourite)}"
+          aria-label="${escapeHtml(getText(isFavourite ? 'guidePage.labels.removeFavourite' : 'guidePage.labels.favourite'))}"
+          title="${escapeHtml(getText(isFavourite ? 'guidePage.labels.removeFavourite' : 'guidePage.labels.favourite'))}"
+        >
+          ${icon('heart')}
+        </button>
         <div class="guide-card-header">
           <div class="guide-card-title-wrap">
             <span class="guide-card-category">${escapeHtml(item.text.category)}</span>
@@ -629,24 +712,14 @@ export function initGuidePage() {
         ${noteMarkup}
         <div class="guide-card-meta">
           ${timeMarkup}
-          <span>${escapeHtml(getText('guidePage.labels.confirmHours', 'Confirme horários e condições antes da visita.'))}</span>
+          <span>${escapeHtml(getText('guidePage.labels.confirmHours'))}</span>
         </div>
         <div class="guide-card-actions">
           <a class="button button-primary" href="${escapeHtml(directions)}" target="_blank" rel="noopener" data-guide-directions="${escapeHtml(item.id)}">
-            ${icon('route')}<span>${escapeHtml(getText('guidePage.labels.directions', 'Abrir direções'))}</span>
+            ${icon('route')}<span>${escapeHtml(getText('guidePage.labels.directions'))}</span>
           </a>
           <button type="button" class="guide-card-action" data-guide-map-select="${escapeHtml(item.id)}">
-            ${icon('map')}<span>${escapeHtml(getText('guidePage.labels.showOnMap', 'Ver no mapa'))}</span>
-          </button>
-          <button
-            type="button"
-            class="guide-card-action guide-favourite-button${isFavourite ? ' is-favourite' : ''}"
-            data-guide-favourite="${escapeHtml(item.id)}"
-            aria-pressed="${String(isFavourite)}"
-            aria-label="${escapeHtml(getText(isFavourite ? 'guidePage.labels.removeFavourite' : 'guidePage.labels.favourite', isFavourite ? 'Remover dos favoritos' : 'Guardar nos favoritos'))}"
-            title="${escapeHtml(getText(isFavourite ? 'guidePage.labels.removeFavourite' : 'guidePage.labels.favourite', isFavourite ? 'Remover dos favoritos' : 'Guardar nos favoritos'))}"
-          >
-            ${icon('heart')}
+            ${icon('map')}<span>${escapeHtml(getText('guidePage.labels.showOnMap'))}</span>
           </button>
         </div>
       </article>
@@ -677,32 +750,281 @@ export function initGuidePage() {
     });
   }
 
+  function mapCategory(item) {
+    return MAP_CATEGORY_PRIORITY.find((category) => item.tags.includes(category)) || 'nearby';
+  }
+
+  function markerIcon(category, { property = false, selected = false } = {}) {
+    const style = MAP_CATEGORY_STYLES[category] || MAP_CATEGORY_STYLES.nearby;
+    return window.L.divIcon({
+      className: 'guide-leaflet-div-icon',
+      html: `<span class="guide-map-pin shape-${style.shape}${property ? ' is-property' : ''}${selected ? ' is-selected' : ''}" style="--guide-pin-color:${style.color}"><span></span></span>`,
+      iconSize: property ? [34, 42] : [28, 35],
+      iconAnchor: property ? [17, 41] : [14, 34],
+      popupAnchor: [0, property ? -38 : -31]
+    });
+  }
+
+  function mapPopup(item) {
+    return `
+      <div class="guide-map-popup">
+        <span>${escapeHtml(item.text.category)}</span>
+        <strong>${escapeHtml(item.text.name)}</strong>
+        <a href="${escapeHtml(directionsUrl(item, locationOrigin))}" target="_blank" rel="noopener">
+          ${escapeHtml(getText('guidePage.labels.directions'))}
+        </a>
+      </div>
+    `;
+  }
+
+  function renderMapLegend(categories) {
+    if (!mapLegend) return;
+    const orderedCategories = ['property', ...MAP_CATEGORY_PRIORITY]
+      .filter((category, index, values) => values.indexOf(category) === index)
+      .filter((category) => category === 'property' || categories.has(category));
+
+    mapLegend.innerHTML = `
+      <strong>${escapeHtml(getText('guidePage.map.legendTitle'))}</strong>
+      <div>
+        ${orderedCategories.map((category) => {
+          const style = MAP_CATEGORY_STYLES[category];
+          return `<span><i class="shape-${style.shape}" style="--guide-pin-color:${style.color}"></i>${escapeHtml(getText(style.labelKey))}</span>`;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  function updateMapMarkers({ fit = true } = {}) {
+    if (!guideMap || !guideMarkerLayer || !window.L) return;
+
+    guideMarkerLayer.clearLayers();
+    mapMarkers = new Map();
+    const categories = new Set();
+    const usedCoordinates = new Map();
+    const propertyCoordinates = SITE_CONFIG.property.coordinates;
+    const propertyMarker = window.L.marker(propertyCoordinates, {
+      icon: markerIcon('property', { property: true }),
+      keyboard: true,
+      title: getText('guidePage.map.propertyLabel'),
+      zIndexOffset: 1000
+    }).bindPopup(`
+      <div class="guide-map-popup">
+        <span>${escapeHtml(getText('guidePage.map.defaultAddress'))}</span>
+        <strong>${escapeHtml(getText('guidePage.map.propertyLabel'))}</strong>
+        <a href="${escapeHtml(MAP_DEFAULT_URL)}" target="_blank" rel="noopener">${escapeHtml(getText('guidePage.map.openDefault'))}</a>
+      </div>
+    `);
+    propertyMarker.addTo(guideMarkerLayer);
+
+    filteredListings({ includePartners: true })
+      .filter((item) => Array.isArray(item.coordinates) && item.coordinates.length === 2)
+      .forEach((item) => {
+        const category = mapCategory(item);
+        const coordinateKey = item.coordinates.join(',');
+        const duplicateIndex = usedCoordinates.get(coordinateKey) || 0;
+        usedCoordinates.set(coordinateKey, duplicateIndex + 1);
+        const angle = duplicateIndex * 2.4;
+        const offset = duplicateIndex === 0 ? 0 : 0.00016 * Math.ceil(duplicateIndex / 2);
+        const coordinates = [
+          item.coordinates[0] + Math.sin(angle) * offset,
+          item.coordinates[1] + Math.cos(angle) * offset
+        ];
+        const marker = window.L.marker(coordinates, {
+          icon: markerIcon(category, { selected: item.id === selectedId }),
+          keyboard: true,
+          title: item.text.name
+        }).bindPopup(mapPopup(item));
+
+        marker.on('click', () => selectOnMap(item.id, false, { openPopup: false }));
+        marker.addTo(guideMarkerLayer);
+        mapMarkers.set(item.id, marker);
+        categories.add(category);
+      });
+
+    renderMapLegend(categories);
+    if (!fit) return;
+
+    const bounds = guideMarkerLayer.getBounds();
+    if (bounds.isValid()) {
+      guideMap.fitBounds(bounds, { padding: [34, 34], maxZoom: 13, animate: !reducedMotionQuery.matches });
+    } else {
+      guideMap.setView(propertyCoordinates, 12);
+    }
+  }
+
+  function initInteractiveMap() {
+    if (!mapCanvas) return;
+    if (!window.L) {
+      mapCanvas.classList.add('is-unavailable');
+      if (mapFallback) mapFallback.hidden = false;
+      return;
+    }
+
+    guideMap = window.L.map(mapCanvas, {
+      scrollWheelZoom: false,
+      zoomControl: true
+    }).setView(SITE_CONFIG.property.coordinates, 11);
+    window.L.tileLayer(SITE_CONFIG.map.tileUrl, {
+      maxZoom: SITE_CONFIG.map.maxZoom,
+      attribution: SITE_CONFIG.map.attribution
+    }).addTo(guideMap);
+    guideMarkerLayer = window.L.featureGroup().addTo(guideMap);
+    guideMap.on('focus', () => guideMap.scrollWheelZoom.enable());
+    guideMap.on('blur', () => guideMap.scrollWheelZoom.disable());
+    if (mapFallback) mapFallback.hidden = true;
+  }
+
   function renderResults() {
-    const items = visibleListings();
+    const allItems = visibleListings();
+    const items = allItems.slice(0, visibleLimit);
     results.innerHTML = items.map(cardMarkup).join('');
     bindCardImages();
-    empty.hidden = items.length !== 0;
+    empty.hidden = allItems.length !== 0;
 
-    const template = getText(items.length === 1 ? 'guidePage.browser.result' : 'guidePage.browser.results', items.length === 1 ? '{count} sugestão' : '{count} sugestões');
-    resultsCount.textContent = replaceCount(template, items.length);
+    const template = getText(allItems.length === 1 ? 'guidePage.browser.result' : 'guidePage.browser.results');
+    resultsCount.textContent = replaceCount(template, allItems.length);
+
+    if (loadMoreWrap && loadMoreButton) {
+      const remaining = Math.max(allItems.length - items.length, 0);
+      loadMoreWrap.hidden = remaining === 0;
+      loadMoreButton.textContent = replaceCount(
+        getText('guidePage.browser.showMore'),
+        remaining
+      );
+    }
 
     bindResultActions();
+    updateMapMarkers();
   }
 
   function partnerMarkup(item) {
     if (!item.image) return '';
-    const details = item.text?.description || getText('guidePage.partners.detailsSoon', 'Informação detalhada a completar.');
+    const details = item.text?.description || '';
+    const partnerDetails = getNestedValue(getCurrentDictionary(), `guidePage.partners.details.${item.id}`) || {};
+    const highlights = Array.isArray(partnerDetails.highlights) ? partnerDetails.highlights : [];
+    const detailsId = `partner-details-${item.id}`;
+    const travelTime = Number.isFinite(item.time)
+      ? `<span class="guide-partner-travel">${icon('clock')} ${escapeHtml(`${item.time} min ${getText('guidePage.labels.fromRefugio')}`)}</span>`
+      : '';
+    const websiteAction = partnerDetails.websiteUrl
+      ? `
+          <a href="${escapeHtml(partnerDetails.websiteUrl)}" target="_blank" rel="noopener">
+            ${icon('external')}<span>${escapeHtml(getText('guidePage.partners.websiteLabel'))}</span>
+          </a>
+        `
+      : '';
     return `
-      <article class="guide-partner-card" data-partner-id="${escapeHtml(item.id)}">
-        <span class="guide-badge partner">${escapeHtml(getText('guidePage.labels.partner', 'Parceiro'))}</span>
-        <img src="${escapeHtml(item.image)}" alt="" loading="lazy" />
+      <article class="guide-partner-card" id="partner-${escapeHtml(item.id)}" data-partner-id="${escapeHtml(item.id)}">
+        <div class="guide-partner-media">
+          <span class="guide-badge partner">${escapeHtml(getText('guidePage.labels.partner'))}</span>
+          <img src="${escapeHtml(item.image)}" alt="" loading="lazy" />
+        </div>
         <div class="guide-partner-card-copy">
-          <h3>${escapeHtml(item.text.name)}</h3>
-          <p>${escapeHtml(details)}</p>
-          <button type="button" class="text-link" data-guide-partner-open="${escapeHtml(item.id)}">${escapeHtml(getText('guidePage.labels.showOnMap', 'Ver no mapa'))}</button>
+          <div class="guide-partner-heading">
+            <span class="guide-partner-category">${escapeHtml(item.text.category)}</span>
+            <h3>${escapeHtml(item.text.name)}</h3>
+            ${travelTime}
+          </div>
+          <p class="guide-partner-summary">${escapeHtml(details)}</p>
+          <div class="guide-partner-details" id="${escapeHtml(detailsId)}" aria-hidden="true" inert>
+            <div class="guide-partner-details-inner">
+              <p class="guide-partner-intro">${escapeHtml(partnerDetails.intro || '')}</p>
+              ${highlights.length ? `
+                <div class="guide-partner-highlights">
+                  <p class="guide-partner-detail-label">${escapeHtml(getText('guidePage.partners.highlightsLabel'))}</p>
+                  <ul>${highlights.map((highlight) => `<li>${icon('check')}<span>${escapeHtml(highlight)}</span></li>`).join('')}</ul>
+                </div>
+              ` : ''}
+              <div class="guide-partner-detail-actions">
+                ${websiteAction}
+                <button type="button" data-guide-partner-open="${escapeHtml(item.id)}">
+                  ${icon('map')}<span>${escapeHtml(getText('guidePage.labels.showOnMap'))}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="guide-partner-more"
+            data-guide-partner-toggle="${escapeHtml(item.id)}"
+            aria-expanded="false"
+            aria-controls="${escapeHtml(detailsId)}"
+          >
+            <span data-guide-partner-toggle-label>${escapeHtml(getText('guidePage.partners.moreLabel'))}</span>
+            ${icon('chevronDown')}
+          </button>
         </div>
       </article>
     `;
+  }
+
+  function capturePartnerLayout() {
+    if (!partnerRoot || reducedMotionQuery.matches) return null;
+    return new Map(
+      [...partnerRoot.querySelectorAll('[data-partner-id]')]
+        .map((article) => [article.dataset.partnerId, article.getBoundingClientRect()])
+    );
+  }
+
+  function animatePartnerLayout(previousLayout) {
+    if (!partnerRoot || !previousLayout || reducedMotionQuery.matches) return;
+
+    partnerRoot.querySelectorAll('[data-partner-id]').forEach((article) => {
+      const previous = previousLayout.get(article.dataset.partnerId);
+      if (!previous) return;
+      const next = article.getBoundingClientRect();
+      if (!next.width || !next.height) return;
+      const translateX = previous.left - next.left;
+      const translateY = previous.top - next.top;
+      const scaleX = previous.width / next.width;
+      const scaleY = previous.height / next.height;
+      const changed = Math.abs(translateX) > 1
+        || Math.abs(translateY) > 1
+        || Math.abs(scaleX - 1) > 0.01
+        || Math.abs(scaleY - 1) > 0.01;
+      if (!changed) return;
+
+      article.getAnimations().forEach((animation) => animation.cancel());
+      article.animate([
+        {
+          transformOrigin: 'top left',
+          transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`
+        },
+        { transformOrigin: 'top left', transform: 'none' }
+      ], {
+        duration: 440,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+      });
+    });
+  }
+
+  function applyPartnerState(article, expanded) {
+    if (!partnerRoot) return;
+    partnerRoot.querySelectorAll('[data-partner-id]').forEach((candidate) => {
+      const isExpanded = expanded && candidate === article;
+      const button = candidate.querySelector('[data-guide-partner-toggle]');
+      const content = candidate.querySelector('.guide-partner-details');
+      candidate.classList.toggle('is-expanded', isExpanded);
+      button?.setAttribute('aria-expanded', String(isExpanded));
+      button?.classList.toggle('is-open', isExpanded);
+      content?.setAttribute('aria-hidden', String(!isExpanded));
+      content?.toggleAttribute('inert', !isExpanded);
+      const label = button?.querySelector('[data-guide-partner-toggle-label]');
+      if (label) label.textContent = getText(isExpanded ? 'guidePage.partners.lessLabel' : 'guidePage.partners.moreLabel');
+    });
+
+    expandedPartnerId = expanded ? article?.dataset.partnerId || null : null;
+    partnerRoot.classList.toggle('has-expanded', Boolean(expandedPartnerId));
+  }
+
+  function setPartnerExpanded(article, expanded, options = {}) {
+    if (!article) return;
+    const previousLayout = options.animate === false ? null : capturePartnerLayout();
+    partnerRoot?.querySelectorAll('[data-partner-id]').forEach((candidate) => {
+      candidate.getAnimations().forEach((animation) => animation.cancel());
+    });
+    applyPartnerState(article, expanded);
+    animatePartnerLayout(previousLayout);
   }
 
   function renderPartners() {
@@ -714,9 +1036,27 @@ export function initGuidePage() {
 
     partnerRoot.innerHTML = partners.map(partnerMarkup).join('');
 
+    if (expandedPartnerId) {
+      const expandedArticle = partnerRoot.querySelector(`[data-partner-id="${CSS.escape(expandedPartnerId)}"]`);
+      if (expandedArticle) setPartnerExpanded(expandedArticle, true, { animate: false });
+      else expandedPartnerId = null;
+    }
+
+    partnerRoot.querySelectorAll('[data-guide-partner-toggle]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const article = button.closest('[data-partner-id]');
+        const shouldExpand = button.getAttribute('aria-expanded') !== 'true';
+        setPartnerExpanded(article, shouldExpand);
+        if (shouldExpand) {
+          window.setTimeout(() => article.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), reducedMotionQuery.matches ? 0 : 460);
+        }
+      });
+    });
+
     partnerRoot.querySelectorAll('[data-guide-partner-open]').forEach((button) => {
       button.addEventListener('click', () => {
         const id = button.dataset.guidePartnerOpen;
+        setFilter('all');
         setView('map');
         selectOnMap(id, true);
       });
@@ -725,11 +1065,18 @@ export function initGuidePage() {
 
   function setFilter(nextFilter) {
     activeFilter = nextFilter;
+    selectedId = null;
+    resetVisibleLimit();
     filterButtons.forEach((button) => {
       const active = button.dataset.guideFilter === activeFilter;
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+    if (mapTitle) mapTitle.textContent = getText('guidePage.map.title');
+    if (mapLink) {
+      mapLink.href = MAP_DEFAULT_URL;
+      mapLink.textContent = getText('guidePage.map.openDefault');
+    }
     renderResults();
   }
 
@@ -742,6 +1089,10 @@ export function initGuidePage() {
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+
+    if (viewMode === 'map' && guideMap) {
+      window.setTimeout(() => guideMap.invalidateSize({ animate: false }), 0);
+    }
   }
 
   function selectedDefinition() {
@@ -750,33 +1101,47 @@ export function initGuidePage() {
 
   function resetMap() {
     selectedId = null;
-    if (mapFrame) {
-      mapFrame.src = mapEmbedUrl(MAP_DEFAULT_QUERY);
-      mapFrame.title = getText('guidePage.map.defaultTitle', 'O Refúgio');
-    }
-    if (mapTitle) mapTitle.textContent = getText('guidePage.map.title', 'Veja cada sugestão no Google Maps.');
+    guideMap?.closePopup();
+    mapCanvas?.setAttribute('aria-label', getText('guidePage.map.defaultTitle'));
+    if (mapTitle) mapTitle.textContent = getText('guidePage.map.title');
     if (mapLink) {
       mapLink.href = MAP_DEFAULT_URL;
-      mapLink.textContent = getText('guidePage.map.openDefault', 'Abrir O Refúgio no Google Maps');
+      mapLink.textContent = getText('guidePage.map.openDefault');
     }
+    document.querySelectorAll('[data-guide-card]').forEach((card) => card.classList.remove('is-selected'));
+    updateMapMarkers();
   }
 
-  function selectOnMap(id, shouldScroll = false) {
+  function selectOnMap(id, shouldScroll = false, { openPopup = true } = {}) {
     const definition = definitions.find((item) => item.id === id);
     const item = definition ? translated(definition) : null;
     if (!item) return;
 
+    const previousId = selectedId;
     selectedId = id;
     setView('map');
 
-    if (mapFrame) {
-      mapFrame.src = mapEmbedUrl(item.mapQuery);
-      mapFrame.title = item.text.name;
+    if (previousId && previousId !== id) {
+      const previousDefinition = definitions.find((candidate) => candidate.id === previousId);
+      const previousItem = previousDefinition ? translated(previousDefinition) : null;
+      const previousMarker = mapMarkers.get(previousId);
+      if (previousItem && previousMarker) previousMarker.setIcon(markerIcon(mapCategory(previousItem)));
     }
+
+    mapCanvas?.setAttribute('aria-label', item.text.name);
     if (mapTitle) mapTitle.textContent = item.text.name;
     if (mapLink) {
       mapLink.href = directionsUrl(item, locationOrigin);
-      mapLink.textContent = getText('guidePage.labels.directions', 'Abrir direções');
+      mapLink.textContent = getText('guidePage.labels.directions');
+    }
+
+    const marker = mapMarkers.get(id);
+    if (guideMap && marker) {
+      marker.setIcon(markerIcon(mapCategory(item), { selected: true }));
+      guideMap.setView(marker.getLatLng(), Math.max(guideMap.getZoom(), 13), {
+        animate: !reducedMotionQuery.matches
+      });
+      if (openPopup) marker.openPopup();
     }
 
     document.querySelectorAll('[data-guide-card]').forEach((card) => {
@@ -808,7 +1173,7 @@ export function initGuidePage() {
 
   function activateLocation() {
     if (!navigator.geolocation) {
-      locationStatus.textContent = getText('guidePage.browser.locationDenied', 'Não foi possível usar a sua localização.');
+      locationStatus.textContent = getText('guidePage.browser.locationDenied');
       return;
     }
 
@@ -821,7 +1186,7 @@ export function initGuidePage() {
         };
         locationButton.disabled = false;
         locationButton.classList.add('is-active');
-        locationLabel.textContent = getText('guidePage.browser.locationReady', 'Localização ativa para direções');
+        locationLabel.textContent = getText('guidePage.browser.locationReady');
         locationStatus.textContent = '';
         renderResults();
 
@@ -830,7 +1195,7 @@ export function initGuidePage() {
       },
       () => {
         locationButton.disabled = false;
-        locationStatus.textContent = getText('guidePage.browser.locationDenied', 'Não foi possível usar a sua localização.');
+        locationStatus.textContent = getText('guidePage.browser.locationDenied');
       },
       {
         enableHighAccuracy: false,
@@ -842,12 +1207,27 @@ export function initGuidePage() {
 
   function applyHashSelection() {
     const hash = decodeURIComponent(window.location.hash || '');
+    if (hash.startsWith('#partner-')) {
+      const id = hash.slice('#partner-'.length);
+      const article = document.getElementById(`partner-${id}`);
+      if (!article) return;
+      setPartnerExpanded(article, true, { animate: false });
+      window.requestAnimationFrame(() => {
+        article.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      return;
+    }
+
     if (!hash.startsWith('#guia-')) return;
 
     const id = hash.slice('#guia-'.length);
     if (!definitions.some((definition) => definition.id === id)) return;
 
+    const targetIndex = visibleListings().findIndex((definition) => definition.id === id);
+    if (targetIndex >= 0) visibleLimit = Math.max(visibleLimit, targetIndex + 1);
     setFilter('all');
+    if (targetIndex >= 0) visibleLimit = Math.max(visibleLimit, targetIndex + 1);
+    renderResults();
     selectOnMap(id, false);
     window.requestAnimationFrame(() => {
       document.getElementById(`guia-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -869,8 +1249,17 @@ export function initGuidePage() {
     });
   });
 
+  window.addEventListener('hashchange', applyHashSelection);
+
   searchInput?.addEventListener('input', () => {
     searchTerm = searchInput.value;
+    selectedId = null;
+    resetVisibleLimit();
+    if (mapTitle) mapTitle.textContent = getText('guidePage.map.title');
+    if (mapLink) {
+      mapLink.href = MAP_DEFAULT_URL;
+      mapLink.textContent = getText('guidePage.map.openDefault');
+    }
     renderResults();
   });
 
@@ -881,13 +1270,25 @@ export function initGuidePage() {
 
   locationButton?.addEventListener('click', activateLocation);
 
+  loadMoreButton?.addEventListener('click', () => {
+    visibleLimit += compactPageSize;
+    renderResults();
+  });
+
+  compactGuideQuery.addEventListener('change', () => {
+    resetVisibleLimit();
+    if (compactGuideQuery.matches) setView('list');
+    renderResults();
+  });
+
   document.addEventListener('language:changed', () => {
     definitions = resolveDefinitions();
     renderResults();
     renderPartners();
+    applyHashSelection();
 
     if (locationOrigin) {
-      locationLabel.textContent = getText('guidePage.browser.locationReady', 'Localização ativa para direções');
+      locationLabel.textContent = getText('guidePage.browser.locationReady');
     }
 
     const selected = selectedDefinition();
@@ -896,6 +1297,7 @@ export function initGuidePage() {
   });
 
   setView(viewMode);
+  initInteractiveMap();
   renderResults();
   renderPartners();
   resetMap();

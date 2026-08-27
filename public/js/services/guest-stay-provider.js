@@ -3,7 +3,7 @@
   ========================
 
   PROTOTYPE:
-  This provider reads the same same-origin browser localStorage entry currently used by
+  This provider reads the same-origin browser localStorage entry currently used by
   the admin prototype: "refugio-admin-prototype-state-v1".
 
   It deliberately returns only a small guest-safe projection of the current reservation.
@@ -131,12 +131,34 @@ function projectReservationForGuest(state, reservation, todayKey) {
   };
 }
 
+function projectGuestServices(state) {
+  const configuredServices = Array.isArray(state?.services) ? state.services : [];
+  if (configuredServices.length) {
+    return configuredServices.map((service) => ({
+      id: String(service.id || ''),
+      enabled: service.enabled !== false,
+      price: Math.max(0, Number(service.price || service.unitPrice || 0)),
+      showOnBooking: service.showOnBooking !== false,
+      showOnGuestStay: service.showOnGuestStay !== false
+    }));
+  }
+
+  return [{
+    id: 'bikes',
+    enabled: true,
+    price: Math.max(0, Number(state?.pricing?.bikeDay || 5)),
+    showOnBooking: true,
+    showOnGuestStay: true
+  }];
+}
+
 export async function loadGuestStayContext() {
   const state = readAdminPrototypeState();
   if (!state) {
     return {
       personalised: false,
       stay: null,
+      services: [{ id: 'bikes', enabled: true, price: 5, showOnBooking: true, showOnGuestStay: true }],
       source: 'generic',
       reason: 'admin-state-unavailable'
     };
@@ -149,6 +171,7 @@ export async function loadGuestStayContext() {
     return {
       personalised: false,
       stay: null,
+      services: projectGuestServices(state),
       source: 'admin-localstorage',
       reason: 'no-active-reservation'
     };
@@ -157,6 +180,7 @@ export async function loadGuestStayContext() {
   return {
     personalised: true,
     stay: projectReservationForGuest(state, reservation, todayKey),
+    services: projectGuestServices(state),
     source: 'admin-localstorage',
     reason: ''
   };

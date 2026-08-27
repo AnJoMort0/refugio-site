@@ -5,8 +5,10 @@
   "version": "0.1.0",
   "scripts": {
     "check": "node ./scripts/check-project.mjs",
+    "locales:sync": "node ./scripts/sync-locales.mjs",
     "gallery:manifest": "node ./scripts/generate-gallery-manifest.mjs",
-    "dev": "node ./scripts/generate-gallery-manifest.mjs && npx serve public",
-    "preview": "node ./scripts/generate-gallery-manifest.mjs && npx serve public"
+    "qa:capture": "node ./scripts/capture-page.mjs",
+    "dev": "node ./scripts/generate-gallery-manifest.mjs && node ./scripts/dev-server.mjs",
+    "preview": "node ./scripts/generate-gallery-manifest.mjs && node ./scripts/dev-server.mjs"
   }
 }

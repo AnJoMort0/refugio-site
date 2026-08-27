@@ -83,7 +83,7 @@
   display: grid;
   gap: 1rem;
   padding: 1rem;
-  border-radius: 16px;
+  border-radius: 8px;
   background: rgba(30, 26, 24, 0.72);
   color: var(--color-soft-ivory);
 }
@@ -159,7 +159,7 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 8px;
   touch-action: none;
 }
 
@@ -226,8 +226,6 @@ body.gallery-lightbox-open .sticky-booking-cta {
   }
 
   .gallery-nav-button {
-    width: 2.8rem;
-    height: 2.8rem;
-    font-size: 1.7rem;
+    display: none;
   }
 }

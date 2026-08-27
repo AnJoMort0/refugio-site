@@ -1,3 +1,5 @@
+import { SITE_CONFIG, buildWhatsAppUrl } from '../config/site-config.js';
+
 const NAV_ITEMS = [
   { key: 'accommodation', href: './alojamento.html', labelKey: 'nav.accommodation' },
   { key: 'gallery', href: './galeria.html', labelKey: 'nav.gallery' },
@@ -5,18 +7,14 @@ const NAV_ITEMS = [
   { key: 'contact', href: './contacto.html', labelKey: 'nav.contact' },
   { key: 'guide', href: './guia-local.html', labelKey: 'nav.guide' }
 ];
-const GOOGLE_REVIEW_URL =
-  'https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D';
-const FACEBOOK_URL = 'https://example.com/REFUGIO_FACEBOOK_URL_REPLACE_ME';
-const INSTAGRAM_URL = 'https://example.com/REFUGIO_INSTAGRAM_URL_REPLACE_ME';
-const CREATOR_URL = 'https://linktr.ee/anjomorto';
-
 function icon(name) {
   const icons = {
     mail: '<rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>',
     menu: '<path d="M4 12h16"></path><path d="M4 6h16"></path><path d="M4 18h16"></path>',
     chevronDown: '<path d="m6 9 6 6 6-6"></path>',
-    external: '<path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>'
+    external: '<path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>',
+    mapPin: '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle>',
+    phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.69 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.33 1.84.56 2.8.69A2 2 0 0 1 22 16.92Z"></path>'
   };
 
   return `<svg class="lucide-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name] || ''}</svg>`;
@@ -51,6 +49,7 @@ function buildHeader(activePage) {
               data-i18n-attr='{"aria-label":"languageSwitcher.label"}'
             >
               <span class="language-menu-current"></span>
+              <span class="language-menu-current-code" aria-hidden="true"></span>
               <span class="language-menu-caret" aria-hidden="true">${icon('chevronDown')}</span>
             </button>
             <div class="language-menu-popover" role="listbox" aria-label="" data-i18n-attr='{"aria-label":"languageSwitcher.label"}'>
@@ -86,27 +85,53 @@ function buildFooter() {
   return `
     <footer class="site-footer">
       <div class="container footer-inner">
-        <div class="footer-brand">
-          <p data-i18n="footer.copyright"></p>
-          <a class="footer-creator" href="${CREATOR_URL}" target="_blank" rel="noopener" data-i18n="footer.creator"></a>
+        <div class="footer-identity">
+          <a class="footer-logo" href="./index.html">${SITE_CONFIG.property.name}</a>
+          <a class="footer-address" href="${SITE_CONFIG.property.mapsUrl}" data-site-link="maps" target="_blank" rel="noopener">
+            ${icon('mapPin')}
+            <span data-site-value="address">${SITE_CONFIG.property.address}</span>
+          </a>
         </div>
-        <div class="footer-links">
-          <a href="./contacto.html"><span data-i18n="nav.contact"></span></a>
-          <a href="${GOOGLE_REVIEW_URL}" target="_blank" rel="noopener"><span data-i18n="footer.googleReview"></span>${icon('external')}</a>
-          <a href="${FACEBOOK_URL}" target="_blank" rel="noopener"><span data-i18n="footer.facebook"></span>${icon('external')}</a>
-          <a href="${INSTAGRAM_URL}" target="_blank" rel="noopener"><span data-i18n="footer.instagram"></span>${icon('external')}</a>
+        <div class="footer-contact" aria-labelledby="footer-contact-title">
+          <p class="footer-heading" id="footer-contact-title" data-i18n="footer.contactTitle"></p>
+          <a href="mailto:${SITE_CONFIG.contact.email}" data-site-link="email">${icon('mail')}<span data-site-value="email">${SITE_CONFIG.contact.email}</span></a>
+          <a href="tel:${SITE_CONFIG.contact.phoneHref}" data-site-link="phone">${icon('phone')}<span data-site-value="phone">${SITE_CONFIG.contact.phoneDisplay}</span></a>
+        </div>
+        <div class="footer-links" aria-labelledby="footer-follow-title">
+          <p class="footer-heading" id="footer-follow-title" data-i18n="footer.followTitle"></p>
+          <div class="footer-social-links">
+            <a href="${SITE_CONFIG.social.facebook}" data-site-link="facebook" target="_blank" rel="noopener"><span data-i18n="footer.facebook"></span>${icon('external')}</a>
+            <a href="${SITE_CONFIG.social.instagram}" data-site-link="instagram" target="_blank" rel="noopener"><span data-i18n="footer.instagram"></span>${icon('external')}</a>
+          </div>
+          <a href="${SITE_CONFIG.property.reviewUrl}" data-site-link="review" target="_blank" rel="noopener"><span data-i18n="footer.googleReview"></span>${icon('external')}</a>
+        </div>
+        <div class="footer-meta">
+          <p data-i18n="footer.copyright"></p>
+          <a class="footer-creator" href="${SITE_CONFIG.creator.url}" data-site-link="creator" target="_blank" rel="noopener" data-i18n="footer.creator"></a>
         </div>
       </div>
     </footer>
   `;
 }
 
-function buildStickyBookingCta() {
+function buildStickyActions(activePage) {
   return `
-    <a class="sticky-booking-cta" href="./reservas.html">
-      <span data-i18n="stickyBookingCta"></span>
-      <span class="sticky-booking-sale" data-promotion-sale-badge data-i18n="promotion.saleBadge" hidden></span>
-    </a>
+    <div class="floating-site-actions">
+      <a
+        class="floating-whatsapp-cta"
+        href="${buildWhatsAppUrl()}"
+        data-site-whatsapp
+        target="_blank"
+        rel="noopener"
+        data-i18n-attr='{"aria-label":"footer.whatsappLabel","title":"footer.whatsappLabel"}'
+      ><img class="floating-whatsapp-icon" src="./assets/icons/Digital_Glyph_White_RGB_2026.svg" alt="" aria-hidden="true" /></a>
+      ${activePage === 'booking' ? '' : `
+        <a class="sticky-booking-cta" href="./reservas.html">
+          <span data-i18n="stickyBookingCta"></span>
+          <span class="sticky-booking-sale" data-promotion-sale-badge data-i18n="promotion.saleBadge" hidden></span>
+        </a>
+      `}
+    </div>
   `;
 }
 
@@ -125,6 +150,6 @@ export function renderSiteShell() {
   }
 
   if (stickyTarget) {
-    stickyTarget.outerHTML = buildStickyBookingCta();
+    stickyTarget.outerHTML = buildStickyActions(activePage);
   }
 }

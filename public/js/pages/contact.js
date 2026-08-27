@@ -19,7 +19,6 @@ const LANGUAGE_BY_PAGE_LANG = {
   pt: 'pt',
   fr: 'fr',
   en: 'en',
-  de: 'de',
   es: 'es'
 };
 
@@ -45,7 +44,7 @@ export async function initContactPage() {
   const params = new URLSearchParams(window.location.search);
   let dictionary = getCurrentDictionary();
 
-  const getText = (path, fallback = '') => getNestedValue(dictionary, path) || fallback;
+  const getText = (path) => getNestedValue(dictionary, path) || '';
 
   function getTopicOptions(context) {
     return (TOPIC_CONFIG[context] || []).map((key) => ({

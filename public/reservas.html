@@ -2,7 +2,7 @@
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
   <title data-i18n="bookingPage.meta.title"></title>
   <meta
@@ -111,7 +111,7 @@
             </div>
           </article>
 
-          <article class="booking-card">
+          <article class="booking-card" data-booking-bike-service>
             <label class="booking-toggle">
               <input id="bike-reservation-toggle" name="bike_reservation" type="checkbox" />
               <span class="booking-toggle-control" aria-hidden="true"></span>
@@ -138,6 +138,8 @@
               </div>
             </div>
           </article>
+
+          <span data-booking-summary-mobile-slot hidden></span>
 
           <article class="booking-card">
             <div class="booking-card-header">
@@ -176,12 +178,13 @@
                   />
                 </label>
                 <label class="field">
-                  <span data-i18n="bookingPage.form.phoneLabel"></span>
+                  <span><span data-i18n="bookingPage.form.phoneLabel"></span><span class="required-mark" aria-hidden="true">*</span></span>
                   <input
                     id="contact-phone"
                     name="contact_phone"
                     type="tel"
                     autocomplete="tel"
+                    required
                     placeholder=""
                     data-i18n-attr='{"placeholder":"bookingPage.form.phonePlaceholder"}'
                   />
@@ -271,7 +274,8 @@
         </form>
 
         <aside class="booking-sidebar">
-          <article class="booking-card booking-summary-card">
+          <span data-booking-summary-desktop-slot hidden></span>
+          <article class="booking-card booking-summary-card" data-booking-summary>
             <div class="booking-card-header">
               <p class="eyebrow" data-i18n="bookingPage.summary.eyebrow"></p>
               <h2 data-i18n="bookingPage.summary.title"></h2>
@@ -297,38 +301,14 @@
             </dl>
 
             <dl class="summary-breakdown">
-              <div>
-                <dt data-i18n="bookingPage.summary.nightsLabel"></dt>
-                <dd id="summary-nights">0</dd>
-              </div>
-              <div>
-                <dt data-i18n="bookingPage.summary.guestsLabel"></dt>
-                <dd id="summary-guests">2</dd>
-              </div>
-              <div>
-                <dt data-i18n="bookingPage.summary.adultsLabel"></dt>
-                <dd id="summary-adults">2</dd>
-              </div>
-              <div>
-                <dt data-i18n="bookingPage.summary.kidsLabel"></dt>
-                <dd id="summary-kids">0</dd>
-              </div>
-              <div>
-                <dt data-i18n="bookingPage.summary.depositChoiceLabel"></dt>
-                <dd id="summary-deposit-choice"></dd>
-              </div>
-              <div id="summary-bikes-row" hidden>
-                <dt data-i18n="bookingPage.summary.bikesLabel"></dt>
-                <dd id="summary-bikes"></dd>
-              </div>
-              <div id="summary-discount-row" hidden>
-                <dt data-i18n="bookingPage.summary.discountLabel"></dt>
-                <dd id="summary-discount">-</dd>
-              </div>
-              <div id="summary-bed-preference-row" hidden>
-                <dt data-i18n="bookingPage.summary.bedPreferenceLabel"></dt>
-                <dd id="summary-bed-preference">-</dd>
-              </div>
+              <div><dt data-i18n="bookingPage.summary.nightsLabel"></dt><dd id="summary-nights">0</dd></div>
+              <div><dt data-i18n="bookingPage.summary.guestsLabel"></dt><dd id="summary-guests">2</dd></div>
+              <div><dt data-i18n="bookingPage.summary.adultsLabel"></dt><dd id="summary-adults">2</dd></div>
+              <div><dt data-i18n="bookingPage.summary.kidsLabel"></dt><dd id="summary-kids">0</dd></div>
+              <div><dt data-i18n="bookingPage.summary.depositChoiceLabel"></dt><dd id="summary-deposit-choice"></dd></div>
+              <div id="summary-bikes-row" hidden><dt data-i18n="bookingPage.summary.bikesLabel"></dt><dd id="summary-bikes"></dd></div>
+              <div id="summary-discount-row" hidden><dt data-i18n="bookingPage.summary.discountLabel"></dt><dd id="summary-discount">-</dd></div>
+              <div id="summary-bed-preference-row" hidden><dt data-i18n="bookingPage.summary.bedPreferenceLabel"></dt><dd id="summary-bed-preference">-</dd></div>
             </dl>
 
             <div class="summary-total" id="summary-total-row" hidden>
@@ -362,7 +342,12 @@
           <p data-i18n="rulesFull.intro"></p>
         </div>
 
-        <div class="rules-grid">
+        <details class="booking-rules-disclosure">
+          <summary>
+            <span data-i18n="rulesFull.openLabel"></span>
+            <svg class="lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+          </summary>
+          <div class="rules-grid">
           <article class="rule-card">
             <h3 data-i18n="rulesFull.capacity.title"></h3>
             <ul>
@@ -472,7 +457,8 @@
               <li data-i18n="rulesFull.legal.item2"></li>
             </ul>
           </article>
-        </div>
+          </div>
+        </details>
       </div>
     </section>
   </main>

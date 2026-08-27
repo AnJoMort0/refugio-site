@@ -1,38 +1,85 @@
-# Admin Management Prototype
+# Admin Prototype Architecture
 
-The admin area is a Portuguese-only owner/employee prototype, separate from the public website i18n files.
+## Scope
 
-## Current Prototype
+`public/admin.html` is a Portuguese-only single-page administration prototype. It is deliberately separate from the public shell and locale system.
 
-- `public/admin.html` is a standalone admin app and does not render the public site header, footer, language switcher, or sticky booking CTA.
-- `public/js/admin/admin-auth.js` gates the UI with individual demo users and hashed demo passwords.
-- The prototype account names reflect the intended real users, but the passwords are still demonstration credentials and must be replaced by a real onboarding/reset flow.
-- `public/js/admin/admin-permissions.js` centralizes role permissions for owners and employees.
-- `public/js/admin/admin-store.js` is the persistence boundary used by the UI.
-- The current repository implementation stores demonstration data in `localStorage`.
-- The data model uses stable IDs for reservations, guests, requests, employees, work sessions, expenses, discounts, and audit entries.
+The interface currently demonstrates owners' and employees' workflows using local browser persistence. Its permission checks improve prototype usability but do not protect real data.
 
-This is enough for an owner demonstration, but it is not a production security model. Do not place real guest documents, ID photographs, financial records, salaries, or private messages in the static/local demo store.
+## Modules
 
-## Future Cloudflare Direction
+- `admin-auth.js`: named demo users, local session, login/logout, remembered identity.
+- `admin-permissions.js`: role and permission catalogue for owner, employee, and dev.
+- `admin-seed.js`: comprehensive deterministic demo business state.
+- `admin-store.js`: state normalisation, migration, local persistence, export/import/reset boundary.
+- `admin-logic.js`: dates, pricing, conflict, messaging, reporting, and shared domain calculations.
+- `main.js`: view state, rendering, forms, interactions, responsive navigation, and audit calls.
+- `admin.css`: desktop sidebar, compact mobile shell, forms, records, calendars, reports, disclosures, and dialogs.
+- `locales/messages.json`: multilingual operational and marketing message catalogue.
 
-The UI should keep using a replaceable repository/service layer. A production Cloudflare version can replace the local repository with authenticated calls to `/api/admin/*`.
+## Data domains
 
-Recommended split:
+The prototype uses stable IDs and timestamps for:
 
-- Cloudflare Pages Functions for protected admin API routes.
-- HTTP-only signed sessions or an external login/access product for authentication.
-- D1 for reservations, guests, pricing, discounts, expenses, employees, work records, audit records, and reporting queries.
-- R2 for private documents such as guest IDs and receipts, served only through authenticated authorization checks.
-- KV only for lightweight configuration, short-lived sessions, or cache-like data where eventual consistency is acceptable.
+- property settings and services;
+- reservations, extra-guest adjustments, guests, and website requests;
+- base/season/override pricing, group reductions, and discount codes;
+- expenses;
+- employees, rate/cost history, work sessions, task selections, and voluntary work;
+- audit events;
+- marketing consent flags present in local reservation/request data.
 
-Authentication options still need a final decision. Evaluate the simplest low-cost option that supports individual owner and employee identities, easy account removal, and stronger protection for owners. Avoid SMS-only 2FA unless cost, deliverability, and maintenance are acceptable.
+## State flow
 
-## Prototype Limitations To Remove Before Production
+1. Authentication resolves a sanitised local demo user.
+2. `admin-store.js` loads state, normalises older browser snapshots, and seeds absent domains.
+3. `main.js` renders the active view from state plus transient `ui` state.
+4. Form/action handlers validate, mutate state, add concise audit records, and persist through the store.
+5. Renders are deterministic from current state; filters and expanded rows live only in UI state.
 
-- Demo credentials exist only to try the interface.
-- Client-side localStorage permissions prevent accidental UI access but do not protect real data.
-- Real admin data must not be bundled into public JavaScript.
-- Admin writes must eventually happen through protected server-side APIs.
-- File uploads for ID documents and receipts require private storage and authorization checks.
-- Audit records should be written server-side so users cannot tamper with them.
+Submitting `reservas.html` on the same origin adds a demonstration website request through the shared browser store. This is testing convenience, not cross-device persistence.
+
+## Prototype security boundary
+
+Do not store real guest identity documents, payment details, employee salaries, private notes, attachments, or production credentials in this app.
+
+- Demo password hashes and local sessions are visible to any visitor who downloads the static JavaScript.
+- `localStorage` can be read or changed by the browser user.
+- Client-side permissions can be bypassed.
+- Client-generated audit events can be altered.
+- Different devices do not share changes.
+
+## Production repository boundary
+
+Preserve the concept of a store/repository while replacing implementation:
+
+```text
+Admin UI
+  -> authenticated JSON API repository
+  -> Cloudflare Worker permission/service layer
+  -> D1 transactions and queries
+  -> server-authored audit events
+```
+
+The browser should request only records its verified role may use. Writes must use optimistic/version checks where simultaneous edits matter, especially reservations, payment state, pricing, work sessions, and services.
+
+## Production permissions
+
+- Cloudflare Access authenticates the individual at the perimeter.
+- The Worker verifies the Access token.
+- A D1 user record supplies active state and role.
+- Every endpoint checks a permission equivalent to the prototype catalogue.
+- Owner/dev-only operations include conflict override, pricing, services, staff/rates, broad financial reports, exports, and account management.
+- Employee access remains limited to operational reservation fields and allowed work records.
+
+## Production consistency rules
+
+- Reservation nights use `[check-in, checkout)` and conflict checks run inside the write transaction.
+- Payment deadline expiry runs server-side on schedule.
+- Prices and totals are recalculated server-side from versioned rules.
+- Audit details contain only meaningful before/after fields plus actor/entity/time.
+- Marketing consent changes append evidence and update the current audience state transactionally.
+- Private files remain in R2 and are never exposed as public URLs.
+- Stable IDs, relationships, historical records, and timestamps survive migration/export.
+
+See [`deployment.md`](./deployment.md) for the target schema, APIs, authentication, marketing list, email, storage, backup, and migration sequence.

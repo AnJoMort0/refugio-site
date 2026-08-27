@@ -1,6 +1,67 @@
-.hero .eyebrow {
-  color: var(--color-sunset-gold);
-  text-shadow: 0 2px 12px rgba(43, 38, 34, 0.58);
+.hero-overlay {
+  background: rgba(27, 31, 27, 0.6);
+}
+
+.hero-content h1 {
+  max-width: 48rem;
+  font-size: 5.1rem;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.hero-dictionary {
+  display: grid;
+  gap: 0.3rem;
+  max-width: 39rem;
+  margin: 0.75rem 0 1.5rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(250, 248, 244, 0.68);
+  text-shadow: 0 2px 12px rgba(21, 24, 20, 0.44);
+}
+
+.hero-dictionary-translation:empty {
+  display: none;
+}
+
+.hero-dictionary-translation {
+  color: rgba(250, 248, 244, 0.76);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.hero-dictionary-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: baseline;
+  font-size: 0.98rem;
+}
+
+.hero-dictionary-meta em {
+  color: rgba(250, 248, 244, 0.78);
+}
+
+.hero-dictionary-definition {
+  max-width: 35rem;
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  line-height: 1.45;
+}
+
+.hero-dictionary-synonyms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  color: rgba(250, 248, 244, 0.82);
+  font-size: 0.9rem;
+}
+
+.hero-dictionary-synonyms strong {
+  color: var(--color-soft-ivory);
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .hero-content > * {
@@ -13,10 +74,6 @@
 
 .hero-content > *:nth-child(3) {
   animation-delay: 180ms;
-}
-
-.hero-content > *:nth-child(4) {
-  animation-delay: 270ms;
 }
 
 .promotion-announcement {
@@ -58,7 +115,6 @@
 }
 
 .promotion-announcement-link {
-  margin-right: 7rem;
   color: var(--color-promotion-red-dark);
   font-size: 0.88rem;
   font-weight: 800;
@@ -91,6 +147,11 @@
 
 .gallery-card {
   min-height: 100%;
+  padding: 0.55rem 0.55rem 0;
+  border: 1px solid rgba(90, 75, 63, 0.12);
+  border-radius: 4px;
+  background: white;
+  box-shadow: 0 14px 34px rgba(43, 38, 34, 0.14);
 }
 
 .gallery-card img {
@@ -102,8 +163,11 @@
 }
 
 .gallery-card p {
-  padding: 1rem;
+  padding: 0.95rem 0.6rem 1.05rem;
   background: white;
+  color: rgba(43, 38, 34, 0.82);
+  font-family: var(--font-heading);
+  font-size: 1.02rem;
 }
 
 .booking-card,
@@ -114,7 +178,18 @@
 }
 
 .booking-card {
-  padding: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-mountain-forest);
+  color: var(--color-soft-ivory);
+}
+
+.booking-card .eyebrow {
+  color: var(--color-sunset-gold);
+}
+
+.booking-card p {
+  max-width: 46rem;
+  color: rgba(250, 248, 244, 0.86);
 }
 
 .sponsor-teaser {
@@ -233,12 +308,20 @@
 }
 
 @media (max-width: 767px) {
-  .promotion-announcement-inner {
-    align-items: flex-start;
+  .hero-content {
+    padding-bottom: 3.25rem;
   }
 
-  .promotion-announcement-link {
-    margin-right: 6.5rem;
+  .hero-content h1 {
+    font-size: 3.15rem;
+  }
+
+  .hero-dictionary-definition {
+    font-size: 1.08rem;
+  }
+
+  .promotion-announcement-inner {
+    align-items: flex-start;
   }
 
   .testimonial-carousel {
@@ -251,6 +334,10 @@
 
   .sponsor-card p {
     font-size: 0.92rem;
+  }
+
+  .booking-card {
+    padding: var(--space-4);
   }
 }
 

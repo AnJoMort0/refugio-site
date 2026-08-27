@@ -1,12 +1,11 @@
 const DEFAULT_LANGUAGE = 'pt';
-const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es', 'de'];
+const SUPPORTED_LANGUAGES = ['pt', 'en', 'fr', 'es'];
 const STORAGE_KEY = 'refugio-language';
 const LANGUAGE_LABELS = {
   pt: 'Português',
   en: 'English',
   fr: 'Français',
-  es: 'Español',
-  de: 'Deutsch'
+  es: 'Español'
 };
 const localeRequests = new Map();
 
@@ -152,6 +151,7 @@ export async function setLanguage(language) {
 
   const menuButton = document.querySelector('#language-menu-button');
   const currentLabel = document.querySelector('.language-menu-current');
+  const currentCode = document.querySelector('.language-menu-current-code');
   const options = document.querySelectorAll('[data-language-option]');
 
   if (menuButton) {
@@ -160,6 +160,10 @@ export async function setLanguage(language) {
 
   if (currentLabel) {
     currentLabel.textContent = LANGUAGE_LABELS[safeLanguage] || LANGUAGE_LABELS[DEFAULT_LANGUAGE];
+  }
+
+  if (currentCode) {
+    currentCode.textContent = safeLanguage.toUpperCase();
   }
 
   if (options.length) {

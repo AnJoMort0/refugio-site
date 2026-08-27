@@ -1,6 +1,7 @@
 import { renderSiteShell } from './ui/site-shell.js';
-import { initI18n } from './services/i18n.js';
+import { getCurrentDictionary, initI18n } from './services/i18n.js';
 import { initMobileNav } from './ui/mobile-nav.js';
+import { applySiteConfig } from './config/site-config.js';
 
 const PAGE_INITIALIZERS = {
   accommodation: () => import('./pages/accommodation.js').then(({ initAccommodationPage }) => initAccommodationPage()),
@@ -15,6 +16,8 @@ const PAGE_INITIALIZERS = {
 
 renderSiteShell();
 await initI18n();
+applySiteConfig(document, getCurrentDictionary());
+document.addEventListener('language:changed', ({ detail }) => applySiteConfig(document, detail.dictionary));
 initMobileNav();
 
 const pageTasks = [];
@@ -38,3 +41,6 @@ if (pageInitializer) {
 }
 
 await Promise.all(pageTasks);
+
+const { initCustomSelects } = await import('./ui/custom-selects.js');
+initCustomSelects();

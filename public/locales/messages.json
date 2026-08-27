@@ -7,88 +7,70 @@
       "pt": "* Relembramos que será solicitada uma caução no valor de {amount}, em numerário ou MB Way.{sourceDepositMention}\n",
       "fr": "* Nous vous rappelons qu'une caution de {amount} sera demandée, en espèces ou par MB Way.{sourceDepositMention}\n",
       "en": "* Please note that a security deposit of {amount} will be requested, in cash or by MB Way.{sourceDepositMention}\n",
-      "es": "* Le recordamos que se solicitará una fianza de {amount}, en efectivo o por MB Way.{sourceDepositMention}\n",
-      "de": "* Bitte beachten Sie, dass eine Kaution in Höhe von {amount} in bar oder per MB Way verlangt wird.{sourceDepositMention}\n"
+      "es": "* Le recordamos que se solicitará una fianza de {amount}, en efectivo o por MB Way.{sourceDepositMention}\n"
     },
     "depositSourceMention": {
       "website": {
         "pt": " (Informação igualmente presente na página de reservas do website)",
         "fr": " (Information également indiquée sur la page de réservation du site)",
         "en": " (This information is also shown on the website reservation page)",
-        "es": " (Información también indicada en la página de reservas del sitio web)",
-        "de": " (Diese Information steht auch auf der Reservierungsseite der Website)"
+        "es": " (Información también indicada en la página de reservas del sitio web)"
       },
       "booking": {
         "pt": " (Informação igualmente presente na página Booking)",
         "fr": " (Information également indiquée sur la page Booking)",
         "en": " (This information is also shown on the Booking page)",
-        "es": " (Información también indicada en la página de Booking)",
-        "de": " (Diese Information steht auch auf der Booking-Seite)"
+        "es": " (Información también indicada en la página de Booking)"
       },
       "abritel": {
         "pt": " (Informação igualmente presente na página Abritel)",
         "fr": " (Information également indiquée sur la page Abritel)",
         "en": " (This information is also shown on the Abritel page)",
-        "es": " (Información también indicada en la página de Abritel)",
-        "de": " (Diese Information steht auch auf der Abritel-Seite)"
+        "es": " (Información también indicada en la página de Abritel)"
       }
     },
     "checkInTimeKnown": {
       "pt": "Temos registada a sua chegada por volta das {time}.",
       "fr": "Nous avons noté votre arrivée vers {time}.",
       "en": "We have your arrival noted for around {time}.",
-      "es": "Tenemos registrada su llegada aproximadamente a las {time}.",
-      "de": "Wir haben Ihre Ankunft gegen {time} notiert."
+      "es": "Tenemos registrada su llegada aproximadamente a las {time}."
     },
     "checkInTimeRequest": {
       "pt": "Nesse sentido, gostaríamos de saber a que horas prevê efetuar o seu check-in, de forma a organizarmos a sua chegada da melhor maneira possível. Sabendo que este poderá ser feito entre as 15h e as 19h.",
       "fr": "Dans ce contexte, nous aimerions savoir vers quelle heure vous prévoyez d’effectuer votre check-in, afin d’organiser votre arrivée au mieux. Le check-in peut être effectué entre 15h et 19h.",
       "en": "With that in mind, we would be grateful if you could let us know what time you expect to check in, so we can organize your arrival in the best possible way. Check-in is available between 15:00 and 19:00.",
-      "es": "Por ese motivo, nos gustaría saber a qué hora prevé realizar el check-in, para organizar su llegada de la mejor manera posible. El check-in puede realizarse entre las 15:00 y las 19:00.",
-      "de": "Daher möchten wir Sie bitten, uns mitzuteilen, wann Sie voraussichtlich einchecken möchten, damit wir Ihre Ankunft bestmöglich organisieren können. Der Check-in ist zwischen 15:00 und 19:00 Uhr möglich."
+      "es": "Por ese motivo, nos gustaría saber a qué hora prevé realizar el check-in, para organizar su llegada de la mejor manera posible. El check-in puede realizarse entre las 15:00 y las 19:00."
     },
     "checkOutTimeKnown": {
       "pt": "Temos registado o check-out por volta das {time}. Se precisarem de ajustar essa hora, diga-nos por favor.",
       "fr": "Nous avons noté votre check-out vers {time}. Si vous avez besoin d’ajuster cet horaire, dites-le-nous s’il vous plaît.",
       "en": "We have your check-out noted for around {time}. If you need to adjust that time, please let us know.",
-      "es": "Tenemos registrado su check-out aproximadamente a las {time}. Si necesitan ajustar esa hora, por favor díganoslo.",
-      "de": "Wir haben Ihren Check-out gegen {time} notiert. Falls Sie diese Uhrzeit anpassen müssen, sagen Sie uns bitte Bescheid."
+      "es": "Tenemos registrado su check-out aproximadamente a las {time}. Si necesitan ajustar esa hora, por favor díganoslo."
     },
     "checkOutTimeRequest": {
       "pt": "Gostaria de saber a que horas é que gostariam de efetuar o seu check-out {when}. Pode decorrer até às {time}.",
       "fr": "Nous aimerions savoir à quelle heure vous souhaiteriez effectuer votre check-out {when}. Il peut être fait jusqu’à {time}.",
       "en": "We would like to know what time you would like to check out {when}. Check-out can take place until {time}.",
-      "es": "Nos gustaría saber a qué hora desean realizar el check-out {when}. Puede hacerse hasta las {time}.",
-      "de": "Wir möchten gerne wissen, um wie viel Uhr Sie {when} auschecken möchten. Der Check-out ist bis {time} möglich."
+      "es": "Nos gustaría saber a qué hora desean realizar el check-out {when}. Puede hacerse hasta las {time}."
     },
     "checkoutWhenTomorrow": {
       "pt": "amanhã",
       "fr": "demain",
       "en": "tomorrow",
-      "es": "mañana",
-      "de": "morgen"
+      "es": "mañana"
     },
     "checkoutWhenDate": {
       "pt": "no dia {date}",
       "fr": "le {date}",
       "en": "on {date}",
-      "es": "el {date}",
-      "de": "am {date}"
+      "es": "el {date}"
     },
     "paymentReceivedLine": {
       "paid": {
         "pt": "Confirmamos também a receção do pagamento da reserva. Muito obrigada.\n\n",
         "fr": "Nous confirmons également la réception du paiement de la réservation. Merci beaucoup.\n\n",
         "en": "We also confirm receipt of the reservation payment. Thank you very much.\n\n",
-        "es": "Confirmamos también la recepción del pago de la reserva. Muchas gracias.\n\n",
-        "de": "Wir bestätigen außerdem den Eingang der Zahlung für die Reservierung. Vielen Dank.\n\n"
-      },
-      "deposit_paid": {
-        "pt": "Confirmamos também a receção do depósito/caução. Muito obrigada.\n\n",
-        "fr": "Nous confirmons également la réception du dépôt/de la caution. Merci beaucoup.\n\n",
-        "en": "We also confirm receipt of the deposit/security deposit. Thank you very much.\n\n",
-        "es": "Confirmamos también la recepción del depósito/la fianza. Muchas gracias.\n\n",
-        "de": "Wir bestätigen außerdem den Eingang der Anzahlung/Kaution. Vielen Dank.\n\n"
+        "es": "Confirmamos también la recepción del pago de la reserva. Muchas gracias.\n\n"
       }
     }
   },
@@ -99,15 +81,13 @@
         "pt": "Instruções de pagamento",
         "fr": "Instructions de paiement",
         "en": "Payment instructions",
-        "es": "Instrucciones de pago",
-        "de": "Zahlungsinformationen"
+        "es": "Instrucciones de pago"
       },
       "body": {
-        "pt": "Olá {guestName},\n\nEsperamos que se encontre bem.\n\nPara avançarmos com a confirmação da sua reserva em O Refúgio, deixamos abaixo o resumo e as instruções de pagamento.\n\nReserva: {reservationId}\nDatas: {checkIn} a {checkOut}\nNoites: {nights}\nHóspedes: {guestCount}\n\nDetalhe do valor:\n{paymentBreakdown}\n\nPara confirmar a reserva, pedimos a transferência do valor indicado para o IBAN partilhado pelo proprietário, usando a referência {reservationId}. Assim que o pagamento for confirmado, enviaremos a confirmação final da reserva.\n\nFicamos ao dispor para qualquer questão adicional.\n\nCom os melhores cumprimentos,\n\nO Refúgio",
-        "fr": "Bonjour {guestName},\n\nNous espérons que vous allez bien.\n\nAfin de poursuivre la confirmation de votre réservation à O Refúgio, voici le résumé et les instructions de paiement.\n\nRéservation : {reservationId}\nDates : du {checkIn} au {checkOut}\nNuits : {nights}\nPersonnes : {guestCount}\n\nDétail du montant :\n{paymentBreakdown}\n\nPour confirmer la réservation, merci d’effectuer le virement du montant indiqué vers l’IBAN communiqué par le propriétaire, avec la référence {reservationId}. Dès réception du paiement, nous vous enverrons la confirmation finale.\n\nNous restons à votre disposition pour toute question.\n\nCordialement,\n\nO Refúgio",
-        "en": "Hello {guestName},\n\nWe hope you are well.\n\nTo move forward with confirming your reservation at O Refúgio, please find the summary and payment instructions below.\n\nReservation: {reservationId}\nDates: {checkIn} to {checkOut}\nNights: {nights}\nGuests: {guestCount}\n\nCost breakdown:\n{paymentBreakdown}\n\nTo confirm the reservation, please transfer the indicated amount to the IBAN shared by the owner, using reference {reservationId}. Once payment is confirmed, we will send the final reservation confirmation.\n\nPlease let us know if you have any questions.\n\nBest regards,\n\nO Refúgio",
-        "es": "Hola {guestName},\n\nEsperamos que se encuentre bien.\n\nPara avanzar con la confirmación de su reserva en O Refúgio, le dejamos a continuación el resumen y las instrucciones de pago.\n\nReserva: {reservationId}\nFechas: del {checkIn} al {checkOut}\nNoches: {nights}\nHuéspedes: {guestCount}\n\nDesglose del importe:\n{paymentBreakdown}\n\nPara confirmar la reserva, le pedimos que realice la transferencia del importe indicado al IBAN compartido por el propietario, usando la referencia {reservationId}. Cuando el pago esté confirmado, enviaremos la confirmación final.\n\nQuedamos a su disposición para cualquier duda.\n\nSaludos cordiales,\n\nO Refúgio",
-        "de": "Hallo {guestName},\n\nwir hoffen, es geht Ihnen gut.\n\nUm Ihre Reservierung bei O Refúgio zu bestätigen, finden Sie unten die Zusammenfassung und die Zahlungsinformationen.\n\nReservierung: {reservationId}\nDaten: {checkIn} bis {checkOut}\nNächte: {nights}\nGäste: {guestCount}\n\nKostenaufstellung:\n{paymentBreakdown}\n\nZur Bestätigung der Reservierung überweisen Sie bitte den angegebenen Betrag auf die vom Eigentümer mitgeteilte IBAN und verwenden Sie die Referenz {reservationId}. Sobald die Zahlung bestätigt ist, senden wir Ihnen die endgültige Reservierungsbestätigung.\n\nBei Fragen stehen wir gerne zur Verfügung.\n\nMit freundlichen Grüßen,\n\nO Refúgio"
+        "pt": "Olá {guestName},\n\nEsperamos que se encontre bem.\n\nPara avançarmos com a confirmação da sua reserva em O Refúgio, deixamos abaixo o resumo e as instruções de pagamento.\n\nReserva: {reservationId}\nDatas: {checkIn} a {checkOut}\nNoites: {nights}\nHóspedes: {guestCount}\n\nDetalhe do valor:\n{paymentBreakdown}\n\nPara confirmar a reserva, pedimos a transferência do valor indicado para o IBAN partilhado pelo proprietário, usando a referência {reservationId}. O pagamento deve ser recebido no prazo de 48 horas; depois desse prazo, a reserva é cancelada e as datas voltam a ficar disponíveis. Assim que o pagamento for confirmado, enviaremos a confirmação final da reserva.\n\nFicamos ao dispor para qualquer questão adicional.\n\nCom os melhores cumprimentos,\n\nO Refúgio",
+        "fr": "Bonjour {guestName},\n\nNous espérons que vous allez bien.\n\nAfin de poursuivre la confirmation de votre réservation à O Refúgio, voici le résumé et les instructions de paiement.\n\nRéservation : {reservationId}\nDates : du {checkIn} au {checkOut}\nNuits : {nights}\nPersonnes : {guestCount}\n\nDétail du montant :\n{paymentBreakdown}\n\nPour confirmer la réservation, merci d’effectuer le virement du montant indiqué vers l’IBAN communiqué par le propriétaire, avec la référence {reservationId}. Le paiement doit être reçu dans les 48 heures ; passé ce délai, la réservation est annulée et les dates redeviennent disponibles. Dès réception du paiement, nous vous enverrons la confirmation finale.\n\nNous restons à votre disposition pour toute question.\n\nCordialement,\n\nO Refúgio",
+        "en": "Hello {guestName},\n\nWe hope you are well.\n\nTo move forward with confirming your reservation at O Refúgio, please find the summary and payment instructions below.\n\nReservation: {reservationId}\nDates: {checkIn} to {checkOut}\nNights: {nights}\nGuests: {guestCount}\n\nCost breakdown:\n{paymentBreakdown}\n\nTo confirm the reservation, please transfer the indicated amount to the IBAN shared by the owner, using reference {reservationId}. Payment must be received within 48 hours; after that, the reservation is cancelled and the dates become available again. Once payment is confirmed, we will send the final reservation confirmation.\n\nPlease let us know if you have any questions.\n\nBest regards,\n\nO Refúgio",
+        "es": "Hola {guestName},\n\nEsperamos que se encuentre bien.\n\nPara avanzar con la confirmación de su reserva en O Refúgio, le dejamos a continuación el resumen y las instrucciones de pago.\n\nReserva: {reservationId}\nFechas: del {checkIn} al {checkOut}\nNoches: {nights}\nHuéspedes: {guestCount}\n\nDesglose del importe:\n{paymentBreakdown}\n\nPara confirmar la reserva, le pedimos que realice la transferencia del importe indicado al IBAN compartido por el propietario, usando la referencia {reservationId}. El pago debe recibirse en un plazo de 48 horas; pasado ese plazo, la reserva se cancela y las fechas vuelven a estar disponibles. Cuando el pago esté confirmado, enviaremos la confirmación final.\n\nQuedamos a su disposición para cualquier duda.\n\nSaludos cordiales,\n\nO Refúgio"
       }
     },
     {
@@ -116,15 +96,13 @@
         "pt": "Confirmação de reserva",
         "fr": "Confirmation de réservation",
         "en": "Reservation confirmation",
-        "es": "Confirmación de reserva",
-        "de": "Reservierungsbestätigung"
+        "es": "Confirmación de reserva"
       },
       "body": {
         "pt": "Olá {guestName},\n\nTemos o prazer de confirmar a sua reserva em O Refúgio. Será um gosto recebê-lo e estamos já a preparar tudo para que tenha uma estadia confortável e agradável.\n\n{paymentReceivedLine}Reserva: {reservationId}\nDatas: {checkIn} a {checkOut}\nNoites: {nights}\nHóspedes: {guestCount}\nCheck-in: {checkInTime}\nCheck-out: {checkOutTime}\nMorada: {propertyAddress}\n\nMais perto da data, enviaremos também as informações úteis para a chegada.\n\nObrigada pela confiança.\n\nCom os melhores cumprimentos,\n\nO Refúgio",
         "fr": "Bonjour {guestName},\n\nNous avons le plaisir de confirmer votre réservation à O Refúgio. Ce sera un plaisir de vous accueillir et nous préparons déjà tout pour que votre séjour soit confortable et agréable.\n\n{paymentReceivedLine}Réservation : {reservationId}\nDates : du {checkIn} au {checkOut}\nNuits : {nights}\nPersonnes : {guestCount}\nCheck-in : {checkInTime}\nCheck-out : {checkOutTime}\nAdresse : {propertyAddress}\n\nÀ l’approche de votre séjour, nous vous enverrons également les informations utiles pour votre arrivée.\n\nMerci pour votre confiance.\n\nCordialement,\n\nO Refúgio",
         "en": "Hello {guestName},\n\nWe are pleased to confirm your reservation at O Refúgio. It will be a pleasure to welcome you, and we are already preparing everything so you can enjoy a comfortable and pleasant stay.\n\n{paymentReceivedLine}Reservation: {reservationId}\nDates: {checkIn} to {checkOut}\nNights: {nights}\nGuests: {guestCount}\nCheck-in: {checkInTime}\nCheck-out: {checkOutTime}\nAddress: {propertyAddress}\n\nCloser to your stay, we will also send useful information for your arrival.\n\nThank you for your trust.\n\nBest regards,\n\nO Refúgio",
-        "es": "Hola {guestName},\n\nNos complace confirmar su reserva en O Refúgio. Será un placer recibirle y ya estamos preparando todo para que disfrute de una estancia cómoda y agradable.\n\n{paymentReceivedLine}Reserva: {reservationId}\nFechas: del {checkIn} al {checkOut}\nNoches: {nights}\nHuéspedes: {guestCount}\nCheck-in: {checkInTime}\nCheck-out: {checkOutTime}\nDirección: {propertyAddress}\n\nMás cerca de la fecha, también enviaremos la información útil para su llegada.\n\nGracias por su confianza.\n\nSaludos cordiales,\n\nO Refúgio",
-        "de": "Hallo {guestName},\n\nwir freuen uns, Ihre Reservierung bei O Refúgio zu bestätigen. Es wird uns eine Freude sein, Sie willkommen zu heißen, und wir bereiten bereits alles vor, damit Sie einen komfortablen und angenehmen Aufenthalt genießen können.\n\n{paymentReceivedLine}Reservierung: {reservationId}\nDaten: {checkIn} bis {checkOut}\nNächte: {nights}\nGäste: {guestCount}\nCheck-in: {checkInTime}\nCheck-out: {checkOutTime}\nAdresse: {propertyAddress}\n\nKurz vor Ihrem Aufenthalt senden wir Ihnen außerdem nützliche Informationen für Ihre Anreise.\n\nVielen Dank für Ihr Vertrauen.\n\nMit freundlichen Grüßen,\n\nO Refúgio"
+        "es": "Hola {guestName},\n\nNos complace confirmar su reserva en O Refúgio. Será un placer recibirle y ya estamos preparando todo para que disfrute de una estancia cómoda y agradable.\n\n{paymentReceivedLine}Reserva: {reservationId}\nFechas: del {checkIn} al {checkOut}\nNoches: {nights}\nHuéspedes: {guestCount}\nCheck-in: {checkInTime}\nCheck-out: {checkOutTime}\nDirección: {propertyAddress}\n\nMás cerca de la fecha, también enviaremos la información útil para su llegada.\n\nGracias por su confianza.\n\nSaludos cordiales,\n\nO Refúgio"
       }
     },
     {
@@ -133,15 +111,13 @@
         "pt": "Informações antes da chegada",
         "fr": "Informations avant l’arrivée",
         "en": "Pre-arrival information",
-        "es": "Información antes de la llegada",
-        "de": "Informationen vor der Anreise"
+        "es": "Información antes de la llegada"
       },
       "body": {
         "pt": "Bom dia {guestName} ☀️\n\nEsperamos que se encontre bem.\n\nA sua estadia connosco está a aproximar-se e queremos dizer-lhe que será um prazer recebê-lo. Estamos já a preparar tudo para que tenha uma experiência confortável e agradável. 🏖️\n\nReserva: {reservationId}\nDatas: {checkIn} a {checkOut}\n\n{checkInTimeLine}\n\nAntes da sua chegada, gostaríamos também de partilhar algumas informações importantes relativamente à sua estadia:\n\n{depositReminder}* As cápsulas de café para a máquina são do tipo Nespresso.\n* Morada: {propertyAddress}.\n\nFicamos ao dispor para qualquer questão adicional e aguardamos a sua resposta. 🤗\n\nCom os melhores cumprimentos,\n\nO Refúgio",
         "fr": "Bonjour {guestName} ☀️\n\nNous espérons que vous allez bien.\n\nVotre séjour chez nous approche et nous tenions à vous dire que ce sera un plaisir de vous accueillir. Nous préparons déjà tout afin que vous puissiez profiter d’une expérience confortable et agréable. 🏖️\n\nRéservation : {reservationId}\nDates : du {checkIn} au {checkOut}\n\n{checkInTimeLine}\n\nAvant votre arrivée, nous souhaitons également partager quelques informations importantes concernant votre séjour :\n\n{depositReminder}* Les capsules de café pour la machine sont de type Nespresso.\n* Adresse : {propertyAddress}.\n\nNous restons à votre disposition pour toute question complémentaire et attendons votre réponse. 🤗\n\nCordialement,\n\nO Refúgio",
         "en": "Good morning {guestName} ☀️\n\nWe hope you are well.\n\nYour stay with us is getting closer and we wanted to say that it will be a pleasure to welcome you. We are already preparing everything so you can have a comfortable and pleasant experience. 🏖️\n\nReservation: {reservationId}\nDates: {checkIn} to {checkOut}\n\n{checkInTimeLine}\n\nBefore your arrival, we would also like to share some important information regarding your stay:\n\n{depositReminder}* The coffee capsules for the machine are Nespresso type.\n* Address: {propertyAddress}.\n\nPlease let us know if you have any questions. We look forward to your reply. 🤗\n\nBest regards,\n\nO Refúgio",
-        "es": "Buenos días {guestName} ☀️\n\nEsperamos que se encuentre bien.\n\nSu estancia con nosotros se está acercando y queremos decirle que será un placer recibirle. Ya estamos preparando todo para que tenga una experiencia cómoda y agradable. 🏖️\n\nReserva: {reservationId}\nFechas: del {checkIn} al {checkOut}\n\n{checkInTimeLine}\n\nAntes de su llegada, también nos gustaría compartir alguna información importante sobre su estancia:\n\n{depositReminder}* Las cápsulas de café para la máquina son de tipo Nespresso.\n* Dirección: {propertyAddress}.\n\nQuedamos a su disposición para cualquier cuestión adicional y esperamos su respuesta. 🤗\n\nSaludos cordiales,\n\nO Refúgio",
-        "de": "Guten Morgen {guestName} ☀️\n\nwir hoffen, es geht Ihnen gut.\n\nIhr Aufenthalt bei uns rückt näher, und wir möchten Ihnen sagen, dass wir uns sehr darauf freuen, Sie willkommen zu heißen. Wir bereiten bereits alles vor, damit Sie einen komfortablen und angenehmen Aufenthalt genießen können. 🏖️\n\nReservierung: {reservationId}\nDaten: {checkIn} bis {checkOut}\n\n{checkInTimeLine}\n\nVor Ihrer Anreise möchten wir außerdem einige wichtige Informationen zu Ihrem Aufenthalt mit Ihnen teilen:\n\n{depositReminder}* Die Kaffeekapseln für die Maschine sind vom Typ Nespresso.\n* Adresse: {propertyAddress}.\n\nBei weiteren Fragen stehen wir gerne zur Verfügung und freuen uns auf Ihre Antwort. 🤗\n\nMit freundlichen Grüßen,\n\nO Refúgio"
+        "es": "Buenos días {guestName} ☀️\n\nEsperamos que se encuentre bien.\n\nSu estancia con nosotros se está acercando y queremos decirle que será un placer recibirle. Ya estamos preparando todo para que tenga una experiencia cómoda y agradable. 🏖️\n\nReserva: {reservationId}\nFechas: del {checkIn} al {checkOut}\n\n{checkInTimeLine}\n\nAntes de su llegada, también nos gustaría compartir alguna información importante sobre su estancia:\n\n{depositReminder}* Las cápsulas de café para la máquina son de tipo Nespresso.\n* Dirección: {propertyAddress}.\n\nQuedamos a su disposición para cualquier cuestión adicional y esperamos su respuesta. 🤗\n\nSaludos cordiales,\n\nO Refúgio"
       }
     },
     {
@@ -150,15 +126,13 @@
         "pt": "Instruções de checkout",
         "fr": "Instructions de check-out",
         "en": "Check-out instructions",
-        "es": "Instrucciones de check-out",
-        "de": "Check-out-Informationen"
+        "es": "Instrucciones de check-out"
       },
       "body": {
         "pt": "Boa tarde {guestName},\n\nEspero que a estadia esteja a correr da melhor maneira possível! ☀️\n\n{checkOutTimeLine}\n\nContinuação de uma ótima estadia!\n\nObrigada pela atenção,\n\nO Refúgio",
         "fr": "Bonjour {guestName},\n\nNous espérons que votre séjour se déroule au mieux ! ☀️\n\n{checkOutTimeLine}\n\nNous vous souhaitons une excellente continuation de séjour !\n\nMerci pour votre attention,\n\nO Refúgio",
         "en": "Good afternoon {guestName},\n\nWe hope your stay is going as well as possible! ☀️\n\n{checkOutTimeLine}\n\nWe wish you a wonderful continuation of your stay!\n\nThank you for your attention,\n\nO Refúgio",
-        "es": "Buenas tardes {guestName},\n\n¡Esperamos que la estancia esté yendo de la mejor manera posible! ☀️\n\n{checkOutTimeLine}\n\n¡Que continúe disfrutando de una excelente estancia!\n\nGracias por su atención,\n\nO Refúgio",
-        "de": "Guten Tag {guestName},\n\nwir hoffen, Ihr Aufenthalt verläuft bestmöglich! ☀️\n\n{checkOutTimeLine}\n\nWir wünschen Ihnen weiterhin einen schönen Aufenthalt!\n\nVielen Dank für Ihre Aufmerksamkeit,\n\nO Refúgio"
+        "es": "Buenas tardes {guestName},\n\n¡Esperamos que la estancia esté yendo de la mejor manera posible! ☀️\n\n{checkOutTimeLine}\n\n¡Que continúe disfrutando de una excelente estancia!\n\nGracias por su atención,\n\nO Refúgio"
       }
     },
     {
@@ -167,15 +141,57 @@
         "pt": "Agradecimento e pedido de feedback",
         "fr": "Remerciement et demande d’avis",
         "en": "Thank you and feedback request",
-        "es": "Agradecimiento y solicitud de opinión",
-        "de": "Dankeschön und Bitte um Feedback"
+        "es": "Agradecimiento y solicitud de opinión"
       },
       "body": {
         "pt": "Olá {guestName},\n\nEsperamos que tenha tido uma estadia confortável e agradável em O Refúgio.\n\nMuito obrigada pela sua visita e pela confiança. Se quiser deixar-nos algum feedback privado, basta responder a esta mensagem. A sua opinião ajuda-nos a continuar a melhorar com cuidado.\n\nSe a experiência foi positiva, agradecemos também uma avaliação no Google Maps:\n{googleReviewUrl}\n\nEsperamos poder recebê-lo novamente no futuro.\n\nCom os melhores cumprimentos,\n\nO Refúgio",
         "fr": "Bonjour {guestName},\n\nNous espérons que vous avez passé un séjour confortable et agréable à O Refúgio.\n\nMerci beaucoup pour votre visite et votre confiance. Si vous souhaitez nous laisser un retour privé, il vous suffit de répondre à ce message. Votre avis nous aide à continuer à nous améliorer avec soin.\n\nSi l’expérience a été positive, un avis sur Google Maps nous ferait également très plaisir :\n{googleReviewUrl}\n\nNous espérons pouvoir vous accueillir à nouveau à l’avenir.\n\nCordialement,\n\nO Refúgio",
         "en": "Hello {guestName},\n\nWe hope you had a comfortable and pleasant stay at O Refúgio.\n\nThank you very much for your visit and trust. If you would like to leave private feedback, simply reply to this message. Your opinion helps us continue improving with care.\n\nIf your experience was positive, a Google Maps review would also be greatly appreciated:\n{googleReviewUrl}\n\nWe hope to welcome you again in the future.\n\nBest regards,\n\nO Refúgio",
-        "es": "Hola {guestName},\n\nEsperamos que haya tenido una estancia cómoda y agradable en O Refúgio.\n\nMuchas gracias por su visita y por su confianza. Si desea dejarnos algún comentario privado, solo tiene que responder a este mensaje. Su opinión nos ayuda a seguir mejorando con cuidado.\n\nSi la experiencia fue positiva, también agradeceríamos una reseña en Google Maps:\n{googleReviewUrl}\n\nEsperamos poder recibirle de nuevo en el futuro.\n\nSaludos cordiales,\n\nO Refúgio",
-        "de": "Hallo {guestName},\n\nwir hoffen, Sie hatten einen komfortablen und angenehmen Aufenthalt bei O Refúgio.\n\nVielen Dank für Ihren Besuch und Ihr Vertrauen. Wenn Sie uns privates Feedback geben möchten, antworten Sie einfach auf diese Nachricht. Ihre Meinung hilft uns, uns weiterhin mit Sorgfalt zu verbessern.\n\nWenn Ihre Erfahrung positiv war, würden wir uns auch sehr über eine Bewertung auf Google Maps freuen:\n{googleReviewUrl}\n\nWir hoffen, Sie in Zukunft wieder willkommen heißen zu dürfen.\n\nMit freundlichen Grüßen,\n\nO Refúgio"
+        "es": "Hola {guestName},\n\nEsperamos que haya tenido una estancia cómoda y agradable en O Refúgio.\n\nMuchas gracias por su visita y por su confianza. Si desea dejarnos algún comentario privado, solo tiene que responder a este mensaje. Su opinión nos ayuda a seguir mejorando con cuidado.\n\nSi la experiencia fue positiva, también agradeceríamos una reseña en Google Maps:\n{googleReviewUrl}\n\nEsperamos poder recibirle de nuevo en el futuro.\n\nSaludos cordiales,\n\nO Refúgio"
+      }
+    }
+  ],
+  "marketingTemplates": [
+    {
+      "id": "news",
+      "label": {
+        "pt": "Novidades de O Refúgio",
+        "fr": "Nouvelles de O Refúgio",
+        "en": "News from O Refúgio",
+        "es": "Novedades de O Refúgio"
+      },
+      "subject": {
+        "pt": "Novidades de O Refúgio",
+        "fr": "Nouvelles de O Refúgio",
+        "en": "News from O Refúgio",
+        "es": "Novedades de O Refúgio"
+      },
+      "body": {
+        "pt": "Olá,\n\n[Escreva aqui as novidades que quer partilhar.]\n\nEsperamos voltar a recebê-lo em breve.\n\nCom os melhores cumprimentos,\n\nO Refúgio",
+        "fr": "Bonjour,\n\n[Écrivez ici les nouvelles que vous souhaitez partager.]\n\nNous espérons vous accueillir à nouveau bientôt.\n\nCordialement,\n\nO Refúgio",
+        "en": "Hello,\n\n[Write the news you would like to share here.]\n\nWe hope to welcome you again soon.\n\nBest regards,\n\nO Refúgio",
+        "es": "Hola,\n\n[Escriba aquí las novedades que desea compartir.]\n\nEsperamos volver a recibirle pronto.\n\nSaludos cordiales,\n\nO Refúgio"
+      }
+    },
+    {
+      "id": "offer",
+      "label": {
+        "pt": "Oferta ou desconto",
+        "fr": "Offre ou remise",
+        "en": "Offer or discount",
+        "es": "Oferta o descuento"
+      },
+      "subject": {
+        "pt": "Uma oferta especial de O Refúgio",
+        "fr": "Une offre spéciale de O Refúgio",
+        "en": "A special offer from O Refúgio",
+        "es": "Una oferta especial de O Refúgio"
+      },
+      "body": {
+        "pt": "Olá,\n\nTemos uma oferta que gostaríamos de partilhar consigo:\n\n[Descreva aqui a oferta, as datas e as condições.]\n\nEsperamos voltar a recebê-lo em O Refúgio.\n\nCom os melhores cumprimentos,\n\nO Refúgio",
+        "fr": "Bonjour,\n\nNous avons une offre que nous aimerions partager avec vous :\n\n[Décrivez ici l'offre, les dates et les conditions.]\n\nNous espérons vous accueillir à nouveau à O Refúgio.\n\nCordialement,\n\nO Refúgio",
+        "en": "Hello,\n\nWe have an offer we would like to share with you:\n\n[Describe the offer, dates and conditions here.]\n\nWe hope to welcome you back to O Refúgio.\n\nBest regards,\n\nO Refúgio",
+        "es": "Hola,\n\nTenemos una oferta que nos gustaría compartir con usted:\n\n[Describa aquí la oferta, las fechas y las condiciones.]\n\nEsperamos volver a recibirle en O Refúgio.\n\nSaludos cordiales,\n\nO Refúgio"
       }
     }
   ],
@@ -186,15 +202,13 @@
         "pt": "Resposta à sua mensagem",
         "fr": "Réponse à votre message",
         "en": "Reply to your message",
-        "es": "Respuesta a su mensaje",
-        "de": "Antwort auf Ihre Nachricht"
+        "es": "Respuesta a su mensaje"
       },
       "body": {
         "pt": "Olá {guestName},\n\nObrigado pela sua mensagem sobre O Refúgio ({stayRange}).{quote}\n\nResposta:\n[Escrever resposta aqui]\n\nCom os melhores cumprimentos,\n\nO Refúgio",
         "fr": "Bonjour {guestName},\n\nMerci pour votre message concernant O Refúgio ({stayRange}).{quote}\n\nRéponse :\n[Écrire la réponse ici]\n\nCordialement,\n\nO Refúgio",
         "en": "Hello {guestName},\n\nThank you for your message about O Refúgio ({stayRange}).{quote}\n\nReply:\n[Write the reply here]\n\nBest regards,\n\nO Refúgio",
-        "es": "Hola {guestName},\n\nGracias por su mensaje sobre O Refúgio ({stayRange}).{quote}\n\nRespuesta:\n[Escribir la respuesta aquí]\n\nSaludos cordiales,\n\nO Refúgio",
-        "de": "Hallo {guestName},\n\nvielen Dank für Ihre Nachricht zu O Refúgio ({stayRange}).{quote}\n\nAntwort:\n[Antwort hier schreiben]\n\nMit freundlichen Grüßen,\n\nO Refúgio"
+        "es": "Hola {guestName},\n\nGracias por su mensaje sobre O Refúgio ({stayRange}).{quote}\n\nRespuesta:\n[Escribir la respuesta aquí]\n\nSaludos cordiales,\n\nO Refúgio"
       }
     },
     {
@@ -203,15 +217,13 @@
         "pt": "Resposta ao pedido {requestId}",
         "fr": "Réponse à la demande {requestId}",
         "en": "Reply to request {requestId}",
-        "es": "Respuesta a la solicitud {requestId}",
-        "de": "Antwort auf Anfrage {requestId}"
+        "es": "Respuesta a la solicitud {requestId}"
       },
       "body": {
         "pt": "Olá {guestName},\n\nObrigado pelo seu pedido para O Refúgio ({stayRange}). Infelizmente, neste momento não conseguimos aceitar este pedido.{quote}\n\nSe quiser, responda a esta mensagem e podemos tentar encontrar outra data.\n\nCom os melhores cumprimentos,\n\nO Refúgio",
         "fr": "Bonjour {guestName},\n\nMerci pour votre demande pour O Refúgio ({stayRange}). Malheureusement, nous ne pouvons pas accepter cette demande pour le moment.{quote}\n\nSi vous le souhaitez, répondez à ce message et nous pouvons essayer de trouver une autre date.\n\nCordialement,\n\nO Refúgio",
         "en": "Hello {guestName},\n\nThank you for your request for O Refúgio ({stayRange}). Unfortunately, we cannot accept this request at the moment.{quote}\n\nIf you wish, reply to this message and we can try to find another date.\n\nBest regards,\n\nO Refúgio",
-        "es": "Hola {guestName},\n\nGracias por su solicitud para O Refúgio ({stayRange}). Lamentablemente, no podemos aceptar esta solicitud en este momento.{quote}\n\nSi lo desea, responda a este mensaje e intentaremos encontrar otra fecha.\n\nSaludos cordiales,\n\nO Refúgio",
-        "de": "Hallo {guestName},\n\nvielen Dank für Ihre Anfrage für O Refúgio ({stayRange}). Leider können wir diese Anfrage im Moment nicht annehmen.{quote}\n\nWenn Sie möchten, antworten Sie auf diese Nachricht und wir können versuchen, ein anderes Datum zu finden.\n\nMit freundlichen Grüßen,\n\nO Refúgio"
+        "es": "Hola {guestName},\n\nGracias por su solicitud para O Refúgio ({stayRange}). Lamentablemente, no podemos aceptar esta solicitud en este momento.{quote}\n\nSi lo desea, responda a este mensaje e intentaremos encontrar otra fecha.\n\nSaludos cordiales,\n\nO Refúgio"
       }
     }
   ]

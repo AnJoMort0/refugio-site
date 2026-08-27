@@ -39,9 +39,14 @@
   "home": {
     "hero": {
       "imageAlt": "Exterior view of the stone house",
-      "eyebrow": "Your rural Refúgio",
-      "title": "The perfect getaway.",
-      "text": "Between the tranquillity of the Castelo de Paiva mountains and the open views over the Douro, every detail has been designed so all you need to do is arrive, breathe and enjoy. An intimate, welcoming space entirely yours, ideal for days as a couple or special family moments.",
+      "title": "O Refúgio",
+      "dictionaryLabel": "Definition of the Portuguese word refúgio",
+      "translationLead": "Portuguese for refuge",
+      "phonetic": "/ʁɨˈfu.ʒju/",
+      "grammar": "masculine noun",
+      "definition": "A place considered safe, where someone or something can take shelter.",
+      "synonymsLabel": "Synonyms:",
+      "synonyms": "shelter, retreat",
       "primaryCta": "Check availability",
       "secondaryCta": "Explore photos"
     },
@@ -95,7 +100,7 @@
       "eyebrow": "Guest reviews",
       "title": "A place you always want to return to.",
       "reviewCta": "Review on Google Maps",
-      "reviewCta2": "Send feedback by message",
+      "reviewCta2": "Send feedback",
       "quote1": "“We had two excellent days, truly a refuge for anyone who likes getting away from the crowds. The house is huge, the view is spectacular and the pool, garden... everything is exceptional. We will definitely be back!”",
       "author1": "Paulo — Portugal",
       "quote2": "“A wonderful private place to relax in the middle of nature. O Refúgio was even better than we expected, with incredible views, lots of privacy and hosts who were always attentive. We hope to return soon :)”",
@@ -285,14 +290,14 @@
         "item1": "€200 security deposit requested at check-in",
         "item2": "Identification document required",
         "item3": "Free parking available on site",
-        "item4": "Languages: Portuguese, French, English, German and Spanish"
+        "item4": "Languages: Portuguese, French, English and Spanish"
       }
     },
     "location": {
       "eyebrow": "Location",
       "title": "Rua da Arejinha 627, in Pedorido.",
       "text": "Use the map to find O Refúgio on Google Maps.",
-      "fallbackLink": "Open in Google Maps",
+      "fallbackLink": "Google Maps",
       "mapTitle": "Map showing the location of O Refúgio",
       "guideLink": "View local guide"
     },
@@ -461,6 +466,7 @@
       "contactNameRequired": "Enter the name for the booking.",
       "emailRequired": "Enter the booking email.",
       "emailInvalid": "Enter a valid email address.",
+      "phoneRequired": "Enter a phone number for the booking.",
       "phoneInvalid": "Enter a valid phone number. You can use Portuguese format, +351 or 00.",
       "checkinTimeInvalid": "Check-in must be between 15:00 and 19:00. If you need another time, mention the request in the comments.",
       "checkoutTimeInvalid": "Check-out must be between 08:00 and 10:00. If you need another time, mention the request in the comments.",
@@ -530,6 +536,7 @@
     "eyebrow": "Rules and conditions",
     "title": "Stay conditions",
     "intro": "Before sending your request, please confirm a few important points to help ensure a peaceful stay.",
+    "openLabel": "View the full stay rules",
     "capacity": {
       "title": "Capacity and occupancy",
       "item1": "Maximum capacity: 6 guests",
@@ -631,12 +638,11 @@
       "languagePortuguese": "Português",
       "languageFrench": "Français",
       "languageEnglish": "English",
-      "languageGerman": "Deutsch",
       "languageSpanish": "Español",
       "preferredContactLabel": "I prefer to be contacted by",
       "preferredEmail": "Email",
-      "preferredWhatsApp": "Request contact by WhatsApp",
-      "preferredCall": "Request a callback",
+      "preferredWhatsApp": "WhatsApp",
+      "preferredCall": "Callback",
       "contextLabel": "Contact context",
       "contextPlaceholder": "Choose an option",
       "contextConfirmed": "I already have a booking",
@@ -753,6 +759,7 @@
       "sortAlpha": "A–Z",
       "listView": "List",
       "mapView": "Map",
+      "viewLabel": "Local Guide view",
       "useLocation": "Use my location",
       "locationReady": "Location enabled for directions",
       "locationDenied": "Your location could not be used.",
@@ -764,6 +771,7 @@
       "noResultsText": "Try clearing your search or choosing another category.",
       "results": "{count} suggestions",
       "result": "{count} suggestion",
+      "showMore": "Show more ({count})",
       "text1": "Search by name or choose a category.",
       "text2": "The times shown are approximate from O Refúgio. Schedules, access and conditions may change, so we recommend checking directly with each place before setting off."
     },
@@ -781,17 +789,61 @@
     },
     "map": {
       "eyebrow": "Map",
-      "title": "View each suggestion on Google Maps.",
-      "text": "Select a place from the list to centre the map.",
+      "title": "Explore every suggestion on the map.",
+      "text": "Markers follow your search and filters. Select a place for details and directions in Google Maps.",
       "defaultTitle": "O Refúgio",
       "defaultAddress": "Rua da Arejinha 627, 4550-518 Pedorido",
-      "openDefault": "Open O Refúgio in Google Maps"
+      "openDefault": "Open O Refúgio in Google Maps",
+      "legendTitle": "Categories",
+      "propertyLabel": "O Refúgio"
     },
     "partners": {
       "eyebrow": "Local partners",
       "title": "Discover who we trust",
       "text": "See our selection of partners and places we recommend visiting during your stay.",
-      "offerNote": "Temporary offers will be updated regularly."
+      "offerNote": "Temporary offers will be updated regularly.",
+      "moreLabel": "See more",
+      "lessLabel": "See less",
+      "websiteLabel": "Partner website",
+      "highlightsLabel": "What makes it worth a visit",
+      "details": {
+        "adega-ramadinha": {
+          "intro": "A Portuguese restaurant close to O Refúgio, well suited to a relaxed meal featuring regional flavours.",
+          "highlights": [
+            "Daily dishes and traditional cooking",
+            "Grilled dishes and sharing options",
+            "Booking recommended at weekends"
+          ],
+          "websiteUrl": "https://example.com/PARTNER_ADEGA_RAMADINHA_URL_REPLACE_ME"
+        },
+        "corga": {
+          "intro": "A stop devoted to local products, offering a simple way to discover the region's flavours and producers.",
+          "highlights": [
+            "Regional product tastings",
+            "Local cheeses, cured meats and wines",
+            "Ideas to take home or give as gifts"
+          ],
+          "websiteUrl": "https://example.com/PARTNER_CORGA_URL_REPLACE_ME"
+        },
+        "cafe-cruzeiro": {
+          "intro": "A nearby cafe and bakery for a simple breakfast or an easy pause during the day.",
+          "highlights": [
+            "Coffee, pastries and bread",
+            "Quick takeaway options",
+            "Relaxed local atmosphere"
+          ],
+          "websiteUrl": "https://example.com/PARTNER_CAFE_CRUZEIRO_URL_REPLACE_ME"
+        },
+        "aquapura": {
+          "intro": "A riverside terrace for ending the day with a drink, a light meal and an open view.",
+          "highlights": [
+            "Drinks, cocktails and snacks",
+            "Terrace with a late-afternoon atmosphere",
+            "Seasonal opening hours to confirm"
+          ],
+          "websiteUrl": "https://example.com/PARTNER_AQUAPURA_URL_REPLACE_ME"
+        }
+      }
     },
     "events": {
       "dateNote": "Dates may vary from year to year. Always check the official programme before visiting."
@@ -1046,10 +1098,14 @@
   },
   "footer": {
     "copyright": "© O Refúgio — Rodrigues Family",
+    "contactTitle": "Contact",
+    "followTitle": "Follow O Refúgio",
     "googleReview": "Review on Google Maps",
     "facebook": "Facebook",
     "instagram": "Instagram",
-    "creator": "Website by André Fonseca"
+    "creator": "Website by André Fonseca",
+    "whatsappLabel": "Contact O Refúgio on WhatsApp",
+    "whatsappMessage": "Hello! I would like more information about O Refúgio."
   },
   "guestStay": {
     "meta": {
@@ -1058,7 +1114,6 @@
     },
     "hero": {
       "eyebrow": "During your stay",
-      "demoBadge": "Demo",
       "genericTitle": "Welcome to O Refúgio.",
       "genericText": "Everything you may need during your stay, all in one place and designed mobile-first.",
       "personalisedTitle": "Hello, {name} 👋",
@@ -1070,6 +1125,7 @@
       "noBikes": "Not booked"
     },
     "quick": {
+      "label": "Quick actions",
       "wifi": "Wi-Fi",
       "host": "Hosts",
       "emergency": "Emergency",
@@ -1091,7 +1147,9 @@
       "title": "If you need help",
       "text": "In immediate danger, call 112. For non-emergency situations, use the appropriate contacts below.",
       "nationalTitle": "National Emergency Number",
-      "nationalText": "Medical emergency, fire or police"
+      "nationalText": "Medical emergency, fire or police",
+      "medicalMore": "Pharmacies and other healthcare",
+      "medicalText": "Always confirm opening hours, available services and on-duty pharmacies before leaving."
     },
     "property": {
       "label": "Accommodation address",
@@ -1101,30 +1159,21 @@
       "eyebrow": "We're nearby",
       "title": "Contact the hosts",
       "text": "Choose the contact that best suits your language. Call and WhatsApp become active as soon as the numbers are configured.",
-      "placeholder": "To be configured",
       "configured": "Available",
-      "whatsappMessage": "Hello! I'm staying at O Refúgio and I need some help."
+      "placeholder": "To be configured",
+      "genericGuestName": "O Refúgio guest",
+      "whatsappMessage": "Hello! I am {guestName}, I am currently staying at O Refúgio and I need some help.",
+      "roles": {
+        "primary": "Main host",
+        "staySupport": "Stay support"
+      }
     },
     "wifi": {
       "eyebrow": "Quick connection",
       "title": "House Wi-Fi",
-      "text": "The credentials are shown here for easy copying. In the future they will be managed in the admin and delivered through the private stay-information layer.",
       "network": "Network",
       "password": "Password",
-      "toConfigure": "To be configured",
-      "qrPlaceholderTitle": "Wi-Fi QR",
-      "qrPlaceholderText": "It will be generated automatically when the credentials are configured.",
-      "qrReadyTitle": "Wi-Fi QR ready to generate",
-      "qrReadyText": "Connect the QR generator once the chosen library has been approved."
-    },
-    "health": {
-      "eyebrow": "Health",
-      "title": "Health and assistance",
-      "text": "Useful contacts in the area. For non-urgent clinical advice you can call SNS 24; in an emergency call 112."
-    },
-    "pharmacy": {
-      "title": "Nearby pharmacies",
-      "text": "Opening hours and on-duty pharmacies can change. Check before leaving, especially at night, on Sundays and public holidays."
+      "toConfigure": "To be configured"
     },
     "nearby": {
       "eyebrow": "Stay essentials",
@@ -1133,13 +1182,16 @@
       "supermarkets": "Shopping",
       "food": "Food",
       "services": "Services",
-      "hoursNote": "Travel times are approximate and opening hours/services may change. Use the Directions button to check at the time."
+      "hoursNote": "Travel times are approximate and opening hours/services may change. Use the Directions button to check at the time.",
+      "tabsLabel": "Essentials near O Refúgio",
+      "minutes": "~{count} min"
     },
     "partners": {
       "eyebrow": "Local partners",
       "title": "A few places we want to highlight",
       "text": "Partners are clearly identified, without presenting them as independent editorial recommendations.",
-      "cta": "View all partners in the Local Guide"
+      "cta": "View all partners in the Local Guide",
+      "openPartner": "Discover this partner"
     },
     "bikes": {
       "eyebrow": "Extra during your stay",
@@ -1148,30 +1200,22 @@
       "priceUnit": "per bicycle / day",
       "text": "Request subject to availability and host confirmation. Planned maximum: one bicycle per guest per day.",
       "requestCta": "Request by WhatsApp",
-      "whatsappMessage": "Hello! I would like to request bicycles during my stay at O Refúgio.",
+      "whatsappMessage": "Hello! I am {guestName}, I am staying at O Refúgio and would like to request bicycles.",
       "alreadyBookedTitle": "You already have {count} bicycle(s) in your booking.",
       "alreadyBookedText": "We show your existing booking instead of offering the same extra again."
     },
     "house": {
       "eyebrow": "The house",
       "title": "Accommodation information",
-      "text": "This structure is ready for the final instructions approved by the owners. Items that are not yet confirmed are marked rather than invented.",
+      "text": "Essential departure information and all the house rules for your stay.",
       "checkoutTitle": "Check-out and departure",
-      "checkoutTime": "Departure time",
-      "keys": "Where to leave the keys",
-      "kitchen": "Kitchen / dishes",
-      "waste": "Waste and recycling",
-      "toConfigure": "To be configured",
-      "rulesTitle": "Quick rules",
-      "rulesQuiet": "Quiet hours — to be confirmed.",
-      "rulesSmoking": "Smoking policy — to be confirmed.",
-      "rulesVisitors": "Visitors, parties and occupancy — to be confirmed.",
-      "rulesPool": "Pool rules and safety — to be confirmed.",
-      "howToTitle": "How to use the house",
-      "heating": "Heating / climate control — add instructions.",
-      "tv": "Television — add simple instructions.",
-      "appliances": "Important appliances — add only those that commonly raise questions.",
-      "parking": "Parking and access — add final instructions."
+      "checkoutTime": "Departure time:",
+      "keysInstruction": "Before leaving, leave the keys in the keyholes of their respective doors.",
+      "wasteInstruction": "Place the rubbish in the green container a little further down the road.",
+      "wasteMapLink": "Open the container location",
+      "kitchenInstruction": "Leave the dishes washed and put away; if that is not possible before check-out, place them in the dishwasher.",
+      "rulesTitle": "All house rules",
+      "rulesLink": "View all house rules"
     },
     "guide": {
       "eyebrow": "Explore the region",
@@ -1179,8 +1223,113 @@
       "text": "Beaches, nature, cities and events.",
       "cta": "Open Local Guide"
     },
+    "directory": {
+      "emergency": {
+        "hospital": {
+          "name": "Hospital Padre Américo",
+          "detail": "~35 min · hospital emergency department in Penafiel"
+        },
+        "firefighters": {
+          "name": "Castelo de Paiva Volunteer Fire Brigade",
+          "detail": "Local emergency assistance · Sobrado"
+        },
+        "gnr": {
+          "name": "GNR — Castelo de Paiva",
+          "detail": "Territorial police station · Felgueiras Industrial Area"
+        },
+        "sns24": {
+          "name": "SNS 24",
+          "detail": "24-hour health advice line"
+        },
+        "poison": {
+          "name": "CIAV — Poison Information Centre",
+          "detail": "Advice in case of poisoning"
+        }
+      },
+      "medical": {
+        "healthExtension": {
+          "name": "Oliveira do Arda Health Centre",
+          "detail": "~6 min · nearest local unit"
+        },
+        "usf": {
+          "name": "USF Paiva Douro",
+          "detail": "Castelo de Paiva · weekdays 08:00–20:00"
+        },
+        "pharmacyPinho": {
+          "name": "Pinho Lopes Pharmacy",
+          "detail": "Oliveira do Arda / Raiva · Av. Jean Tyssen 326"
+        },
+        "pharmacyAdriano": {
+          "name": "Adriano Moreira Pharmacy",
+          "detail": "Castelo de Paiva · Praça da República 11"
+        },
+        "pharmacyCentral": {
+          "name": "Central Pharmacy",
+          "detail": "Castelo de Paiva · Rua Dr. Sá Carneiro 22"
+        }
+      },
+      "supermarkets": {
+        "minimarket": {
+          "name": "Soares da Costa Mini-market — Póvoa",
+          "detail": "Local convenience shopping"
+        },
+        "continente": {
+          "name": "Continente — Canedo",
+          "detail": "Supermarket"
+        },
+        "intermarcheCanedo": {
+          "name": "Intermarché — Canedo",
+          "detail": "Supermarket"
+        },
+        "auchan": {
+          "name": "Auchan — Castelo de Paiva",
+          "detail": "Supermarket"
+        },
+        "intermarchePaiva": {
+          "name": "Intermarché — Castelo de Paiva",
+          "detail": "Supermarket"
+        }
+      },
+      "food": {
+        "cantinho": {
+          "name": "O Cantinho — Oliveira do Arda",
+          "detail": "Portuguese cooking"
+        },
+        "ramadinha": {
+          "name": "Adega Ramadinha — Pedorido",
+          "detail": "Traditional cooking · local partner"
+        },
+        "espacoZ": {
+          "name": "Espaço Z Pizzeria — Castelo de Paiva",
+          "detail": "Pizzeria"
+        },
+        "boavista": {
+          "name": "Boavista — Castelo de Paiva",
+          "detail": "Restaurant"
+        },
+        "estacao4550": {
+          "name": "Estação 4550 — Castelo de Paiva",
+          "detail": "Restaurant"
+        }
+      },
+      "services": {
+        "taxiSales": {
+          "name": "Táxi Sales — Castelo de Paiva",
+          "detail": "Local taxi · call or WhatsApp"
+        },
+        "taxisRaiva": {
+          "name": "Táxis Centrais da Raiva",
+          "detail": "Local service in the Raiva / Pedorido area"
+        },
+        "fuel": {
+          "name": "Cepsa fuel station — Sobrado",
+          "detail": "Fuel · Castelo de Paiva"
+        }
+      }
+    },
     "updatedLabel": "Information reviewed on",
     "bottomNav": {
+      "label": "Stay navigation",
       "home": "Home",
       "help": "Help",
       "wifi": "Wi-Fi",

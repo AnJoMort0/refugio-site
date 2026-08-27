@@ -2,7 +2,7 @@
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
   <title data-i18n="meta.title"></title>
   <meta name="description" content="" data-i18n-attr='{"content":"meta.description"}' />
@@ -28,9 +28,20 @@
       </div>
       <div class="hero-overlay"></div>
       <div class="container hero-content">
-        <p class="eyebrow" data-i18n="home.hero.eyebrow"></p>
         <h1 data-i18n="home.hero.title"></h1>
-        <p class="hero-text" data-i18n="home.hero.text"></p>
+        <div class="hero-dictionary" aria-label="" data-i18n-attr='{"aria-label":"home.hero.dictionaryLabel"}'>
+          <p class="hero-dictionary-translation" data-i18n="home.hero.translationLead"></p>
+          <p class="hero-dictionary-meta">
+            <span data-i18n="home.hero.phonetic"></span>
+            <span aria-hidden="true">·</span>
+            <em data-i18n="home.hero.grammar"></em>
+          </p>
+          <p class="hero-dictionary-definition" data-i18n="home.hero.definition"></p>
+          <p class="hero-dictionary-synonyms">
+            <span data-i18n="home.hero.synonymsLabel"></span>
+            <strong data-i18n="home.hero.synonyms"></strong>
+          </p>
+        </div>
         <div class="hero-actions">
           <a class="button button-primary" href="./reservas.html" data-i18n="home.hero.primaryCta"></a>
           <a class="button button-secondary" href="./galeria.html" data-i18n="home.hero.secondaryCta"></a>
@@ -59,7 +70,8 @@
             <strong data-i18n="home.location.label"></strong>
             <a
               class="home-address-link"
-              href="https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0205166,-8.3828538,108m/data=!3m1!1e3!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu"
+              href="#"
+              data-site-link="maps"
               target="_blank"
               rel="noopener"
               data-i18n-attr='{"aria-label":"home.location.mapLink"}'
@@ -68,7 +80,7 @@
                 <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
                 <circle cx="12" cy="10" r="3"></circle>
               </svg>
-              <span data-i18n="home.location.address"></span>
+              <span data-site-value="address" data-i18n="home.location.address"></span>
             </a>
           </p>
           <a class="text-link" href="./alojamento.html" data-i18n="home.accommodation.link"></a>
@@ -155,7 +167,7 @@
           <p class="eyebrow" data-i18n="home.testimonials.eyebrow"></p>
           <h2 data-i18n="home.testimonials.title"></h2>
           <div class="section-cta-group">
-            <a class="text-link section-cta" href="https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener" data-i18n="home.testimonials.reviewCta"></a>
+            <a class="text-link section-cta" href="#" data-site-link="review" target="_blank" rel="noopener" data-i18n="home.testimonials.reviewCta"></a>
             <a class="text-link section-cta" href="./contacto.html?context=past&topic=pastFeedback#mensagem" data-i18n="home.testimonials.reviewCta2"></a>
           </div>
         </div>
@@ -205,7 +217,7 @@
           <a class="text-link section-cta" href="./guia-local.html#parceiros" data-i18n="home.sponsors.link"></a>
         </div>
         <div class="sponsor-grid">
-          <a class="sponsor-card" href="./guia-local.html">
+          <a class="sponsor-card" href="./guia-local.html#partner-adega-ramadinha">
             <img
               src="./assets/images/partners/ramadinha_1.jpg"
               alt=""
@@ -213,7 +225,7 @@
             />
             <p data-i18n="home.sponsors.card1"></p>
           </a>
-          <a class="sponsor-card" href="./guia-local.html">
+          <a class="sponsor-card" href="./guia-local.html#partner-corga">
             <img
               src="./assets/images/partners/corga_1.jpg"
               alt=""
@@ -221,7 +233,7 @@
             />
             <p data-i18n="home.sponsors.card2"></p>
           </a>
-          <a class="sponsor-card" href="./guia-local.html">
+          <a class="sponsor-card" href="./guia-local.html#partner-cafe-cruzeiro">
             <img
               src="./assets/images/partners/cruzeiro_1.jpg"
               alt=""
@@ -229,7 +241,7 @@
             />
             <p data-i18n="home.sponsors.card3"></p>
           </a>
-          <a class="sponsor-card" href="./guia-local.html">
+          <a class="sponsor-card" href="./guia-local.html#partner-aquapura">
             <img
               src="./assets/images/partners/aquapura_1.jpg"
               alt=""

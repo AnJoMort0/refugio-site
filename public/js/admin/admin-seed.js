@@ -1,4 +1,5 @@
 import { addDays, formatDateKey, parseDateKey } from '../utils/date.js';
+import { SITE_CONFIG } from '../config/site-config.js';
 
 export const ADMIN_DATA_VERSION = 6;
 
@@ -74,8 +75,8 @@ export function createInitialAdminState(now = new Date()) {
     abritelSpanish: id('RES', 4, 11),
     ownerStay: id('RES', 5, 16),
     provisional: id('RES', 6, 19),
-    familyGerman: id('RES', 7, 23),
-    abritelGerman: id('RES', 8, 29),
+    familyInternational: id('RES', 7, 23),
+    abritelInternational: id('RES', 8, 29),
     cancelledFuture: id('RES', 9, 3),
     recentRepeat: id('RES', 10, -5),
     privatePast: id('RES', 11, -12),
@@ -94,7 +95,7 @@ export function createInitialAdminState(now = new Date()) {
     currentAccepted: id('REQ', 1, -18),
     futureAccepted: id('REQ', 2, -28),
     conflictNew: id('REQ', 3),
-    germanNew: id('REQ', 4),
+    internationalNew: id('REQ', 4),
     discountedNew: id('REQ', 5),
     englishNew: id('REQ', 6),
     portugueseNew: id('REQ', 7),
@@ -104,14 +105,14 @@ export function createInitialAdminState(now = new Date()) {
   };
 
   const guests = [
-    { id: 'GUEST-RODRIGUES-MARTINS', name: 'Rodrigues Martins', email: 'rodrigues.martins@example.com', phone: '+351 912 345 678', preferredLanguage: 'pt', nationality: 'Portugal', notes: 'Hóspede repetente. Prefere contacto por email.' },
-    { id: 'GUEST-CLAIRE-DUBOIS', name: 'Claire Dubois', email: 'claire.dubois@example.fr', phone: '+33 6 11 22 33 44', preferredLanguage: 'fr', nationality: 'França', notes: 'Hóspede repetente; viaja de carro.' },
+    { id: 'GUEST-RODRIGUES-MARTINS', name: 'Rodrigues Martins', email: 'rodrigues.martins@example.com', phone: '+351 912 345 678', preferredLanguage: 'pt', nationality: 'Portugal', nif: '000000000', identityDocumentType: 'cc', identityDocumentNumber: 'DEMO-CC-001', notes: 'Hóspede repetente. Prefere contacto por email.' },
+    { id: 'GUEST-CLAIRE-DUBOIS', name: 'Claire Dubois', email: 'claire.dubois@example.fr', phone: '+33 6 11 22 33 44', preferredLanguage: 'fr', nationality: 'França', nif: '', identityDocumentType: 'passport', identityDocumentNumber: 'DEMO-PASS-002', notes: 'Hóspede repetente; viaja de carro.' },
     { id: 'GUEST-TOM-WALKER', name: 'Tom Walker', email: 'tom.walker@example.com', phone: '+44 7700 900123', preferredLanguage: 'en', nationality: 'Reino Unido', notes: 'Já pediu informação sobre bicicletas.' },
     { id: 'GUEST-SOFIA-ALVAREZ', name: 'Sofía Álvarez', email: 'sofia.alvarez@example.es', phone: '+34 611 234 567', preferredLanguage: 'es', nationality: 'Espanha', notes: 'Viaja com duas crianças.' },
     { id: 'GUEST-MANUEL-PEREIRA', name: 'Manuel Pereira', email: 'manuel.pereira@example.pt', phone: '917 222 444', preferredLanguage: 'pt', nationality: 'Portugal', notes: 'Estadia de uso do proprietário, sem cobrança.' },
     { id: 'GUEST-EMMA-WILSON', name: 'Emma Wilson', email: 'emma.wilson@example.ie', phone: '', preferredLanguage: 'en', nationality: 'Irlanda', notes: 'Contacto apenas por email.' },
-    { id: 'GUEST-ANNA-SCHNEIDER', name: 'Anna Schneider', email: 'anna.schneider@example.de', phone: '+49 151 23456789', preferredLanguage: 'de', nationality: 'Alemanha', notes: '' },
-    { id: 'GUEST-LUKAS-WEBER', name: 'Lukas Weber', email: 'lukas.weber@example.at', phone: '+43 660 1234567', preferredLanguage: 'de', nationality: 'Áustria', notes: 'Reserva recebida através da Abritel.fr.' },
+    { id: 'GUEST-ANNA-SCHNEIDER', name: 'Anna Schneider', email: 'anna.schneider@example.de', phone: '+49 151 23456789', preferredLanguage: 'en', nationality: 'Alemanha', notes: '' },
+    { id: 'GUEST-LUKAS-WEBER', name: 'Lukas Weber', email: 'lukas.weber@example.at', phone: '+43 660 1234567', preferredLanguage: 'fr', nationality: 'Áustria', notes: 'Reserva recebida através da Abritel.fr.' },
     { id: 'GUEST-INES-CARVALHO', name: 'Inês Carvalho', email: 'ines.carvalho@example.pt', phone: '934 555 210', preferredLanguage: 'pt', nationality: 'Portugal', notes: '' },
     { id: 'GUEST-OLIVER-SMITH', name: 'Oliver Smith', email: 'oliver.smith@example.co.uk', phone: '+44 7700 900456', preferredLanguage: 'en', nationality: 'Reino Unido', notes: 'Não compareceu e não respondeu às mensagens.' },
     { id: 'GUEST-LUCIA-MARCIA', name: 'Lucia Marcia', email: 'lucia.marcia@example.com.br', phone: '+55 11 91234 5678', preferredLanguage: 'pt', nationality: 'Brasil', notes: 'Cancelou por alteração do voo.' },
@@ -204,7 +205,8 @@ export function createInitialAdminState(now = new Date()) {
       sourceReference: requestIds.futureAccepted,
       websiteRequestId: requestIds.futureAccepted,
       status: 'confirmed',
-      paymentStatus: 'deposit_paid',
+      paymentStatus: 'paid',
+      securityDepositPaid: true,
       preferredLanguage: 'es',
       stay: stay(11, 15),
       guests: { adults: 2, children: 2, childAges: [4, 9] },
@@ -244,13 +246,13 @@ export function createInitialAdminState(now = new Date()) {
       createdBy: 'user-dev-andre'
     }),
     reservation({
-      id: reservationIds.familyGerman,
+      id: reservationIds.familyInternational,
       guestId: 'GUEST-ANNA-SCHNEIDER',
       source: 'booking',
       sourceReference: 'BOOKING-9926510473',
       status: 'confirmed',
       paymentStatus: 'paid',
-      preferredLanguage: 'de',
+      preferredLanguage: 'en',
       stay: stay(23, 27, '18:00'),
       guests: { adults: 2, children: 2, childAges: [6, 11] },
       preferences: { bed: 'single' },
@@ -261,13 +263,13 @@ export function createInitialAdminState(now = new Date()) {
       createdBy: 'user-owner-marlene'
     }),
     reservation({
-      id: reservationIds.abritelGerman,
+      id: reservationIds.abritelInternational,
       guestId: 'GUEST-LUKAS-WEBER',
       source: 'abritel',
       sourceReference: 'ABRITEL-HA-730442',
       status: 'awaiting_payment',
       paymentStatus: 'awaiting_transfer',
-      preferredLanguage: 'de',
+      preferredLanguage: 'fr',
       stay: stay(29, 33),
       pricing: { depositIncluded: true },
       notes: { owner: 'Instruções de pagamento enviadas; prazo termina dentro de três dias.' },
@@ -330,7 +332,8 @@ export function createInitialAdminState(now = new Date()) {
       source: 'booking',
       sourceReference: 'BOOKING-7712049850',
       status: 'no_show',
-      paymentStatus: 'deposit_paid',
+      paymentStatus: 'paid',
+      securityDepositPaid: true,
       preferredLanguage: 'en',
       stay: stay(-19, -16),
       notes: { owner: 'Não compareceu. Contactado por email e telefone sem resposta.' },
@@ -489,9 +492,9 @@ export function createInitialAdminState(now = new Date()) {
       estimatedTotal: 765
     }),
     createWebsiteRequest({
-      id: requestIds.germanNew,
+      id: requestIds.internationalNew,
       submittedAt: timestampAt(0, '10:17'),
-      preferredLanguage: 'de',
+      preferredLanguage: 'en',
       contact: { name: 'Marlene Keller', email: 'marlene.keller@example.de', phone: '+49 170 555 1212', nationality: 'Alemanha' },
       stay: stay(34, 37, '18:30'),
       bikes: { count: 1, days: 2 },
@@ -590,7 +593,7 @@ export function createInitialAdminState(now = new Date()) {
       status: 'rejected',
       submittedAt: timestampAt(-45, '09:35'),
       updatedAt: timestampAt(-44, '12:00'),
-      preferredLanguage: 'de',
+      preferredLanguage: 'en',
       contact: { name: 'Greta Fischer', email: 'greta.fischer@example.de', phone: '+49 160 1234567', nationality: 'Alemanha' },
       stay: stay(-20, -17),
       guests: { adults: 2, children: 1, childAges: [3] },
@@ -662,7 +665,7 @@ export function createInitialAdminState(now = new Date()) {
   });
   const auditLog = [
     auditEntry(1, 0, '11:36', 'website', 'Website', 'Pedido do website recebido', 'websiteRequest', requestIds.discountedNew, { origem: 'Formulário público', idioma: 'Português', desconto: 'VERAO10' }),
-    auditEntry(2, 0, '10:17', 'website', 'Website', 'Pedido do website recebido', 'websiteRequest', requestIds.germanNew, { origem: 'Formulário público', idioma: 'Alemão', depósitoAntecipado: true }),
+    auditEntry(2, 0, '10:17', 'website', 'Website', 'Pedido do website recebido', 'websiteRequest', requestIds.internationalNew, { origem: 'Formulário público', idioma: 'Inglês', depósitoAntecipado: true }),
     auditEntry(3, 0, '09:30', 'user-owner-paula', 'Paula', 'Hóspede extra adicionado', 'reservation', reservationIds.current, { hóspedes: '1 adulto', chegada: todayKey, pagamento: 'A aguardar transferência' }),
     auditEntry(4, -1, '17:25', 'user-dev-andre', 'André', 'Pedido provisório criado manualmente', 'reservation', reservationIds.provisional, { estado: 'Pedido', origem: 'Website' }),
     auditEntry(5, -2, '11:05', 'user-owner-jorge', 'Jorge', 'Reserva criada manualmente', 'reservation', reservationIds.awaitingEnglish, { origem: 'Contacto privado', estado: 'A aguardar pagamento', desconto: '10%' }),
@@ -688,9 +691,9 @@ export function createInitialAdminState(now = new Date()) {
     generatedAt: now.toISOString(),
     updatedAt: now.toISOString(),
     property: {
-      name: 'O Refúgio',
-      address: 'Rua da Arejinha 627, 4550-518 Pedorido',
-      googleReviewUrl: 'https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu',
+      name: SITE_CONFIG.property.name,
+      address: SITE_CONFIG.property.address,
+      googleReviewUrl: SITE_CONFIG.property.reviewUrl,
       defaultCheckInTime: '15:00',
       defaultCheckOutTime: '10:00',
       occupancyLimit: 6
@@ -723,6 +726,18 @@ export function createInitialAdminState(now = new Date()) {
         { id: 'DISC-ARQUIVADO', title: 'Campanha encerrada', code: 'PRIMAVERA15', type: 'percentage', percentage: 15, amount: 0, maxUses: 10, usedCount: 10, startDate: dateAt(-180), endDate: dateAt(-120), appliesTo: 'accommodation', active: false }
       ]
     },
+    services: [
+      {
+        id: 'bikes',
+        name: 'Bicicletas',
+        description: 'Aluguer por bicicleta e por dia.',
+        enabled: true,
+        price: 5,
+        unit: 'bicicleta / dia',
+        showOnBooking: true,
+        showOnGuestStay: true
+      }
+    ],
     guests,
     reservations,
     websiteRequests,

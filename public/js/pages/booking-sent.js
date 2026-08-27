@@ -56,7 +56,7 @@ export async function initBookingSentPage() {
   if (!page) return;
 
   const dictionary = getCurrentDictionary();
-  const getText = (path, fallback = '') => getNestedValue(dictionary, path) || fallback;
+  const getText = (path) => getNestedValue(dictionary, path) || '';
   const params = new URLSearchParams(window.location.search);
 
   const reservationId = params.get('reservation_id') || params.get('request_id') || '';

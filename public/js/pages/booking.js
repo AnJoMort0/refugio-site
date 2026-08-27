@@ -8,6 +8,7 @@ const PRICE_CONFIG = {
   minimumPaidAdults: 2,
   childPerNight: 65,
   bikePerDay: 5,
+  bikesEnabled: true,
   securityDeposit: 200,
   seasons: []
 };
@@ -256,7 +257,13 @@ function syncPriceConfigFromAdminState(state) {
   PRICE_CONFIG.adultPerNight = Number(state.pricing.adultNight || PRICE_CONFIG.adultPerNight);
   PRICE_CONFIG.minimumPaidAdults = Number(state.pricing.minimumPaidAdults || PRICE_CONFIG.minimumPaidAdults || 2);
   PRICE_CONFIG.childPerNight = Number(state.pricing.childNight || PRICE_CONFIG.childPerNight);
-  PRICE_CONFIG.bikePerDay = Number(state.pricing.bikeDay || PRICE_CONFIG.bikePerDay);
+  const bikeService = Array.isArray(state.services)
+    ? state.services.find((service) => service.id === 'bikes')
+    : null;
+  PRICE_CONFIG.bikePerDay = Number(bikeService?.price ?? state.pricing.bikeDay ?? PRICE_CONFIG.bikePerDay);
+  PRICE_CONFIG.bikesEnabled = bikeService
+    ? bikeService.enabled !== false && bikeService.showOnBooking !== false
+    : true;
   PRICE_CONFIG.securityDeposit = Number(state.pricing.securityDeposit || PRICE_CONFIG.securityDeposit);
   PRICE_CONFIG.seasons = Array.isArray(state.pricing.seasons) ? state.pricing.seasons : [];
 }
@@ -325,10 +332,12 @@ export async function initBookingPage() {
   const discountCodeInput = document.querySelector('#discount-code');
   const discountCodeStatus = document.querySelector('#discount-code-status');
   const bikeReservationToggle = document.querySelector('#bike-reservation-toggle');
+  const bikeServiceCard = document.querySelector('[data-booking-bike-service]');
   const bikeDaysGroup = document.querySelector('#bike-days-group');
   const bikeCountInput = document.querySelector('#bike-count');
   const bikeRentalDaysInput = document.querySelector('#bike-rental-days');
   const rulesConfirmationInput = document.querySelector('#rules-confirmation');
+  const rulesDisclosure = document.querySelector('.booking-rules-disclosure');
   const marketingOptInInput = document.querySelector('#booking-marketing-opt-in');
   const bedPreferenceInputs = Array.from(document.querySelectorAll('input[name="bed_preference"]'));
   const childAgesGroup = document.querySelector('#child-ages-group');
@@ -359,18 +368,34 @@ export async function initBookingPage() {
   const priceChild = document.querySelector('[data-price-child]');
   const priceBike = document.querySelector('[data-price-bike]');
   const priceDeposit = document.querySelector('[data-price-deposit]');
+  const summaryCard = document.querySelector('[data-booking-summary]');
+  const summaryMobileSlot = document.querySelector('[data-booking-summary-mobile-slot]');
+  const summaryDesktopSlot = document.querySelector('[data-booking-summary-desktop-slot]');
+  const summaryLayoutQuery = window.matchMedia('(max-width: 979px)');
+
+  const placeSummaryForViewport = () => {
+    const slot = summaryLayoutQuery.matches ? summaryMobileSlot : summaryDesktopSlot;
+    if (!summaryCard || !slot?.parentElement || summaryCard.previousElementSibling === slot) return;
+    slot.parentElement.insertBefore(summaryCard, slot.nextSibling);
+  };
+
+  placeSummaryForViewport();
+  summaryLayoutQuery.addEventListener('change', placeSummaryForViewport);
 
   const portugalNow = getPortugalNow();
   const adminState = getAdminPrototypeState() || await getWritableAdminPrototypeState();
   adminPrototypeStateSnapshot = adminState;
   syncPriceConfigFromAdminState(adminState);
+  if (bikeServiceCard) bikeServiceCard.hidden = !PRICE_CONFIG.bikesEnabled;
+  if (!PRICE_CONFIG.bikesEnabled && bikeReservationToggle) bikeReservationToggle.checked = false;
   const today = portugalNow.date;
   today.setHours(0, 0, 0, 0);
   const earliestCheckinDate = addDays(today, portugalNow.hour < 15 ? 1 : 2);
   const occupiedRanges = buildOccupiedRanges(adminState);
   const occupiedDates = new Set();
   const turnoverDates = new Set();
-  const monthsToRender = 2;
+  const compactCalendarQuery = window.matchMedia('(max-width: 767px)');
+  let monthsToRender = compactCalendarQuery.matches ? 1 : 2;
   const monthFormatter = () =>
     new Intl.DateTimeFormat(document.documentElement.lang || 'pt-PT', { month: 'long', year: 'numeric' });
   const weekdayFormatter = () =>
@@ -389,7 +414,7 @@ export async function initBookingPage() {
   checkinInput.min = minimumCheckin;
   checkoutInput.min = formatDateKey(addDays(earliestCheckinDate, 2));
 
-  const getText = (path, fallback = '') => getNestedValue(dictionary, path) || fallback;
+  const getText = (path) => getNestedValue(dictionary, path) || '';
 
   function setFieldValidity(input, message = '') {
     if (!input) return;
@@ -407,22 +432,28 @@ export async function initBookingPage() {
     return `${text}<span class="required-mark" aria-hidden="true">*</span>`;
   }
 
+  function parseGuestCount(input, maximum) {
+    const rawValue = String(input?.value || '').trim();
+    if (!rawValue) return 0;
+
+    const value = Math.trunc(Number(rawValue));
+    if (!Number.isFinite(value)) return 0;
+    return Math.min(maximum, Math.max(0, value));
+  }
+
   function getGuestCounts() {
-    const adults = Math.max(1, Number(adultInput.value || 1));
-    const children = Math.max(0, Number(childInput.value || 0));
+    const adults = parseGuestCount(adultInput, 6);
+    const children = parseGuestCount(childInput, 5);
     const total = adults + children;
     return { adults, children, total };
   }
 
   function clampGuestCounts() {
-    const adults = Math.min(6, Math.max(1, Number(adultInput.value || 1)));
-    const children = Math.max(0, Number(childInput.value || 0));
+    const adults = Math.max(1, parseGuestCount(adultInput, 6));
+    const children = parseGuestCount(childInput, 5);
 
     adultInput.value = String(adults);
-
-    if (adults + children > 6) {
-      childInput.value = String(Math.max(0, 6 - adults));
-    }
+    childInput.value = String(Math.min(children, Math.max(0, 6 - adults)));
   }
 
   function needsBedPreference() {
@@ -663,8 +694,8 @@ export async function initBookingPage() {
       currentValues: adultNightlyTotals,
       baselineValues: baselineAdultNightlyTotals,
       count: adults,
-      singularLabel: getText('bookingPage.summary.adultSingular', 'adulto'),
-      pluralLabel: getText('bookingPage.summary.adultPlural', 'adultos'),
+      singularLabel: getText('bookingPage.summary.adultSingular'),
+      pluralLabel: getText('bookingPage.summary.adultPlural'),
       discounted: rateComparisons.some(({ adultDiscounted }) => adultDiscounted)
     });
     if (summaryChildRate) {
@@ -674,8 +705,8 @@ export async function initBookingPage() {
       currentValues: childNightlyTotals,
       baselineValues: baselineChildNightlyTotals,
       count: children,
-      singularLabel: getText('bookingPage.summary.childSingular', 'criança'),
-      pluralLabel: getText('bookingPage.summary.childPlural', 'crianças'),
+      singularLabel: getText('bookingPage.summary.childSingular'),
+      pluralLabel: getText('bookingPage.summary.childPlural'),
       discounted: rateComparisons.some(({ childDiscounted }) => childDiscounted)
     });
     if (priceBike) {
@@ -762,7 +793,9 @@ export async function initBookingPage() {
       today.getMonth() + visibleMonthOffset + monthsToRender - 1,
       1
     );
-    currentRange.textContent = `${monthFormatter().format(firstVisibleMonth)} - ${monthFormatter().format(lastVisibleMonth)}`;
+    currentRange.textContent = monthsToRender === 1
+      ? monthFormatter().format(firstVisibleMonth)
+      : `${monthFormatter().format(firstVisibleMonth)} - ${monthFormatter().format(lastVisibleMonth)}`;
 
     const nextButton = document.createElement('button');
     nextButton.type = 'button';
@@ -858,7 +891,7 @@ export async function initBookingPage() {
         button.classList.toggle('is-start', key === checkinInput.value);
         button.classList.toggle('is-end', key === checkoutInput.value);
         button.classList.toggle('is-in-range', Boolean(isInRange));
-        button.classList.toggle('is-today', key === minimumCheckin);
+        button.classList.toggle('is-today', key === formatDateKey(today));
 
         const priceComparison = getLimitedTimePriceComparison(PRICE_CONFIG, key);
         const currentPrice =
@@ -933,6 +966,69 @@ export async function initBookingPage() {
 
     calendar.replaceChildren(calendarHeader, monthsWrapper);
   }
+
+  let calendarSwipeStart = null;
+  let calendarPointerSwipeStart = null;
+  let lastCompletedCalendarSwipe = 0;
+
+  function completeCalendarSwipe(start, endX, endY, event) {
+    if (!start) return false;
+    const deltaX = endX - start.x;
+    const deltaY = endY - start.y;
+
+    if (Math.abs(deltaX) < 52 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.2) return false;
+    if (Date.now() - lastCompletedCalendarSwipe < 300) return false;
+
+    if (deltaX < 0) {
+      visibleMonthOffset += 1;
+    } else if (visibleMonthOffset > 0) {
+      visibleMonthOffset -= 1;
+    } else {
+      return false;
+    }
+
+    lastCompletedCalendarSwipe = Date.now();
+    event?.preventDefault();
+    renderCalendar();
+    return true;
+  }
+
+  calendar?.addEventListener('touchstart', (event) => {
+    if (event.touches.length !== 1) return;
+    calendarSwipeStart = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY
+    };
+  }, { passive: true });
+
+  calendar?.addEventListener('touchend', (event) => {
+    if (!calendarSwipeStart || event.changedTouches.length !== 1) return;
+    const start = calendarSwipeStart;
+    calendarSwipeStart = null;
+    completeCalendarSwipe(start, event.changedTouches[0].clientX, event.changedTouches[0].clientY, event);
+  });
+
+  calendar?.addEventListener('pointerdown', (event) => {
+    if (event.pointerType !== 'touch') return;
+    calendarPointerSwipeStart = { x: event.clientX, y: event.clientY };
+    calendar.setPointerCapture?.(event.pointerId);
+  });
+
+  calendar?.addEventListener('pointerup', (event) => {
+    if (event.pointerType !== 'touch' || !calendarPointerSwipeStart) return;
+    const start = calendarPointerSwipeStart;
+    calendarPointerSwipeStart = null;
+    completeCalendarSwipe(start, event.clientX, event.clientY, event);
+  });
+
+  calendar?.addEventListener('pointercancel', () => {
+    calendarPointerSwipeStart = null;
+  });
+
+  compactCalendarQuery.addEventListener('change', (event) => {
+    monthsToRender = event.matches ? 1 : 2;
+    renderCalendar();
+  });
 
   function validateDateSelection(showBrowserMessages = true) {
     const checkIn = checkinInput.value;
@@ -1060,7 +1156,14 @@ export async function initBookingPage() {
       return message;
     }
 
-    if (contactPhoneInput?.value.trim() && !isValidPhoneNumber(contactPhoneInput.value)) {
+    if (!contactPhoneInput?.value.trim()) {
+      const message = getText('bookingPage.validation.phoneRequired');
+      setFieldValidity(contactPhoneInput, message);
+      if (showBrowserMessages) contactPhoneInput?.reportValidity();
+      return message;
+    }
+
+    if (!isValidPhoneNumber(contactPhoneInput.value)) {
       const message = getText('bookingPage.validation.phoneInvalid');
       setFieldValidity(contactPhoneInput, message);
       if (showBrowserMessages) contactPhoneInput.reportValidity();
@@ -1223,13 +1326,18 @@ export async function initBookingPage() {
   );
 
   adultInput.addEventListener('input', () => {
-    clampGuestCounts();
     rerenderDynamicContent();
   });
 
   childInput.addEventListener('input', () => {
-    clampGuestCounts();
     rerenderDynamicContent();
+  });
+
+  [adultInput, childInput].forEach((input) => {
+    input.addEventListener('change', () => {
+      clampGuestCounts();
+      rerenderDynamicContent();
+    });
   });
 
   bedPreferenceInputs.forEach((input) =>
@@ -1480,5 +1588,11 @@ export async function initBookingPage() {
   document.addEventListener('language:changed', (event) => {
     dictionary = event.detail?.dictionary || getCurrentDictionary();
     rerenderDynamicContent();
+  });
+
+  document.querySelectorAll('a[href="#booking-rules"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (rulesDisclosure) rulesDisclosure.open = true;
+    });
   });
 }

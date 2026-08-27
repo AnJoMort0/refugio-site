@@ -1,18 +1,19 @@
 import { addDays, formatDateKey, parseDateKey } from './admin-seed.js';
 import { diffCalendarDays, monthDayOrdinal } from '../utils/date.js';
+import { SITE_CONFIG } from '../config/site-config.js';
 
 export const LANGUAGE_LABELS = {
   pt: 'Português',
   fr: 'Francês',
   en: 'Inglês',
-  es: 'Espanhol',
-  de: 'Alemão'
+  es: 'Espanhol'
 };
 
 export const STATUS_LABELS = {
   request: 'Pedido',
   awaiting_payment: 'A aguardar pagamento',
   confirmed: 'Confirmada',
+  checked_in: 'Em estadia',
   checked_out: 'Check-out realizado',
   cancelled: 'Cancelada',
   no_show: 'Não compareceu'
@@ -21,9 +22,14 @@ export const STATUS_LABELS = {
 export const PAYMENT_LABELS = {
   unpaid: 'Não pago',
   awaiting_transfer: 'A aguardar transferência',
-  deposit_paid: 'Depósito recebido',
   paid: 'Pago',
   refunded: 'Reembolsado'
+};
+
+export const IDENTITY_DOCUMENT_LABELS = {
+  cc: 'CC',
+  bi: 'BI',
+  passport: 'Passaporte'
 };
 
 export const SOURCE_LABELS = {
@@ -56,7 +62,7 @@ export const WORK_TASK_LABELS = {
   checkout: 'Check-out',
   clean: 'Limpeza',
   bureaucracy: 'Burocracia',
-  maintenance: 'Manutenção/reparações',
+  maintenance: 'Manutenção',
   shopping: 'Compras',
   other: 'Outro'
 };
@@ -79,10 +85,6 @@ const REQUEST_COMMENT_LABELS = {
   es: {
     comment: 'Comentario del huésped:',
     reply: 'Respuesta para añadir:'
-  },
-  de: {
-    comment: 'Kommentar des Gastes:',
-    reply: 'Antwort ergänzen:'
   }
 };
 
@@ -122,15 +124,6 @@ const PAYMENT_BREAKDOWN_LABELS = {
     deposit: 'Depósito de seguridad',
     discount: 'Descuentos',
     total: 'Total a transferir'
-  },
-  de: {
-    accommodation: 'Unterkunft',
-    extraGuests: 'Zusätzliche Gäste',
-    services: 'Services / Fahrräder',
-    bikeUnits: 'Fahrrad-Tag(e)',
-    deposit: 'Kaution',
-    discount: 'Rabatte',
-    total: 'Zu überweisender Gesamtbetrag'
   }
 };
 
@@ -138,8 +131,7 @@ const MESSAGE_LOCALES = {
   pt: 'pt-PT',
   fr: 'fr-FR',
   en: 'en-GB',
-  es: 'es-ES',
-  de: 'de-DE'
+  es: 'es-ES'
 };
 
 const STANDALONE_PLACEHOLDERS = {
@@ -178,15 +170,6 @@ const STANDALONE_PLACEHOLDERS = {
     nights: '[número]',
     guestCount: '[número]',
     total: '[importe]'
-  },
-  de: {
-    guestName: '[Name des Gastes]',
-    reservationId: '[Referenz]',
-    checkIn: '[Anreisedatum]',
-    checkOut: '[Abreisedatum]',
-    nights: '[Anzahl]',
-    guestCount: '[Anzahl]',
-    total: '[Betrag]'
   }
 };
 
@@ -417,6 +400,9 @@ export function getOrCreateGuest(state, contact, preferredLanguage = 'pt', natio
     phone: contact.phone || '',
     preferredLanguage,
     nationality,
+    nif: '',
+    identityDocumentType: '',
+    identityDocumentNumber: '',
     notes: ''
   };
 
@@ -503,7 +489,7 @@ function isTomorrow(dateKey) {
 }
 
 function hasSecurityDepositHandled(reservation) {
-  return Boolean(reservation.pricing?.depositIncluded) || reservation.paymentStatus === 'deposit_paid';
+  return Boolean(reservation.pricing?.depositIncluded) || Boolean(reservation.securityDepositPaid);
 }
 
 function getDepositSourceMention(reservation, language = 'pt', catalog = {}) {
@@ -523,7 +509,7 @@ function getDepositReminderLine(reservation, state, language = 'pt', catalog = {
 
 function getPaymentReceivedLine(reservation, language = 'pt', catalog = {}) {
   const paymentStatus = String(reservation?.paymentStatus || '').trim();
-  if (!['paid', 'deposit_paid'].includes(paymentStatus)) return '';
+  if (paymentStatus !== 'paid') return '';
   return getNestedMessageSnippet(catalog, 'paymentReceivedLine', paymentStatus, language);
 }
 
@@ -558,7 +544,7 @@ function getPaymentBreakdownText(reservation, state, language = 'pt', totals = c
 function getGoogleReviewUrl(state) {
   return state?.property?.googleReviewUrl
     || state?.property?.googleMapsUrl
-    || 'https://www.google.com/maps/place/O+Ref%C3%BAgio/@41.0204811,-8.3871842,646m/data=!3m2!1e3!4b1!4m6!3m5!1s0xd24830c21a7821f:0x7babb9259b50311a!8m2!3d41.0204812!4d-8.3823133!16s%2Fg%2F11vqhfvg0k?entry=ttu';
+    || SITE_CONFIG.property.reviewUrl;
 }
 
 function getCheckInTimeLine(reservation, state, language = 'pt', catalog = {}) {
@@ -645,7 +631,7 @@ export function generateStandaloneMessage(state, language = 'pt', templateKey = 
     checkOutTime: formatMessageTime(state?.property?.defaultCheckOutTime || '10:00'),
     nights: placeholders.nights,
     guestCount: placeholders.guestCount,
-    propertyAddress: state?.property?.address || 'Rua da Arejinha 627, 4550-518 Pedorido',
+    propertyAddress: state?.property?.address || SITE_CONFIG.property.address,
     total: placeholders.total,
     paymentBreakdown: placeholders.total,
     depositReminder: getDepositReminderLine({ source: 'website', paymentStatus: 'awaiting_transfer', pricing: { depositIncluded: false } }, state, language, catalog),
@@ -700,7 +686,10 @@ export function summarizeDashboard(state) {
   const departures = state.reservations
     .filter((reservation) => reservation.status !== 'cancelled' && reservation.stay.checkOut >= todayKey)
     .sort((a, b) => a.stay.checkOut.localeCompare(b.stay.checkOut));
-  const awaitingPayment = state.reservations.filter((reservation) => reservation.status === 'awaiting_payment');
+  const awaitingPayment = state.reservations.filter((reservation) =>
+    !['cancelled', 'no_show', 'checked_out'].includes(reservation.status) &&
+    ['unpaid', 'awaiting_transfer'].includes(reservation.paymentStatus)
+  );
   const openRequests = state.websiteRequests.filter((request) => request.status === 'new');
   const confirmedRevenue = state.reservations
     .filter((reservation) => ['awaiting_payment', 'confirmed', 'checked_in', 'checked_out'].includes(reservation.status))

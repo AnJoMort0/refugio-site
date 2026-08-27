@@ -1,606 +1,259 @@
-# O Refúgio — Product Roadmap
+# O Refúgio - Living Product Roadmap
 
-## Project strategy
+Last reviewed: 2026-08-27
 
-The project is currently in the **prototype phase**. The immediate goal is to complete the public website and in-stay guest experience, then improve booking, contact, content, pricing, and administrative workflows in small, testable increments.
-
-Routine operational changes should be manageable through the Cloudflare-hosted admin application. Owners should not need to edit source code, configuration files, or Cloudflare settings to update prices, availability, guest information, or local-guide content.
+This file is the current source of truth for product status and remaining work. The previous long-form roadmap, including old prompts and reversion notes, is preserved in [`roadmap-archive.md`](./roadmap-archive.md).
 
 ## Status legend
 
-- [x] Completed
-- [ ] Planned
-- [~] In progress
-- [!] Requires a decision, content, or external dependency
-- [c] Codex changed
-
----
-
-# Phase 1 — Complete the public website prototype
-
-## 1.1 Existing page scaffolds
-
-A scaffold means a made static HTML page ready for owner review/approval. A placeholder shell does not count.
-
-- [x] Homepage
-- [x] Alojamento page
-- [x] Galeria page
-- [x] Reservas page
-- [x] Reserva enviada page
-- [x] Contacto page
-- [x] Obrigado.html
-- [ ] Guia Local page
-- [c] Guest Stay prototype scaffold at `qr.html` for QR/NFC access
-- [x] Custom `404.html` page
-
-## 1.2 Immediate content and consistency fixes
-
-### Tweaks
-
-- [c] Surface lower limited-time price overrides as automatic promotions on the public website.
-  - Note: Dated rates are now compared with the seasonal or base rate they override. Qualifying lower rates show the usual price struck through and the special price in red in `reservas.html`, plus a dated homepage announcement and a small sale badge on the floating reservation button; all signals hide automatically when no current or approaching discount applies.
-  - [c] Show the current guest-aware accommodation price beneath each day in the public availability calendar, including the crossed-out usual rate on promotional dates.
-    - [c] Reduce the calendar price labels to regular-weight gray text, keep promotional red restrained, and anchor the price stack lower in each day cell for easier scanning.
-  - [c] Keep summary prices hidden until dates provide enough context: nightly rates appear after check-in selection and the estimated total appears after the complete stay is selected.
-  - [c] Treat reservation boundaries correctly: an existing check-in date can be another stay’s checkout, and an existing checkout date can be another stay’s check-in.
-    - Note: Calendar buttons now distinguish occupied nights from valid checkout boundaries, exclude dates that cannot fit the two-night minimum as new arrivals, and let a second check-in click replace or clear a partial selection.
-    - [c] Keep arrival/departure turnover dates visually neutral; only dates that cannot serve as either reservation boundary use the red occupied treatment.
-- [~] Admin page
-  - [ ] Calendar
-    - [c] Show each guest on both arrival and departure dates, with `->|` for check-in and `|->` for check-out.
-      - Note: Calendar display includes the departure boundary without treating that day as an occupied night.
-    - [c] Warn about genuine reservation overlaps beside website-request and manual reservation actions.
-      - Note: Conflict checks use the same end-exclusive stay rule as the public booking calendar, so one stay may check out on another stay's check-in date; owners still retain the existing confirmed override for exceptional cases.
-    - [ ] Have a text box where they can paste the text of the booking.com email in there and the app would look for the information to fill up the field, need to use an example of email to be able to code the data scrapper.
-  - [ ] Despesas
-    - [ ] Add filters to see certain things, by type, date, etc
-    - [ ] Move the add field to the top of the page
-  - [ ] Audit/Log
-    - [ ] Should more clearly show what was changed
-
-## Additions
-
----
-
-# Phase 2 — Contacto page follow-up checklist
-
-The current `contacto.html` page already has a usable prototype flow: structured contact form, required name/email/message fields, language preference, preferred reply method, optional context and assunto fields, phone validation, locked phone-dependent reply options, optional marketing checkbox, attachment picker with selected-file summary, Google Maps/Facebook/Instagram links, URL prefill support, and a basic `obrigado.html` success page.
-
-## 2.1 Later if needed — data, consent, and delivery
-
-- [ ] Connect the form to a real backend, email service, CRM, or admin inbox instead of the current GET-based prototype redirect.
-- [ ] Connect selected attachments to real upload/storage/email delivery once the contact backend exists.
-- [ ] Store enough submitted context for staff to handle the enquiry efficiently.
-- [ ] Add a required privacy-policy acknowledgement once the privacy-policy page/text exists.
-- [ ] Store marketing consent status and timestamp if marketing messages will actually be sent.
-- [ ] Provide a clear unsubscribe method before sending future marketing communications.
-
-## 2.2 Later if needed — reliability and abuse protection
-
-- [ ] Prevent accidental duplicate submissions after a real backend exists.
-- [ ] Display actionable backend error messages if message delivery fails.
-- [ ] Add spam protection suitable for the final hosting setup.
-- [ ] Add monitoring or logs for failed contact submissions.
-
-## 2.3 Later if needed — richer contact help
-
-- [ ] Add FAQ entries for the most common contact topics.
-- [ ] Add reservation/request reference fields if staff need those to match messages faster.
-- [ ] Add direct telephone, WhatsApp deep link, copy-number, and `.vcf` contact-card actions if the page should become a fuller contact hub.
-- [ ] Link current guests to the future Guest Stay page for urgent or stay-specific information once that page exists.
-
----
-
-# Phase 4 — Local discovery and the in-stay guest experience
-
-## 4.1 Guia Local — public local discovery guide
-
-### Purpose and scope
-
-The Guia Local is a public page for people planning a stay and guests who want to explore the surrounding area. It should focus on **places to discover, day trips, nature, beaches, culture, events, and selected sponsors or partners**.
-
-Practical during-the-stay recommendations such as supermarkets, routine food options, emergency contacts, Wi-Fi credentials, house rules, or stay-specific instructions belong on the Guest Stay page. Commercial partners may still appear publicly in a clearly separated partner section, but should not be mixed into the editorial discovery list.
-
-### Content categories
-
-- [ ] Attractions, walks, nature, beaches, culture, and entertainment.
-- [ ] Nearby towns, cities, viewpoints, monuments, and day-trip ideas.
-- [ ] Seasonal events and traditional festivities.
-- [ ] Family-friendly, rainy-day, accessible, and seasonal suggestions where confirmed.
-- [ ] Sponsored businesses, partners, offers, or discount codes in a clearly separated partner section.
-- [ ] Keep routine supermarkets, restaurants, pharmacies, fuel, transport, and other practical stay services on the Guest Stay / QR page rather than in the editorial discovery list.
-
-### Listing information
-
-Where available, each listing should include:
-
-- [ ] Name and category.
-- [ ] Short description and why it is recommended.
-- [ ] Approximate distance or travel time from O Refúgio.
-- [ ] Address and map/directions link.
-- [ ] Telephone and website or social link.
-- [ ] Typical opening hours, with a reminder that they may change.
-- [ ] Accessibility, booking, age, or seasonal notes where relevant.
-- [ ] A visible **Sponsored** or **Partner** label when applicable.
-
-### Page features
-
-- [ ] Category filters and a simple search.
-- [ ] List and map views, if the map remains clear on mobile.
-- [ ] “Near me” or distance sorting only after the visitor grants location permission.
-- [ ] Favourite/share actions that do not require an account.
-- [ ] Language-aware external links and telephone actions.
-- [ ] Clear separation between editorial recommendations and paid placements.
-- [ ] Expiry dates for temporary sponsor offers so outdated promotions disappear automatically.
-- [ ] A fallback list when the map or third-party content cannot load.
-
-### Guia Local acceptance criteria
-
-- The page remains useful to visitors who are not currently staying at O Refúgio.
-- The editorial list stays focused on places and experiences worth discovering rather than routine stay logistics.
-- Sponsored content is clearly identified, separated from the editorial list, and does not imitate an independent recommendation.
-- Listings can be updated or unpublished from the admin application without editing code.
-- External opening hours and prices are not presented as guaranteed unless they are actively maintained.
-
-## 4.2 Guest Stay page — QR/NFC guest hub
-
-### Prototype implementation note — `qr.html`
-
-- [c] Add a mobile-first `qr.html` prototype that remains useful without personalised reservation data.
-- [c] Add a dedicated guest-page data-provider boundary so the UI is not coupled to the admin page, DOM, or browser `localStorage`.
-- [c] Add placeholder host contacts with language labels and call/WhatsApp actions that stay disabled until real numbers are configured.
-- [c] Add one-tap emergency, health, pharmacy, supermarket, restaurant, transport, fuel, property-location, partner, bicycle, Wi-Fi, and house-information sections.
-- [c] Keep safety/house-rule content that has not been approved visibly marked as pending rather than inventing operational guidance.
-- [!] Production migration: move reservations and guest-only content to a **private server-side database** behind authenticated APIs. Personalised QR/direct links should carry an unguessable expiring/revocable stay token; the guest endpoint validates it server-side and returns only the minimum guest-facing projection (first name, stay dates/times, guest count, preferred language, and relevant extras). Never expose payment information, owner notes, other reservations, the guest directory, or raw admin state.
-- [!] The static property QR/NFC tag should continue to support a generic guest view; personalised information should unlock only through the secure stay token or another approved verification flow.
-- [!] Before launch, replace the prototype adapter, owner placeholders, Wi-Fi placeholders, house/check-out placeholders, and unapproved safety copy with admin-managed production data.
-
-### Purpose
-
-Create a mobile-first page for guests who are currently staying at O Refúgio. It should be reachable through a QR code, an NFC tag, and a direct link supplied during check-in or reservation confirmation.
-
-The page should provide the information a guest may need during the stay without requiring them to search through the public website.
-
-### Access and personalisation
-
-- [c] Prototype bridge: `qr.html` reads the current active reservation from the same-origin `refugio-admin-prototype-state-v1` browser localStorage through an isolated `guest-stay-provider.js` service. It mirrors the admin active-stay rule and returns only a guest-safe projection (name, stay dates/times, guest count, language, bicycles). This is same-browser prototype behaviour only and must be replaced by the private database + expiring/revocable stay-token API before real guest deployment.
-- [ ] Check active reservation data and greet current guests by first name.
-- [ ] Show only information related to the active stay.
-- [ ] Use an expiring signed link, stay code, or equivalent secure token for personalised content.
-- [ ] Expire personalised access automatically after checkout and allow staff to revoke it early.
-- [ ] Never expose the complete list of current guests through a public or guessable URL.
-- [ ] Do not place guest names, reservation references, or stay details in search-engine-indexable content.
-- [ ] Show a useful generic guest-information view when personalised access is unavailable.
-- [ ] Let a static property NFC tag open the generic guest page; unlock personalised details only after a secure stay link or code is supplied.
-- [ ] Use the reservation language when known, otherwise use the browser language and retain manual language selection.
-
-### Recommended page sections
-
-#### Welcome and stay summary
-
-- [ ] Personal greeting using the active guest or booking name.
-- [ ] Check-in and checkout dates and times.
-- [ ] A simple reminder of remaining extras or actions, without displaying sensitive payment information.
-- [ ] Direct buttons to contact the host, report a property problem, or request help.
-
-#### Emergency and urgent contacts
-
-- [ ] Place emergency information near the top of the page.
-- [ ] Clearly separate public emergency services from urgent property assistance.
-- [ ] Add one-tap telephone links.
-- [ ] Add WhatsApp actions only for contacts that support WhatsApp.
-- [ ] Include the complete property address and a copy-address button.
-- [ ] Include directions back to O Refúgio.
-- [ ] Explain what information a guest should provide during an emergency.
-- [ ] Keep emergency information available even when personalisation fails.
-
-#### Wi-Fi access
-
-- [ ] Display the network name and password.
-- [ ] Add copy buttons for both values.
-- [ ] Generate a standards-compatible Wi-Fi QR code using the current network credentials.
-- [ ] Let guests reopen or share the QR code so other people in their group can connect their own devices.
-- [ ] Provide a manual connection fallback for devices that cannot use the QR code.
-- [ ] Regenerate the QR code automatically when staff change the Wi-Fi credentials.
-- [ ] Avoid placing Wi-Fi credentials in the public Guia Local or other indexed pages.
-
-#### Mud-wasp warning
-
-- [ ] Add a clear, calm mud-wasp warning.
-- [ ] Explain how guests can recognise the issue and what they should avoid doing.
-- [ ] Provide the correct action to take and a one-tap way to notify the host.
-- [ ] Include photographs or illustrations only when they improve recognition.
-- [!] Confirm the exact safety guidance and approved wording before publishing.
-
-#### Bicycle rental during the stay
-
-- [ ] Show bicycle rental information when the reservation does not already include bicycles.
-- [ ] Display the price of **€5 per bicycle per day**.
-- [ ] Show available dates and quantities when live inventory is supported.
-- [ ] Allow the guest to submit a rental request for selected dates.
-- [ ] Limit requests to one bicycle per guest per selected day.
-- [ ] Show the existing bicycle reservation instead of a second sales prompt when bicycles are already booked.
-- [ ] Explain whether the request is immediately confirmed or requires host approval.
-- [ ] Notify staff and add approved bicycle rentals to the reservation record and daily inventory.
-
-#### Nearby essentials during the stay
-
-- [ ] Show supermarkets and grocery shops with approximate travel time and one-tap directions.
-- [ ] Show practical restaurant / takeaway suggestions supplied by the hosts.
-- [ ] Keep commercial partners clearly labelled when they also appear in this practical guest list.
-- [ ] Include pharmacies, fuel, taxis/transport, and other practical services once their details are confirmed.
-- [ ] Keep opening hours and availability clearly non-guaranteed unless actively maintained.
-- [ ] Keep these practical listings mobile-first and easy to scan from the property QR/NFC page.
-
-#### House rules and property information
-
-- [ ] House rules in a short, scannable format.
-- [ ] Quiet hours.
-- [ ] Smoking, pets, visitors, parties, and occupancy rules.
-- [ ] Kitchen, heating, television, appliance, waste, and recycling guidance where useful.
-- [ ] Parking and access instructions.
-- [ ] Check-out checklist and key-return instructions.
-- [ ] Instructions for reporting damage, maintenance problems, or missing items.
-- [ ] Accessibility and safety notes relevant to the property.
-
-#### Guia Local call to action
-
-- [ ] Add a prominent link to Guia Local.
-- [ ] Explain that it includes places to explore, day trips, beaches, nature, events, and clearly labelled partner recommendations.
-- [ ] Preserve the guest’s selected language when moving between the two pages.
-- [ ] Provide a clear route back to the Guest Stay page.
-
-### QR and NFC delivery
-
-- [ ] Place a durable QR code and NFC tag in an appropriate location inside the property.
-- [ ] Test QR scanning in low light and from a reasonable distance.
-- [ ] Encode a stable short URL so the destination can change without replacing printed tags.
-- [ ] Make the NFC interaction open the same stable URL as the QR code.
-- [ ] Include a short printed URL as a fallback.
-- [ ] Keep the destination fast and usable on weak mobile connections.
-- [ ] Add a version or last-updated date for rules and safety information.
-- [ ] Prepare a replacement process for damaged or missing tags.
-
-### Guest Stay page acceptance criteria
-
-- A valid current-stay link greets the correct guest without revealing other guests.
-- An expired, revoked, or invalid link does not expose personal reservation information.
-- Emergency contacts remain immediately accessible on a small mobile screen.
-- Wi-Fi credentials can be copied and the Wi-Fi QR code works on supported devices.
-- Bicycle content changes according to whether bicycles are already included.
-- House rules and warnings can be updated from the admin application.
-- QR, NFC, and typed-link access all reach a usable page.
-- The page loads quickly and does not depend on a guest creating an account.
-
----
-
-# Phase 5 — Supporting pages and conversion improvements
-
-## 5.1 Marketing and communication preferences
-
-- [x] Add an optional promotions, offers, deals, and news checkbox in suitable forms.
-- [ ] Store consent status and timestamp.
-- [ ] Provide a clear unsubscribe method for future marketing communications.
-- [x] Avoid combining service messages with marketing consent.
-
----
-
-# Phase 6 — Admin application roadmap
-
-The admin application should be designed for owners who are not highly technical. Routine work must be completed through clear forms, previews, and confirmation steps in the Cloudflare-hosted admin interface rather than by editing code or deployment settings.
-
-## 6.0 Admin prototype foundation
-
-- [x] Replace the placeholder `admin.html` with a Portuguese-only standalone admin management prototype.
-- [x] Remove the public footer link to `admin.html` so the admin is not presented as guest navigation.
-- [x] Add an owner/dev/employee login gate for the prototype with named accounts and hashed demo passwords.
-- [x] Remember the last selected admin login account locally so returning users do not need to scroll the user menu again.
-- [x] Add a central permission map for owner and employee capabilities.
-- [x] Add a replaceable local repository/service layer so the UI is not tied directly to static JSON or page markup.
-- [x] Add stable-ID demo entities for reservations, website requests, guests, pricing, discounts, expenses, employees, work sessions, and audit log entries.
-- [c] Expand the admin demonstration seed into a complete showcase of the implemented workflows.
-  - Note: Added active, future, past, cancelled, no-show, provisional, paid, unpaid, deposit-paid, and refunded reservations across every supported source and language. The seed also includes open/accepted/rejected website requests, repeat guests, children, bicycles, discounts, extra guests, expenses, paid/free/voluntary work, and detailed audit examples spread across reporting periods.
-- [x] Add a dashboard showing current guests, next arrival/departure, pending website requests, awaiting-payment reservations, revenue, expenses, and active work sessions.
-- [x] Add a detailed month calendar with reservation status markers, selected-day details, and website request visibility.
-- [x] Add reservation search/filtering and a manual reservation form with conflict detection and owner override confirmation.
-- [x] Add a website request queue with accept/reject actions and conversion into an awaiting-payment reservation.
-- [x] Add `preferred_language` compatibility to the public reservation redirect so future website request storage can infer the guest communication language.
-- [x] Add copyable multilingual guest message templates separate from Portuguese-only admin UI text.
-- [x] Add owner-facing prototype sections for pricing, discounts, expenses, employees, employee rate history, employee time tracking, statistics, data export, and demo-data reset.
-- [x] Add work-hour tracking for owners as well as employees.
-- [x] Add paid, free, and voluntary work types so invested owner/volunteer time is tracked without becoming wage cost.
-- [x] Add task checkboxes for work sessions: check-in, check-out, cleaning, bureaucracy, maintenance/repairs, shopping, and other details.
-- [x] Document the prototype security/storage limits and Cloudflare migration path in `docs/admin-architecture.md`.
-- [!] Before real data is used, replace the localStorage demo repository with authenticated server-side APIs and private storage.
-
-## 6.1 Calendar management overview
-
-- [x] Create a consolidated reservation calendar.
-- [x] Show property occupancy and reservation status.
-- [!] Add day, week, month, and agenda views.
-- [x] Provide clear visual distinction between requests, provisional holds, confirmed reservations, external bookings, maintenance, and unavailable periods.
-- [ ] Provide printable and mobile-friendly arrival, departure, and occupancy views.
-
-## 6.2 Pricing, seasonal rates, and availability management
-
-### Owner-friendly price controls
-
-- [x] Allow authorised owners to change base accommodation prices from the admin application.
-- [x] Support seasonal prices with a start date, end date, name, and optional notes.
-  - Note: Added in the admin prototype with date-overlap checks; public price calculation still needs the final shared backend source.
-- [!] Support day-of-week and weekend adjustments.
-- [x] Support special-event, holiday, or one-off date overrides.
-- [x] Keep bicycle pricing and other extras separate from accommodation pricing.
-- [ ] Provide a calendar-style price editor for quick date-range changes.
-- [x] Provide a simple form mode for owners who prefer not to edit a pricing grid.
-
-### Price calculation and safety
-
-- [x] Define a clear precedence order for overlapping base, seasonal, weekend, and date-specific rules.
-- [ ] Preview the final guest price before publishing a rule.
-- [ ] Show which pricing rules produced the calculated total.
-- [~] Warn about gaps, overlaps, unusually large changes, and impossible stay rules.
-  - Note: Seasonal date overlaps are blocked in the prototype; gap/unusual-change/impossible-stay warnings remain planned.
-- [ ] Keep an audit history of who changed a price, what changed, and when.
-- [ ] Allow an authorised owner to restore a previous pricing configuration.
-- [ ] Do not silently reprice confirmed reservations.
-- [ ] Require an explicit choice before applying a new price to an existing request or reservation.
-- [ ] Test price changes against sample stays before publication.
-- [~] Ensure the website and admin application use the same price-calculation source.
-  - Note: Public booking now reads the admin prototype localStorage prices when present; final launch still needs a shared server-side pricing source.
-
-### Availability controls
-
-- [ ] Allow manual closure of dates without creating a fake reservation.
-- [ ] Explain whether a closure is maintenance, owner use, operational, or another reason.
-- [ ] Optionally set an automatic reopening date.
-- [ ] Prevent pricing rules from making a closed date bookable.
-
-## 6.3 Reservation creation, confirmation, and import
-
-### Manual reservation entry
-
-- [x] Allow authorised staff to create a reservation directly from the reservation list.
-- [~] Collect guest details, room, dates, guest count, source, price, payment status, extras, language, and internal notes.
-  - Note: The prototype collects guest details, dates, guest count, source, extras, language, status, discounts, deposit choice, and owner notes; room selection is not needed while the property is modeled as one unit.
-- [~] Check availability, occupancy limits, maintenance blocks, and bicycle inventory before saving.
-  - Note: The prototype checks date conflicts and occupancy limit; maintenance blocks and bicycle inventory checks remain planned.
-- [~] Allow provisional, awaiting-payment, confirmed, checked-in, checked-out, cancelled, and no-show states.
-  - Note: The data model includes these statuses; the manual create UI currently offers the most useful first statuses.
-- [x] Record the staff member and time for every manually created reservation.
-- [x] Clearly distinguish internal notes from guest-visible information.
-- [ ] Detect likely duplicate reservations before saving.
-
-### Copy-ready reservation confirmation email
-
-After a manual reservation is prepared, generate an editable email that staff can copy and paste to the guest.
-
-- [x] Generate the email in the guest’s preferred language.
-- [~] Include the guest name, stay dates, accommodation, guest count, price, deposit or amount due, and payment deadline.
-  - Note: The prototype message includes guest name, stay dates, guest count, total, and reservation reference; final bank/payment details and legal wording still need confirmation.
-- [ ] Include the correct IBAN, account-holder name, bank-transfer reference, and transfer instructions.
-- [ ] Include cancellation terms, important booking conditions, and contact details.
-- [x] Add a one-click **Copy email** action with a clear copied confirmation.
-- [ ] Let staff edit the generated text before copying it.
-- [~] Provide approved templates for confirmation, payment reminder, amendment, and cancellation.
-  - Note: The prototype includes payment instructions, combined reservation/payment confirmation, pre-arrival, checkout, and post-stay feedback templates in Portuguese, French, English, Spanish, and German.
-- [ ] Store the template version used without storing unnecessary clipboard contents.
-- [!] Confirm the final IBAN, account-holder details, payment deadline, and approved legal wording.
-
-### Website reservation requests and bank-transfer confirmation
-
-- [~] Add new website requests to the admin queue automatically.
-  - Note: The prototype includes a queue backed by demo data; wiring public reservation submissions into the queue needs a real persistence/API layer.
-- [ ] Optionally place a temporary calendar hold while the request awaits review or payment.
-- [ ] Display the hold-expiry time and release expired holds automatically.
-- [~] Let staff approve, reject, edit, or request more information.
-  - Note: The prototype supports prepare/approve through the reservation form, reject with a draft response, restore rejected requests, and respond without changing request status; deeper request editing remains planned.
-- [x] Let staff mark a bank transfer as received after checking the bank account.
-- [x] Convert the request into an awaiting-payment reservation and then a confirmed reservation after manual payment confirmation.
-- [x] Add the accepted reservation to the calendar without re-entering guest data.
-- [!] Prevent confirmation when dates have become unavailable.
-- [x] Generate the appropriate confirmation or rejection email.
-  - Note: The prototype generates payment instructions, combined reservation/payment confirmations, and rejection/response drafts. Final approved legal/payment wording remains open.
-- [!] Keep the original request, changes, payment status, and staff actions in the audit history.
-- [ ] Notify staff when a request has remained unanswered or unpaid for too long.
-
-### Booking.com email paste import
-
-Create a review-first importer where staff can paste a Booking.com reservation email and have the admin application extract the relevant information.
-
-- [ ] Extract the booking reference, guest name, dates, guest count, room or unit, price, currency, payment details, commission where present, special requests, and contact information.
-- [ ] Identify whether the pasted email represents a new reservation, modification, or cancellation.
-- [ ] Match imported accommodation names to the correct internal room or unit.
-- [ ] Highlight missing, uncertain, or conflicting fields.
-- [ ] Require staff review and confirmation before creating or changing a reservation.
-- [ ] Detect duplicates using the source, booking reference, dates, and guest details.
-- [ ] Preserve the original source and booking reference for reconciliation.
-- [ ] Avoid storing the full pasted email longer than necessary unless retention is explicitly required.
-- [ ] Support the known email languages and formats used by the owners.
-- [ ] Fail safely when Booking.com changes its email layout.
-- [ ] Provide a manual correction form when parsing is incomplete.
-- [ ] Record the importer version and staff member responsible for approval.
-- [ ] Consider a later direct channel-manager, calendar-feed, or API integration if email parsing becomes unreliable or too time-consuming.
-
-### Reservation workflow acceptance criteria
-
-- A manually entered reservation cannot create an unnoticed calendar conflict.
-- A website request becomes a confirmed calendar reservation without duplicate data entry.
-- Bank transfers are never treated as received without an explicit staff action.
-- Generated emails use the correct reservation data and editable approved templates.
-- Pasted Booking.com emails always require a human review before changing the calendar.
-- Duplicate detection prevents the same external booking from being entered twice.
-- Every creation, import, status change, and confirmation is attributable to a staff account.
-
-## 6.4 Employee access and records
-
-- [x] Add employee accounts with limited permissions.
-- [x] Restrict employees to the information required for their role.
-- [x] Add views for pay, hours worked, and related records.
-- [x] Track unpaid owner/volunteer work separately from paid employee work.
-- [~] Define which roles may view, create, edit, approve, or export employee information.
-- [ ] Keep salary and personal employee data out of general reservation permissions.
-- [~] Record access and changes to sensitive employee records.
-  - Note: The prototype records important admin actions in a local audit log; production audit records must be server-side.
-- [ ] Require stronger authentication for owners and staff with financial or employee access.
-- [ ] Provide a fast way to disable access when a staff member leaves.
-
-## 6.5 Guest history, logs, and reporting
-
-- [~] Create a complete, organised history for every guest.
-  - Note: The prototype creates reusable guest records and links reservations to guest IDs; a full guest-history view remains planned.
-- [ ] Connect repeat stays without incorrectly merging different people.
-- [~] Keep reservation changes, cancellations, messages, extras, payments, imports, and staff actions in an audit trail.
-  - Note: The prototype logs key actions locally; imports and immutable server-side auditing remain planned.
-- [~] Add yearly summary statistics.
-  - Note: The prototype includes basic reservation, revenue, source, and language statistics.
-- [ ] Define core metrics, including:
-  - Reservations and reservation requests
-  - Confirmed stays
-  - Cancellations and no-shows
-  - Occupancy
-  - Revenue
-  - Average daily rate and average stay length
-  - Booking source and commission
-  - Guest origins and languages, where appropriate and lawful
-  - Repeat guests
-  - Bicycle hire usage and revenue
-  - Maintenance downtime
-  - Outstanding and received bank transfers
-- [ ] Add export options for authorised administrators.
-- [ ] Define data-retention and privacy rules before treating the guest log as permanent.
-- [ ] Make reports reproducible from the underlying reservation and payment records.
-- [ ] Avoid using sensitive guest data in statistics when aggregated data is sufficient.
-
-## 6.6 Content, settings, and communication management
-
-Provide owner-friendly controls for frequently changing website and guest information.
-
-- [ ] Manage Guia Local listings, categories, sponsor labels, offers, display order, and expiry dates.
-- [ ] Manage Guest Stay page Wi-Fi credentials, emergency contacts, rules, warnings, announcements, and check-out instructions.
-- [ ] Manage contact details, social links, property address, map links, and review links.
-- [ ] Manage bicycle inventory, pricing, availability, and request wording.
-- [ ] Manage IBAN and bank-transfer instructions with restricted financial permissions.
-- [ ] Manage multilingual email templates and website text that changes frequently.
-- [ ] Preview changes in every supported language before publishing.
-- [ ] Schedule content to appear and disappear automatically.
-- [ ] Keep draft, published, archived, and expired states.
-- [ ] Record who changed public, guest-only, safety, financial, or legal content.
-
-## 6.7 Admin acceptance criteria
-
-- [c] Permissions follow the principle of least privilege in the prototype permission map.
-- [~] Important changes are attributable to a staff account and timestamp.
-- Maintenance and availability blocks reliably prevent conflicting reservations.
-- Owners can change prices and seasonal rules without editing code.
-- Price previews match the amounts displayed on the booking website.
-- Website requests and reviewed external imports populate the same reservation calendar.
-- [~] Sensitive financial, guest, and employee information is not exposed to unauthorised staff.
-  - Note: The prototype UI gates access by role but must use authenticated server-side APIs before real sensitive data is entered.
-- Safety-critical guest information can be updated quickly and has a visible last-updated time.
-- [c] Destructive or high-impact actions require a confirmation step where implemented.
-
----
-
-# Recommended delivery order
-
-## Milestone A — Finish the prototype
-
-- [x] Contacto Enviado page scaffold
-- [ ] Guia Local scaffold
-- [ ] Guest Stay page scaffold
-- [x] `404.html`
-- [x] “O Refúgio” naming corrections
-- [x] Television information correction
-- [x] Homepage address and Alojamento map
-
-## Milestone B — Make contact and booking flows usable
-
-- [~] Complete the Contacto form
-- [x] Add browser-language defaults
-- [x] Add bicycle reservation extras
-- [~] Add success, error, validation, and spam-protection behaviour
-- [x] Add the first manual reservation form and calendar conflict checks
-- [~] Add copy-ready reservation confirmation emails with bank-transfer details
-- [x] Convert manually approved website requests into awaiting-payment reservations, then confirmed reservations after payment is marked received
-
-## Milestone C — Launch local and in-stay guest information
-
-- [ ] Build the public Guia Local with activities, nearby stores, practical services, and sponsor labels
-- [ ] Build secure Guest Stay page access for QR, NFC, and direct links
-- [ ] Add emergency contacts, Wi-Fi QR, house rules, and mud-wasp guidance
-- [ ] Add conditional bicycle rental information for current guests
-- [ ] Add admin controls for guest information and Guia Local listings
-- [ ] Test access expiry and personal-data protection
-
-## Milestone D — Add pricing and external reservation operations
-
-- [x] Add base, seasonal, weekend, and date-specific price controls
-- [ ] Add price previews, rule precedence, drafts, publishing, and audit history
-- [ ] Add temporary reservation holds and bank-transfer statuses
-- [ ] Add the review-first Booking.com email paste importer
-- [ ] Add duplicate detection and external booking references
-- [ ] Add approved multilingual email templates
-
-## Milestone E — Complete operational tooling
-
-- [x] Add the admin prototype foundation with role-based navigation, dashboard, local data layer, and owner/employee flows
-- [x] Expand the admin calendar and maintenance controls
-- [ ] Add mid-stay guest additions
-- [x] Add employee access and records
-- [~] Add guest history and audit logs
-- [~] Add yearly statistics and exports
-- [ ] Add stronger authentication, protected APIs, role management, and recovery controls
-
----
-
-# Open decisions and required information
-
-- [!] Supported website languages and the fallback language.
-- [!] Final public name and URL for the Guest Stay page.
-- [!] Secure personalisation method: signed stay link, reservation code, or another token model.
-- [!] Whether the static QR/NFC tag opens only generic content or also starts a secure guest-verification flow.
-- [!] Wi-Fi network name, security type, password-management process, and who may update it.
-- [!] Final emergency contacts, urgent property contacts, and approved emergency wording.
-- [!] Approved house rules, check-in/check-out instructions, and appliance guidance.
-- [!] Approved mud-wasp safety guidance and any supporting images.
-- [!] Bicycle inventory, approval workflow, and whether in-stay rental requests can be confirmed instantly.
-- [!] Guia Local categories, initial listings, sponsor policy, disclosure wording, and offer-expiry rules.
-- [!] Exact social media account URLs.
-- [!] Contact and service hours.
-- [!] Privacy-policy wording, cookie requirements, and data-retention rules.
-- [!] Final admin authentication method, including whether to use Cloudflare Access, Pages Functions sessions, an external identity provider, passkeys, email OTP, SMS 2FA, or another low-cost approach.
-- [!] Final individual admin usernames, onboarding process, temporary passwords, password-reset flow, and whether every listed person should keep active access.
-- [!] Final hourly rates and default paid/free/voluntary status for each person.
-- [!] Room/map data needed for multiple map pins or labels.
-- [!] Final IBAN, account-holder name, payment reference format, transfer deadline, and cancellation wording.
-- [!] Whether website reservation requests temporarily block availability and how long holds remain active.
-- [!] Booking.com email languages and examples for new bookings, modifications, and cancellations.
-- [!] Pricing-rule precedence, taxes, fees, deposits, discounts, and whether prices vary by occupancy.
-- [!] Employee roles and permission matrix.
-- [!] Definitions for yearly business metrics and revenue reporting.
-
----
-
-# Definition of done for each feature
-
-A feature is complete when:
-
-- [ ] It works on current desktop and mobile browsers.
-- [ ] It is keyboard accessible and has appropriate labels.
-- [ ] It is translated into every supported language.
-- [ ] It handles loading, empty, success, and error states.
-- [ ] It does not expose private information unnecessarily.
-- [ ] Guest-only links, tokens, permissions, and expiry behaviour have been tested where applicable.
-- [ ] Price, availability, and reservation changes have clear audit records where applicable.
-- [ ] Relevant analytics or logs are included without collecting excessive data.
-- [ ] Content has been reviewed for accuracy.
-- [ ] The feature has been tested through its main user journey.
-
----
-
-# Removed Ideas
-
-## Google Maps and location
-
-- [ ] Investigate whether separate pins or labels can clearly represent the different rooms or accommodation areas.
+- [x] Complete in the current prototype
+- [~] Partly complete, or complete as a prototype with a known limitation
+- [!] Needs owner content, a product decision, or an external dependency
+- [>] Belongs to the production version rather than the browser-only prototype
+- [ ] Planned and not yet implemented
+
+`[c]` is retired. A change made by Codex is marked by its actual product status instead.
+
+## Product position
+
+The public website, guest-stay page, and administration area are substantial working prototypes. Public content is translated into Portuguese, English, French, and Spanish. The admin prototype is intentionally Portuguese-only and stores demonstration data in `localStorage`.
+
+The prototype is suitable for owner review and workflow testing. It is not suitable for real personal, financial, employment, or identity data until authentication, server-side storage, APIs, and operational safeguards described in [`deployment.md`](./deployment.md) are implemented.
+
+## 1. Current review batch
+
+### 1.1 Repository, content, and documentation
+
+- [x] Review and reclassify the roadmap with `[x]`, `[~]`, `[!]`, and `[>]`.
+  - Note: The working roadmap was condensed by capability; the original 54 KB document remains in `roadmap-archive.md` for traceability.
+- [x] Reorganise the roadmap into public, admin, responsive, production, and decision sections.
+- [x] Make `pt.json` the structural source of truth for public locales.
+  - Note: `npm run locales:sync` preserves the order of `pt.json`, removes target-language keys removed from Portuguese, and refuses to write when a new Portuguese key has not yet been translated.
+- [x] Limit available and preferred languages throughout the public site, admin prototype, seed data, and message templates to Portuguese, English, French, and Spanish.
+- [x] Align English, French, and Spanish locale structure and current copy with `pt.json`.
+- [x] Remove public page-script Portuguese fallback copy.
+  - Note: Missing locale keys now render empty and fail project checks instead of silently reviving hardcoded Portuguese.
+- [x] Review repository hierarchy.
+  - Note: Runtime modules already have clear `admin`, `config`, `pages`, `services`, `ui`, and `utils` boundaries. Tracked map concepts moved from `temp/` to `docs/design-explorations/local-map/`; unused empty Pages Functions/partials placeholders were removed.
+- [x] Update project documentation to describe the current prototype and cheapest production route.
+- [>] Automatically collect every marketing opt-in in a private production admin list.
+  - Note: The local prototype can list consent already present in its demo reservations and requests. Production must also ingest contact/booking APIs, store consent evidence, and support unsubscribe and suppression records.
+
+### 1.2 Shared public shell
+
+- [x] Keep the floating reservation sale label inside desktop and phone viewports.
+- [~] Add a compact floating WhatsApp action beside the reservation action using the official white WhatsApp glyph and brand green.
+  - Note: The action and translated default message work. Add the final WhatsApp number in `public/js/config/site-config.js` before launch.
+- [~] Rebuild the footer with grouped navigation, Google Maps address, click-to-email, click-to-call, social links, review link, and creator credit.
+  - Note: Layout is complete and verified at 390px and 1440px. Email, phone, Facebook, and Instagram still use intentionally obvious replaceable values in `site-config.js`.
+- [x] Centralise property, contact, social, creator, host, Wi-Fi, and map values in `public/js/config/site-config.js`.
+- [x] Replace native dropdown presentation with one shared rounded select menu across public and dynamically rendered admin forms.
+  - Note: Native `<select>` values, validation, form submission, and change events remain underneath; the shared visual menu adds the same caret, typography, focus treatment, rounded options, and keyboard controls used by the language selector.
+- [x] Keep the header, language control, menu button, and floating actions inside mobile safe areas.
+- [x] Use PT/EN/FR/ES initials in the compact language trigger while retaining full language names in its menu.
+- [x] Remove full-page horizontal overflow at narrow widths.
+
+### 1.3 Homepage
+
+- [x] Replace the old hero copy with a premium dictionary-style presentation of "O Refúgio".
+- [x] Translate the dictionary treatment appropriately in all four public languages.
+- [x] Deep-link homepage partner cards to the matching expanded partner entry in Guia Local.
+- [x] Restyle homepage gallery previews as restrained white print/polaroid cards.
+- [x] Give the homepage reservation section the distinct coloured-band treatment used by the accommodation page.
+- [x] Keep the promotional announcement and sale badge driven by lower limited-date prices from the admin pricing data.
+
+### 1.4 Alojamento and Galeria
+
+- [x] Remove the empty desktop grid cell in "Antes de reservar".
+- [x] Add washing-machine and dryer information to amenities.
+- [x] Remove inline-image baseline gaps that appeared as unexplained white strips on phones.
+- [x] Support panning around zoomed gallery images.
+- [x] Use swipe navigation in the phone lightbox and hide redundant previous/next buttons there.
+
+### 1.5 Reservas
+
+- [x] Make today clearly recognisable in the availability calendar.
+- [x] Show subtle per-day prices, including crossed-out comparison prices for active limited-date offers.
+- [x] Keep prices out of the Summary until valid dates are selected.
+- [x] Treat reservation ranges as half-open: another stay may check out on an existing check-in date or check in on an existing checkout date.
+- [x] Keep turnover dates selectable and avoid presenting them as fully occupied.
+- [x] Let a visitor recover after selecting a check-in that cannot fit the minimum stay.
+- [x] Allow adult/child number inputs to be temporarily blank while typing, then validate and normalise on change/submit.
+- [x] Enforce child ages from 0 through 12.
+- [x] Require a valid telephone number with every website reservation request.
+- [x] Keep the one-adult booking price equal to the two-adult minimum charge without displaying a redundant minimum-charge note.
+- [x] Keep the Summary in the sticky right sidebar on desktop.
+- [x] Move the Summary immediately before Details only on mobile.
+- [x] Hide the bicycle booking control when the service is disabled in admin.
+- [x] Keep all booking validation and pricing copy in locale files.
+
+### 1.6 Contact, confirmation, thanks, and errors
+
+- [x] Contact context and topic remain visually encouraged but are not submission blockers.
+- [x] Contact attachments use a custom translated picker instead of browser-native English file text.
+- [x] Feedback links preselect "Já tive reserva" and the past-stay feedback topic.
+- [x] Reservation-sent summaries avoid duplicate list markers and duplicate bicycle detail.
+- [x] Reservation-sent contact links use translated prefilled context.
+- [x] Add complete translated `obrigado.html` and useful `404.html` pages.
+- [>] Deliver contact attachments and messages through a real backend, private storage, and transactional email.
+- [x] Route unknown preview URLs to `404.html` and declare the same production static-asset behaviour.
+  - Note: The dependency-free `npm run dev` server returns the custom page with status 404; `wrangler.toml` declares Cloudflare `404-page` handling, which must still be verified after the first real deployment.
+
+### 1.7 Guia Local
+
+- [x] Keep desktop search, sorting, location, category filters, and view controls in two stable rows.
+- [x] Preserve the compact horizontal category rail and progressive results on phones.
+- [x] Place favourites at the top-right of cards.
+- [x] Keep partner previews in an aligned side-by-side grid and animate one selection into a full-width, image-led feature with translated highlights and visit actions.
+- [x] Open and scroll to a partner from homepage and Guest Stay deep links.
+- [x] Preserve list/map views, search, category filtering, favourites, directions, geolocation, expiry dates, and map fallback links.
+- [x] Replace the single-place Google iframe with a free multi-marker Leaflet map using saved coordinates and category-coded OpenStreetMap markers.
+  - Note: Pins react immediately to search, category, and favourite filters. Categories now use distinct colours and silhouettes, with a complete wrapping legend beside the directions action below the map instead of a clipped map overlay. Marker popups and cards retain Google Maps direction links; no live geocoding or paid Google API key is required.
+- [!] Replace demonstration partner descriptions, menus, websites, images, commercial terms, coordinates, and expiry dates with owner-approved content.
+- [>] Make guide listings editable through the production admin API instead of bundled JavaScript data.
+
+### 1.8 Guest Stay (`qr.html`)
+
+- [x] Remove the demonstration label and generic filler paragraphs.
+- [x] Make top stay facts and bicycle facts scroll to their related sections.
+- [x] Translate emergency contacts and all other guest-facing UI.
+- [x] Place the hospital before firefighters and consolidate pharmacies/medical options beneath Emergencies.
+- [x] Remove the separate Health section.
+- [x] Open Food first in "Perto de mim", use optional real images, and remove laundromat recommendations.
+- [x] Deep-link partner entries to Guia Local.
+- [x] Add exact checkout guidance for keys, the mapped green waste container, and washed/stored dishes or dishwasher loading.
+- [x] Reuse the complete translated booking rules and provide an expand-all route.
+- [x] Prefill WhatsApp with the current guest name when reservation context is available.
+- [x] Respect admin bicycle-service visibility and price in the guest projection.
+- [!] Replace host, phone, WhatsApp, and Wi-Fi placeholders with approved operational values.
+- [>] Issue unguessable, expiring, revocable stay tokens and return only a minimal guest-facing server projection.
+
+### 1.9 Admin application
+
+- [x] Add a dedicated Services tab and move bicycle enablement/price out of Pricing.
+- [~] Keep the service model extensible for future breakfast or other services.
+  - Note: Owners can add generic service records now. Each future service still needs a decision about how its booking controls, quantities, dates, and guest-page presentation behave.
+- [x] Keep the security deposit with base property pricing rather than seasonal service pricing.
+- [~] Add call, WhatsApp, and email quick actions to the current-guest dashboard card.
+  - Note: Email works with seeded data; phone actions become live once final numbers exist.
+- [x] Make Dashboard "Iniciar trabalho" open a compact task/type chooser before starting the timer.
+- [x] Open Reservations with a pending-payment filter when its dashboard alert is selected.
+- [x] Separate reservation lifecycle status, overall reservation payment, and security-deposit receipt throughout Reservations.
+  - Note: The dashboard alert and payment filter now use `unpaid`/`awaiting transfer`, while the caução is an independent yes/no detail editable by owners and employees. Existing prototype records using the old ambiguous deposit payment state migrate automatically.
+- [x] Add optional NIF and CC/BI/Passaporte number to guest details and both owner and employee reservation editors.
+- [x] Group reservation fields by guest identity, stay, commercial state/payment, services/discounts, and notes.
+- [x] Route newly created reservations by source and state.
+  - Note: Booking.com, Abritel.fr, and owner reservations finish in Reservations. Website and private-contact reservations open payment instructions while payment is pending, or the reservation confirmation when already paid/confirmed. Editing an existing reservation never opens Messages automatically.
+- [x] Standardise automatic admin navigation on desktop and mobile.
+  - Note: Tab changes return to the view heading, forms open at their own heading below the fixed mobile header, message actions start at the top of Messages, and collapsed records return to their summary instead of the middle of the page.
+- [~] Expire unpaid reservation requests after 48 hours, mark the payment failure reason, release dates, and mention the deadline in payment messages.
+  - Note: The prototype performs expiry when admin state loads. Reliable production expiry needs a scheduled server task.
+- [x] Gray past calendar days while keeping them selectable.
+- [x] Include guest names on checkout days and distinguish check-in/check-out calendar markers.
+- [x] Warn on impossible website requests and manual reservation conflicts while allowing authorised overrides.
+- [x] Add a bottom close action to expanded admin disclosures and past-reservation cards, then scroll back to the collapsed record.
+- [x] Reset filters and expanded rows when the already-active admin tab is selected again.
+- [~] Add a private-looking Marketing area in Messages with consent contacts grouped by language, BCC copy, offer/news templates, and one-click email launch.
+  - Note: It reflects local prototype reservations/requests only; full production ingestion is listed separately.
+- [x] Add an explicit chevron to treated website-request history.
+- [x] Align boxed Pricing and Expense list columns.
+- [x] Resolve overlapping current pricing rules into exactly one `Ativa hoje` rule, with lower-priority current rules labelled `Sobreposta hoje` and all others `Inativa`.
+- [x] Keep Pricing/Discount disclosure titles, values or statuses, and expand controls aligned in a stable mobile grid.
+- [x] Keep disclosure actions padded inside Pricing cards, including the automatically added bottom close action.
+- [x] Show all Expenses and combine month/year periods in one filter.
+- [x] Regenerate message drafts immediately when reservation, template, or no-reservation language changes.
+- [x] Put report exports in their relevant Statistics sections and apply current filters.
+- [x] Keep audit entries concise: entity identity plus only fields that actually changed.
+- [x] Remove the duplicate desktop account/logout block and give the public-site action a stable sidebar row.
+- [x] Keep the desktop sidebar navigation and public-site footer in separate rows at short window heights and browser zoom levels.
+- [x] Keep the mobile admin drawer brand, scrollable navigation, account controls, and public-site action in separate non-overlapping rows at iPhone SE heights.
+- [x] Make the phone calendar Create Reservation action a full, readable row.
+- [ ] Add everything necessary for the admin page to be able to be added as PWA for the owners and employee's easy access
+
+## 2. Implemented prototype inventory
+
+### 2.1 Public website
+
+- [x] Static pages: Homepage, Alojamento, Galeria, Reservas, Reserva Enviada, Contacto, Obrigado, Guia Local, Guest Stay, and 404.
+- [x] Shared responsive header, navigation, language menu, footer, WhatsApp, promotional booking action, scroll reveals, and carousel controls.
+- [x] Four-language public i18n using `pt.json`, `en.json`, `fr.json`, and `es.json`.
+- [x] Data-driven gallery manifest and accessible zoom/lightbox controls.
+- [x] Booking calendar, availability, turnover rules, minimum stay, guest/child validation, seasonal/daily pricing, discounts, deposit, bicycles, bed setup, marketing consent, and local request handoff to admin.
+- [x] Contact contexts/topics, reply-method rules, Portuguese phone handling, attachments UI, marketing consent, social links, and success routing.
+- [x] Local guide list/map views, filters, location, favourites, partner content, seasonal expiry, and deep links.
+- [x] Mobile-first Guest Stay hub with emergencies, hosts, Wi-Fi, nearby places, partners, rules, checkout, services, and personalised stay projection.
+
+### 2.2 Admin operations
+
+- [x] Named demo accounts for Jorge, Paula, Bárbara, Marlene, André, Dulce, and Fábio with owner/employee/dev permissions.
+- [x] Remember the last selected admin login account locally.
+- [x] Owner and employee dashboards with role-appropriate information and work timer access.
+- [x] Limited employee reservation operations include check-in/check-out times, preferred language, nationality, NIF, identification document, overall payment, and caução receipt.
+- [x] Calendar with today, turnover markers, guest names, selected-day operations, messaging, and reservation management links.
+- [x] Reservation creation/editing, grouped contact/language/identity/caução/payment data, source including Abritel, conflicts, extra guests, cancellation/restoration, and past reservations.
+- [x] Website request inbox/history, request-to-reservation conversion, deposit choice, conflicts, and local booking-form ingestion.
+- [x] Base, seasonal, date-specific, group, and code discount management with `dd/mm/yyyy` entry and native date-picker buttons.
+- [x] Services catalogue with enablement and pricing.
+- [x] Expenses with notes, filters, add/edit/remove, and complete visible history.
+- [x] Employee profiles, normal compensation mode, job rates/costs, work history, voluntary work, active timer task editing, and manual time.
+- [x] Localised message templates driven by `public/locales/messages.json`, editable drafts, email/WhatsApp/copy shortcuts, source-aware wording, payment breakdowns, and Google review links.
+- [x] Statistics for reservations, guests, revenue, expenses, labour, profit, periods, comparisons, and scoped CSV exports.
+- [x] Lightweight audit, unsaved-change warning, stable IDs, demo export/restore, and broad validation.
+- [x] Comprehensive demonstration seed covering current, future, past, cancelled, no-show, source, language, payment, request, discount, service, expense, and work scenarios.
+
+## 3. Responsive verification
+
+- [x] Verify public and admin layouts with a repeatable Edge/CDP capture script at `scripts/capture-page.mjs`.
+- [x] Verify 390px pages have `scrollWidth === clientWidth` for Homepage, Reservas, Alojamento, Guia Local, QR, and Admin views.
+- [x] Verify 1440px Homepage, Reservas, Guia Local, Dashboard, Pricing, Services, and Messages compositions.
+- [x] Preserve phone-only calendar swipes, lightbox swipes, admin bottom navigation, and touch-sized actions.
+- [x] Keep fixed-format calendar cells, controls, cards, and labels from resizing or colliding at narrow widths.
+
+## 4. Production migration
+
+- [ ] Write a very detailed step by step tutorial for the deployment in a different .md file in docs, for someone who never did it, has nothing prepared like domain or anything and needs to have every step detailed
+
+The full low-cost route, data model, security boundaries, API plan, deployment steps, and launch checklist live in [`deployment.md`](./deployment.md).
+
+- [>] Replace demo authentication with Cloudflare Access plus server-validated individual accounts and role mapping.
+- [>] Replace `localStorage` business state with D1 and protected `/api/admin/*` repositories.
+- [>] Move reservation availability and pricing reads to public server endpoints with no private data exposure.
+- [>] Send booking/contact transactional email through Resend or an approved equivalent.
+- [>] Store contact attachments and private documents in private R2 buckets with authorised access only.
+- [>] Add Turnstile, request throttling, idempotency, and delivery/error monitoring to public forms.
+- [>] Run 48-hour payment expiry and reminders with scheduled Workers.
+- [>] Store marketing consent evidence, language, source, unsubscribe status, suppression status, and timestamps in D1.
+- [>] Provide a private admin marketing audience grouped by language and compliant one-click unsubscribe.
+- [>] Add secure guest-stay tokens, revocation, expiry, and minimal response projections.
+- [>] Write audit events server-side and make them append-only to normal admin roles.
+- [>] Add database migrations, encrypted backups/exports, restore drills, retention rules, and portability documentation.
+- [>] Add privacy, cookies, terms, cancellation, complaints-book, accessibility, and marketing-compliance content approved for the real business.
+- [>] Test production mail DNS, domain routing, 404s, backups, alerting, role boundaries, and mobile workflows before launch.
+
+## 5. Decisions and owner content
+
+- [!] Final public domain and production Cloudflare account/project ownership.
+- [!] Final reservations email, public telephone, and WhatsApp number.
+- [!] Final Facebook and Instagram URLs.
+- [!] Final host names, responsibilities, languages, call numbers, and WhatsApp numbers for Guest Stay.
+- [!] Final Wi-Fi network/password and whether the password may appear behind a guest token.
+- [!] Owner-approved partner list, descriptions, menus, websites, images, offers, sponsorship labels, and expiry dates.
+- [!] Owner-approved nearby medical, pharmacy, food, transport, fuel, and emergency details.
+- [!] Bank-transfer instructions, payment reference format, cancellation wording, and reminder cadence.
+- [!] Privacy retention periods for enquiries, reservations, guest data, work records, expenses, attachments, and audit logs.
+- [!] Whether future services are per stay, per person, per unit, per day, or selectable by date.
+- [!] Whether contact attachments are retained in admin, forwarded by email, or both.
+- [!] Final creator-credit URL.
+
+## 6. Current batch reversion map
+
+- Shared configuration and shell: `public/js/config/site-config.js`, `public/js/ui/site-shell.js`, `public/js/main.js`, `public/css/{base,layout,components,variables}.css`.
+- Homepage: `public/index.html`, `public/css/pages/home.css`, and the `home` locale blocks.
+- Alojamento/Galeria/Contacto: their matching HTML, page JS, and page CSS files.
+- Reservas: `public/reservas.html`, `public/js/pages/booking.js`, `public/css/pages/reservas.css`, pricing services, and booking locale blocks.
+- Guia Local: `public/guia-local.html`, `public/js/pages/guide.js`, `public/css/pages/guia-local.css`, and `guidePage` locale blocks.
+- Guest Stay: `public/qr.html`, `public/js/pages/qr.js`, `public/js/services/guest-stay-provider.js`, `public/css/pages/qr.css`, and `guestStay` locale blocks.
+- Admin: `public/js/admin/{main,admin-store,admin-seed,admin-logic}.js` and `public/css/pages/admin.css`.
+- Message catalogue: `public/locales/messages.json`.
+- Locale governance: `public/locales/{pt,en,fr,es}.json`, `scripts/sync-locales.mjs`, and `scripts/check-project.mjs`.
+- QA and docs: `scripts/capture-page.mjs`, `docs/*.md`, `README.md`, and `wrangler.toml`.
