@@ -10,6 +10,17 @@ Este documento descreve o comportamento esperado do protótipo administrativo em
 
 O último utilizador escolhido fica memorizado no dispositivo. Na versão final, cada pessoa terá identidade individual, acesso revogável e permissões verificadas no servidor.
 
+## Instalação como aplicação
+
+O admin inclui uma Progressive Web App própria, chamada `O Refúgio Gestão`.
+
+- Em Chrome, Edge e navegadores Android compatíveis, `Instalar aplicação` aparece no rodapé do menu quando o navegador disponibiliza a instalação.
+- Em iPhone ou iPad, abrir `admin.html` no Safari e usar `Partilhar` > `Adicionar ao ecrã principal`.
+- Quando uma nova versão do service worker estiver pronta, `Atualizar aplicação` aparece no mesmo local. A atualização respeita o aviso de alterações por guardar antes de recarregar.
+- O indicador `Sem ligação · dados locais` identifica o modo offline do protótipo.
+
+O cache offline contém apenas o documento, estilos, scripts, catálogo de mensagens e ícones necessários ao admin. Não armazena respostas de `/api/`, anexos ou dados futuros do servidor. No protótipo, os registos de demonstração continuam no `localStorage`; isso não substitui persistência, autenticação ou autorização de produção.
+
 ## Painel do proprietário
 
 O Painel concentra as ações frequentes:

@@ -13,8 +13,10 @@ The interface currently demonstrates owners' and employees' workflows using loca
 - `admin-seed.js`: comprehensive deterministic demo business state.
 - `admin-store.js`: state normalisation, migration, local persistence, export/import/reset boundary.
 - `admin-logic.js`: dates, pricing, conflict, messaging, reporting, and shared domain calculations.
+- `pwa.js`: install prompt state, update consent, online/offline status, and service-worker registration.
 - `main.js`: view state, rendering, forms, interactions, responsive navigation, and audit calls.
 - `admin.css`: desktop sidebar, compact mobile shell, forms, records, calendars, reports, disclosures, and dialogs.
+- `admin.webmanifest` and `admin-sw.js`: standalone installation metadata and a static admin-shell cache that explicitly excludes future APIs.
 - `locales/messages.json`: multilingual operational and marketing message catalogue.
 
 ## Data domains
@@ -48,6 +50,10 @@ Do not store real guest identity documents, payment details, employee salaries, 
 - Client-side permissions can be bypassed.
 - Client-generated audit events can be altered.
 - Different devices do not share changes.
+
+## PWA boundary
+
+The service worker improves launch and static-shell availability only. It never acts as an authentication or data-persistence layer and deliberately ignores `/api/`, non-GET requests, public navigation, and cross-origin resources. The app waits for explicit update consent so a new worker cannot reload over unsaved admin forms.
 
 ## Production repository boundary
 

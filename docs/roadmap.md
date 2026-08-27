@@ -168,7 +168,8 @@ The prototype is suitable for owner review and workflow testing. It is not suita
 - [x] Keep the desktop sidebar navigation and public-site footer in separate rows at short window heights and browser zoom levels.
 - [x] Keep the mobile admin drawer brand, scrollable navigation, account controls, and public-site action in separate non-overlapping rows at iPhone SE heights.
 - [x] Make the phone calendar Create Reservation action a full, readable row.
-- [ ] Add everything necessary for the admin page to be able to be added as PWA for the owners and employee's easy access
+- [x] Make the admin installable as a PWA for owners and employees.
+  - Note: Added a standalone admin manifest, 180/192/512 px house-mark icons, maskable icon support, a deliberately admin-only static cache strategy, offline shell fallback, safe-area layout, install/update controls, and automated integrity checks. Installation requires HTTPS in production; iPhone/iPad installation continues through Safari's Add to Home Screen action because iOS does not expose the custom browser install prompt.
 
 ## 2. Implemented prototype inventory
 
@@ -200,6 +201,7 @@ The prototype is suitable for owner review and workflow testing. It is not suita
 - [x] Statistics for reservations, guests, revenue, expenses, labour, profit, periods, comparisons, and scoped CSV exports.
 - [x] Lightweight audit, unsaved-change warning, stable IDs, demo export/restore, and broad validation.
 - [x] Comprehensive demonstration seed covering current, future, past, cancelled, no-show, source, language, payment, request, discount, service, expense, and work scenarios.
+- [x] Installable `O Refúgio Gestão` PWA with platform icons, standalone safe areas, explicit updates, and offline access to the static admin shell.
 
 ## 3. Responsive verification
 

@@ -1,5 +1,11 @@
 import { getAvailableUsers, getStoredSession, login, logout } from './admin-auth.js';
 import { can, requirePermission, ROLE_LABELS } from './admin-permissions.js';
+import {
+  activateAdminPwaUpdate,
+  getAdminPwaState,
+  initAdminPwa,
+  promptAdminPwaInstall
+} from './pwa.js';
 import { createAdminRepository } from './admin-store.js';
 import { initCustomSelects } from '../ui/custom-selects.js';
 import {
@@ -122,6 +128,7 @@ const ICONS = {
   trash: '<path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path>',
   userPlus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M19 8v6"></path><path d="M22 11h-6"></path>',
   users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
+  wifiOff: '<path d="M12 20h.01"></path><path d="M8.5 16.4a5 5 0 0 1 7 0"></path><path d="M5 12.9a10 10 0 0 1 2.4-1.6"></path><path d="M16.8 11.4a10 10 0 0 1 2.2 1.5"></path><path d="M1.4 9a15 15 0 0 1 2.7-2"></path><path d="M10.6 5.2A15 15 0 0 1 22.6 9"></path><path d="m2 2 20 20"></path>',
   x: '<path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>'
 };
 
@@ -1021,6 +1028,15 @@ function renderApp() {
       <span>${escapeHtml(item.mobileLabel || item.label)}</span>
     </button>
   `).join('');
+  const pwaState = getAdminPwaState();
+  const pwaAction = pwaState.updateAvailable
+    ? `<button class="button admin-secondary-button admin-pwa-action" type="button" data-action="update-admin-app">${icon('rotateCcw')} Atualizar aplicação</button>`
+    : pwaState.installAvailable && !pwaState.installed && !pwaState.offline
+      ? `<button class="button admin-secondary-button admin-pwa-action" type="button" data-action="install-admin-app">${icon('download')} Instalar aplicação</button>`
+      : '';
+  const offlineStatus = pwaState.offline
+    ? `<p class="admin-pwa-offline" role="status">${icon('wifiOff')} Sem ligação · dados locais</p>`
+    : '';
 
   app.innerHTML = `
     <div class="admin-shell">
@@ -1054,6 +1070,8 @@ function renderApp() {
             </div>
             <button class="admin-icon-button" type="button" data-action="logout" aria-label="Sair">${icon('logOut')}</button>
           </div>
+          ${offlineStatus}
+          ${pwaAction}
           <a class="admin-public-link" href="./index.html">Abrir site público</a>
         </div>
       </aside>
@@ -5203,6 +5221,20 @@ async function handleClick(event) {
       return;
     }
 
+    if (action === 'install-admin-app') {
+      const installed = await promptAdminPwaInstall();
+      if (installed) setNotice('Aplicação instalada neste dispositivo.');
+      renderApp();
+      return;
+    }
+
+    if (action === 'update-admin-app') {
+      if (!confirmDiscardUnsavedChanges()) return;
+      if (activateAdminPwaUpdate()) setNotice('A atualizar a aplicação...');
+      renderApp();
+      return;
+    }
+
     if (action === 'close-disclosure') {
       const details = target.closest('details');
       const summary = details?.querySelector(':scope > summary');
@@ -5636,4 +5668,7 @@ window.addEventListener('beforeunload', (event) => {
 });
 
 initCustomSelects();
+initAdminPwa(() => {
+  if (currentUser && state) renderApp();
+});
 loadSessionAndState();

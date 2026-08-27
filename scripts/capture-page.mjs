@@ -15,7 +15,7 @@ const port = Number(args.port || 9333);
 const profile = path.resolve(`.tmp-edge-cdp-${port}`);
 const emulateReducedMotion = args.motion !== 'normal';
 
-await rm(profile, { recursive: true, force: true });
+await rm(profile, { recursive: true, force: true, maxRetries: 8, retryDelay: 200 });
 await mkdir(profile, { recursive: true });
 await mkdir(path.dirname(output), { recursive: true });
 
@@ -82,7 +82,7 @@ async function navigate(nextUrl) {
   await command('Page.navigate', { url: nextUrl });
   for (let attempt = 0; attempt < 60; attempt += 1) {
     const ready = await command('Runtime.evaluate', {
-      expression: "document.readyState === 'complete' && Boolean(document.title.trim())",
+      expression: "document.readyState === 'complete'",
       returnByValue: true
     });
     if (ready.result.value) break;
@@ -136,6 +136,25 @@ try {
     await navigate(url);
   }
 
+  if (args['pwa-offline']) {
+    await command('Runtime.evaluate', {
+      expression: `navigator.serviceWorker
+        ? navigator.serviceWorker.ready.then(() => true).catch(() => false)
+        : Promise.resolve(false)`,
+      awaitPromise: true,
+      returnByValue: true
+    });
+    await navigate(url);
+    await command('Network.enable');
+    await command('Network.emulateNetworkConditions', {
+      offline: true,
+      latency: 0,
+      downloadThroughput: 0,
+      uploadThroughput: 0
+    });
+    await navigate(url);
+  }
+
   if (args.view) {
     const viewSelector = `[data-view="${String(args.view)}"]`;
     await command('Runtime.evaluate', {
@@ -172,7 +191,9 @@ try {
       clientWidth: document.documentElement.clientWidth,
       scrollWidth: document.documentElement.scrollWidth,
       scrollHeight: document.documentElement.scrollHeight,
-      title: document.title
+      title: document.title,
+      serviceWorkerControlled: Boolean(navigator.serviceWorker?.controller),
+      standalone: window.matchMedia('(display-mode: standalone)').matches
     })`,
     returnByValue: true
   });
@@ -198,5 +219,5 @@ try {
       new Promise((resolve) => setTimeout(resolve, 2000))
     ]);
   }
-  await rm(profile, { recursive: true, force: true });
+  await rm(profile, { recursive: true, force: true, maxRetries: 8, retryDelay: 200 });
 }

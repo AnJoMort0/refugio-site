@@ -1075,6 +1075,28 @@ form.is-dirty::before {
   border-radius: 8px;
 }
 
+.admin-sidebar-footer .admin-pwa-action {
+  width: 100%;
+  min-height: 2.75rem;
+  justify-content: flex-start;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+}
+
+.admin-pwa-offline {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid rgba(200, 154, 75, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 249, 235, 0.92);
+  color: #72521f;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
 .admin-calendar-legend {
   display: flex;
   flex-wrap: wrap;
@@ -1465,24 +1487,24 @@ form.is-dirty::before {
   .admin-list-disclosure,
   #create-reservation,
   #reservation-operations {
-    scroll-margin-top: 5rem;
+    scroll-margin-top: calc(5rem + env(safe-area-inset-top));
   }
 
   .admin-shell {
     display: block;
-    padding-top: 4.25rem;
+    padding-top: calc(4.25rem + env(safe-area-inset-top));
   }
 
   .admin-mobile-header {
     position: fixed;
     inset: 0 0 auto;
     z-index: 60;
-    min-height: 4.25rem;
+    min-height: calc(4.25rem + env(safe-area-inset-top));
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    padding: 0.6rem max(0.8rem, env(safe-area-inset-left));
+    padding: calc(0.6rem + env(safe-area-inset-top)) max(0.8rem, env(safe-area-inset-right)) 0.6rem max(0.8rem, env(safe-area-inset-left));
     border-bottom: 1px solid rgba(90, 75, 63, 0.12);
     background: rgba(250, 248, 244, 0.96);
     backdrop-filter: blur(14px);
@@ -1524,6 +1546,8 @@ form.is-dirty::before {
     border-bottom: 0;
     background: var(--color-soft-ivory);
     box-shadow: 18px 0 44px rgba(43, 38, 34, 0.18);
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
     transform: translateX(-105%);
     transition: transform 180ms ease;
   }

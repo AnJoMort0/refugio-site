@@ -303,6 +303,69 @@ async function checkGalleryManifest() {
   return manifest.length;
 }
 
+async function checkAdminPwa() {
+  const manifestPath = path.join(PUBLIC_DIRECTORY, 'admin.webmanifest');
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+  const adminHtml = await readFile(path.join(PUBLIC_DIRECTORY, 'admin.html'), 'utf8');
+  const serviceWorker = await readFile(path.join(PUBLIC_DIRECTORY, 'admin-sw.js'), 'utf8');
+  const pwaModule = await readFile(path.join(PUBLIC_DIRECTORY, 'js', 'admin', 'pwa.js'), 'utf8');
+
+  if (manifest.id !== './admin.html' || manifest.start_url !== './admin.html?source=pwa') {
+    reportError('Admin PWA manifest must identify and launch admin.html.');
+  }
+  if (manifest.display !== 'standalone' || manifest.scope !== './') {
+    reportError('Admin PWA manifest must use standalone display inside the current site scope.');
+  }
+  if (manifest.theme_color !== '#394534' || manifest.background_color !== '#FAF8F4') {
+    reportError('Admin PWA manifest colours no longer match the admin shell.');
+  }
+
+  const icons = Array.isArray(manifest.icons) ? manifest.icons : [];
+  const requiredSizes = new Set(['192x192', '512x512']);
+  const foundSizes = new Set(icons.map((icon) => icon.sizes));
+  requiredSizes.forEach((size) => {
+    if (!foundSizes.has(size)) reportError(`Admin PWA manifest is missing its ${size} icon.`);
+  });
+  if (!icons.some((icon) => String(icon.purpose || '').split(/\s+/).includes('maskable'))) {
+    reportError('Admin PWA manifest is missing a maskable icon.');
+  }
+
+  for (const icon of icons) {
+    const iconPath = path.resolve(path.dirname(manifestPath), cleanReference(icon.src || ''));
+    if (!icon.src || !await pathExists(iconPath)) {
+      reportError(`Admin PWA manifest references missing icon "${icon.src || ''}".`);
+      continue;
+    }
+
+    if (icon.type === 'image/png' && /^\d+x\d+$/.test(icon.sizes || '')) {
+      const bytes = await readFile(iconPath);
+      const expected = icon.sizes.split('x').map(Number);
+      const actual = bytes.length >= 24 && bytes.subarray(1, 4).toString('ascii') === 'PNG'
+        ? [bytes.readUInt32BE(16), bytes.readUInt32BE(20)]
+        : [];
+      if (actual[0] !== expected[0] || actual[1] !== expected[1]) {
+        reportError(`${relative(iconPath)} is not the declared ${icon.sizes} PNG.`);
+      }
+    }
+  }
+
+  for (const requiredMarkup of ['rel="manifest"', 'name="theme-color"', 'rel="apple-touch-icon"']) {
+    if (!adminHtml.includes(requiredMarkup)) reportError(`public/admin.html is missing ${requiredMarkup}.`);
+  }
+  if (!pwaModule.includes("register('./admin-sw.js'")) {
+    reportError('Admin PWA module does not register admin-sw.js.');
+  }
+  if (!serviceWorker.includes("url.pathname.startsWith('/api/')")) {
+    reportError('Admin service worker must leave future API requests out of its cache strategy.');
+  }
+
+  const shellReferences = [...serviceWorker.matchAll(/^\s+'(\.\/[^']+)'[,]?$/gm)].map((match) => match[1]);
+  for (const reference of shellReferences) {
+    const target = path.resolve(PUBLIC_DIRECTORY, reference);
+    if (!await pathExists(target)) reportError(`Admin service-worker shell references missing file "${reference}".`);
+  }
+}
+
 async function checkSharedUtilities() {
   const dateUtilities = await import(pathToFileURL(path.join(PUBLIC_DIRECTORY, 'js', 'utils', 'date.js')));
   const phoneUtilities = await import(pathToFileURL(path.join(PUBLIC_DIRECTORY, 'js', 'utils', 'phone.js')));
@@ -398,7 +461,7 @@ const scriptFiles = await walk(path.join(PROJECT_DIRECTORY, 'scripts'));
 const htmlFiles = publicFiles.filter((file) => file.endsWith('.html'));
 const cssFiles = publicFiles.filter((file) => file.endsWith('.css'));
 const javaScriptFiles = [...publicFiles, ...scriptFiles].filter((file) => /\.(?:js|mjs)$/.test(file));
-const jsonFiles = publicFiles.filter((file) => file.endsWith('.json'));
+const jsonFiles = publicFiles.filter((file) => /\.(?:json|webmanifest)$/.test(file));
 const translationSourceFiles = [...htmlFiles, ...publicFiles.filter((file) => file.endsWith('.js'))];
 
 await checkJsonFiles(jsonFiles);
@@ -410,6 +473,7 @@ await checkCssReferences(cssFiles);
 const translationKeyCount = await checkTranslationReferences(translationSourceFiles);
 const messageTemplateCount = await checkMessageCatalog();
 const galleryImageCount = await checkGalleryManifest();
+await checkAdminPwa();
 await checkSharedUtilities();
 await checkAdminModel();
 

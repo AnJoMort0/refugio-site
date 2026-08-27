@@ -10,7 +10,7 @@ This repository contains a feature-rich static prototype rather than an empty sc
 - Portuguese, English, French, and Spanish public content.
 - Availability, seasonal/date pricing, discounts, guest pricing, services, and booking-request simulation.
 - A Portuguese admin application for reservations, requests, calendar, prices, services, expenses, staff, work time, messages, marketing consent, statistics, exports, and audit history.
-- Responsive desktop and phone layouts, including touch calendars and compact admin navigation.
+- Responsive desktop and phone layouts, including touch calendars, compact admin navigation, and an installable admin PWA with a conservative offline shell.
 
 The admin data and login are demonstrations stored in the current browser's `localStorage`. Do not use the prototype for real guest, identity, employment, payment, or financial data.
 
@@ -40,7 +40,7 @@ npm run gallery:manifest
 npm run qa:capture -- --url=http://127.0.0.1:3000/index.html --output=temp/home.png --width=390 --height=844 --locale=pt
 ```
 
-- `check` validates JavaScript, JSON, page assets, locale parity, supported languages, translation references, message templates, and gallery data.
+- `check` validates JavaScript, JSON, page assets, locale parity, supported languages, translation references, message templates, gallery data, and admin PWA integrity.
 - `locales:sync` makes EN/FR/ES follow the structure and ordering of PT. It removes translations whose Portuguese key was deleted and stops if a new key still needs translation.
 - `gallery:manifest` rebuilds the image manifest.
 - `qa:capture` creates a repeatable Edge/CDP screenshot and reports viewport overflow metrics. Add `--admin --view=calendar` for an authenticated admin view.
@@ -69,6 +69,8 @@ public/
   js/ui/                  Shared shell and interaction components
   js/utils/               Small domain-independent helpers
   locales/                Public UI and message catalogues
+  admin.webmanifest       Install metadata for O Refúgio Gestão
+  admin-sw.js             Admin-only static shell and offline fallback
 scripts/                  Validation, locale sync, manifests, and visual QA
 docs/                     Roadmap, architecture, workflow, design, deployment
 ```

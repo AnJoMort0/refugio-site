@@ -229,6 +229,28 @@ npx wrangler deploy
 
 Store binding IDs in environment-specific Wrangler configuration. Use separate preview and production databases/buckets. Never commit `.dev.vars`, API keys, Access secrets, or production exports.
 
+## Admin PWA
+
+The prototype admin is installable as `O Refúgio Gestão` through `admin.webmanifest`. Its service worker is intentionally conservative:
+
+- it precaches only the admin HTML shell, its CSS/JavaScript modules, message catalogue, manifest, and icons;
+- it uses the network first for the admin document and static assets, falling back to the cache when offline;
+- it does not intercept `/api/`, non-GET requests, cross-origin requests, public-page navigation, attachments, or future server data;
+- updates wait for the owner/employee to choose `Atualizar aplicação`, so an active form is not silently replaced;
+- installed layouts account for top and bottom device safe areas.
+
+Production requirements:
+
+1. Serve the app over HTTPS; localhost is only the development exception.
+2. Serve `admin.webmanifest` as `application/manifest+json` and `admin-sw.js` as JavaScript without a long immutable cache lifetime.
+3. Keep the manifest, service worker, icons, admin shell, and authenticated admin APIs on the same final origin.
+4. Protect `admin.html` and `/api/admin/*` with Cloudflare Access and server-side role checks. The service worker is an availability layer, never an authentication boundary.
+5. Keep API responses, guest records, identity data, uploads, and secrets out of Cache Storage. The existing worker explicitly passes `/api/` through to the network.
+6. Test install, launch, update, offline shell, logout/session expiry, and uninstall on at least one Android/Chromium device and one current iPhone/iPad before launch.
+7. If the admin later moves to `/admin/` or a dedicated admin subdomain, move the manifest and service worker with it and reduce their scope accordingly.
+
+The manifest follows the current [W3C Web Application Manifest specification](https://www.w3.org/TR/appmanifest/). Browser-specific installation behavior and icon handling should be rechecked against current platform documentation during production acceptance.
+
 ## Environments
 
 - Local: demo seed or local D1, fake recipients, no real personal data.
