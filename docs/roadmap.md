@@ -86,6 +86,7 @@ The prototype is suitable for owner review and workflow testing. It is not suita
 - [x] Move the Summary immediately before Details only on mobile.
 - [x] Hide the bicycle booking control when the service is disabled in admin.
 - [x] Keep all booking validation and pricing copy in locale files.
+- [ ] Add new mandatory fields sorted in their appropriate place: address with [street nr] [postal code] [city] [country (is a a drop-down menu from an imported from some ressource/public database/API possible here? with the possibility of searching by typing in the field?]. In this case the Nationality field in admin becomes useless, so remove it from owner and employee. Add the address fields to the owner reservation page
 
 ### 1.6 Contact, confirmation, thanks, and errors
 
