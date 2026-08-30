@@ -12,6 +12,8 @@ The design/workflow review stage is therefore complete. This document starts fro
 
 | Need | Recommended service | Why |
 | --- | --- | --- |
+| Independent recovery identity | Proton Mail Free | Business-controlled recovery/billing mailbox remains usable even if `YOUR_DOMAIN`, DNS, or Cloudflare has a problem |
+| Shared infrastructure credentials | Bitwarden Free Organization initially | Two individual users (designated owner + developer) can share business-owned break-glass credentials without sharing a password-manager login |
 | Static pages and API | Cloudflare Workers with Static Assets | One deployment for `public/` plus API routes; edge caching; custom 404 support |
 | Relational business data | Cloudflare D1 | Reservations, guests, prices, services, consent, staff, expenses, work, and audit need relational constraints plus atomic writes |
 | Admin perimeter | Cloudflare Access | Individual identities can protect `/admin.html` and `/api/admin/*` before application role checks |
@@ -20,7 +22,7 @@ The design/workflow review stage is therefore complete. This document starts fro
 | Private files | Cloudflare R2 | Contact attachments, receipts, or identity files can remain outside public assets |
 | Scheduled work | Workers Cron Triggers | Expire unpaid holds, send reminders, and run retention/maintenance jobs |
 | Local Guide map | Leaflet plus an OSM-compatible tile provider | Saved coordinates support filtered multi-marker maps without live geocoding or a Google Maps API key |
-| Source and CI | GitHub | Reviewable changes and automatic deployments |
+| Source and CI | GitHub Organization | Business owns the repository; developer and at least one owner use separate human accounts with Organization Owner continuity |
 
 Official references:
 
@@ -35,10 +37,47 @@ Official references:
 - [Resend pricing](https://resend.com/pricing) and [domain verification](https://resend.com/docs/dashboard/domains/introduction)
 - [Leaflet quick start](https://leafletjs.com/examples/quick-start/)
 - [OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
+- [Proton Free plans](https://proton.me/support/proton-plans), [2FA](https://proton.me/support/two-factor-authentication-2fa), and [custom domains](https://proton.me/support/custom-domain)
+- [Bitwarden Organizations Quick Start](https://bitwarden.com/help/getting-started-organizations/)
+- [GitHub organization ownership continuity](https://docs.github.com/en/organizations/managing-peoples-access-to-your-organization-with-roles/maintaining-ownership-continuity-for-your-organization) and [repository transfers](https://docs.github.com/en/repositories/creating-and-managing-repositories/transferring-a-repository)
+- [Cloudflare account members](https://developers.cloudflare.com/fundamentals/manage-members/)
+- [Resend team management](https://resend.com/docs/dashboard/settings/team)
+- [Cloudflare Email Routing limitations](https://developers.cloudflare.com/email-service/reference/postmaster/)
 
 The prototype may use the public OpenStreetMap raster tile endpoint for ordinary, human-driven interactive viewing. If it does, use the current HTTPS endpoint (`https://tile.openstreetmap.org/{z}/{x}/{y}.png`), keep visible OpenStreetMap attribution, allow the browser to send a normal `Referer`, respect HTTP cache headers, and do not implement bulk prefetching or offline tile downloads. The service is best-effort with no SLA and can block non-compliant use. Keep the tile URL configurable and switch `SITE_CONFIG.map.tileUrl` to a production OSM-compatible tile provider if traffic, reliability, offline use, or support requirements exceed the public service policy.
 
-At the prototype's expected traffic, the free tiers may cover normal operation. As of 2026-08-30, Workers Free allows 100,000 Worker requests per day; D1 Free includes 5 million rows read and 100,000 rows written per day, with a 500 MB maximum per database; R2 Standard includes 10 GB-month of storage plus monthly operation allowances; Cloudflare Zero Trust Free is intended for teams under 50 users; and Resend Free includes 3,000 emails per month with a 100-per-day limit. Workers Paid currently starts at a $5 USD monthly minimum. Verify provider pricing and limits again immediately before launch, and do not design the system so exceeding a free limit silently loses bookings.
+At the prototype's expected traffic, the free tiers may cover normal operation. As of 2026-08-30, Proton Mail Free provides one mailbox with up to 1 GB of Mail storage after its starter actions; Bitwarden Free Organizations allow two users to share organization-owned credentials; Workers Free allows 100,000 Worker requests per day; D1 Free includes 5 million rows read and 100,000 rows written per day, with a 500 MB maximum per database; R2 Standard includes 10 GB-month of storage plus monthly operation allowances; Cloudflare Zero Trust Free is intended for teams under 50 users; and Resend Free includes 3,000 emails per month with a 100-per-day limit and currently up to three verified domains. Workers Paid currently starts at a $5 USD monthly minimum. Verify provider pricing and limits again immediately before launch, and do not design the system so exceeding a free limit silently loses bookings.
+
+## Business ownership and account model
+
+The developer may administer the system long-term, but the business must be able to recover every critical asset without depending on the developer's personal email, personal GitHub namespace, personal payment card, or personal password vault. Use **business-owned resources with individual human access** rather than one shared login everywhere.
+
+### Independent recovery mailbox
+
+- Create one Proton Mail Free mailbox solely for infrastructure recovery, billing/security notices, provider verification, and emergency support. Proton Free is a single account, not a formal multi-user business mailbox; keep its shared/break-glass use limited to the designated owner and developer, or move to a paid multi-user mailbox if separate named access is later required.
+- In documentation and source code, refer to it only as `BUSINESS_RECOVERY_EMAIL`; keep the real address in the private password vault/deployment record.
+- Keep it independent from `YOUR_DOMAIN`. A root recovery address that depends on the same domain/DNS being recovered creates an avoidable circular dependency.
+- Do not publish this mailbox or use it as the ordinary reservations/contact inbox.
+- Install it only for the designated primary owner and developer unless additional access is genuinely required.
+- Enable Proton 2FA on both authorized devices and keep recovery codes in owner-controlled offline emergency material. Proton supports multiple 2FA devices and up to four security keys if hardware keys are later adopted.
+
+### Shared credential custody
+
+- Start with a Bitwarden Free Organization containing exactly two individual users: the designated primary owner and the developer.
+- Give both Organization Owner status and store business-owned break-glass credentials in an `Infrastructure` collection.
+- Keep each person's Bitwarden master password and 2FA individual; never share a Bitwarden user login.
+- The free Organization is a two-user design. If more owners need live vault access later, upgrade rather than sharing credentials.
+- Keep a secondary owner informed of the location of sealed/offline recovery material so the family can regain access even if the two live users are unavailable.
+
+### Provider ownership rules
+
+- **Domain/registrar:** register to the appropriate owner/business party, use a business/owner payment method, use `BUSINESS_RECOVERY_EMAIL` for root recovery where practical, enable 2FA, and invite the developer individually when the registrar supports members.
+- **Cloudflare:** establish a business/break-glass login using `BUSINESS_RECOVERY_EMAIL`, then add the developer and at least one actual owner as individual account members. Use the developer's individual member account for routine dashboard and Wrangler work. Cloudflare account-member policies should follow least privilege; critical administrators may be Super Administrators where full recovery/control is required.
+- **GitHub:** do not create a shared generic personal account. Create an O Refúgio GitHub Organization and transfer the existing repository from the developer's personal namespace. Keep the developer's personal GitHub account and one real owner's personal GitHub account as Organization Owners; GitHub recommends at least two Organization Owners for continuity.
+- **Resend:** create the business account/team with business recovery details, then invite the developer's individual Resend account as an Admin. Use team roles rather than sharing the root account for routine work.
+- **Other future services:** prefer organizations/teams/member access. A generic business/root credential is a break-glass identity, not the day-to-day account, whenever the provider supports individual users.
+
+The operational test is simple: **the owners do not need to know how to deploy the site, but they must be able to prove ownership, recover the account chain, replace the developer, and regain administrative control if necessary.**
 
 ## Target architecture
 
@@ -182,7 +221,9 @@ The current admin-load expiry is demonstration behaviour only.
 
 ## Email delivery
 
-Configure a Resend sending subdomain. SPF and DKIM are required for domain verification; add DMARC as a separate deliverability/security policy, beginning cautiously (for example `p=none`) until all legitimate senders are confirmed. Store API keys as Worker secrets.
+Cloudflare Email Routing may forward incoming custom-domain addresses to a monitored mailbox, but it is not a normal outbound mailbox: replying from the destination mailbox sends from that destination address rather than automatically from the routed `@YOUR_DOMAIN` address. Keep `BUSINESS_RECOVERY_EMAIL` separate from normal customer correspondence. If staff later need a true shared custom-domain mailbox for manual sending/replies, budget for an appropriate mailbox provider instead of turning the root recovery inbox into the customer inbox.
+
+Create the Resend business team using the business recovery path, invite the developer's individual Resend account as an Admin, and use individual team access for routine operation. Configure a Resend sending subdomain. SPF and DKIM are required for domain verification; add DMARC as a separate deliverability/security policy, beginning cautiously (for example `p=none`) until all legitimate senders are confirmed. Store API keys as Worker secrets.
 
 Transactional flow:
 
@@ -300,6 +341,15 @@ Use request/correlation IDs from form submission through email and audit records
 
 ## Migration order
 
+### Stage 0: business ownership and recovery foundation
+
+- Create two individual Bitwarden accounts (designated primary owner + developer), then a two-user Bitwarden Free Organization and `Infrastructure` collection.
+- Create and secure an independent Proton Mail Free recovery mailbox; keep the real address private and outside Git.
+- Establish offline recovery material with a secondary owner.
+- Create/convert infrastructure ownership so billing/recovery is business-controlled while the developer uses individual member accounts.
+- Create a GitHub Organization with at least two human owners and transfer the existing repository out of the developer's personal namespace.
+- Confirm the business can recover the critical account chain without relying solely on the developer.
+
 ### Starting point: approved static prototype — already complete
 
 - Owners have approved the current UI and intended workflows through the GitHub Pages prototype.
@@ -348,6 +398,13 @@ Use request/correlation IDs from form submission through email and audit records
 
 ## Launch checklist
 
+- [ ] `BUSINESS_RECOVERY_EMAIL` is independent from `YOUR_DOMAIN`, secured with 2FA, not published, and its recovery material is owner-controlled.
+- [ ] Bitwarden `Infrastructure` collection is accessible to the designated owner and developer through separate individual Bitwarden accounts.
+- [ ] The secondary owner knows where the sealed/offline recovery material is stored.
+- [ ] Domain/registrar billing and registrant details are owner/business controlled rather than developer-personal.
+- [ ] Cloudflare has business-controlled recovery plus individual administrator/member access; routine developer work does not require the break-glass login.
+- [ ] The repository is owned by the O Refúgio GitHub Organization with at least two human Organization Owners, including a real owner and the developer.
+- [ ] Resend is a business team with an owner-controlled recovery path and the developer added individually as an Admin.
 - [ ] Owner-approved copy, prices, rules, contacts, partners, and images.
 - [ ] Domain, DNS, TLS, canonical URLs, sitemap, robots, and production 404 verified.
 - [ ] Privacy, terms, cancellation, complaint, accessibility, and marketing wording approved.

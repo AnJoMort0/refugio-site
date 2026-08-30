@@ -29,13 +29,14 @@ Use these services unless a later business decision changes the architecture:
 
 | Purpose | Service | Account owner |
 | --- | --- | --- |
-| Domain, DNS, website, API, database, private files, admin perimeter | Cloudflare | O Refúgio owners |
-| Source code and deployment history | GitHub | O Refúgio organisation or owner-controlled account |
-| Transactional email sending | Resend | O Refúgio owners |
-| Passwords and recovery codes | A shared business password manager | O Refúgio owners |
-| Incoming mailbox | Existing mailbox through Cloudflare Email Routing, or a paid mailbox provider | O Refúgio owners |
+| Independent business recovery mailbox | Proton Mail Free | O Refúgio owners; kept independent from `YOUR_DOMAIN` |
+| Domain, DNS, website, API, database, private files, admin perimeter | Cloudflare | O Refúgio business account, with individual members |
+| Source code and deployment history | GitHub | O Refúgio GitHub Organization, with individual human owners/members |
+| Transactional email sending | Resend | O Refúgio team, with individual admins/members |
+| Shared infrastructure credentials | Bitwarden Free Organization initially | Designated owner + developer; upgrade if more live users are needed |
+| Incoming customer mail | Cloudflare Email Routing to an existing monitored mailbox, or a paid mailbox provider | O Refúgio owners |
 
-Cloudflare Workers, D1, R2, Access, Turnstile, and Resend have low-volume/free allowances, but prices and limits change. As of this review, Workers Free allows 100,000 Worker requests per day, the Zero Trust Free plan is intended for teams under 50 users, and Resend Free allows 3,000 emails per month with a 100-per-day limit. Check the provider's current pricing immediately before launch. The domain is the main unavoidable recurring purchase; a paid mailbox may also be needed if staff must manually send as `@YOUR_DOMAIN`.
+Cloudflare Workers, D1, R2, Access, Turnstile, Proton Mail, Bitwarden, and Resend all have useful free tiers for this small project, but prices and limits change. As of this review, Proton Mail Free provides one free mailbox and up to 1 GB of Mail storage after its starter actions; Bitwarden Free Organizations support secure sharing between two users; Workers Free allows 100,000 Worker requests per day; the Zero Trust Free plan is intended for teams under 50 users; and Resend Free allows 3,000 emails per month with a 100-per-day limit and currently up to three verified domains. Check provider pricing and limits again immediately before launch. The domain is the main unavoidable recurring purchase; a paid mailbox may also be needed later if staff must manually send as `@YOUR_DOMAIN`.
 
 ## 3. Words used in this guide
 
@@ -54,15 +55,23 @@ Cloudflare Workers, D1, R2, Access, Turnstile, and Resend have low-volume/free a
 
 ## 4. Create a deployment record
 
-Before opening accounts, create a private document in the business password manager. Call it `O Refúgio website deployment record` and add these empty fields:
+Before opening accounts, create a temporary deployment record **outside the project/repository**. At this moment the shared business password vault does not exist yet, so use either a paper sheet kept with the owners or an encrypted local note that is not inside the project folder and is not synchronized to a public/shared location. After Section 5 creates Bitwarden, move this record into the shared `Infrastructure` collection and securely destroy/delete the temporary copy. Call it `O Refúgio website deployment record` and add these empty fields:
 
 ```text
+Business recovery mailbox (record privately; never commit it):
+Primary owner responsible for recovery:
+Secondary owner holding offline recovery copy:
+Developer individual account/contact:
+Bitwarden Organization name:
+Bitwarden live members:
 Chosen domain:
 Domain registrar:
 Domain renewal date:
-Cloudflare account email:
-Cloudflare account ID:
-GitHub account/organisation:
+Cloudflare business account ID:
+Cloudflare break-glass/business login recorded in vault: yes/no
+Cloudflare individual Super Administrators:
+GitHub Organization:
+GitHub Organization owners:
 GitHub repository URL:
 Approved GitHub Pages prototype URL:
 Production Worker name:
@@ -75,7 +84,8 @@ Public website URL:
 Admin URL:
 Reservations sender address:
 Reservations receiving address:
-Resend account email:
+Resend team name:
+Resend team administrators:
 Turnstile production site key:
 Turnstile staging site key:
 Cloudflare Zero Trust team name:
@@ -86,19 +96,137 @@ Last backup test:
 Last restore test:
 ```
 
-Never put passwords, API keys, guest exports, or recovery codes in this repository.
+Never put passwords, API keys, guest exports, recovery codes, or the real business recovery-mailbox address in this repository.
 
-## 5. Secure the owner accounts
+## 5. Establish business ownership and recovery before creating infrastructure
 
-Do this before buying the domain because losing the registrar or Cloudflare account can mean losing control of the site.
+Do this before buying the domain or creating production service accounts. The goal is **not** that every owner learns GitHub, Cloudflare, DNS, or deployment work. The goal is that the family/business can recover and take control of every important digital asset even if the developer is unavailable.
 
-1. Decide which owner-controlled email address will own the infrastructure. Do not use a developer's personal address as the sole owner.
-2. Create or choose a business password manager.
-3. Generate a different long random password for Cloudflare, GitHub, Resend, and the registrar.
-4. Enable two-factor authentication on every account.
-5. Save recovery codes in the password manager and one separate owner-controlled backup location.
-6. Add at least one second owner as an account member where the provider supports it.
-7. Do not share one administrator password among all staff. Production users must have individual identities.
+Use three roles in the steps below:
+
+- **Primary owner:** one owner who is willing to hold emergency access and occasionally confirm account/security actions.
+- **Secondary owner:** another owner who holds an offline recovery copy in case both the developer and primary owner are unavailable.
+- **Developer:** the person who will do normal technical administration and deployment work using their own individual accounts.
+
+The developer may remain the day-to-day administrator indefinitely. That is compatible with owner control as long as the domain, billing, organizations, recovery mailbox, shared credentials, and emergency access remain business-controlled.
+
+### 5.1 Create the two individual Bitwarden accounts
+
+Use **Bitwarden Free** as the initial shared credential system. Bitwarden's free Organization supports two users, which fits the initial operating model: the primary owner plus the developer. Each person must have their **own** Bitwarden login. Do not make one shared Bitwarden user.
+
+1. The developer opens the official [Bitwarden](https://bitwarden.com/) website or official Bitwarden app.
+2. The developer creates or uses an individual Bitwarden account with an email address the developer personally controls.
+3. Choose a long, unique Bitwarden master password that is not used anywhere else. A master password must be memorable/recoverable but hard to guess.
+4. Verify the developer's Bitwarden email address.
+5. Enable Bitwarden two-step login with an authenticator app or another supported method.
+6. Save the developer's Bitwarden two-step-login recovery code in the developer's own secure emergency material, not in the Git repository.
+7. The primary owner repeats the same process using an email address that **the owner personally controls**.
+8. The primary owner chooses their own Bitwarden master password; the developer does not reuse or copy the developer's master password.
+9. Verify the owner's Bitwarden email and enable two-step login.
+10. Save the owner's Bitwarden recovery material in the owner-controlled physical emergency location.
+11. Test that both users can independently sign in to Bitwarden from their own device.
+
+### 5.2 Create the shared Bitwarden Free Organization
+
+Now create the business-owned shared area inside Bitwarden. Organization-owned items are separate from each person's private Bitwarden items.
+
+1. In Bitwarden Web Vault, the primary owner or developer selects **New organization**.
+2. Give it a clear business name related to the property. Record that organization name in the deployment record.
+3. Choose the **Free** organization plan.
+4. For the billing/contact email at this first moment, use the primary owner's controlled email. After the independent business recovery mailbox is created in Section 5.3, change the Organization billing/contact email to `BUSINESS_RECOVERY_EMAIL` if Bitwarden allows it in the current settings.
+5. Invite the other Bitwarden user.
+6. Complete Bitwarden's full **Invite > Accept > Confirm** process. Merely sending the invitation is not enough.
+7. Give both users the Organization **Owner** role so the developer is not the sole controller and the owner is not dependent on the developer.
+8. Create a collection named `Infrastructure`.
+9. Move the temporary `O Refúgio website deployment record` from Section 4 into a secure note inside this collection.
+10. Confirm both users can open that secure note.
+11. Securely destroy/delete the temporary paper/digital copy from Section 4 once the shared-vault copy is verified. If the temporary record was on paper and contains only non-secret placeholders, it may instead remain as part of the owner emergency folder.
+12. From now on, store shared break-glass/provider credentials and account-recovery notes in this collection.
+13. Do not use Bitwarden as a substitute for runtime secret stores: Worker/API secrets still belong in Cloudflare secrets or the relevant provider's secret facility, never in source code.
+
+The Free Organization is intentionally limited to two live users. If three or more family members later need direct live access to the shared vault, upgrade to a Bitwarden plan that supports them. **Do not work around the two-user limit by sharing a Bitwarden user's login.**
+
+Official reference: [Bitwarden Organizations Quick Start](https://bitwarden.com/help/getting-started-organizations/).
+
+### 5.3 Create the independent business recovery mailbox with Proton Mail Free
+
+Create **one new Proton Mail Free account specifically for infrastructure ownership, recovery, billing, security alerts, and provider verification**. Do not use a mailbox on `YOUR_DOMAIN` for this root recovery role: if the domain, DNS, registrar, or Cloudflare configuration ever fails, the recovery mailbox must still work independently.
+
+Proton Free is a **single account**, not a formal multi-user business mailbox. That is acceptable here only because this address is a quiet break-glass/recovery identity rather than the daily reservations inbox. Keep access limited to the primary owner and developer. If the family later wants several people to have separate named logins to the same business mailbox, move to a paid multi-user/shared-mailbox solution instead of expanding password sharing.
+
+Do **not** write the chosen address anywhere in this repository. In this guide, it is called `BUSINESS_RECOVERY_EMAIL`. Record the real address only in the private Bitwarden deployment record and the `Infrastructure` collection.
+
+1. Sit with the primary owner for this setup so both the owner and developer understand what the account is for.
+2. Open Proton Mail's official sign-up page or install the official Proton Mail mobile app from the phone's app store.
+3. Choose the **Free** plan. A paid Proton plan is not needed for this recovery mailbox.
+4. Choose a neutral, long-lived mailbox name connected to the property/business rather than to one person's name. Do not use examples from this guide as the actual address.
+5. In Bitwarden, create a new login item inside the `Infrastructure` collection for the business recovery mailbox.
+6. Use Bitwarden's password generator to create a long, unique password. Save it directly into that login item; do not reuse it for any other service.
+7. Create the Proton account using that password.
+8. Do not connect `YOUR_DOMAIN` to this Proton account. Proton custom-domain mail is a paid feature, and this particular mailbox is intentionally independent from the domain.
+9. Sign in and verify that the inbox works.
+10. Install the Proton Mail mobile app on the primary owner's phone. Because this is a single Proton account, do not install it on every family member's phone. For this project, the developer may also keep one authorized session/device because the developer is the long-term technical administrator; treat that as controlled break-glass access, not as a normal multi-user mailbox.
+11. Complete Proton's Free-plan starter actions if offered so the mailbox receives its full available free storage allowance.
+12. Send one test message to the new mailbox from an unrelated email account and confirm it arrives on the primary owner's phone and on the developer's authorized device/session if the developer keeps one.
+13. Update the Bitwarden deployment record with the real recovery-mailbox address and note which people/devices currently have authorized access.
+14. If Bitwarden's Organization settings permit a separate billing/contact email, change that field from the primary owner's email to `BUSINESS_RECOVERY_EMAIL`.
+
+Use this mailbox for:
+
+- registrar/domain ownership and recovery;
+- Cloudflare account recovery and important billing/security notices;
+- Resend team/account recovery;
+- GitHub organization billing/contact notices where GitHub allows a separate organization contact;
+- password-manager billing/contact information;
+- emergency provider support.
+
+Do **not** use it as the normal reservations/contact mailbox and do not publish it on the website.
+
+Official references: [Proton Free plans](https://proton.me/support/proton-plans), [Proton Mail support](https://proton.me/support/mail), and [custom domains](https://proton.me/support/custom-domain).
+
+### 5.4 Secure the recovery mailbox with two-factor authentication and offline recovery material
+
+The recovery mailbox is a high-value account because it can reset other services. Protect it before using it to register infrastructure.
+
+1. In Proton, open **Settings > All settings > Account and password**.
+2. Enable two-factor authentication. Proton supports authenticator-app 2FA on Free plans.
+3. Pair the primary owner's authenticator device.
+4. Add the developer's authenticator device as another supported 2FA device. Proton supports multiple 2FA devices. Do not photograph or permanently save the setup QR code.
+5. Proton will provide one-time 2FA recovery codes. Print or carefully write a copy and place it in a sealed envelope or other secure owner-controlled physical location.
+6. Create a second sealed/offline copy only if the family has a genuinely separate secure location. Do **not** make the Bitwarden vault the only home of the Proton 2FA recovery codes, because the Proton password is already stored in that vault.
+7. Tell the secondary owner where the emergency recovery material is kept. The secondary owner does not need to use Proton, GitHub, or Cloudflare routinely.
+8. In the Bitwarden deployment record, write only the **location/status** of the recovery codes, not necessarily the codes themselves.
+9. If the family later purchases physical FIDO2/security keys, Proton can register multiple keys. Keeping one with the primary owner and another in a separate emergency location is a stronger optional setup.
+10. Test a normal Proton sign-in from a private/incognito browser: enter the password and then complete 2FA. Do not consume a recovery code during the test.
+
+Official references: [Proton two-factor authentication](https://proton.me/support/two-factor-authentication-2fa) and [security keys](https://proton.me/support/2fa-security-key).
+
+### 5.5 Apply one ownership rule to every service from now on
+
+For every service in the rest of this guide, use this rule:
+
+1. The **business owns the resource**: domain, Cloudflare account, GitHub Organization, Resend team, production database, storage, billing, and recovery path.
+2. The **developer uses an individual account** for normal work whenever the provider supports members/teams/organizations.
+3. At least one actual owner has an independent recovery/owner path.
+4. A generic business/root login, when a provider requires or benefits from one, is a **break-glass account**, not the daily login.
+5. Never give employees or unrelated contractors the root/recovery mailbox password. Give them individual access with the minimum role they need.
+6. Use a different random password for every provider login that genuinely requires a password.
+7. Enable 2FA/MFA everywhere it is supported.
+8. Keep critical recovery codes in owner-controlled offline emergency material; the private deployment record should say where they are stored without exposing them in Git.
+9. Use a business/owner payment method for the domain and production services, not the developer's personal card as the permanent billing source.
+10. Record account IDs, organization/team names, owners/admins, renewal dates, and recovery status in the private deployment record.
+
+### 5.6 Perform a recovery test before continuing
+
+Before buying the domain, verify the ownership model works in practice:
+
+1. The primary owner opens Bitwarden on their own device and confirms they can see the `Infrastructure` collection and deployment record.
+2. The primary owner confirms they can sign in to the business recovery mailbox using their own 2FA device.
+3. The developer confirms the same from a separate device/browser.
+4. The secondary owner confirms they know where the sealed emergency recovery material is kept, without opening or photographing it.
+5. Confirm that no production account created later will depend solely on the developer's personal email, personal payment card, personal password vault, or personal GitHub namespace.
+
+Only after this test should you create the registrar/Cloudflare/GitHub/Resend production ownership structure.
 
 ## 6. Choose and buy the domain
 
@@ -115,18 +243,22 @@ Check that the same name is not impersonating another accommodation or registere
 
 ### 6.2 Buy through Cloudflare when supported
 
-1. Go to [Cloudflare](https://dash.cloudflare.com/sign-up) and create the owner-controlled account.
-2. Verify the account email.
-3. Add the business payment method.
-4. In the dashboard, open **Domain Registration > Register Domains**.
-5. Search for the exact domain without `https://` or `www`.
-6. Confirm the spelling and current renewal price, not only the first-year price.
-7. Select the registration period.
-8. Enter accurate registrant contact details using ordinary ASCII characters if the form requires it.
-9. Keep auto-renew enabled.
-10. Complete the purchase and save the invoice.
-11. Verify any registrant email sent after purchase.
-12. Record the domain and renewal date in the deployment record.
+1. Go to [Cloudflare](https://dash.cloudflare.com/sign-up) and create the business's Cloudflare login using `BUSINESS_RECOVERY_EMAIL`. Generate a unique password and store it in the Bitwarden `Infrastructure` collection. Treat this login as the break-glass/business identity, not the developer's normal daily login.
+2. Verify the account email through the business recovery mailbox.
+3. Enable Cloudflare two-factor authentication on this business login and save recovery material in the vault plus the owner-controlled offline recovery location.
+4. In **Account > Members**, invite the developer's individual Cloudflare account/email as a **Super Administrator**. If the developer does not yet have a personal Cloudflare login, accept the invitation using the developer's own individual email and create one.
+5. Invite at least one actual owner using their own individual email as another Super Administrator or otherwise ensure the primary owner can independently regain full account control.
+6. Log out of the business/root Cloudflare login, sign in with the developer's individual Cloudflare account, and confirm the O Refúgio Cloudflare account is visible. Use the developer's individual member login for normal administration from now on.
+7. Add the owners'/business payment method. Do not leave the developer's personal payment card as the permanent production billing method.
+8. In the dashboard, open **Domain Registration > Register Domains**.
+9. Search for the exact domain without `https://` or `www`.
+10. Confirm the spelling and current renewal price, not only the first-year price.
+11. Select the registration period.
+12. Enter accurate registrant contact details using ordinary ASCII characters if the form requires it. The registrant must be the appropriate owner/business party, not the developer personally.
+13. Keep auto-renew enabled.
+14. Complete the purchase and save the invoice in the owner-controlled business records.
+15. Verify any registrant email sent after purchase.
+16. Record the domain, registrant, renewal date, Cloudflare account ID, and current Super Administrators in the deployment record.
 
 Cloudflare domains already use Cloudflare nameservers. No separate DNS transfer is needed.
 
@@ -134,7 +266,7 @@ Cloudflare domains already use Cloudflare nameservers. No separate DNS transfer 
 
 For example, if the desired `.pt` option is not offered, use an accredited registrar shown by the `.PT` registry or another reputable registrar.
 
-1. Buy the domain in an owner-controlled registrar account.
+1. Create the registrar account with `BUSINESS_RECOVERY_EMAIL`, a unique password stored in Bitwarden, owner/business registrant details, business payment details, and 2FA. Buy the domain in that account. If the registrar supports individual members, invite the developer rather than using the root login every day.
 2. In Cloudflare, select **Add a domain** and enter only the root domain, for example `example.pt`.
 3. Choose the Cloudflare Free plan unless a paid feature is genuinely needed.
 4. Review the DNS records Cloudflare discovers. Do not delete existing email records without understanding them.
@@ -214,43 +346,99 @@ npm run dev
 
 Open the URL printed by the command. Keep this terminal open while testing. Press `Ctrl+C` to stop the server.
 
-## 8. Verify the existing GitHub repository and ownership
+## 8. Move the existing repository into a business-owned GitHub Organization
 
-Because the approved prototype is already hosted with GitHub Pages, there should already be a GitHub repository. **Do not create a second repository simply for this deployment.** First make sure the existing repository and account ownership are suitable for production development.
+The approved prototype already lives in a repository under the developer's personal GitHub account. Keep using the developer's personal GitHub identity for day-to-day development, but move the **repository ownership** into a GitHub Organization controlled by the family/business.
 
-### 8.1 Confirm ownership and repository safety
+Do **not** create a generic shared GitHub personal account for the property. GitHub personal accounts represent individual people, and GitHub requires each person who accesses an Organization to use their own personal account. The correct shared business container is a **GitHub Organization**. GitHub recommends at least two organization owners for continuity.
 
-1. Open the GitHub repository that currently publishes the approved GitHub Pages prototype.
-2. Confirm the repository is owned by an owner-controlled account or, preferably, an organisation controlled by the business. A developer's personal account must not be the sole long-term owner.
-3. Enable two-factor authentication for every account with write or administration access.
-4. Record the repository URL and the current GitHub Pages prototype URL in the deployment record.
-5. Review the repository and Git history for `.env`, `.dev.vars`, API keys, database exports, real guest data, attachments, or other secrets/private data before backend work begins.
-6. If the repository is public because it currently serves GitHub Pages, remember that **all committed code and history are public**. Never rely on repository privacy to protect secrets. Consider moving ongoing production development to an owner-controlled private repository if the chosen GitHub plan/workflow supports that, but do not break the approved Pages reference until the production replacement is ready.
-7. Demo passwords or seed credentials visible in the prototype must never become production credentials.
+### 8.1 Prepare the human GitHub accounts
 
-### 8.2 Confirm the local folder points to that repository
+1. The developer keeps their existing personal GitHub account. Do not convert or abandon it.
+2. Choose the primary owner from Section 5 to be the non-developer GitHub Organization owner.
+3. If that owner already has a GitHub personal account, use it.
+4. If they do not have one, sit with them and have **the owner create their own personal GitHub account**. You may guide the screens, but the account represents that individual; do not create a fake generic business person.
+5. The owner uses an email address they personally control and can recover. Do not use `BUSINESS_RECOVERY_EMAIL` as a shared human GitHub login.
+6. Enable two-factor authentication on both the owner's and developer's GitHub accounts.
+7. Save each person's GitHub recovery codes in that person's appropriate secure storage. The owner may also place an emergency copy with the family recovery material.
 
-From the project folder, run:
+Official references: [GitHub accounts in organizations](https://docs.github.com/en/organizations/managing-membership-in-your-organization/can-i-create-accounts-for-people-in-my-organization) and [organization ownership continuity](https://docs.github.com/en/organizations/managing-peoples-access-to-your-organization-with-roles/maintaining-ownership-continuity-for-your-organization).
+
+### 8.2 Create the O Refúgio GitHub Organization
+
+Do this while signed in as the primary owner's personal GitHub account if practical. If the developer creates it first for convenience, add/promote the owner to Organization Owner **before** transferring the repository.
+
+1. In GitHub, open the profile menu and choose **Your organizations**.
+2. Choose **New organization**.
+3. Select the GitHub Free organization plan unless a paid feature is actually needed.
+4. Choose an organization name connected to the property/business. Record the exact name in the private deployment record.
+5. If GitHub asks for organization contact/billing information, use business-controlled information and use `BUSINESS_RECOVERY_EMAIL` where an organization-level contact address is appropriate.
+6. Finish creating the Organization.
+7. Open the Organization's **People** page.
+8. Invite the developer's existing personal GitHub account.
+9. After the developer accepts, change the developer's Organization role to **Owner**.
+10. Confirm the primary owner is also an **Owner**.
+11. The Organization must now have at least two human owners: one owner/family member and the developer. A second family owner may also be added later, but do not create shared personal accounts to achieve this.
+12. In **Organization Settings > Member privileges**, keep destructive privileges conservative. In particular, avoid allowing ordinary members to delete or transfer repositories unless there is a specific need.
+
+### 8.3 Review the existing repository before transfer
+
+1. Open the repository that currently publishes the approved GitHub Pages prototype.
+2. Record its current URL and the GitHub Pages prototype URL in the private deployment record.
+3. Review the repository and Git history for `.env`, `.dev.vars`, API keys, database exports, real guest data, attachments, or other secrets/private data.
+4. If any real secret was ever committed, deleting the file from the latest commit is not enough. Rotate/revoke the exposed secret and clean the history appropriately before production use.
+5. Demo passwords or seed credentials visible in the prototype must never become production credentials.
+6. If the repository is public because of the existing Pages prototype, remember that every committed file and historical commit intended to remain public must be treated as public information. Production secrets will be stored in Cloudflare/other provider secret stores, never in Git.
+
+### 8.4 Transfer the existing repository to the Organization
+
+The developer must have admin access to the existing repository and sufficient permissions in the destination Organization.
+
+1. Sign in to the developer's personal GitHub account.
+2. Open the existing repository.
+3. Open **Settings** for that repository.
+4. Scroll to **Danger Zone**.
+5. Find **Transfer** / **Transfer ownership** and select it.
+6. Read GitHub's transfer warnings carefully, especially anything about GitHub Pages, packages, Actions, secrets, or features affected by the move.
+7. Choose the new O Refúgio Organization as the new owner.
+8. Keep the repository name unchanged unless there is a deliberate reason to rename it.
+9. Type the repository name when GitHub asks for confirmation.
+10. Confirm the transfer.
+11. Open the repository under the Organization and verify issues, branches, Actions, settings, Pages configuration, and collaborators are still present as expected.
+12. Open the existing GitHub Pages prototype URL and confirm the approved reference site still works. If Pages or its URL changed, update the private deployment record and any temporary reference links.
+13. From the local project folder, run:
+
+```powershell
+git remote -v
+git fetch origin
+git status
+```
+
+14. GitHub normally redirects the old repository URL after a transfer, but update the local `origin` to the Organization URL explicitly so there is no ambiguity:
+
+```powershell
+git remote set-url origin https://github.com/YOUR-ORGANIZATION/refugio-site.git
+git remote -v
+```
+
+15. Confirm `origin` now shows the Organization repository for fetch and push.
+16. Push a harmless documentation-only branch and confirm it appears under the Organization before starting production backend work.
+
+Official reference: [transferring a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/transferring-a-repository).
+
+### 8.5 Create the production-development branch
+
+From the project folder:
 
 ```powershell
 git status
-git remote -v
 git branch --show-current
-```
-
-Confirm `origin` is the expected owner-controlled repository before pushing anything. If it points somewhere unexpected, stop and verify ownership rather than replacing it blindly.
-
-Before beginning production changes, create a working branch and run the existing checks:
-
-```powershell
 git switch -c production/backend-foundation
 npm ci
 npm run check
 ```
 
-Commit reviewed changes normally. Before every commit, inspect `git status`. Never commit `.dev.vars`, `.env`, API keys, database exports, contact attachments, or real guest data.
-
-GitHub's [repository security guidance](https://docs.github.com/en/code-security/getting-started/securing-your-repository) is a useful companion when preparing the existing repository for production work.
+Before every commit, inspect `git status`. Never commit `.dev.vars`, `.env`, API keys, database exports, contact attachments, recovery codes, the real `BUSINESS_RECOVERY_EMAIL`, or real guest data.
 
 ## 9. Production implementation checkpoint
 
@@ -280,7 +468,7 @@ The target tables and API routes are listed in [`deployment.md`](./deployment.md
 
 Only do this when the Worker/API code and migrations exist. The approved GitHub Pages prototype does not need its own Cloudflare Worker; these resources are for the new staging and production system.
 
-### 10.1 Log Wrangler into the owner-controlled Cloudflare account
+### 10.1 Log Wrangler in with the developer's individual Cloudflare member account
 
 From the project folder, run:
 
@@ -289,7 +477,7 @@ npx wrangler login
 npx wrangler --version
 ```
 
-A browser opens. Sign in to the owner-controlled Cloudflare account and approve Wrangler. Return to PowerShell and confirm the Wrangler version prints successfully. Do this before creating staging or production resources.
+A browser opens. Sign in with the developer's **individual Cloudflare member account** that was invited to the O Refúgio Cloudflare account in Section 6, then approve Wrangler. Do not use the shared/break-glass business login for routine CLI work. Return to PowerShell and confirm the Wrangler version prints successfully. Do this before creating staging or production resources.
 
 ### 10.2 Choose data location, then create D1 databases
 
@@ -396,7 +584,7 @@ Incoming mail and transactional sending are different services.
 
 ### 12.1 Receive replies
 
-The cheapest setup can route addresses such as `reservas@YOUR_DOMAIN` and `contacto@YOUR_DOMAIN` to an existing owner mailbox.
+The cheapest setup can route addresses such as `reservas@YOUR_DOMAIN` and `contacto@YOUR_DOMAIN` to an existing mailbox that the owners actually monitor. Do not automatically route customer correspondence into `BUSINESS_RECOVERY_EMAIL`; keep the root recovery mailbox quiet and reserved for infrastructure/recovery unless there is a specific temporary reason.
 
 1. In Cloudflare, go to **Email > Email Routing**.
 2. Add the real destination mailbox.
@@ -408,26 +596,28 @@ Cloudflare Email Routing is forwarding, not a normal outbound mailbox. Replying 
 
 ### 12.2 Send transactional messages with Resend
 
-1. Create the owner-controlled Resend account.
-2. Add a sending subdomain such as `updates.YOUR_DOMAIN`; isolating transactional sending protects the main domain's reputation.
-3. Resend shows DNS records for SPF and DKIM.
-4. Add those records in Cloudflare DNS exactly as shown.
-5. Wait for Resend to mark the domain verified.
-6. SPF and DKIM are required for Resend verification. Add DMARC separately with a cautious initial policy such as `p=none`, review reports and all legitimate senders, then tighten it only when safe.
-7. Create a production API key and a separate staging key. On a free Resend plan, do not assume you can verify unlimited separate staging/production sending domains; if necessary, use the same verified sending subdomain with separate keys plus a strict staging recipient allow-list.
-8. Put each key into the matching Worker as a secret:
+1. Create the business Resend account/team using `BUSINESS_RECOVERY_EMAIL`, a unique password, and the business recovery details. Do not use Google/GitHub social login for the root business identity; use Resend's email/password sign-up so recovery does not depend on another provider account.
+2. In **Team Settings**, give the team a clear business name and invite the developer's individual Resend account/email as an **Admin**. Resend teams support individual Admin/Member roles; use the developer's individual login for normal work after the invitation is accepted. Keep at least one owner-controlled admin/recovery path.
+3. Record the Resend team name and administrators in the private deployment record.
+4. Add a sending subdomain such as `updates.YOUR_DOMAIN`; isolating transactional sending protects the main domain's reputation.
+5. Resend shows DNS records for SPF and DKIM.
+6. Add those records in Cloudflare DNS exactly as shown.
+7. Wait for Resend to mark the domain verified.
+8. SPF and DKIM are required for Resend verification. Add DMARC separately with a cautious initial policy such as `p=none`, review reports and all legitimate senders, then tighten it only when safe.
+9. Create a production API key and a separate staging key. As of 2026-08-30, Resend Free allows up to three verified domains, so a separate staging sending domain/subdomain is now practical if desired; still keep a strict staging recipient allow-list so tests can never mail real guests accidentally.
+10. Put each key into the matching Worker as a secret:
 
 ```powershell
 npx wrangler secret put RESEND_API_KEY --env staging
 npx wrangler secret put RESEND_API_KEY --env production
 ```
 
-9. Never paste the key into JavaScript, JSON, `wrangler.toml`, GitHub, or screenshots.
-10. Configure a real reply-to address that owners monitor. If `updates.YOUR_DOMAIN` is the verified Resend domain, use a From address on that verified subdomain (for example `bookings@updates.YOUR_DOMAIN`) and set `Reply-To: reservas@YOUR_DOMAIN` if replies should enter the routed owner mailbox.
-11. Test acknowledgement, payment instructions, confirmation, pre-arrival, checkout, and feedback messages in every supported language.
-12. Store provider message IDs and delivery results, but avoid retaining unnecessary full message bodies forever.
+11. Never paste the key into JavaScript, JSON, `wrangler.toml`, GitHub, or screenshots.
+12. Configure a real reply-to address that owners monitor. If `updates.YOUR_DOMAIN` is the verified Resend domain, use a From address on that verified subdomain (for example `bookings@updates.YOUR_DOMAIN`) and set `Reply-To: reservas@YOUR_DOMAIN` if replies should enter the routed owner mailbox.
+13. Test acknowledgement, payment instructions, confirmation, pre-arrival, checkout, and feedback messages in every supported language.
+14. Store provider message IDs and delivery results, but avoid retaining unnecessary full message bodies forever.
 
-Resend's official guides cover [domain verification](https://resend.com/docs/dashboard/domains/introduction) and [sending email](https://resend.com/docs/api-reference/emails/send-email). Cloudflare's [secrets documentation](https://developers.cloudflare.com/workers/configuration/secrets/) explains encrypted Worker secrets.
+Resend's official guides cover [team management](https://resend.com/docs/dashboard/settings/team), [domain verification](https://resend.com/docs/dashboard/domains/introduction), and [sending email](https://resend.com/docs/api-reference/emails/send-email). Cloudflare's [secrets documentation](https://developers.cloudflare.com/workers/configuration/secrets/) explains encrypted Worker secrets.
 
 ## 13. Add Turnstile to public forms
 
