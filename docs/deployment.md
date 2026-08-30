@@ -1,6 +1,6 @@
 # Production Migration and Deployment
 
-Last reviewed: 2026-08-26
+Last reviewed: 2026-08-30
 
 ## Purpose
 
@@ -13,7 +13,7 @@ This document describes the lowest-cost practical route to a real website while 
 | Need | Recommended service | Why |
 | --- | --- | --- |
 | Static pages and API | Cloudflare Workers with Static Assets | One deployment for `public/` plus API routes; edge caching; custom 404 support |
-| Relational business data | Cloudflare D1 | Reservations, guests, prices, services, consent, staff, expenses, work, and audit need transactions and relationships |
+| Relational business data | Cloudflare D1 | Reservations, guests, prices, services, consent, staff, expenses, work, and audit need relational constraints plus atomic writes |
 | Admin perimeter | Cloudflare Access | Individual identities can protect `/admin.html` and `/api/admin/*` before application role checks |
 | Public-form protection | Cloudflare Turnstile | Server-validated bot protection without a traditional CAPTCHA |
 | Transactional email | Resend | Simple API for booking/contact confirmations and operational messages |
@@ -28,16 +28,17 @@ Official references:
 - [Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/)
 - [D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/) and [limits](https://developers.cloudflare.com/d1/platform/limits/)
 - [D1 Time Travel](https://developers.cloudflare.com/d1/reference/time-travel/)
-- [R2 pricing](https://developers.cloudflare.com/r2/pricing/)
+- [D1 data location](https://developers.cloudflare.com/d1/configuration/data-location/) and [Workers Binding API](https://developers.cloudflare.com/d1/worker-api/d1-database/)
+- [R2 pricing](https://developers.cloudflare.com/r2/pricing/), [data location](https://developers.cloudflare.com/r2/reference/data-location/), and [presigned URLs](https://developers.cloudflare.com/r2/api/s3/presigned-urls/)
 - [Turnstile setup](https://developers.cloudflare.com/turnstile/get-started/)
-- [Cloudflare Access applications](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/choose-application-type/)
-- [Resend pricing](https://resend.com/docs/knowledge-base/what-is-resend-pricing)
+- [Cloudflare Access applications](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/choose-application-type/), [JWT validation](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/), and [independent MFA](https://developers.cloudflare.com/cloudflare-one/access-controls/access-settings/independent-mfa/)
+- [Resend pricing](https://resend.com/pricing) and [domain verification](https://resend.com/docs/dashboard/domains/introduction)
 - [Leaflet quick start](https://leafletjs.com/examples/quick-start/)
 - [OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
 
-The prototype uses the public OpenStreetMap raster tile endpoint for ordinary interactive viewing with visible attribution. It is a best-effort community service with no SLA. Before launch, keep the tile URL configurable and review traffic expectations; switch `SITE_CONFIG.map.tileUrl` to a production tile provider if usage or reliability requirements exceed the public service policy.
+The prototype may use the public OpenStreetMap raster tile endpoint for ordinary, human-driven interactive viewing. If it does, use the current HTTPS endpoint (`https://tile.openstreetmap.org/{z}/{x}/{y}.png`), keep visible OpenStreetMap attribution, allow the browser to send a normal `Referer`, respect HTTP cache headers, and do not implement bulk prefetching or offline tile downloads. The service is best-effort with no SLA and can block non-compliant use. Keep the tile URL configurable and switch `SITE_CONFIG.map.tileUrl` to a production OSM-compatible tile provider if traffic, reliability, offline use, or support requirements exceed the public service policy.
 
-At the prototype's expected traffic, Cloudflare's free allowances and Resend's free transactional tier may cover normal operation. As of this review, Workers Free includes 100,000 requests per day, R2 includes a 10 GB-month Standard Storage allowance, and Resend Free includes 3,000 transactional emails per month with a 100-per-day limit. Verify current pricing before launch. The custom domain remains the main unavoidable recurring cost; Workers Paid currently starts at a $5 monthly minimum if the free tier is outgrown.
+At the prototype's expected traffic, the free tiers may cover normal operation. As of 2026-08-30, Workers Free allows 100,000 Worker requests per day; D1 Free includes 5 million rows read and 100,000 rows written per day, with a 500 MB maximum per database; R2 Standard includes 10 GB-month of storage plus monthly operation allowances; Cloudflare Zero Trust Free is intended for teams under 50 users; and Resend Free includes 3,000 emails per month with a 100-per-day limit. Workers Paid currently starts at a $5 USD monthly minimum. Verify provider pricing and limits again immediately before launch, and do not design the system so exceeding a free limit silently loses bookings.
 
 ## Target architecture
 
@@ -109,7 +110,7 @@ The production admin needs a private Marketing area populated automatically from
 - `marketing_unsubscribe_tokens`: hashed single-purpose token, expiry/use timestamp.
 - `marketing_deliveries`: campaign, recipient, provider result, unsubscribe event, bounce/complaint state.
 
-On every booking/contact submission, update these tables transactionally. Never infer consent from a reservation or pre-tick the option. Deduplicate by a normalised email while preserving the consent history. A withdrawal or provider suppression must override later list generation until fresh valid consent is recorded.
+On every booking/contact submission, update these records atomically using a single SQL statement where practical or a D1 `batch()` when multiple independent statements must succeed or fail together. D1 runs in auto-commit mode; do not design this as an application-controlled `BEGIN`/`COMMIT` read-then-write transaction. Never infer consent from a reservation or pre-tick the option. Deduplicate by a normalised email while preserving the consent history. A withdrawal or provider suppression must override later list generation until fresh valid consent is recorded.
 
 The admin should provide language filters, counts, CSV export where appropriate, and a server-side send action. A BCC copy button may remain as a manual fallback, but production campaigns should normally send individual messages or use a provider marketing feature so each recipient receives an unsubscribe link and no addresses leak.
 
@@ -156,7 +157,7 @@ Every write checks the authenticated identity and application permission server-
 2. Validate the Access JWT in the Worker, not only at the page boundary.
 3. Match the verified email/subject to an active D1 `users` record.
 4. Apply owner, employee, and dev permissions in every endpoint.
-5. Require stronger authentication for owner/dev accounts if the chosen identity provider supports it.
+5. Require MFA for owner/dev accounts. Cloudflare Access can now enforce independent MFA (TOTP, WebAuthn security keys, or device biometrics) even when the primary login method is email OTP.
 6. Record the verified actor on every business-changing audit event.
 7. Support immediate account deactivation without a code deployment.
 
@@ -166,22 +167,22 @@ The seven prototype names may become initial records, but demo password hashes a
 
 Use half-open reservation ranges: `[check_in, check_out)`. This permits checkout and another check-in on the same date while rejecting overlapping occupied nights.
 
-Create or confirm reservations in a D1 transaction that rechecks conflicts. Do not trust an availability result fetched earlier by the browser.
+Create or confirm reservations with a database-enforced atomic write that rechecks conflicts at write time. Prefer one conditional `INSERT ... SELECT ... WHERE NOT EXISTS (...)`, an equivalent constraint-backed statement, or a carefully designed D1 `batch()`; do not perform a JavaScript `SELECT` followed later by an unconditional `INSERT`. Do not trust an availability result fetched earlier by the browser.
 
 For website requests awaiting transfer:
 
 1. Set `payment_deadline_at` to 48 hours after acceptance.
 2. Keep the dates held while the request is valid.
-3. A scheduled Worker marks overdue unpaid records cancelled with reason `payment_deadline_expired`.
-4. Release the dates in the same transaction.
-5. Record an audit event and optionally send a cancellation notice.
-6. A payment webhook or owner action clears the deadline and confirms payment.
+3. A scheduled Worker identifies overdue candidates and performs a conditional write such as `UPDATE ... WHERE status = 'awaiting_payment' AND payment_deadline_at <= ? AND paid_at IS NULL`.
+4. Treat the dates as released only when that conditional write actually changes the record. If availability is derived from active reservation status, no separate “release” row is needed.
+5. Keep the cancellation and audit change atomic where possible (for example with a database trigger, or a `batch()` of statements designed to roll back together). Send cancellation email only after the database write succeeds.
+6. A payment webhook or owner action must also use conditional/idempotent writes so it cannot race an expiry into an inconsistent state.
 
 The current admin-load expiry is demonstration behaviour only.
 
 ## Email delivery
 
-Configure a sending subdomain and complete SPF, DKIM, and DMARC before using real guests. Store API keys as Worker secrets.
+Configure a Resend sending subdomain. SPF and DKIM are required for domain verification; add DMARC as a separate deliverability/security policy, beginning cautiously (for example `p=none`) until all legitimate senders are confirmed. Store API keys as Worker secrets.
 
 Transactional flow:
 
@@ -197,10 +198,12 @@ Marketing messages need clear sender identity, consent basis, unsubscribe, suppr
 
 ## Attachments and private files
 
-- Upload contact attachments directly to a private R2 bucket using short-lived authorised upload URLs or through a size-limited Worker endpoint.
-- Store only object keys and metadata in D1.
-- Scan or restrict file types and sizes; never trust extensions.
-- Serve files only after admin authorisation through short-lived signed responses.
+- Keep R2 buckets private; do not enable a public `r2.dev` URL for sensitive files.
+- Upload contact attachments either through a size-limited Worker endpoint or with short-lived R2 S3 presigned `PUT` URLs generated server-side. Browser use of presigned URLs requires an R2 CORS policy limited to the expected origin and methods.
+- Treat every presigned URL as a bearer token. Use short expiries and random object keys; presigned URLs use the R2 S3 API hostname and do not work on R2 custom domains.
+- Store only object keys and necessary metadata in D1.
+- Validate MIME type, magic bytes where practical, and size; never trust filename extensions. Add malware scanning if the risk and file types justify it.
+- For downloads, authorise the admin first, then either stream the object through the Worker or issue a short-lived presigned `GET` URL.
 - Apply documented retention/deletion periods.
 - Do not place identity documents, receipts, or attachments under `public/`.
 
@@ -214,20 +217,28 @@ Keep a generic no-token QR page useful for non-personal property information.
 
 ## Static deployment configuration
 
-`wrangler.toml` uses the `public/` directory as Worker static assets and `not_found_handling = "404-page"`. Once API code exists, add a Worker entry point and route `/api/*` through it while static files continue to be served as assets.
+`wrangler.toml` uses the `public/` directory as Worker static assets and `not_found_handling = "404-page"`. Once API code exists, add a Worker entry point. For explicit API-first routing, give the assets a binding and set `run_worker_first = ["/api/*"]`; the Worker can then handle `/api/*` while other requests continue to use static assets. Do not advance `compatibility_date` merely because the calendar moved: update it deliberately and test the resulting runtime changes.
 
-Typical initial commands:
+Before creating D1 or R2, make the data-residency decision. If the legal/privacy decision is to guarantee EU storage/processing for these resources, create them with `--jurisdiction eu`; jurisdiction cannot be added or changed later. A location such as `weur` is only a best-effort placement hint, not a residency guarantee. D1/R2 jurisdiction does not by itself make the entire application EU-only: separately review where Worker request processing, logs, Access identity data, email delivery, analytics, and any other providers process data.
+
+Typical initial commands after the database/file code exists, **if the chosen policy is the Western Europe location hint**:
 
 ```powershell
 npx wrangler login
-npx wrangler d1 create refugio-production
-npx wrangler r2 bucket create refugio-private-files
-npx wrangler secret put RESEND_API_KEY
-npx wrangler secret put TURNSTILE_SECRET_KEY
-npx wrangler deploy
+npx wrangler --version
+npx wrangler d1 create refugio-staging --location weur
+npx wrangler d1 create refugio-production --location weur
+npx wrangler r2 bucket create refugio-staging-private --location weur
+npx wrangler r2 bucket create refugio-production-private --location weur
+npx wrangler secret put RESEND_API_KEY --env staging
+npx wrangler secret put RESEND_API_KEY --env production
+npx wrangler secret put TURNSTILE_SECRET_KEY --env staging
+npx wrangler secret put TURNSTILE_SECRET_KEY --env production
 ```
 
-Store binding IDs in environment-specific Wrangler configuration. Use separate preview and production databases/buckets. Never commit `.dev.vars`, API keys, Access secrets, or production exports.
+If EU jurisdiction is required, replace the four resource-creation commands above with the corresponding `--jurisdiction eu` commands and include `jurisdiction = "eu"` on each R2 Worker binding.
+
+Store binding IDs in environment-specific Wrangler configuration. D1/R2 bindings and `vars` are non-inheritable Wrangler environment keys, so declare them explicitly under every named environment. Use separate staging and production databases/buckets. Never commit `.dev.vars`, API keys, Access credentials, or production exports.
 
 ## Admin PWA
 
@@ -249,7 +260,7 @@ Production requirements:
 6. Test install, launch, update, offline shell, logout/session expiry, and uninstall on at least one Android/Chromium device and one current iPhone/iPad before launch.
 7. If the admin later moves to `/admin/` or a dedicated admin subdomain, move the manifest and service worker with it and reduce their scope accordingly.
 
-The manifest follows the current [W3C Web Application Manifest specification](https://www.w3.org/TR/appmanifest/). Browser-specific installation behavior and icon handling should be rechecked against current platform documentation during production acceptance.
+The manifest follows the current [W3C Web Application Manifest specification](https://www.w3.org/TR/appmanifest/) (a W3C Working Draft as of this review). Browser-specific installation behavior and icon handling should be rechecked against current platform documentation during production acceptance.
 
 ## Environments
 
@@ -262,7 +273,7 @@ Do not point preview deployments at production data.
 ## Backups, audit, and portability
 
 - Use timestamped D1 migrations committed to the repository.
-- Use D1 Time Travel for short-window recovery, while recognising that it is not the only backup strategy.
+- Use D1 Time Travel for short-window recovery. As of this review the recovery window is 7 days on Workers Free and 30 days on Workers Paid; it is not a substitute for longer-retention exports.
 - Export encrypted periodic snapshots to a separate controlled location and test restoration.
 - Export stable IDs, relationships, timestamps, and historical records in documented formats.
 - Keep audit writes server-side and concise; normal users should not edit/delete audit events.
@@ -330,6 +341,7 @@ Use request/correlation IDs from form submission through email and audit records
 - [ ] Transactional and marketing email authentication/delivery/unsubscribe tested.
 - [ ] Marketing consent appears privately and withdrawal suppresses future sends.
 - [ ] Guest tokens are unguessable, minimal, expiring, and revocable.
+- [ ] D1/R2 location or jurisdiction was chosen deliberately before resource creation, and any EU-residency requirement is documented.
 - [ ] Backups can be restored into a clean preview environment.
 - [ ] Mobile and desktop workflows tested with production configuration.
 - [ ] Real-data seed/export files and secrets are absent from the public bundle and Git history.

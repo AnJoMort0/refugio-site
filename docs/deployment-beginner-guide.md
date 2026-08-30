@@ -35,7 +35,7 @@ Use these services unless a later business decision changes the architecture:
 | Passwords and recovery codes | A shared business password manager | O Refúgio owners |
 | Incoming mailbox | Existing mailbox through Cloudflare Email Routing, or a paid mailbox provider | O Refúgio owners |
 
-Cloudflare Workers, D1, R2, Access, Turnstile, and Resend have low-volume/free allowances, but prices and limits change. Check the provider's current pricing immediately before launch. The domain is the unavoidable recurring purchase.
+Cloudflare Workers, D1, R2, Access, Turnstile, and Resend have low-volume/free allowances, but prices and limits change. As of this review, Workers Free allows 100,000 Worker requests per day, the Zero Trust Free plan is intended for teams under 50 users, and Resend Free allows 3,000 emails per month with a 100-per-day limit. Check the provider's current pricing immediately before launch. The domain is the main unavoidable recurring purchase; a paid mailbox may also be needed if staff must manually send as `@YOUR_DOMAIN`.
 
 ## 3. Words used in this guide
 
@@ -77,6 +77,10 @@ Reservations receiving address:
 Resend account email:
 Turnstile production site key:
 Turnstile staging site key:
+Cloudflare Zero Trust team name:
+Access application AUD tag:
+D1/R2 data-location decision (automatic, weur hint, or EU jurisdiction):
+Wrangler version last tested:
 Last backup test:
 Last restore test:
 ```
@@ -164,7 +168,7 @@ If `winget` is unavailable, use the installer from [Git for Windows](https://git
 
 ### 7.2 Install Node.js
 
-1. Download the current **LTS** release from [nodejs.org](https://nodejs.org/en/download).
+1. Download the current **LTS** release from [nodejs.org](https://nodejs.org/en/download). As of 2026-08-30, Node.js 24 is LTS; Node.js 20 is already end-of-life.
 2. Run the installer with its normal recommended options.
 3. Close and reopen PowerShell.
 4. Confirm both Node and npm:
@@ -174,7 +178,7 @@ node --version
 npm --version
 ```
 
-Use an LTS version supported by the current Wrangler release. Do not download Node from an advertisement or unofficial mirror.
+Use an LTS version supported by the current Wrangler release. Cloudflare currently supports Wrangler on Node.js versions that are in Node's Current, Active LTS, or Maintenance LTS lifecycle. Do not download Node from an advertisement or unofficial mirror.
 
 ### 7.3 Open the project
 
@@ -184,17 +188,22 @@ Navigate to the project folder. Quotes are important because paths may contain s
 cd "E:\André\Outros\refugio-site"
 ```
 
-Install the project's development dependencies:
+Install the project's development dependencies. If the repository contains `package-lock.json`, prefer the reproducible install:
 
 ```powershell
-npm install
+npm ci
 ```
 
-Run the checks:
+If there is no lockfile yet, use `npm install` once and commit the resulting lockfile after review.
+
+Confirm that the project uses a locally pinned Wrangler version (Cloudflare's recommended setup), then run the checks:
 
 ```powershell
+npx wrangler --version
 npm run check
 ```
+
+If Wrangler is not listed in the project's development dependencies, add the current Wrangler v4 release with `npm install -D wrangler@latest`, rerun the checks, and commit the `package.json`/lockfile change.
 
 Start the local site:
 
@@ -272,7 +281,7 @@ directory = "./public"
 not_found_handling = "404-page"
 ```
 
-For a private review copy, change the Worker name only if that name is already taken in the Cloudflare account.
+For a private review copy, change the Worker name only if that name is already taken in the Cloudflare account. Do **not** change `compatibility_date` just because it looks old. Compatibility dates intentionally opt into runtime behavior changes; advance the date only as a reviewed code change and retest the site.
 
 ### 9.3 Deploy
 
@@ -311,7 +320,7 @@ Do not continue to production launch until all of these are implemented and revi
 - `admin-store.js` uses authenticated API requests instead of `localStorage`;
 - the demo seed and demo passwords are excluded from the production bundle;
 - owner, employee, and dev permissions are checked by the server on every admin action;
-- availability uses half-open stays `[check-in, check-out)` and rechecks conflicts in a database transaction;
+- availability uses half-open stays `[check-in, check-out)` and performs a database-enforced atomic conflict check/write (not a browser or JavaScript `SELECT` followed by an unconditional insert);
 - email is sent only after the request is stored;
 - contact attachments use private R2 objects and authorised downloads;
 - guest-stay pages use expiring, revocable, unguessable tokens;
@@ -325,14 +334,25 @@ The target tables and API routes are listed in [`deployment.md`](./deployment.md
 
 Only do this when the Worker/API code and migrations exist.
 
-### 11.1 Create D1 databases
+### 11.1 Choose data location, then create D1 databases
+
+Make this decision **before** creating D1 or R2. A location hint such as Western Europe is best-effort placement. An EU jurisdiction is a data-residency restriction and cannot be added or changed after the resource is created. EU jurisdiction may be useful if the business/legal review wants D1/R2 data guaranteed to stay within the EU, but GDPR does not automatically mean every system must use EU-only storage. This setting covers those resources only; separately review Worker request processing/logs, Cloudflare Access, email, analytics, and any other providers.
+
+If the decision is a Western Europe location hint:
 
 ```powershell
-npx wrangler d1 create refugio-staging
+npx wrangler d1 create refugio-staging --location weur
 npx wrangler d1 create refugio-production --location weur
 ```
 
-Save each database ID. Add the returned bindings to the correct Wrangler environments. Never point staging at the production database.
+If the decision is an EU jurisdiction instead:
+
+```powershell
+npx wrangler d1 create refugio-staging --jurisdiction eu
+npx wrangler d1 create refugio-production --jurisdiction eu
+```
+
+Use the same policy for staging and production unless there is a documented reason not to. Save each database ID. Add the returned bindings to the correct Wrangler environments. Never point staging at the production database.
 
 Create migrations in source control:
 
@@ -355,16 +375,25 @@ Always apply and test on staging first. Cloudflare's [D1 getting-started guide](
 
 ### 11.2 Create private R2 buckets
 
+If you chose a Western Europe location hint:
+
 ```powershell
-npx wrangler r2 bucket create refugio-staging-private
-npx wrangler r2 bucket create refugio-production-private
+npx wrangler r2 bucket create refugio-staging-private --location weur
+npx wrangler r2 bucket create refugio-production-private --location weur
 ```
 
-Add separate R2 bindings for staging and production. Keep both buckets private. A browser must never receive a permanent public R2 URL for an attachment or identity document. See the official [R2 CLI guide](https://developers.cloudflare.com/r2/get-started/cli/).
+If you chose EU jurisdiction:
+
+```powershell
+npx wrangler r2 bucket create refugio-staging-private --jurisdiction eu
+npx wrangler r2 bucket create refugio-production-private --jurisdiction eu
+```
+
+Add separate R2 bindings for staging and production, including `jurisdiction = "eu"` in the Wrangler R2 binding when using an EU-jurisdiction bucket. Keep both buckets private and leave the public `r2.dev` URL disabled for sensitive content. Direct browser uploads may use short-lived S3 presigned `PUT` URLs, but those require an R2 CORS policy for the exact site origin and must be treated as bearer tokens. A browser must never receive a permanent public URL for an attachment or identity document. See the official [R2 CLI guide](https://developers.cloudflare.com/r2/get-started/cli/), [data-location guide](https://developers.cloudflare.com/r2/reference/data-location/), and [presigned-URL guide](https://developers.cloudflare.com/r2/api/s3/presigned-urls/).
 
 ### 11.3 Configure environments
 
-Use at least `staging` and `production` Wrangler environments. Each needs its own:
+Use at least `staging` and `production` Wrangler environments. Wrangler bindings and `vars` are **non-inheritable**, so do not define a D1/R2 binding only at the top level and assume named environments will receive it. Each environment needs its own:
 
 - Worker name;
 - D1 binding;
@@ -387,19 +416,19 @@ Use fake guests and a recipient allow-list in staging.
 
 ## 12. Protect the admin with Cloudflare Access
 
-For the simplest owner experience, use email one-time PIN login initially. Each person still has an individual email identity.
+For the simplest bootstrap, email one-time PIN can be used as the primary Cloudflare Access login. New Zero Trust organisations no longer add OTP automatically, so enable it explicitly if you choose it. For production admin access, also require Cloudflare Access independent MFA (TOTP, a WebAuthn security key, or device biometrics), especially for owner/dev accounts. Each person must still have an individual identity.
 
 1. In Cloudflare, open **Zero Trust** and create the organisation/team name if prompted.
 2. Go to **Settings > Authentication > Login methods**.
 3. Enable **One-time PIN**, or connect the business identity provider if one exists.
 4. Go to **Access controls > Applications**.
-5. Create a **Self-hosted** public-hostname application.
-6. Protect the final admin hostname, preferably `gestao.YOUR_DOMAIN`, and the admin API hostname/path.
-7. Create an **Allow** policy containing the exact email address of Jorge, Paula, Bárbara, Marlene, André, Dulce, and Fábio.
-8. Do not use a rule that allows every email address.
-9. Set an appropriate session duration.
-10. Test an allowed owner, an allowed employee, and a completely unlisted email.
-11. The Worker must validate the Access identity/JWT and map the verified identity to an active D1 user before returning admin data.
+5. Create a **Self-hosted** application. For the least migration work, initially protect the existing admin path and admin API paths on the same site origin, such as `YOUR_DOMAIN/admin.html` and `YOUR_DOMAIN/api/admin/*`. If you instead move the PWA to `gestao.YOUR_DOMAIN`, move its manifest, service worker, icons, and admin API to that origin together and retest service-worker scope.
+6. Create an **Allow** policy containing only the exact approved individual email addresses. Do not use a rule that allows every address or an entire public email domain.
+7. In the application configuration, open **Authentication > MFA**, choose **Custom MFA settings** (or deliberately inherit an organisation-wide MFA requirement), and select the allowed authenticator methods. A policy can override the application setting, so review the final Allow policy too.
+8. Set an appropriate Access session duration and MFA authentication duration.
+9. Test an allowed owner, an allowed employee, and a completely unlisted email.
+10. Copy the Access application's **AUD tag** into the private deployment record/configuration.
+11. The Worker must validate the `Cf-Access-Jwt-Assertion` header against Cloudflare's signing keys and the expected AUD, then map the verified identity to an active D1 user before returning admin data. Do not trust the browser cookie by itself.
 12. Test deactivating a user without deploying new code.
 
 Cloudflare documents [one-time PIN login](https://developers.cloudflare.com/cloudflare-one/integrations/identity-providers/one-time-pin/) and [Access applications](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/). Access is the outer gate; D1 role checks remain mandatory inside the API.
@@ -416,9 +445,9 @@ The cheapest setup can route addresses such as `reservas@YOUR_DOMAIN` and `conta
 2. Add the real destination mailbox.
 3. Open the verification email at that destination and approve it.
 4. Create routing addresses for reservations and contact.
-5. Send a test from an unrelated email account and reply to it.
+5. Send a test from an unrelated email account to each routed address and confirm it arrives at the destination mailbox.
 
-Use a paid mailbox provider instead if the business needs a full shared inbox, calendar, mailbox storage, or multiple staff sending manually as the domain.
+Cloudflare Email Routing is forwarding, not a normal outbound mailbox. Replying from the destination mailbox will normally send **from that destination address**, not automatically from `reservas@YOUR_DOMAIN`. Use a mailbox/SMTP provider (or a correctly configured “send as” feature backed by an SMTP service) if staff need to write manual replies from the custom-domain address, need a shared inbox/calendar, or need mailbox storage.
 
 ### 13.2 Send transactional messages with Resend
 
@@ -427,8 +456,8 @@ Use a paid mailbox provider instead if the business needs a full shared inbox, c
 3. Resend shows DNS records for SPF and DKIM.
 4. Add those records in Cloudflare DNS exactly as shown.
 5. Wait for Resend to mark the domain verified.
-6. Add DMARC with a cautious policy and review reports before tightening it.
-7. Create a production API key and a separate staging key.
+6. SPF and DKIM are required for Resend verification. Add DMARC separately with a cautious initial policy such as `p=none`, review reports and all legitimate senders, then tighten it only when safe.
+7. Create a production API key and a separate staging key. On a free Resend plan, do not assume you can verify unlimited separate staging/production sending domains; if necessary, use the same verified sending subdomain with separate keys plus a strict staging recipient allow-list.
 8. Put each key into the matching Worker as a secret:
 
 ```powershell
@@ -437,7 +466,7 @@ npx wrangler secret put RESEND_API_KEY --env production
 ```
 
 9. Never paste the key into JavaScript, JSON, `wrangler.toml`, GitHub, or screenshots.
-10. Configure a real reply-to address that owners monitor.
+10. Configure a real reply-to address that owners monitor. If `updates.YOUR_DOMAIN` is the verified Resend domain, use a From address on that verified subdomain (for example `bookings@updates.YOUR_DOMAIN`) and set `Reply-To: reservas@YOUR_DOMAIN` if replies should enter the routed owner mailbox.
 11. Test acknowledgement, payment instructions, confirmation, pre-arrival, checkout, and feedback messages in every supported language.
 12. Store provider message IDs and delivery results, but avoid retaining unnecessary full message bodies forever.
 
@@ -466,16 +495,17 @@ The browser widget alone is not protection. Server validation is mandatory; toke
 
 ## 15. Add payment-hold automation
 
-The server must hold an accepted website request for 48 hours, then release it if payment is not received.
+The server must hold an accepted website request for 48 hours, then release it if payment is not received. D1 uses auto-commit; design this with conditional/idempotent writes or `batch()`/database triggers rather than assuming an application-controlled `BEGIN`/`COMMIT` transaction.
 
 1. Implement a Worker's `scheduled()` handler.
-2. Query only overdue `awaiting_payment` reservations.
-3. In one transaction, mark each one cancelled with `payment_deadline_expired`, release availability, and add an audit event.
-4. Send any cancellation notice after the database transaction succeeds.
-5. Make retries idempotent.
-6. Configure a Cron Trigger in Wrangler. Cron times are UTC.
-7. Test the scheduled handler locally and on staging with deliberately short fake deadlines.
-8. Confirm a paid reservation is never expired.
+2. Query only overdue `awaiting_payment` candidates.
+3. For each candidate, issue a conditional update that still requires `awaiting_payment`, an expired deadline, and no recorded payment. Only a row actually changed by that write is considered expired.
+4. If availability is calculated from active reservation status, the successful cancellation itself releases the dates. Keep the audit write atomic with the state change where practical (for example with a database trigger or a rollback-safe `batch()`).
+5. Send any cancellation notice only after the database write succeeds.
+6. Make retries and payment-webhook handling idempotent so payment and expiry cannot race into contradictory states.
+7. Configure a Cron Trigger in Wrangler. Cron times are UTC.
+8. Test the scheduled handler locally with `wrangler dev` and `/cdn-cgi/handler/scheduled`, then on staging with deliberately short fake deadlines.
+9. Confirm a paid reservation is never expired.
 
 Use Cloudflare's [Cron Trigger guide](https://developers.cloudflare.com/workers/configuration/cron-triggers/) for the current configuration syntax.
 
@@ -540,12 +570,11 @@ In Cloudflare:
 
 1. Open **Workers & Pages** and select the production Worker.
 2. Open **Settings > Domains & Routes**.
-3. Add the root domain as a **Custom Domain**.
-4. Add `www.YOUR_DOMAIN` too, then choose one canonical hostname and redirect the other.
-5. Add the separate protected admin hostname if that is the chosen architecture.
-6. Wait for Cloudflare's certificate to become active.
-7. Keep Universal SSL enabled; Cloudflare supplies and renews the normal certificate automatically.
-8. Test `https://`, the root domain, `www`, admin, APIs, email DNS, and 404 behavior.
+3. Choose the canonical hostname (`YOUR_DOMAIN` or `www.YOUR_DOMAIN`) and add **that hostname** as the Worker **Custom Domain**. Cloudflare creates the necessary DNS record and certificate.
+4. For the non-canonical hostname, create a proxied placeholder DNS record and a Cloudflare Single Redirect to the canonical hostname, following the Custom Domains guide. Do not create an origin server just for the redirect.
+5. Add the separate protected admin hostname only if that architecture was intentionally chosen and its PWA/API were moved together.
+6. Wait for the Custom Domain certificate to become active.
+7. Test `https://`, the canonical hostname, the redirecting hostname, admin, APIs, email DNS, and 404 behavior.
 
 Cloudflare's [Custom Domains guide](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/) explains that Cloudflare creates DNS and certificates for the Worker hostname. Do not delete unrelated MX, SPF, DKIM, or DMARC records when adding the website.
 
@@ -553,21 +582,23 @@ Cloudflare's [Custom Domains guide](https://developers.cloudflare.com/workers/co
 
 Once manual production deployment is understood and tested, connect GitHub to Cloudflare Workers Builds.
 
-1. In the Worker, open **Settings > Builds**.
-2. Connect the private GitHub repository.
-3. Allow Cloudflare access only to the required repository.
-4. Set `main` as the production branch.
-5. Set the deploy command to `npx wrangler deploy` if Cloudflare does not detect it.
-6. Keep preview branches connected only to staging/preview resources.
-7. Require `npm run check` before production deployment.
-8. Make a harmless documentation or text change on a branch and verify the preview.
-9. Merge only after owner approval and green checks.
+For the beginner setup, automate production first and keep staging deployments manual until that pipeline is understood. Wrangler named environments create separate Worker deployments, so this avoids a preview branch accidentally targeting the wrong Worker.
 
-Cloudflare's [GitHub integration](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/) deploys connected Workers when the chosen branch changes. Bindings and secrets must still be configured per environment.
+1. Manually deploy both environments at least once with `npx wrangler deploy --env staging` and `npx wrangler deploy --env production`.
+2. Open the **production environment Worker** in Cloudflare and go to **Settings > Builds**.
+3. Connect the private GitHub repository and allow Cloudflare access only to the required repository.
+4. Set `main` as the production branch.
+5. Set the build command to run the required project checks (for example `npm run check`, plus any real build command if the project later has one).
+6. Set the production deploy command to `npx wrangler deploy --env production`.
+7. Initially leave **non-production branch builds disabled** on the production Worker. Continue deploying staging manually with `npx wrangler deploy --env staging` after local checks.
+8. Make a harmless approved change, merge it to `main`, and verify that the build deploys only the production environment and uses the production bindings.
+9. If you later want automatic staging/PR previews, follow Cloudflare's Wrangler-environments advanced setup and connect/configure the **staging environment Worker separately**. Use commands with `--env staging` (for example `npx wrangler versions upload --env staging` for preview uploads), and verify that preview builds cannot reach production D1/R2.
+
+Cloudflare's [GitHub integration](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/) and [Workers Builds advanced setup](https://developers.cloudflare.com/workers/ci-cd/builds/advanced-setups/) are the source of truth. Bindings and secrets must still be configured per environment.
 
 ## 20. Backups and recovery
 
-D1 Time Travel is automatic, but it is not the only backup.
+D1 Time Travel is automatic, but it is not the only backup. As of this review, the recovery window is 7 days on Workers Free and 30 days on Workers Paid.
 
 ### 20.1 Regular export
 
@@ -584,7 +615,7 @@ Never put this file in Git, email, or an unencrypted shared folder. It contains 
 At least quarterly:
 
 1. Create a fresh temporary/staging D1 database.
-2. Restore/import the latest encrypted export into that non-production database.
+2. Restore/import the latest encrypted export into that non-production database with an explicit remote command, for example `npx wrangler d1 execute YOUR-RESTORE-DRILL-DB --remote --file "D:\RefugioBackups\refugio-YYYY-MM-DD.sql"`.
 3. Run integrity checks and compare expected record counts.
 4. Open the staging admin and verify representative reservations, prices, consent, work, and audit records.
 5. Record the date, operator, backup used, result, and cleanup.
@@ -607,9 +638,9 @@ Only install the production admin after Access and the server-side API are worki
 
 1. Open the admin URL in Safari.
 2. Sign in.
-3. Tap **Share**.
+3. Tap **Share** (or **More > Share**, depending on the Safari tab layout).
 4. Choose **Add to Home Screen**.
-5. Confirm the name and add it.
+5. Turn on **Open as Web App**, confirm the name, and tap **Add**.
 6. Test launch, session expiry, safe areas, and update behavior.
 
 The service worker caches only the static admin shell. It must never cache API responses, guest records, attachments, credentials, or secrets.
@@ -637,7 +668,7 @@ For every normal change:
 
 ```powershell
 git switch -c change/short-description
-npm install
+npm ci
 npm run check
 npm run dev
 ```
@@ -658,7 +689,7 @@ Quarterly:
 - perform a restore drill;
 - test all owner/employee role boundaries;
 - test PWA install/update on current mobile browsers;
-- review dependencies, provider limits, retention, and legal text;
+- review dependencies, the pinned Wrangler/Node versions, provider limits, retention, and legal text;
 - verify marketing unsubscribe and suppression behavior.
 
 Yearly:
