@@ -369,6 +369,7 @@ async function checkAdminPwa() {
 async function checkSharedUtilities() {
   const dateUtilities = await import(pathToFileURL(path.join(PUBLIC_DIRECTORY, 'js', 'utils', 'date.js')));
   const phoneUtilities = await import(pathToFileURL(path.join(PUBLIC_DIRECTORY, 'js', 'utils', 'phone.js')));
+  const countryUtilities = await import(pathToFileURL(path.join(PUBLIC_DIRECTORY, 'js', 'utils', 'countries.js')));
   const sampleDate = dateUtilities.parseDateKey('2026-08-20');
 
   if (dateUtilities.formatDateKey(dateUtilities.addDays(sampleDate, 1)) !== '2026-08-21') {
@@ -385,6 +386,12 @@ async function checkSharedUtilities() {
   }
   if (phoneUtilities.isValidPhoneNumber('12345')) {
     reportError('Shared phone validation accepted an invalid short number.');
+  }
+  if (countryUtilities.resolveCountryCode('Portugal', 'pt-PT') !== 'PT') {
+    reportError('Shared country search failed to resolve a localized country name.');
+  }
+  if (!countryUtilities.isCompleteAddress({ street: 'Rua Exemplo 1', postalCode: '4550-518', city: 'Pedorido', countryCode: 'PT' })) {
+    reportError('Shared address validation rejected a complete address.');
   }
 }
 
@@ -421,6 +428,14 @@ async function checkAdminModel() {
 
   if (!state.guests.some((guest) => guest.nif && guest.identityDocumentType && guest.identityDocumentNumber)) {
     reportError('Admin seed is missing the guest tax/identity fields used by the reservation editor.');
+  }
+
+  if (state.guests.some((guest) => !guest.address?.street || !guest.address?.postalCode || !guest.address?.city || !guest.address?.countryCode)) {
+    reportError('Admin seed contains a guest without a complete postal address.');
+  }
+
+  if (state.websiteRequests.some((request) => !request.contact?.address?.countryCode)) {
+    reportError('Admin seed contains a website request without a country in its contact address.');
   }
 
   const reservationIds = new Set(state.reservations.map((reservation) => reservation.id));

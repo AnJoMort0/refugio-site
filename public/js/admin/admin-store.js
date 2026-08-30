@@ -1,4 +1,5 @@
 import { ADMIN_DATA_VERSION, createInitialAdminState } from './admin-seed.js';
+import { normalizeAddress } from '../utils/countries.js';
 
 const STORAGE_KEY = 'refugio-admin-prototype-state-v1';
 
@@ -20,12 +21,26 @@ function isValidState(value) {
 function normalizeState(value) {
   const state = clone(value);
   state.services = Array.isArray(state.services) ? state.services : [];
-  state.guests = state.guests.map((guest) => ({
-    ...guest,
-    nif: String(guest.nif || ''),
-    identityDocumentType: String(guest.identityDocumentType || ''),
-    identityDocumentNumber: String(guest.identityDocumentNumber || '')
-  }));
+  state.guests = state.guests.map((guest) => {
+    const { nationality, ...guestData } = guest;
+    return {
+      ...guestData,
+      address: normalizeAddress(guest.address, nationality),
+      nif: String(guest.nif || ''),
+      identityDocumentType: String(guest.identityDocumentType || ''),
+      identityDocumentNumber: String(guest.identityDocumentNumber || '')
+    };
+  });
+  state.websiteRequests = state.websiteRequests.map((request) => {
+    const { nationality, ...contact } = request.contact || {};
+    return {
+      ...request,
+      contact: {
+        ...contact,
+        address: normalizeAddress(request.contact?.address, nationality)
+      }
+    };
+  });
   state.reservations = state.reservations.map((reservation) => {
     if (reservation.paymentStatus !== 'deposit_paid') {
       return {

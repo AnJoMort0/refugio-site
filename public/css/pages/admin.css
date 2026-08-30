@@ -401,6 +401,15 @@
   font-weight: 800;
 }
 
+.admin-record-details .admin-record-detail-wide {
+  display: grid;
+  grid-template-columns: minmax(8rem, auto) minmax(0, 1fr);
+}
+
+.admin-record-details .admin-record-detail-wide dd {
+  text-align: right;
+}
+
 .admin-record-details .admin-record-detail-section {
   display: grid;
   gap: 0.55rem;
@@ -878,6 +887,7 @@ form.is-dirty::before {
 }
 
 .admin-field-full,
+.admin-field-wide,
 .admin-form-actions {
   grid-column: 1 / -1;
 }

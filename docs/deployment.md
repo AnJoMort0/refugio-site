@@ -87,7 +87,7 @@ Use migrations and foreign keys. Keep the stable IDs already used by the prototy
 ### Core tables
 
 - `users`: external identity, display name, role, active state, timestamps.
-- `guests`: contact details, preferred language, nationality, optional NIF and identification-document type/number, normalised lookup fields, retention state.
+- `guests`: contact details, preferred language, structured postal address (street/number, postal code, city, ISO country code), optional NIF and identification-document type/number, normalised lookup fields, retention state.
 - `reservations`: source, lifecycle status, overall payment status/deadline, security-deposit receipt, dates/times, guest counts, totals, currency, notes, timestamps.
 - `reservation_guests`: reservation-to-guest relationship and party role.
 - `reservation_children`: child age at booking without unnecessary identity data.

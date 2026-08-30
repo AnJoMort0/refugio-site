@@ -25,6 +25,7 @@ const APP_SHELL = [
   './js/config/site-config.js',
   './js/ui/custom-selects.js',
   './js/utils/date.js',
+  './js/utils/countries.js',
   './locales/messages.json'
 ];
 const APP_SHELL_URLS = new Set(APP_SHELL.map((path) => new URL(path, self.registration.scope).href));

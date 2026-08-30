@@ -191,6 +191,30 @@
                 </label>
               </div>
 
+              <div class="booking-address-group">
+                <div class="dynamic-group-header">
+                  <h3 data-i18n="bookingPage.form.addressTitle"></h3>
+                </div>
+                <div class="booking-address-grid">
+                  <label class="field booking-address-street">
+                    <span><span data-i18n="bookingPage.form.streetLabel"></span><span class="required-mark" aria-hidden="true">*</span></span>
+                    <input id="contact-street" name="address_street" type="text" autocomplete="street-address" required placeholder="" data-i18n-attr='{"placeholder":"bookingPage.form.streetPlaceholder"}' />
+                  </label>
+                  <label class="field">
+                    <span><span data-i18n="bookingPage.form.postalCodeLabel"></span><span class="required-mark" aria-hidden="true">*</span></span>
+                    <input id="contact-postal-code" name="address_postal_code" type="text" autocomplete="postal-code" required placeholder="" data-i18n-attr='{"placeholder":"bookingPage.form.postalCodePlaceholder"}' />
+                  </label>
+                  <label class="field">
+                    <span><span data-i18n="bookingPage.form.cityLabel"></span><span class="required-mark" aria-hidden="true">*</span></span>
+                    <input id="contact-city" name="address_city" type="text" autocomplete="address-level2" required placeholder="" data-i18n-attr='{"placeholder":"bookingPage.form.cityPlaceholder"}' />
+                  </label>
+                  <label class="field">
+                    <span><span data-i18n="bookingPage.form.countryLabel"></span><span class="required-mark" aria-hidden="true">*</span></span>
+                    <select id="contact-country" name="address_country" autocomplete="country-name" required data-searchable data-search-placeholder="" data-i18n-attr='{"data-search-placeholder":"bookingPage.form.countrySearchPlaceholder"}'></select>
+                  </label>
+                </div>
+              </div>
+
               <p class="field-hint field-warning" data-i18n="bookingPage.form.confirmationWarning"></p>
             </div>
 

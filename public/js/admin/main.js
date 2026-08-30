@@ -9,6 +9,14 @@ import {
 import { createAdminRepository } from './admin-store.js';
 import { initCustomSelects } from '../ui/custom-selects.js';
 import {
+  formatAddress,
+  getCountryName,
+  getCountryOptions,
+  isCompleteAddress,
+  normalizeAddress,
+  resolveCountryCode
+} from '../utils/countries.js';
+import {
   COMPENSATION_LABELS,
   EXPENSE_LABELS,
   IDENTITY_DOCUMENT_LABELS,
@@ -197,6 +205,12 @@ function icon(name) {
 
 function renderOption(value, label, selectedValue) {
   return `<option value="${escapeHtml(value)}"${value === selectedValue ? ' selected' : ''}>${escapeHtml(label)}</option>`;
+}
+
+function renderCountryOptions(selectedCode = '') {
+  return getCountryOptions('pt-PT')
+    .map(({ code, name }) => renderOption(code, name, selectedCode))
+    .join('');
 }
 
 function renderStatusBadge(status) {
@@ -778,7 +792,7 @@ function renderReservationExpandedDetails(reservation, totals) {
   const operationalNotes = reservation.notes?.operational || '-';
 
   return `
-    <div><dt>Nacionalidade</dt><dd>${escapeHtml(guest?.nationality || '-')}</dd></div>
+    <div class="admin-record-detail-wide"><dt>Morada</dt><dd>${escapeHtml(formatAddress(guest?.address, 'pt-PT') || '-')}</dd></div>
     <div><dt>NIF</dt><dd>${escapeHtml(guest?.nif || '-')}</dd></div>
     <div><dt>Documento de identificação</dt><dd>${escapeHtml(renderIdentityDocument(guest))}</dd></div>
     <div><dt>Idades das crianças</dt><dd>${escapeHtml(getChildAgeText(reservation.guests))}</dd></div>
@@ -1486,6 +1500,7 @@ function renderRequestSummary(request) {
           ${Number(request.guests?.children || 0) ? `<div><dt>Idades das crianças</dt><dd>${escapeHtml(getChildAgeText(request.guests))}</dd></div>` : ''}
           ${Number(request.extras?.bikes?.count || 0) ? `<div><dt>Bicicletas</dt><dd>${escapeHtml(getBikeText(request))}</dd></div>` : ''}
           ${getRequestDiscountText(request) ? `<div><dt>Desconto</dt><dd>${escapeHtml(getRequestDiscountText(request))}</dd></div>` : ''}
+          <div class="admin-record-detail-wide"><dt>Morada</dt><dd>${escapeHtml(formatAddress(request.contact?.address, 'pt-PT') || '-')}</dd></div>
           ${renderContactDetailRows(request.contact)}
           <div><dt>Marketing</dt><dd>${request.marketingOptIn ? 'Sim' : 'Não'}</dd></div>
         </dl>
@@ -1776,10 +1791,6 @@ function renderReservationOperationsPanel() {
           <legend>Identificação do hóspede</legend>
           <div class="admin-form-section-grid">
             <label class="admin-field">
-              <span>Nacionalidade</span>
-              <input name="nationality" type="text" autocomplete="country-name" value="${escapeHtml(guest?.nationality || '')}" placeholder="Ex.: Portugal, França, Espanha" />
-            </label>
-            <label class="admin-field">
               <span>NIF</span>
               <input name="nif" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(guest?.nif || '')}" />
             </label>
@@ -1860,7 +1871,7 @@ function renderCreateReservationForm() {
     guestName: editingReservation?.contact?.name || draftRequest?.contact?.name || '',
     email: editingReservation?.contact?.email || draftRequest?.contact?.email || '',
     phone: editingReservation?.contact?.phone || draftRequest?.contact?.phone || '',
-    nationality: editingGuest?.nationality || draftRequest?.contact?.nationality || draftRequest?.nationality || '',
+    address: normalizeAddress(editingGuest?.address || draftRequest?.contact?.address || {}),
     nif: editingGuest?.nif || '',
     identityDocumentType: editingGuest?.identityDocumentType || '',
     identityDocumentNumber: editingGuest?.identityDocumentNumber || '',
@@ -1922,11 +1933,19 @@ function renderCreateReservationForm() {
             <label class="admin-field"><span>Email *</span><input name="email" type="email" value="${escapeHtml(defaults.email)}" required /></label>
             <label class="admin-field"><span>Telefone</span><input name="phone" type="tel" value="${escapeHtml(defaults.phone)}" /></label>
             <label class="admin-field"><span>Idioma do hóspede</span><select name="preferredLanguage">${Object.entries(LANGUAGE_LABELS).map(([value, label]) => renderOption(value, label, defaults.preferredLanguage)).join('')}</select></label>
-            <label class="admin-field"><span>Nacionalidade</span><input name="nationality" type="text" autocomplete="country-name" value="${escapeHtml(defaults.nationality)}" placeholder="Ex.: Portugal, França, Espanha" /></label>
             <label class="admin-field"><span>NIF</span><input name="nif" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(defaults.nif)}" /></label>
             <label class="admin-field"><span>Tipo de documento</span><select name="identityDocumentType">${renderOption('', 'Não indicado', defaults.identityDocumentType)}${Object.entries(IDENTITY_DOCUMENT_LABELS).map(([value, label]) => renderOption(value, label, defaults.identityDocumentType)).join('')}</select></label>
             <label class="admin-field"><span>Número do documento</span><input name="identityDocumentNumber" type="text" autocomplete="off" value="${escapeHtml(defaults.identityDocumentNumber)}" /></label>
             <label class="admin-checkbox admin-checkbox-compact"><input name="marketingOptIn" type="checkbox" ${defaults.marketingOptIn ? 'checked' : ''} /><span>Hóspede aceitou receber novidades, ofertas e descontos</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Morada</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field admin-field-wide"><span>Rua e número *</span><input name="addressStreet" type="text" autocomplete="street-address" value="${escapeHtml(defaults.address.street)}" required /></label>
+            <label class="admin-field"><span>Código postal *</span><input name="addressPostalCode" type="text" autocomplete="postal-code" value="${escapeHtml(defaults.address.postalCode)}" required /></label>
+            <label class="admin-field"><span>Localidade *</span><input name="addressCity" type="text" autocomplete="address-level2" value="${escapeHtml(defaults.address.city)}" required /></label>
+            <label class="admin-field"><span>País *</span><select name="addressCountry" autocomplete="country-name" required data-searchable data-search-placeholder="Pesquisar país"><option value="" disabled hidden${defaults.address.countryCode ? '' : ' selected'}>Escolha um país</option>${renderCountryOptions(defaults.address.countryCode)}</select></label>
           </div>
         </fieldset>
         <fieldset class="admin-form-section">
@@ -3331,8 +3350,8 @@ function renderReportsView() {
         <button class="button admin-secondary-button admin-small-button" type="button" data-action="export-report" data-report="guests">${icon('download')} Exportar hóspedes</button>
       </details>
       <details class="admin-panel admin-report-disclosure"${reportSectionsOpen}>
-        <summary><span><span class="admin-eyebrow">Nacionalidade</span><strong>Registos conhecidos</strong></span></summary>
-        ${renderCountList(report.guests.byNationality, {})}
+        <summary><span><span class="admin-eyebrow">País de residência</span><strong>Moradas registadas</strong></span></summary>
+        ${renderCountList(report.guests.byCountry, {})}
         <button class="button admin-secondary-button admin-small-button" type="button" data-action="export-report" data-report="guests">${icon('download')} Exportar hóspedes</button>
       </details>
     </section>
@@ -3415,7 +3434,7 @@ function buildReportData() {
   const bySource = {};
   const byLanguage = {};
   const groupSizes = {};
-  const byNationality = {};
+  const byCountry = {};
   const reservationsByMonth = {};
   const guestReservationCounts = {};
 
@@ -3427,7 +3446,10 @@ function buildReportData() {
     if (reservation.guestId) addCount(guestReservationCounts, reservation.guestId);
   });
 
-  state.guests.forEach((guest) => addCount(byNationality, guest.nationality || 'Sem dados'));
+  state.guests.forEach((guest) => {
+    const countryName = getCountryName(guest.address?.countryCode, 'pt-PT') || 'Sem dados';
+    addCount(byCountry, countryName);
+  });
 
   const rangeDays = range.start && range.end
     ? Math.max(1, Math.round((parseDateKey(range.end) - parseDateKey(range.start)) / 86400000) + 1)
@@ -3462,7 +3484,7 @@ function buildReportData() {
       averageGroupSize: average(countedReservations.map(getGuestCount)),
       groupSizes,
       byLanguage,
-      byNationality,
+      byCountry,
       repeatBookings: Object.values(guestReservationCounts).filter((count) => count > 1).reduce((total, count) => total + count - 1, 0),
       newGuests: Math.max(0, Object.keys(guestReservationCounts).length - returningGuestIds),
       returningGuests: returningGuestIds
@@ -3786,7 +3808,12 @@ function buildReservationFromForm(form) {
     email: String(data.get('email') || '').trim(),
     phone: String(data.get('phone') || '').trim()
   };
-  const guestNationality = String(data.get('nationality') || '').trim();
+  const guestAddress = normalizeAddress({
+    street: data.get('addressStreet'),
+    postalCode: data.get('addressPostalCode'),
+    city: data.get('addressCity'),
+    countryCode: resolveCountryCode(data.get('addressCountry'), 'pt-PT')
+  });
   const guestNif = String(data.get('nif') || '').trim();
   const guestIdentityDocumentType = String(data.get('identityDocumentType') || '').trim();
   const guestIdentityDocumentNumber = String(data.get('identityDocumentNumber') || '').trim();
@@ -3805,6 +3832,10 @@ function buildReservationFromForm(form) {
 
   if (guestIdentityDocumentType && !IDENTITY_DOCUMENT_LABELS[guestIdentityDocumentType]) {
     throw new Error('Escolha um tipo de documento de identificação válido.');
+  }
+
+  if (!isCompleteAddress(guestAddress)) {
+    throw new Error('Preencha a rua e número, código postal, localidade e escolha um país válido para a morada.');
   }
 
   return {
@@ -3855,7 +3886,7 @@ function buildReservationFromForm(form) {
     guestAdjustments: existingGuestAdjustments,
     marketingOptIn: data.get('marketingOptIn') === 'on',
     guestProfile: {
-      nationality: guestNationality,
+      address: guestAddress,
       nif: guestNif,
       identityDocumentType: guestIdentityDocumentType,
       identityDocumentNumber: guestIdentityDocumentNumber
@@ -3897,7 +3928,7 @@ function getReservationAuditChanges(previousReservation, reservation, previousGu
   addChange('Nome', previousReservation.contact?.name, reservation.contact?.name);
   addChange('Email', previousReservation.contact?.email, reservation.contact?.email);
   addChange('Telefone', previousReservation.contact?.phone, reservation.contact?.phone);
-  addChange('Nacionalidade', previousGuest.nationality, guest.nationality);
+  addChange('Morada', formatAddress(previousGuest.address, 'pt-PT'), formatAddress(guest.address, 'pt-PT'));
   addChange('NIF', previousGuest.nif, guest.nif);
   addChange('Tipo de documento', IDENTITY_DOCUMENT_LABELS[previousGuest.identityDocumentType] || previousGuest.identityDocumentType, IDENTITY_DOCUMENT_LABELS[guest.identityDocumentType] || guest.identityDocumentType);
   addChange('Número do documento', previousGuest.identityDocumentNumber, guest.identityDocumentNumber);
@@ -3926,8 +3957,8 @@ async function handleCreateReservation(form) {
   }
 
   const guestProfile = reservation.guestProfile || {};
-  const guest = getOrCreateGuest(state, reservation.contact, reservation.preferredLanguage, guestProfile.nationality);
-  guest.nationality = String(guestProfile.nationality || '');
+  const guest = getOrCreateGuest(state, reservation.contact, reservation.preferredLanguage, guestProfile.address);
+  guest.address = normalizeAddress(guestProfile.address);
   guest.nif = String(guestProfile.nif || '');
   guest.identityDocumentType = String(guestProfile.identityDocumentType || '');
   guest.identityDocumentNumber = String(guestProfile.identityDocumentNumber || '');
@@ -4037,7 +4068,6 @@ async function handleReservationOperationsSubmit(form) {
     checkInTime: reservation.stay.checkInTime,
     checkOutTime: reservation.stay.checkOutTime,
     language: reservation.preferredLanguage,
-    nationality: guest.nationality || '',
     nif: guest.nif || '',
     identityDocumentType: guest.identityDocumentType || '',
     identityDocumentNumber: guest.identityDocumentNumber || '',
@@ -4060,7 +4090,6 @@ async function handleReservationOperationsSubmit(form) {
   reservation.paymentStatus = paymentStatus;
   reservation.securityDepositPaid = data.get('securityDepositPaid') === 'on';
   guest.preferredLanguage = reservation.preferredLanguage;
-  guest.nationality = String(data.get('nationality') ?? guest.nationality ?? '').trim();
   guest.nif = String(data.get('nif') ?? guest.nif ?? '').trim();
   guest.identityDocumentType = identityDocumentType;
   guest.identityDocumentNumber = String(data.get('identityDocumentNumber') ?? guest.identityDocumentNumber ?? '').trim();
@@ -4081,7 +4110,6 @@ async function handleReservationOperationsSubmit(form) {
   addChange('horário check-in', before.checkInTime, reservation.stay.checkInTime);
   addChange('horário check-out', before.checkOutTime, reservation.stay.checkOutTime);
   addChange('idioma', before.language, reservation.preferredLanguage, LANGUAGE_LABELS);
-  addChange('nacionalidade', before.nationality, guest.nationality);
   addChange('NIF', before.nif, guest.nif);
   addChange('tipo de documento', before.identityDocumentType, guest.identityDocumentType, IDENTITY_DOCUMENT_LABELS);
   addChange('número do documento', before.identityDocumentNumber, guest.identityDocumentNumber);
@@ -5115,13 +5143,16 @@ function exportReport(type) {
         email: reservation.contact.email || '',
         phone: reservation.contact.phone || '',
         language: LANGUAGE_LABELS[reservation.preferredLanguage] || reservation.preferredLanguage,
-        nationality: guest?.nationality || '',
+        street: guest?.address?.street || '',
+        postalCode: guest?.address?.postalCode || '',
+        city: guest?.address?.city || '',
+        country: getCountryName(guest?.address?.countryCode, 'pt-PT') || '',
         marketing: reservation.marketingOptIn ? 'Sim' : 'Não'
       });
     });
     downloadCsv(`refugio-hospedes-${suffix}`, [
-      ['ID', 'Nome', 'Email', 'Telefone', 'Idioma', 'Nacionalidade', 'Marketing'],
-      ...[...guests.values()].map((guest) => [guest.id, guest.name, guest.email, guest.phone, guest.language, guest.nationality, guest.marketing])
+      ['ID', 'Nome', 'Email', 'Telefone', 'Idioma', 'Rua e número', 'Código postal', 'Localidade', 'País', 'Marketing'],
+      ...[...guests.values()].map((guest) => [guest.id, guest.name, guest.email, guest.phone, guest.language, guest.street, guest.postalCode, guest.city, guest.country, guest.marketing])
     ]);
     return;
   }

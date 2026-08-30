@@ -82,6 +82,7 @@ Tracked design experiments live under `docs/design-explorations/`; `temp/` is re
 - [Living roadmap](docs/roadmap.md)
 - [Archived long-form roadmap](docs/roadmap-archive.md)
 - [Production migration and deployment](docs/deployment.md)
+- [Beginner step-by-step deployment guide](docs/deployment-beginner-guide.md)
 - [Owner and employee workflows](docs/owner-workflow.md)
 - [Admin architecture](docs/admin-architecture.md)
 - [Design system](docs/design-system.md)

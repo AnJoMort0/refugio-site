@@ -67,6 +67,7 @@ export function createInitialAdminState(now = new Date()) {
     checkInTime,
     checkOutTime
   });
+  const demoAddress = (street, postalCode, city, countryCode) => ({ street, postalCode, city, countryCode });
 
   const reservationIds = {
     current: id('RES', 1, -1),
@@ -105,27 +106,27 @@ export function createInitialAdminState(now = new Date()) {
   };
 
   const guests = [
-    { id: 'GUEST-RODRIGUES-MARTINS', name: 'Rodrigues Martins', email: 'rodrigues.martins@example.com', phone: '+351 912 345 678', preferredLanguage: 'pt', nationality: 'Portugal', nif: '000000000', identityDocumentType: 'cc', identityDocumentNumber: 'DEMO-CC-001', notes: 'Hóspede repetente. Prefere contacto por email.' },
-    { id: 'GUEST-CLAIRE-DUBOIS', name: 'Claire Dubois', email: 'claire.dubois@example.fr', phone: '+33 6 11 22 33 44', preferredLanguage: 'fr', nationality: 'França', nif: '', identityDocumentType: 'passport', identityDocumentNumber: 'DEMO-PASS-002', notes: 'Hóspede repetente; viaja de carro.' },
-    { id: 'GUEST-TOM-WALKER', name: 'Tom Walker', email: 'tom.walker@example.com', phone: '+44 7700 900123', preferredLanguage: 'en', nationality: 'Reino Unido', notes: 'Já pediu informação sobre bicicletas.' },
-    { id: 'GUEST-SOFIA-ALVAREZ', name: 'Sofía Álvarez', email: 'sofia.alvarez@example.es', phone: '+34 611 234 567', preferredLanguage: 'es', nationality: 'Espanha', notes: 'Viaja com duas crianças.' },
-    { id: 'GUEST-MANUEL-PEREIRA', name: 'Manuel Pereira', email: 'manuel.pereira@example.pt', phone: '917 222 444', preferredLanguage: 'pt', nationality: 'Portugal', notes: 'Estadia de uso do proprietário, sem cobrança.' },
-    { id: 'GUEST-EMMA-WILSON', name: 'Emma Wilson', email: 'emma.wilson@example.ie', phone: '', preferredLanguage: 'en', nationality: 'Irlanda', notes: 'Contacto apenas por email.' },
-    { id: 'GUEST-ANNA-SCHNEIDER', name: 'Anna Schneider', email: 'anna.schneider@example.de', phone: '+49 151 23456789', preferredLanguage: 'en', nationality: 'Alemanha', notes: '' },
-    { id: 'GUEST-LUKAS-WEBER', name: 'Lukas Weber', email: 'lukas.weber@example.at', phone: '+43 660 1234567', preferredLanguage: 'fr', nationality: 'Áustria', notes: 'Reserva recebida através da Abritel.fr.' },
-    { id: 'GUEST-INES-CARVALHO', name: 'Inês Carvalho', email: 'ines.carvalho@example.pt', phone: '934 555 210', preferredLanguage: 'pt', nationality: 'Portugal', notes: '' },
-    { id: 'GUEST-OLIVER-SMITH', name: 'Oliver Smith', email: 'oliver.smith@example.co.uk', phone: '+44 7700 900456', preferredLanguage: 'en', nationality: 'Reino Unido', notes: 'Não compareceu e não respondeu às mensagens.' },
-    { id: 'GUEST-LUCIA-MARCIA', name: 'Lucia Marcia', email: 'lucia.marcia@example.com.br', phone: '+55 11 91234 5678', preferredLanguage: 'pt', nationality: 'Brasil', notes: 'Cancelou por alteração do voo.' },
-    { id: 'GUEST-GIULIA-ROSSI', name: 'Giulia Rossi', email: 'giulia.rossi@example.it', phone: '+39 320 123 4567', preferredLanguage: 'en', nationality: 'Itália', notes: '' },
-    { id: 'GUEST-PIERRE-MARTIN', name: 'Pierre Martin', email: 'pierre.martin@example.fr', phone: '+33 6 98 76 54 32', preferredLanguage: 'fr', nationality: 'França', notes: '' },
-    { id: 'GUEST-JOAO-PEREIRA', name: 'João Pereira', email: 'joao.pereira@example.pt', phone: '229 555 010', preferredLanguage: 'pt', nationality: 'Portugal', notes: 'Reserva de utilização familiar do alojamento.' },
-    { id: 'GUEST-SARA-OLIVEIRA', name: 'Sara Oliveira', email: 'sara.oliveira@example.pt', phone: '+351 963 444 111', preferredLanguage: 'pt', nationality: 'Portugal', notes: 'Foram acrescentados hóspedes a meio da estadia.' },
-    { id: 'GUEST-MICHAEL-BROWN', name: 'Michael Brown', email: 'michael.brown@example.us', phone: '+1 202 555 0176', preferredLanguage: 'en', nationality: 'Estados Unidos', notes: 'Reserva do ano anterior para comparação estatística.' }
+    { id: 'GUEST-RODRIGUES-MARTINS', name: 'Rodrigues Martins', email: 'rodrigues.martins@example.com', phone: '+351 912 345 678', preferredLanguage: 'pt', address: demoAddress('Rua Exemplo 12', '4000-001', 'Porto', 'PT'), nif: '000000000', identityDocumentType: 'cc', identityDocumentNumber: 'DEMO-CC-001', notes: 'Hóspede repetente. Prefere contacto por email.' },
+    { id: 'GUEST-CLAIRE-DUBOIS', name: 'Claire Dubois', email: 'claire.dubois@example.fr', phone: '+33 6 11 22 33 44', preferredLanguage: 'fr', address: demoAddress('12 rue Exemple', '75001', 'Paris', 'FR'), nif: '', identityDocumentType: 'passport', identityDocumentNumber: 'DEMO-PASS-002', notes: 'Hóspede repetente; viaja de carro.' },
+    { id: 'GUEST-TOM-WALKER', name: 'Tom Walker', email: 'tom.walker@example.com', phone: '+44 7700 900123', preferredLanguage: 'en', address: demoAddress('10 Example Street', 'SW1A 1AA', 'London', 'GB'), notes: 'Já pediu informação sobre bicicletas.' },
+    { id: 'GUEST-SOFIA-ALVAREZ', name: 'Sofía Álvarez', email: 'sofia.alvarez@example.es', phone: '+34 611 234 567', preferredLanguage: 'es', address: demoAddress('Calle Ejemplo 14', '28001', 'Madrid', 'ES'), notes: 'Viaja com duas crianças.' },
+    { id: 'GUEST-MANUEL-PEREIRA', name: 'Manuel Pereira', email: 'manuel.pereira@example.pt', phone: '917 222 444', preferredLanguage: 'pt', address: demoAddress('Avenida Exemplo 8', '4100-002', 'Porto', 'PT'), notes: 'Estadia de uso do proprietário, sem cobrança.' },
+    { id: 'GUEST-EMMA-WILSON', name: 'Emma Wilson', email: 'emma.wilson@example.ie', phone: '', preferredLanguage: 'en', address: demoAddress('4 Example Road', 'D02 X285', 'Dublin', 'IE'), notes: 'Contacto apenas por email.' },
+    { id: 'GUEST-ANNA-SCHNEIDER', name: 'Anna Schneider', email: 'anna.schneider@example.de', phone: '+49 151 23456789', preferredLanguage: 'en', address: demoAddress('Beispielstraße 7', '10115', 'Berlin', 'DE'), notes: '' },
+    { id: 'GUEST-LUKAS-WEBER', name: 'Lukas Weber', email: 'lukas.weber@example.at', phone: '+43 660 1234567', preferredLanguage: 'fr', address: demoAddress('Beispielgasse 5', '1010', 'Wien', 'AT'), notes: 'Reserva recebida através da Abritel.fr.' },
+    { id: 'GUEST-INES-CARVALHO', name: 'Inês Carvalho', email: 'ines.carvalho@example.pt', phone: '934 555 210', preferredLanguage: 'pt', address: demoAddress('Rua Modelo 21', '4700-003', 'Braga', 'PT'), notes: '' },
+    { id: 'GUEST-OLIVER-SMITH', name: 'Oliver Smith', email: 'oliver.smith@example.co.uk', phone: '+44 7700 900456', preferredLanguage: 'en', address: demoAddress('18 Sample Lane', 'M1 1AE', 'Manchester', 'GB'), notes: 'Não compareceu e não respondeu às mensagens.' },
+    { id: 'GUEST-LUCIA-MARCIA', name: 'Lucia Marcia', email: 'lucia.marcia@example.com.br', phone: '+55 11 91234 5678', preferredLanguage: 'pt', address: demoAddress('Rua Exemplo 30', '01001-000', 'São Paulo', 'BR'), notes: 'Cancelou por alteração do voo.' },
+    { id: 'GUEST-GIULIA-ROSSI', name: 'Giulia Rossi', email: 'giulia.rossi@example.it', phone: '+39 320 123 4567', preferredLanguage: 'en', address: demoAddress('Via Esempio 9', '00184', 'Roma', 'IT'), notes: '' },
+    { id: 'GUEST-PIERRE-MARTIN', name: 'Pierre Martin', email: 'pierre.martin@example.fr', phone: '+33 6 98 76 54 32', preferredLanguage: 'fr', address: demoAddress('8 avenue Exemple', '69001', 'Lyon', 'FR'), notes: '' },
+    { id: 'GUEST-JOAO-PEREIRA', name: 'João Pereira', email: 'joao.pereira@example.pt', phone: '229 555 010', preferredLanguage: 'pt', address: demoAddress('Travessa Exemplo 2', '4400-004', 'Vila Nova de Gaia', 'PT'), notes: 'Reserva de utilização familiar do alojamento.' },
+    { id: 'GUEST-SARA-OLIVEIRA', name: 'Sara Oliveira', email: 'sara.oliveira@example.pt', phone: '+351 963 444 111', preferredLanguage: 'pt', address: demoAddress('Rua Modelo 44', '3800-005', 'Aveiro', 'PT'), notes: 'Foram acrescentados hóspedes a meio da estadia.' },
+    { id: 'GUEST-MICHAEL-BROWN', name: 'Michael Brown', email: 'michael.brown@example.us', phone: '+1 202 555 0176', preferredLanguage: 'en', address: demoAddress('100 Example Avenue', '20001', 'Washington', 'US'), notes: 'Reserva do ano anterior para comparação estatística.' }
   ];
   const guestById = new Map(guests.map((guest) => [guest.id, guest]));
   const contactFor = (guestId) => {
     const guest = guestById.get(guestId);
-    return { name: guest?.name || '', email: guest?.email || '', phone: guest?.phone || '' };
+    return { name: guest?.name || '', email: guest?.email || '', phone: guest?.phone || '', address: guest?.address || demoAddress('', '', '', '') };
   };
   const reservation = (options) => createReservation({ ...options, contact: contactFor(options.guestId) });
 
@@ -483,7 +484,7 @@ export function createInitialAdminState(now = new Date()) {
       id: requestIds.conflictNew,
       submittedAt: timestampAt(0, '08:42'),
       preferredLanguage: 'es',
-      contact: { name: 'Lucía García', email: 'lucia.garcia@example.es', phone: '+34 600 111 222', nationality: 'Espanha' },
+      contact: { name: 'Lucía García', email: 'lucia.garcia@example.es', phone: '+34 600 111 222', address: demoAddress('Calle Muestra 6', '46001', 'Valencia', 'ES') },
       stay: stay(4, 7, '16:00'),
       guests: { adults: 2, children: 2, childAges: [4, 9] },
       preferences: { bed: 'double' },
@@ -495,7 +496,7 @@ export function createInitialAdminState(now = new Date()) {
       id: requestIds.internationalNew,
       submittedAt: timestampAt(0, '10:17'),
       preferredLanguage: 'en',
-      contact: { name: 'Marlene Keller', email: 'marlene.keller@example.de', phone: '+49 170 555 1212', nationality: 'Alemanha' },
+      contact: { name: 'Marlene Keller', email: 'marlene.keller@example.de', phone: '+49 170 555 1212', address: demoAddress('Musterweg 16', '80331', 'München', 'DE') },
       stay: stay(34, 37, '18:30'),
       bikes: { count: 1, days: 2 },
       depositPrepay: true,
@@ -506,7 +507,7 @@ export function createInitialAdminState(now = new Date()) {
       id: requestIds.discountedNew,
       submittedAt: timestampAt(0, '11:36'),
       preferredLanguage: 'pt',
-      contact: { name: 'Beatriz Costa', email: 'beatriz.costa@example.pt', phone: '962 110 844', nationality: 'Portugal' },
+      contact: { name: 'Beatriz Costa', email: 'beatriz.costa@example.pt', phone: '962 110 844', address: demoAddress('Rua Modelo 16', '1200-006', 'Lisboa', 'PT') },
       stay: stay(23, 26),
       guests: { adults: 2, children: 1, childAges: [6] },
       preferences: { bed: 'single' },
@@ -519,7 +520,7 @@ export function createInitialAdminState(now = new Date()) {
       id: requestIds.englishNew,
       submittedAt: timestampAt(-1, '21:08'),
       preferredLanguage: 'en',
-      contact: { name: 'Hiro Tanaka', email: 'hiro.tanaka@example.jp', phone: '', nationality: 'Japão' },
+      contact: { name: 'Hiro Tanaka', email: 'hiro.tanaka@example.jp', phone: '', address: demoAddress('1-2-3 Example', '100-0001', 'Tokyo', 'JP') },
       stay: stay(40, 44, '15:00', '09:00'),
       guests: { adults: 1 },
       comments: 'I will travel by public transport and would appreciate arrival directions.',
@@ -528,7 +529,7 @@ export function createInitialAdminState(now = new Date()) {
     createWebsiteRequest({
       id: requestIds.portugueseNew,
       submittedAt: timestampAt(-1, '18:22'),
-      contact: { name: 'Marta Neves', email: 'marta.neves@example.pt', phone: '+351 919 808 707', nationality: 'Portugal' },
+      contact: { name: 'Marta Neves', email: 'marta.neves@example.pt', phone: '+351 919 808 707', address: demoAddress('Rua Exemplo 27', '3000-007', 'Coimbra', 'PT') },
       stay: stay(46, 50, '16:30'),
       guests: { adults: 3 },
       bikes: { count: 2, days: 2 },
@@ -539,7 +540,7 @@ export function createInitialAdminState(now = new Date()) {
       status: 'accepted',
       submittedAt: timestampAt(-18, '12:30'),
       updatedAt: timestampAt(-17, '09:10'),
-      contact: { ...contactFor('GUEST-RODRIGUES-MARTINS'), nationality: 'Portugal' },
+      contact: contactFor('GUEST-RODRIGUES-MARTINS'),
       stay: stay(-1, 2, '16:00'),
       guests: { adults: 2, children: 1, childAges: [7] },
       preferences: { bed: 'double' },
@@ -556,7 +557,7 @@ export function createInitialAdminState(now = new Date()) {
       submittedAt: timestampAt(-28, '10:02'),
       updatedAt: timestampAt(-27, '15:30'),
       preferredLanguage: 'es',
-      contact: { ...contactFor('GUEST-SOFIA-ALVAREZ'), nationality: 'Espanha' },
+      contact: contactFor('GUEST-SOFIA-ALVAREZ'),
       stay: stay(11, 15),
       guests: { adults: 2, children: 2, childAges: [4, 9] },
       preferences: { bed: 'double' },
@@ -571,7 +572,7 @@ export function createInitialAdminState(now = new Date()) {
       submittedAt: timestampAt(-3, '13:14'),
       updatedAt: timestampAt(-2, '09:05'),
       preferredLanguage: 'fr',
-      contact: { name: 'Camille Bernard', email: 'camille.bernard@example.fr', phone: '+33 6 45 67 89 10', nationality: 'França' },
+      contact: { name: 'Camille Bernard', email: 'camille.bernard@example.fr', phone: '+33 6 45 67 89 10', address: demoAddress('22 rue Modèle', '33000', 'Bordeaux', 'FR') },
       stay: stay(7, 10),
       comments: 'Dates indisponibles; foram sugeridas duas alternativas.',
       estimatedTotal: 375
@@ -582,7 +583,7 @@ export function createInitialAdminState(now = new Date()) {
       submittedAt: timestampAt(-14, '20:40'),
       updatedAt: timestampAt(-12, '16:25'),
       preferredLanguage: 'en',
-      contact: { name: 'Daniel Cooper', email: 'daniel.cooper@example.com', phone: '+44 7700 900812', nationality: 'Reino Unido' },
+      contact: { name: 'Daniel Cooper', email: 'daniel.cooper@example.com', phone: '+44 7700 900812', address: demoAddress('7 Example Close', 'EH1 1YZ', 'Edinburgh', 'GB') },
       stay: stay(52, 57),
       guests: { adults: 4 },
       comments: 'Guest withdrew the request before payment instructions were sent.',
@@ -594,7 +595,7 @@ export function createInitialAdminState(now = new Date()) {
       submittedAt: timestampAt(-45, '09:35'),
       updatedAt: timestampAt(-44, '12:00'),
       preferredLanguage: 'en',
-      contact: { name: 'Greta Fischer', email: 'greta.fischer@example.de', phone: '+49 160 1234567', nationality: 'Alemanha' },
+      contact: { name: 'Greta Fischer', email: 'greta.fischer@example.de', phone: '+49 160 1234567', address: demoAddress('Beispielplatz 11', '20095', 'Hamburg', 'DE') },
       stay: stay(-20, -17),
       guests: { adults: 2, children: 1, childAges: [3] },
       comments: 'Pedido antigo recusado por conflito com uma reserva Booking.com.',

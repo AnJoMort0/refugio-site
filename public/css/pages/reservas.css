@@ -181,6 +181,7 @@
 
 .booking-date-fields,
 .booking-contact-grid,
+.booking-address-grid,
 .guest-count-grid,
 .booking-time-grid,
 .dynamic-grid {
@@ -190,6 +191,12 @@
 
 .booking-contact-grid-wide {
   align-items: stretch;
+}
+
+.booking-address-group {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
 }
 
 .guest-count-grid {
@@ -843,6 +850,14 @@ body[data-page="booking"] .sticky-booking-cta {
 
   .booking-contact-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .booking-address-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .booking-address-street {
+    grid-column: 1 / -1;
   }
 
   .rules-grid {

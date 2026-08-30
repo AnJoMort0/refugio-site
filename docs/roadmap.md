@@ -190,9 +190,10 @@ The prototype is suitable for owner review and workflow testing. It is not suita
 - [x] Named demo accounts for Jorge, Paula, Bárbara, Marlene, André, Dulce, and Fábio with owner/employee/dev permissions.
 - [x] Remember the last selected admin login account locally.
 - [x] Owner and employee dashboards with role-appropriate information and work timer access.
-- [x] Limited employee reservation operations include check-in/check-out times, preferred language, nationality, NIF, identification document, overall payment, and caução receipt.
+- [x] Limited employee reservation operations include check-in/check-out times, preferred language, NIF, identification document, overall payment, and caução receipt.
 - [x] Calendar with today, turnover markers, guest names, selected-day operations, messaging, and reservation management links.
 - [x] Reservation creation/editing, grouped contact/language/identity/caução/payment data, source including Abritel, conflicts, extra guests, cancellation/restoration, and past reservations.
+- [x] Require a structured guest postal address in public booking requests and owner reservation creation/editing, with a locally searchable ISO country list; show the address in request/reservation details and replace nationality reporting with country of residence.
 - [x] Website request inbox/history, request-to-reservation conversion, deposit choice, conflicts, and local booking-form ingestion.
 - [x] Base, seasonal, date-specific, group, and code discount management with `dd/mm/yyyy` entry and native date-picker buttons.
 - [x] Services catalogue with enablement and pricing.
@@ -214,9 +215,10 @@ The prototype is suitable for owner review and workflow testing. It is not suita
 
 ## 4. Production migration
 
-- [ ] Write a very detailed step by step tutorial for the deployment in a different .md file in docs, for someone who never did it, has nothing prepared like domain or anything and needs to have every step detailed
+- [x] Write a very detailed step-by-step deployment tutorial for a first-time owner starting without a domain, accounts, or local tooling.
+  - Note: Added [`deployment-beginner-guide.md`](./deployment-beginner-guide.md), separating a private static review deployment from the production migration and covering account security, domain purchase/DNS, local setup, GitHub, Workers, D1, R2, Access, email, Turnstile, staging, launch, backups, PWA installation, and routine operation.
 
-The full low-cost route, data model, security boundaries, API plan, deployment steps, and launch checklist live in [`deployment.md`](./deployment.md).
+The architecture and production boundary live in [`deployment.md`](./deployment.md); the beginner click-by-click route lives in [`deployment-beginner-guide.md`](./deployment-beginner-guide.md).
 
 - [>] Replace demo authentication with Cloudflare Access plus server-validated individual accounts and role mapping.
 - [>] Replace `localStorage` business state with D1 and protected `/api/admin/*` repositories.

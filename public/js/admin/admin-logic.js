@@ -1,6 +1,7 @@
 import { addDays, formatDateKey, parseDateKey } from './admin-seed.js';
 import { diffCalendarDays, monthDayOrdinal } from '../utils/date.js';
 import { SITE_CONFIG } from '../config/site-config.js';
+import { normalizeAddress } from '../utils/countries.js';
 
 export const LANGUAGE_LABELS = {
   pt: 'Português',
@@ -380,7 +381,7 @@ export function makeId(prefix, collection) {
   return `${prefix}-${year}-${String(count).padStart(4, '0')}`;
 }
 
-export function getOrCreateGuest(state, contact, preferredLanguage = 'pt', nationality = '') {
+export function getOrCreateGuest(state, contact, preferredLanguage = 'pt', address = {}) {
   const email = contact.email?.trim().toLowerCase();
   const existing = state.guests.find((guest) => email && guest.email.toLowerCase() === email);
 
@@ -389,7 +390,8 @@ export function getOrCreateGuest(state, contact, preferredLanguage = 'pt', natio
     existing.email = contact.email || existing.email;
     existing.phone = contact.phone || existing.phone;
     existing.preferredLanguage = preferredLanguage || existing.preferredLanguage;
-    if (nationality) existing.nationality = nationality;
+    const normalizedAddress = normalizeAddress(address);
+    if (Object.values(normalizedAddress).some(Boolean)) existing.address = normalizedAddress;
     return existing;
   }
 
@@ -399,7 +401,7 @@ export function getOrCreateGuest(state, contact, preferredLanguage = 'pt', natio
     email: contact.email || '',
     phone: contact.phone || '',
     preferredLanguage,
-    nationality,
+    address: normalizeAddress(address),
     nif: '',
     identityDocumentType: '',
     identityDocumentNumber: '',

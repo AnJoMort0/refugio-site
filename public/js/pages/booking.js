@@ -1,6 +1,7 @@
 import { getActiveLanguage, getCurrentDictionary, getNestedValue } from '../services/i18n.js';
 import { getEffectivePricesForDate, getLimitedTimePriceComparison } from '../services/pricing-promotions.js';
 import { addDays, diffCalendarDays as diffNights, formatDateKey, parseDateKey } from '../utils/date.js';
+import { renderCountrySelect, resolveCountryCode } from '../utils/countries.js';
 import { isValidPhoneNumber } from '../utils/phone.js';
 
 const PRICE_CONFIG = {
@@ -325,7 +326,10 @@ export async function initBookingPage() {
   const contactNameInput = document.querySelector('#contact-name');
   const contactEmailInput = document.querySelector('#contact-email');
   const contactPhoneInput = document.querySelector('#contact-phone');
-  const contactNationalityInput = document.querySelector('#contact-nationality');
+  const contactStreetInput = document.querySelector('#contact-street');
+  const contactPostalCodeInput = document.querySelector('#contact-postal-code');
+  const contactCityInput = document.querySelector('#contact-city');
+  const contactCountryInput = document.querySelector('#contact-country');
   const checkinTimeInput = document.querySelector('#checkin-time');
   const checkoutTimeInput = document.querySelector('#checkout-time');
   const depositPrepayInput = document.querySelector('#deposit-prepay');
@@ -415,6 +419,17 @@ export async function initBookingPage() {
   checkoutInput.min = formatDateKey(addDays(earliestCheckinDate, 2));
 
   const getText = (path) => getNestedValue(dictionary, path) || '';
+  const getCountryLocale = () => document.documentElement.lang || getActiveLanguage() || 'pt-PT';
+
+  function renderCountryChoices({ preserveSelection = false } = {}) {
+    const selectedCode = preserveSelection
+      ? contactCountryInput?.value
+      : '';
+    renderCountrySelect(contactCountryInput, getCountryLocale(), {
+      selectedCode,
+      placeholder: getText('bookingPage.form.countryPlaceholder')
+    });
+  }
 
   function setFieldValidity(input, message = '') {
     if (!input) return;
@@ -1127,6 +1142,10 @@ export async function initBookingPage() {
     clearFieldValidity(contactNameInput);
     clearFieldValidity(contactEmailInput);
     clearFieldValidity(contactPhoneInput);
+    clearFieldValidity(contactStreetInput);
+    clearFieldValidity(contactPostalCodeInput);
+    clearFieldValidity(contactCityInput);
+    clearFieldValidity(contactCountryInput);
     clearFieldValidity(discountCodeInput);
     clearFieldValidity(rulesConfirmationInput);
 
@@ -1167,6 +1186,41 @@ export async function initBookingPage() {
       const message = getText('bookingPage.validation.phoneInvalid');
       setFieldValidity(contactPhoneInput, message);
       if (showBrowserMessages) contactPhoneInput.reportValidity();
+      return message;
+    }
+
+    if (!contactStreetInput?.value.trim()) {
+      const message = getText('bookingPage.validation.streetRequired');
+      setFieldValidity(contactStreetInput, message);
+      if (showBrowserMessages) contactStreetInput?.reportValidity();
+      return message;
+    }
+
+    if (!contactPostalCodeInput?.value.trim()) {
+      const message = getText('bookingPage.validation.postalCodeRequired');
+      setFieldValidity(contactPostalCodeInput, message);
+      if (showBrowserMessages) contactPostalCodeInput?.reportValidity();
+      return message;
+    }
+
+    if (!contactCityInput?.value.trim()) {
+      const message = getText('bookingPage.validation.cityRequired');
+      setFieldValidity(contactCityInput, message);
+      if (showBrowserMessages) contactCityInput?.reportValidity();
+      return message;
+    }
+
+    if (!contactCountryInput?.value) {
+      const message = getText('bookingPage.validation.countryRequired');
+      setFieldValidity(contactCountryInput, message);
+      if (showBrowserMessages) contactCountryInput?.reportValidity();
+      return message;
+    }
+
+    if (!resolveCountryCode(contactCountryInput.value, getCountryLocale())) {
+      const message = getText('bookingPage.validation.countryInvalid');
+      setFieldValidity(contactCountryInput, message);
+      if (showBrowserMessages) contactCountryInput.reportValidity();
       return message;
     }
 
@@ -1293,6 +1347,7 @@ export async function initBookingPage() {
   }
 
   renderTimezoneWarning();
+  renderCountryChoices();
   rerenderDynamicContent();
   setStatus('');
 
@@ -1355,7 +1410,15 @@ export async function initBookingPage() {
     })
   );
 
-  [contactNameInput, contactEmailInput, contactPhoneInput, contactNationalityInput].forEach((input) =>
+  [
+    contactNameInput,
+    contactEmailInput,
+    contactPhoneInput,
+    contactStreetInput,
+    contactPostalCodeInput,
+    contactCityInput,
+    contactCountryInput
+  ].forEach((input) =>
     input?.addEventListener('input', () => {
       clearFieldValidity(input);
       setStatus('');
@@ -1479,6 +1542,7 @@ export async function initBookingPage() {
       .map(Number);
     const selectedBedPreference = bedPreferenceInputs.find((input) => input.checked)?.value || '';
     const comments = commentsInput instanceof HTMLTextAreaElement ? commentsInput.value.trim() : '';
+    const countryCode = resolveCountryCode(contactCountryInput?.value, getCountryLocale());
 
     params.set('reservation_id', reservationId);
     params.set('checkin', checkinInput.value);
@@ -1490,9 +1554,6 @@ export async function initBookingPage() {
     params.set('preferred_language', preferredLanguage);
     params.set('contact_name', contactNameInput?.value.trim() || '');
     params.set('contact_email', contactEmailInput?.value.trim() || '');
-    if (contactNationalityInput?.value.trim()) {
-      params.set('contact_nationality', contactNationalityInput.value.trim());
-    }
 
     if (contactPhoneInput?.value.trim()) {
       params.set('contact_phone', contactPhoneInput.value.trim());
@@ -1547,7 +1608,12 @@ export async function initBookingPage() {
         name: contactNameInput?.value.trim() || '',
         email: contactEmailInput?.value.trim() || '',
         phone: contactPhoneInput?.value.trim() || '',
-        nationality: contactNationalityInput?.value.trim() || ''
+        address: {
+          street: contactStreetInput?.value.trim() || '',
+          postalCode: contactPostalCodeInput?.value.trim() || '',
+          city: contactCityInput?.value.trim() || '',
+          countryCode
+        }
       },
       stay: {
         checkIn: checkinInput.value,
@@ -1587,6 +1653,7 @@ export async function initBookingPage() {
 
   document.addEventListener('language:changed', (event) => {
     dictionary = event.detail?.dictionary || getCurrentDictionary();
+    renderCountryChoices({ preserveSelection: true });
     rerenderDynamicContent();
   });
 

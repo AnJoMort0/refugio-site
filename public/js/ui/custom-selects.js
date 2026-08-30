@@ -38,6 +38,10 @@ function closeInstance(instance, { returnFocus = false } = {}) {
   instance.wrapper.classList.remove('is-open');
   instance.button.setAttribute('aria-expanded', 'false');
   openInstances.delete(instance);
+  if (instance.search) {
+    instance.search.value = '';
+    filterOptions(instance, '');
+  }
   if (returnFocus) instance.button.focus();
 }
 
@@ -48,7 +52,22 @@ function closeOthers(current) {
 }
 
 function enabledOptions(instance) {
-  return [...instance.list.querySelectorAll('[role="option"]:not([disabled])')];
+  return [...instance.optionsContainer.querySelectorAll('[role="option"]:not([disabled]):not([hidden])')];
+}
+
+function normalizeSearch(value = '') {
+  return String(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase()
+    .trim();
+}
+
+function filterOptions(instance, query) {
+  const normalizedQuery = normalizeSearch(query);
+  instance.optionsContainer.querySelectorAll('[role="option"]').forEach((option) => {
+    option.hidden = Boolean(normalizedQuery) && !normalizeSearch(option.textContent).includes(normalizedQuery);
+  });
 }
 
 function openInstance(instance) {
@@ -58,6 +77,11 @@ function openInstance(instance) {
   instance.wrapper.classList.add('is-open');
   instance.button.setAttribute('aria-expanded', 'true');
   openInstances.add(instance);
+
+  if (instance.search) {
+    instance.search.focus();
+    return;
+  }
 
   const options = enabledOptions(instance);
   const selected = options.find((option) => option.getAttribute('aria-selected') === 'true') || options[0];
@@ -103,7 +127,7 @@ function optionMarkup(instance, option, index) {
 }
 
 function syncInstance(instance) {
-  const { select, wrapper, button, value, list } = instance;
+  const { select, wrapper, button, value, list, optionsContainer } = instance;
   const options = [...select.options].filter((option) => !option.hidden);
   const selected = select.selectedOptions[0] || options[0];
   const label = selectLabel(select);
@@ -112,10 +136,14 @@ function syncInstance(instance) {
   button.disabled = select.disabled;
   button.setAttribute('aria-label', label);
   wrapper.classList.toggle('is-disabled', select.disabled);
-  list.setAttribute('aria-label', label);
-  list.innerHTML = options.map((option, index) => optionMarkup(instance, option, index)).join('');
+  optionsContainer.setAttribute('aria-label', label);
+  if (instance.search) {
+    instance.search.placeholder = select.dataset.searchPlaceholder || '';
+    instance.search.setAttribute('aria-label', select.dataset.searchPlaceholder || label);
+  }
+  optionsContainer.innerHTML = options.map((option, index) => optionMarkup(instance, option, index)).join('');
 
-  list.querySelectorAll('[data-custom-select-value]').forEach((optionButton) => {
+  optionsContainer.querySelectorAll('[data-custom-select-value]').forEach((optionButton) => {
     optionButton.addEventListener('click', () => chooseOption(instance, optionButton.dataset.customSelectValue || ''));
     optionButton.addEventListener('keydown', (event) => {
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
@@ -155,11 +183,27 @@ function enhanceSelect(select) {
   const list = document.createElement('div');
   list.className = 'custom-select-popover';
   list.id = `${id}-options`;
-  list.setAttribute('role', 'listbox');
   list.setAttribute('aria-labelledby', button.id);
   button.setAttribute('aria-controls', list.id);
 
+  const isSearchable = select.hasAttribute('data-searchable');
+  const search = isSearchable ? document.createElement('input') : null;
+  if (search) {
+    search.className = 'custom-select-search';
+    search.type = 'search';
+    search.autocomplete = 'off';
+    search.spellcheck = false;
+    search.placeholder = select.dataset.searchPlaceholder || '';
+    search.setAttribute('aria-label', select.dataset.searchPlaceholder || selectLabel(select));
+    wrapper.classList.add('is-searchable');
+  }
+
+  const optionsContainer = document.createElement('div');
+  optionsContainer.className = 'custom-select-options';
+  optionsContainer.setAttribute('role', 'listbox');
+
   select.before(wrapper);
+  list.append(...[search, optionsContainer].filter(Boolean));
   wrapper.append(select, button, list);
   select.classList.add('custom-select-native');
 
@@ -170,6 +214,8 @@ function enhanceSelect(select) {
     button,
     value: button.querySelector('.custom-select-value'),
     list,
+    optionsContainer,
+    search,
     isOpen: false,
     observer: null
   };
@@ -187,6 +233,22 @@ function enhanceSelect(select) {
       closeInstance(instance);
     }
   });
+  search?.addEventListener('input', () => filterOptions(instance, search.value));
+  search?.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      enabledOptions(instance)[0]?.focus();
+    } else if (event.key === 'Enter') {
+      const firstOption = enabledOptions(instance)[0];
+      if (firstOption) {
+        event.preventDefault();
+        chooseOption(instance, firstOption.dataset.customSelectValue || '');
+      }
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      closeInstance(instance, { returnFocus: true });
+    }
+  });
   select.addEventListener('change', () => syncInstance(instance));
   select.addEventListener('invalid', (event) => {
     event.preventDefault();
@@ -201,7 +263,7 @@ function enhanceSelect(select) {
     childList: true,
     characterData: true,
     subtree: true,
-    attributeFilter: ['disabled', 'hidden', 'label', 'selected', 'data-locked', 'title']
+    attributeFilter: ['disabled', 'hidden', 'label', 'selected', 'data-locked', 'title', 'data-search-placeholder']
   });
 
   syncInstance(instance);
