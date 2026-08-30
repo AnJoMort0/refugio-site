@@ -110,6 +110,7 @@ const NAV_ITEMS = [
 ];
 
 const ICONS = {
+  archive: '<rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path>',
   arrowLeft: '<path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path>',
   arrowRight: '<path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>',
   badgeEuro: '<path d="M4 10h12"></path><path d="M4 14h9"></path><path d="M19 5.5A7 7 0 1 0 19 18.5"></path>',
@@ -162,6 +163,8 @@ const ui = {
   },
   expandedReservationIds: new Set(),
   expandedEmployeeIds: new Set(),
+  expandedEmployeeHistoryIds: new Set(),
+  employeeHistoryFilters: {},
   requestDraftId: '',
   editingReservationId: '',
   editingWorkSessionId: '',
@@ -190,6 +193,7 @@ const ui = {
   showManualWorkForm: false,
   showWorkStartChooser: false,
   showPastReservations: false,
+  showArchivedEmployees: false,
   reservationLimit: ADMIN_LIST_PAGE_SIZE,
   pastReservationLimit: ADMIN_LIST_PAGE_SIZE,
   auditLimit: AUDIT_LIST_PAGE_SIZE,
@@ -1011,6 +1015,14 @@ async function loadSessionAndState() {
 
   currentUser = session.user;
   state = await repository.load();
+  const employeeProfile = state.employees.find((employee) => employee.userId === currentUser.id);
+  if (employeeProfile?.active === false) {
+    logout();
+    currentUser = null;
+    state = null;
+    renderLogin('Este utilizador está arquivado. Peça a um proprietário para restaurar o acesso.');
+    return;
+  }
   if (expireOverduePaymentReservations()) state = await repository.save(state);
   await loadMessageCatalog();
   renderApp();
@@ -2689,24 +2701,48 @@ function renderExpensesView() {
   `;
 }
 
+function renderYearMonthPeriodOptions(dateValues, selectedValue, { allLabel = 'Todos os períodos', includeCurrentYear = false } = {}) {
+  const currentYear = formatDateKey(new Date()).slice(0, 4);
+  const years = new Set(
+    dateValues
+      .map((value) => String(value || '').slice(0, 4))
+      .filter((year) => /^\d{4}$/.test(year))
+  );
+  if (includeCurrentYear) years.add(currentYear);
+
+  const sortedYears = [...years].sort((a, b) => b.localeCompare(a));
+  const options = [renderOption('all', allLabel, selectedValue)];
+
+  sortedYears.forEach((year) => {
+    options.push(renderOption(`year:${year}`, year, selectedValue));
+    for (let month = 12; month >= 1; month -= 1) {
+      const monthKey = `${year}-${String(month).padStart(2, '0')}`;
+      const label = new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' })
+        .format(new Date(Number(year), month - 1, 1));
+      options.push(renderOption(monthKey, label, selectedValue));
+    }
+  });
+
+  return options.join('');
+}
+
+function dateMatchesPeriod(dateValue, period) {
+  if (period === 'all') return true;
+  const prefix = String(period || '').replace(/^year:/, '');
+  return String(dateValue || '').startsWith(prefix);
+}
+
 function getFilteredExpenses() {
   const search = ui.expenseFilters.search.trim().toLowerCase();
   return state.expenses
     .filter((expense) => ui.expenseFilters.category === 'all' || expense.category === ui.expenseFilters.category)
-    .filter((expense) => {
-      if (ui.expenseFilters.month === 'all') return true;
-      const period = ui.expenseFilters.month.replace(/^year:/, '');
-      return String(expense.date || '').startsWith(period);
-    })
+    .filter((expense) => dateMatchesPeriod(expense.date, ui.expenseFilters.month))
     .filter((expense) => !search || [expense.description, expense.notes, EXPENSE_LABELS[expense.category]]
       .some((value) => String(value || '').toLowerCase().includes(search)))
     .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
 }
 
 function renderExpenseFilters() {
-  const months = [...new Set(state.expenses.map((expense) => String(expense.date || '').slice(0, 7)).filter(Boolean))]
-    .sort((a, b) => b.localeCompare(a));
-  const years = [...new Set(months.map((month) => month.slice(0, 4)))];
   return `
     <form class="admin-filter-bar admin-expense-filters" data-form="expense-filters">
       <label class="admin-field">
@@ -2723,13 +2759,7 @@ function renderExpenseFilters() {
       <label class="admin-field">
         <span>Período</span>
         <select name="month">
-          ${renderOption('all', 'Todos', ui.expenseFilters.month)}
-          ${years.map((year) => renderOption(`year:${year}`, `Ano ${year}`, ui.expenseFilters.month)).join('')}
-          ${months.map((month) => {
-            const [year, monthNumber] = month.split('-').map(Number);
-            const label = new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(new Date(year, monthNumber - 1, 1));
-            return renderOption(month, label, ui.expenseFilters.month);
-          }).join('')}
+          ${renderYearMonthPeriodOptions(state.expenses.map((expense) => expense.date), ui.expenseFilters.month, { allLabel: 'Todos' })}
         </select>
       </label>
       <button class="button admin-secondary-button" type="button" data-action="clear-expense-filters">Limpar</button>
@@ -2796,85 +2826,171 @@ function renderExpenseForm() {
   `;
 }
 
+function getEmployeeHistoryFilters(employeeId) {
+  ui.employeeHistoryFilters[employeeId] ||= {
+    period: formatDateKey(new Date()).slice(0, 7),
+    compensation: 'all',
+    task: 'all',
+    sort: 'newest'
+  };
+  return ui.employeeHistoryFilters[employeeId];
+}
+
+function getFilteredEmployeeSessions(employee) {
+  const filters = getEmployeeHistoryFilters(employee.id);
+  const sessions = state.workSessions
+    .filter((session) => session.employeeId === employee.id)
+    .filter((session) => dateMatchesPeriod(session.date, filters.period))
+    .filter((session) => filters.compensation === 'all' || (session.compensationType || 'paid') === filters.compensation)
+    .filter((session) => filters.task === 'all' || (session.tasks || []).includes(filters.task));
+
+  return sessions.sort((a, b) => {
+    if (filters.sort === 'oldest') return String(a.start || a.date).localeCompare(String(b.start || b.date));
+    if (filters.sort === 'duration') return getWorkDurationHours(b) - getWorkDurationHours(a);
+    if (filters.sort === 'cost') return getWorkSessionCost(b) - getWorkSessionCost(a);
+    return String(b.start || b.date).localeCompare(String(a.start || a.date));
+  });
+}
+
+function getEmployeeHistoryPeriodLabel(period) {
+  if (period === 'all') return 'Todos os períodos';
+  if (period.startsWith('year:')) return period.slice(5);
+  const [year, month] = period.split('-').map(Number);
+  if (!year || !month) return period;
+  return new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1));
+}
+
+function renderEmployeeHistory(employee) {
+  const isOpen = ui.expandedEmployeeHistoryIds.has(employee.id);
+  const filters = getEmployeeHistoryFilters(employee.id);
+  const allSessions = state.workSessions.filter((session) => session.employeeId === employee.id);
+  const sessions = getFilteredEmployeeSessions(employee);
+  const totalHours = sessions.reduce((total, session) => total + getWorkDurationHours(session), 0);
+  const totalCost = sessions.reduce((total, session) => total + getWorkSessionCost(session), 0);
+
+  return `
+    <section class="admin-employee-history${isOpen ? ' is-open' : ''}">
+      <button class="admin-employee-history-toggle" type="button" data-action="toggle-employee-history" data-employee-id="${employee.id}" aria-expanded="${String(isOpen)}">
+        <span><strong>Histórico de trabalho</strong><small>${escapeHtml(getEmployeeHistoryPeriodLabel(filters.period))}</small></span>
+        ${icon(isOpen ? 'chevronUp' : 'chevronDown')}
+      </button>
+      ${isOpen ? `
+        <div class="admin-employee-history-body">
+          <form class="admin-filter-bar admin-employee-history-filters" data-form="employee-history-filters" data-employee-id="${employee.id}">
+            <label class="admin-field"><span>Período</span><select name="period">${renderYearMonthPeriodOptions(allSessions.map((session) => session.date), filters.period, { includeCurrentYear: true })}</select></label>
+            <label class="admin-field"><span>Tipo de trabalho</span><select name="compensation">${renderOption('all', 'Todos', filters.compensation)}${Object.entries(COMPENSATION_LABELS).map(([value, label]) => renderOption(value, label, filters.compensation)).join('')}</select></label>
+            <label class="admin-field"><span>Tarefa</span><select name="task">${renderOption('all', 'Todas', filters.task)}${Object.entries(WORK_TASK_LABELS).map(([value, label]) => renderOption(value, label, filters.task)).join('')}</select></label>
+            <label class="admin-field"><span>Ordenar</span><select name="sort">${renderOption('newest', 'Mais recente primeiro', filters.sort)}${renderOption('oldest', 'Mais antigo primeiro', filters.sort)}${renderOption('duration', 'Mais horas primeiro', filters.sort)}${renderOption('cost', 'Maior custo primeiro', filters.sort)}</select></label>
+            <button class="button admin-secondary-button" type="button" data-action="reset-employee-history-filters" data-employee-id="${employee.id}">Limpar</button>
+          </form>
+          <dl class="admin-record-details admin-employee-history-totals">
+            <div><dt>Período selecionado</dt><dd>${escapeHtml(getEmployeeHistoryPeriodLabel(filters.period))}</dd></div>
+            <div><dt>Horas</dt><dd>${totalHours.toFixed(1)} h</dd></div>
+            <div><dt>Custo</dt><dd>${renderMoney(totalCost)}</dd></div>
+            <div><dt>Sessões</dt><dd>${sessions.length}</dd></div>
+          </dl>
+          ${renderWorkTable(sessions, {
+            editable: can(currentUser, 'employees:manage'),
+            emptyMessage: 'Nenhuma sessão corresponde aos filtros selecionados.'
+          })}
+          ${can(currentUser, 'employees:manage') ? renderEmployeeWorkCorrectionForm(employee) : ''}
+          <button class="button admin-secondary-button admin-small-button admin-collapse-button" type="button" data-action="toggle-employee-history" data-employee-id="${employee.id}">${icon('chevronUp')} Fechar histórico</button>
+        </div>
+      ` : ''}
+    </section>
+  `;
+}
+
+function renderEmployeeCard(employee) {
+  const currentMonth = formatDateKey(new Date()).slice(0, 7);
+  const monthSessions = state.workSessions.filter((session) => session.employeeId === employee.id && session.date.startsWith(currentMonth));
+  const monthHours = monthSessions.reduce((total, session) => total + getWorkDurationHours(session), 0);
+  const monthEarnings = monthSessions.reduce((total, session) => total + getWorkSessionCost(session), 0);
+  const activeSession = state.workSessions.find((session) => session.employeeId === employee.id && !session.end);
+  const isExpanded = ui.expandedEmployeeIds.has(employee.id);
+  const isActive = employee.active !== false;
+  const roleLabel = ROLE_LABELS[employee.role] || employee.role;
+  const permissionsLabel = ROLE_LABELS[employee.permissionsProfile] || employee.permissionsProfile;
+  const roleSummary = roleLabel === permissionsLabel ? roleLabel : `${roleLabel} · acesso ${permissionsLabel}`;
+  const canArchive = can(currentUser, 'employees:manage') && employee.role === 'employee';
+
+  return `
+    <article class="admin-record${isActive ? '' : ' is-archived'}" id="admin-employee-${employee.id}">
+      <div class="admin-record-main">
+        <div>
+          <strong>${escapeHtml(employee.name)}</strong>
+          <span>${isActive ? 'Ativo' : 'Arquivado'} · ${escapeHtml(roleSummary)}</span>
+        </div>
+        <div class="admin-record-badges">
+          <span class="admin-source">${renderMoney(getHourlyRate(employee))}/h</span>
+          ${activeSession ? '<span class="admin-status status-checked_in">Horário iniciado</span>' : ''}
+          ${!isActive && canArchive ? `<button class="button admin-secondary-button admin-small-button" type="button" data-action="restore-employee" data-employee-id="${employee.id}">${icon('rotateCcw')} Restaurar</button>` : ''}
+          <button class="button admin-secondary-button admin-small-button" type="button" data-action="toggle-employee-details" data-employee-id="${employee.id}">
+            ${icon(isExpanded ? 'chevronUp' : 'chevronDown')} ${isExpanded ? 'Fechar detalhes' : 'Ver detalhes'}
+          </button>
+        </div>
+      </div>
+      <dl class="admin-record-details">
+        <div><dt>Horas este mês</dt><dd>${monthHours.toFixed(1)} h</dd></div>
+        <div><dt>Ganhos este mês</dt><dd>${renderMoney(monthEarnings)}</dd></div>
+        <div><dt>Modo habitual</dt><dd>${escapeHtml(COMPENSATION_LABELS[getEmployeeDefaultCompensation(employee)])}</dd></div>
+      </dl>
+      ${isExpanded ? `
+        <div class="admin-employee-details">
+          ${can(currentUser, 'employees:manage') ? `
+            <div class="admin-employee-control-grid">
+              ${renderEmployeeProfileForm(employee)}
+              <form class="admin-inline-form" data-form="employee-rate">
+                <input type="hidden" name="employeeId" value="${employee.id}" />
+                <label class="admin-field"><span>Nova taxa/hora</span><input name="rate" type="number" min="0" step="0.01" value="${getHourlyRate(employee)}" /></label>
+                <label class="admin-field"><span>Desde</span>${renderAdminDateControl({ name: 'from', value: formatDateInputValue(formatDateKey(new Date())) })}</label>
+                <button class="button admin-secondary-button admin-small-button" type="submit">${icon('check')} Guardar taxa</button>
+              </form>
+            </div>
+          ` : ''}
+          ${renderEmployeeHistory(employee)}
+          ${canArchive ? `
+            <div class="admin-button-row admin-employee-archive-actions">
+              ${isActive
+                ? `<button class="button admin-secondary-button admin-small-button" type="button" data-action="archive-employee" data-employee-id="${employee.id}">${icon('archive')} Arquivar funcionário</button>`
+                : `<button class="button admin-secondary-button admin-small-button" type="button" data-action="restore-employee" data-employee-id="${employee.id}">${icon('rotateCcw')} Restaurar funcionário</button>`}
+            </div>
+          ` : ''}
+          <button class="button admin-secondary-button admin-small-button admin-collapse-button" type="button" data-action="toggle-employee-details" data-employee-id="${employee.id}">${icon('chevronUp')} Fechar detalhes</button>
+        </div>
+      ` : ''}
+    </article>
+  `;
+}
+
 function renderEmployeesView() {
   requirePermission(currentUser, 'employees:view');
+  const activeEmployees = state.employees.filter((employee) => employee.active !== false);
+  const archivedEmployees = state.employees.filter((employee) => employee.active === false);
 
   return `
     <section class="admin-panel">
       <div class="admin-panel-heading">
         <div>
           <p class="admin-eyebrow">Funcionários</p>
-          <h2>Acessos, taxas e custos</h2>
+          <h2>Equipa, taxas e custos</h2>
         </div>
       </div>
       <div class="admin-record-list">
-        ${state.employees.map((employee) => {
-          const monthEarnings = calculateEmployeeEarnings(state, employee.id);
-          const monthSessions = state.workSessions.filter((session) => session.employeeId === employee.id && session.date.startsWith(formatDateKey(new Date()).slice(0, 7)));
-          const monthHours = monthSessions.reduce((total, session) => total + getWorkDurationHours(session), 0);
-          const activeSession = state.workSessions.find((session) => session.employeeId === employee.id && !session.end);
-          const sessionCount = state.workSessions.filter((session) => session.employeeId === employee.id).length;
-          const isExpanded = ui.expandedEmployeeIds.has(employee.id);
-          const roleLabel = ROLE_LABELS[employee.role] || employee.role;
-          const permissionsLabel = ROLE_LABELS[employee.permissionsProfile] || employee.permissionsProfile;
-          const roleSummary = roleLabel === permissionsLabel ? roleLabel : `${roleLabel} · acesso ${permissionsLabel}`;
-          return `
-            <article class="admin-record">
-              <div class="admin-record-main">
-                <div>
-                  <strong>${escapeHtml(employee.name)}</strong>
-                  <span>${employee.active ? 'Ativo' : 'Inativo'} · ${escapeHtml(roleSummary)}</span>
-                </div>
-                <div class="admin-record-badges">
-                  <span class="admin-source">${renderMoney(getHourlyRate(employee))}/h</span>
-                  ${activeSession ? '<span class="admin-status status-checked_in">Horário iniciado</span>' : ''}
-                  <button class="button admin-secondary-button admin-small-button" type="button" data-action="toggle-employee-details" data-employee-id="${employee.id}">
-                    ${isExpanded ? 'Fechar detalhes' : 'Ver detalhes'}
-                  </button>
-                </div>
-              </div>
-              <dl class="admin-record-details">
-                <div><dt>Horas este mês</dt><dd>${monthHours.toFixed(1)} h</dd></div>
-                <div><dt>Modo habitual</dt><dd>${escapeHtml(COMPENSATION_LABELS[getEmployeeDefaultCompensation(employee)])}</dd></div>
-              </dl>
-              ${isExpanded ? `
-                <div class="admin-employee-details">
-                  <dl class="admin-record-details admin-record-details-secondary">
-                    <div><dt>Ganhos este mês</dt><dd>${renderMoney(monthEarnings)}</dd></div>
-                    <div><dt>Sessões registadas</dt><dd>${sessionCount}</dd></div>
-                  </dl>
-                  ${can(currentUser, 'employees:manage') ? `
-                    <div class="admin-employee-control-grid">
-                      ${renderEmployeeProfileForm(employee)}
-                      <form class="admin-inline-form" data-form="employee-rate">
-                        <input type="hidden" name="employeeId" value="${employee.id}" />
-                        <label class="admin-field">
-                          <span>Nova taxa/hora</span>
-                          <input name="rate" type="number" min="0" step="0.01" value="${getHourlyRate(employee)}" />
-                        </label>
-                        <label class="admin-field">
-                          <span>Desde</span>
-                          ${renderAdminDateControl({ name: 'from', value: formatDateInputValue(formatDateKey(new Date())) })}
-                        </label>
-                        <button class="button admin-secondary-button admin-small-button" type="submit">${icon('check')} Guardar taxa</button>
-                      </form>
-                    </div>
-                  ` : ''}
-                  <div class="admin-section-heading">
-                    <div>
-                      <p class="admin-eyebrow">Tarefas e custos</p>
-                      <h3>Histórico de trabalho</h3>
-                    </div>
-                  </div>
-                  ${renderEmployeeSessionSummary(employee)}
-                  ${can(currentUser, 'employees:manage') ? renderEmployeeWorkCorrectionForm(employee) : ''}
-                  <button class="button admin-secondary-button admin-small-button admin-collapse-button" type="button" data-action="toggle-employee-details" data-employee-id="${employee.id}">${icon('chevronUp')} Fechar detalhes</button>
-                </div>
-              ` : ''}
-            </article>
-          `;
-        }).join('')}
+        ${activeEmployees.length ? activeEmployees.map(renderEmployeeCard).join('') : '<p class="admin-empty">Não existem funcionários ativos.</p>'}
       </div>
+      ${archivedEmployees.length ? `
+        <section class="admin-archived-employees${ui.showArchivedEmployees ? ' is-open' : ''}">
+          <button class="admin-employee-history-toggle" type="button" data-action="toggle-archived-employees" aria-expanded="${String(ui.showArchivedEmployees)}">
+            <span><strong>Funcionários arquivados</strong><small>${archivedEmployees.length} registo(s) preservado(s)</small></span>
+            <span class="admin-record-badges"><span class="admin-source">${archivedEmployees.length}</span>${icon(ui.showArchivedEmployees ? 'chevronUp' : 'chevronDown')}</span>
+          </button>
+          ${ui.showArchivedEmployees ? `<div class="admin-archived-employees-body">
+            <div class="admin-record-list">${archivedEmployees.map(renderEmployeeCard).join('')}</div>
+            <button class="button admin-secondary-button admin-small-button admin-collapse-button" type="button" data-action="toggle-archived-employees">${icon('chevronUp')} Fechar arquivados</button>
+          </div>` : ''}
+        </section>
+      ` : ''}
     </section>
   `;
 }
@@ -2892,15 +3008,6 @@ function renderEmployeeProfileForm(employee) {
       <button class="button admin-secondary-button admin-small-button" type="submit">${icon('check')} Guardar modo</button>
     </form>
   `;
-}
-
-function renderEmployeeSessionSummary(employee) {
-  const sessions = state.workSessions
-    .filter((session) => session.employeeId === employee.id)
-    .sort((a, b) => String(b.start || '').localeCompare(String(a.start || '')));
-
-  if (!sessions.length) return '<p class="admin-empty">Sem sessões registadas.</p>';
-  return renderWorkTable(sessions, { editable: can(currentUser, 'employees:manage') });
 }
 
 function renderEmployeeWorkCorrectionForm(employee) {
@@ -3110,7 +3217,7 @@ function renderWorkView() {
 }
 
 function renderWorkTable(sessions, options = {}) {
-  if (!sessions.length) return '<p class="admin-empty">Ainda não há horas registadas este mês.</p>';
+  if (!sessions.length) return `<p class="admin-empty">${escapeHtml(options.emptyMessage || 'Ainda não há horas registadas este mês.')}</p>`;
   const showActions = Boolean(options.editable || options.own);
 
   return `
@@ -4547,6 +4654,8 @@ async function handleEmployeeWorkSubmit(form) {
     Object.assign(session, payload);
     state.workSessions.sort((a, b) => String(b.start || '').localeCompare(String(a.start || '')));
     ui.editingWorkSessionId = '';
+    ui.expandedEmployeeHistoryIds.add(employee.id);
+    resetEmployeeHistoryFilters(employee.id, date.slice(0, 7));
     addAudit(state, currentUser, 'Sessão de trabalho atualizada', 'workSession', session.id);
     await persist(`Sessão de ${employee.name} atualizada.`);
     return;
@@ -4557,6 +4666,8 @@ async function handleEmployeeWorkSubmit(form) {
     ...payload
   };
   state.workSessions.unshift(session);
+  ui.expandedEmployeeHistoryIds.add(employee.id);
+  resetEmployeeHistoryFilters(employee.id, date.slice(0, 7));
   addAudit(state, currentUser, 'Horas de funcionário adicionadas/corrigidas', 'workSession', session.id);
   await persist(`Horas de ${employee.name} guardadas.`);
 }
@@ -4766,6 +4877,7 @@ function toggleEmployeeDetails(employeeId) {
 
   if (ui.expandedEmployeeIds.has(employeeId)) {
     ui.expandedEmployeeIds.delete(employeeId);
+    ui.expandedEmployeeHistoryIds.delete(employeeId);
     const editingSession = state.workSessions.find((session) => session.id === ui.editingWorkSessionId);
     if (editingSession?.employeeId === employeeId) ui.editingWorkSessionId = '';
   } else {
@@ -4773,6 +4885,60 @@ function toggleEmployeeDetails(employeeId) {
   }
 
   renderApp();
+}
+
+function resetEmployeeHistoryFilters(employeeId, period = formatDateKey(new Date()).slice(0, 7)) {
+  ui.employeeHistoryFilters[employeeId] = {
+    period,
+    compensation: 'all',
+    task: 'all',
+    sort: 'newest'
+  };
+}
+
+function syncEmployeeHistoryFilters(form) {
+  const employeeId = String(form.dataset.employeeId || '');
+  if (!employeeId) return;
+  const data = new FormData(form);
+  ui.employeeHistoryFilters[employeeId] = {
+    period: String(data.get('period') || 'all'),
+    compensation: String(data.get('compensation') || 'all'),
+    task: String(data.get('task') || 'all'),
+    sort: String(data.get('sort') || 'newest')
+  };
+}
+
+function toggleEmployeeHistory(employeeId) {
+  if (ui.expandedEmployeeHistoryIds.has(employeeId)) {
+    ui.expandedEmployeeHistoryIds.delete(employeeId);
+  } else {
+    getEmployeeHistoryFilters(employeeId);
+    ui.expandedEmployeeHistoryIds.add(employeeId);
+  }
+  renderApp();
+}
+
+async function setEmployeeArchived(employeeId, archived) {
+  requirePermission(currentUser, 'employees:manage');
+  const employee = state.employees.find((candidate) => candidate.id === employeeId);
+  if (!employee) throw new Error('Funcionário não encontrado.');
+  if (employee.role !== 'employee') throw new Error('Os registos de proprietários e desenvolvimento não podem ser arquivados aqui.');
+  if (archived && state.workSessions.some((session) => session.employeeId === employeeId && !session.end)) {
+    throw new Error('Termine o horário em curso antes de arquivar este funcionário.');
+  }
+
+  if (!window.confirm(`${archived ? 'Arquivar' : 'Restaurar'} ${employee.name}? O histórico de trabalho será preservado.`)) return;
+
+  employee.active = !archived;
+  employee.archivedAt = archived ? new Date().toISOString() : '';
+  employee.archivedBy = archived ? currentUser.id : '';
+  ui.expandedEmployeeIds.delete(employeeId);
+  ui.expandedEmployeeHistoryIds.delete(employeeId);
+  addAudit(state, currentUser, archived ? 'Funcionário arquivado' : 'Funcionário restaurado', 'employee', employee.id, {
+    employee: employee.name,
+    status: archived ? 'Ativo -> Arquivado' : 'Arquivado -> Ativo'
+  });
+  await persist(`${employee.name} ${archived ? 'foi arquivado' : 'foi restaurado'}.`);
 }
 
 function scrollToAdminTarget(targetOrSelector = '.admin-main', behavior = 'auto') {
@@ -4798,6 +4964,8 @@ function editWorkSession(sessionId) {
 
   if (!confirmDiscardUnsavedChanges()) return;
   ui.expandedEmployeeIds.add(session.employeeId);
+  ui.expandedEmployeeHistoryIds.add(session.employeeId);
+  resetEmployeeHistoryFilters(session.employeeId, String(session.date || '').slice(0, 7));
   ui.editingWorkSessionId = session.id;
   renderApp();
   scrollToAdminEditor(`[data-work-form-for="${session.employeeId}"]`);
@@ -5323,8 +5491,10 @@ function exportReport(type) {
 function resetViewUi(viewId) {
   ui.expandedReservationIds.clear();
   ui.expandedEmployeeIds.clear();
+  ui.expandedEmployeeHistoryIds.clear();
   ui.expandedAuditIds.clear();
   ui.showPastReservations = false;
+  ui.showArchivedEmployees = false;
   ui.reservationLimit = ADMIN_LIST_PAGE_SIZE;
   ui.pastReservationLimit = ADMIN_LIST_PAGE_SIZE;
   ui.auditLimit = AUDIT_LIST_PAGE_SIZE;
@@ -5334,6 +5504,9 @@ function resetViewUi(viewId) {
   }
   if (viewId === 'expenses') {
     ui.expenseFilters = { search: '', category: 'all', month: 'all' };
+  }
+  if (viewId === 'employees') {
+    ui.employeeHistoryFilters = {};
   }
   if (viewId === 'settings') {
     ui.auditFilters = { search: '', entityType: 'all', actor: 'all' };
@@ -5464,6 +5637,33 @@ async function handleClick(event) {
 
     if (action === 'toggle-employee-details') {
       toggleEmployeeDetails(target.dataset.employeeId || '');
+      return;
+    }
+
+    if (action === 'toggle-archived-employees') {
+      ui.showArchivedEmployees = !ui.showArchivedEmployees;
+      renderApp();
+      return;
+    }
+
+    if (action === 'toggle-employee-history') {
+      toggleEmployeeHistory(target.dataset.employeeId || '');
+      return;
+    }
+
+    if (action === 'reset-employee-history-filters') {
+      resetEmployeeHistoryFilters(target.dataset.employeeId || '');
+      renderApp();
+      return;
+    }
+
+    if (action === 'archive-employee') {
+      await setEmployeeArchived(target.dataset.employeeId || '', true);
+      return;
+    }
+
+    if (action === 'restore-employee') {
+      await setEmployeeArchived(target.dataset.employeeId || '', false);
       return;
     }
 
@@ -5706,6 +5906,13 @@ function handleChange(event) {
   if (filterForm) {
     syncReservationFiltersFromForm(filterForm);
     updateReservationList();
+    return;
+  }
+
+  const employeeHistoryFilterForm = target.closest('form[data-form="employee-history-filters"]');
+  if (employeeHistoryFilterForm) {
+    syncEmployeeHistoryFilters(employeeHistoryFilterForm);
+    renderApp();
     return;
   }
 

@@ -447,6 +447,16 @@ async function checkAdminModel() {
   checkCoverage('website request statuses', ['new', 'accepted', 'rejected'], state.websiteRequests.map((request) => request.status));
   checkCoverage('work compensation types', ['paid', 'free', 'voluntary'], state.workSessions.map((session) => session.compensationType));
 
+  const archivedEmployee = state.employees.find((employee) => employee.id === 'EMP-ANA' && employee.active === false);
+  if (!archivedEmployee) {
+    reportError('Admin seed is missing the archived seasonal employee example.');
+  } else if (!state.workSessions.some((session) => session.employeeId === archivedEmployee.id)) {
+    reportError('Archived employee example has no preserved work history.');
+  }
+  if (state.employees.some((employee) => employee.active === false && state.workSessions.some((session) => session.employeeId === employee.id && !session.end))) {
+    reportError('An archived employee cannot have an active work timer.');
+  }
+
   const giftDiscounts = state.pricing.discounts.filter((discount) => discount.type === 'gift');
   if (!giftDiscounts.some((discount) => discount.gift?.guests && discount.gift?.nights)) {
     reportError('Admin seed is missing an accommodation gift code.');

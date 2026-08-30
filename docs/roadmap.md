@@ -1,6 +1,6 @@
 # O Refúgio - Living Product Roadmap
 
-Last reviewed: 2026-08-27
+Last reviewed: 2026-08-30
 
 This file is the current source of truth for product status and remaining work. The previous long-form roadmap, including old prompts and reversion notes, is preserved in [`roadmap-archive.md`](./roadmap-archive.md).
 
@@ -173,6 +173,10 @@ The prototype is suitable for owner review and workflow testing. It is not suita
 - [x] Keep the desktop sidebar navigation and public-site footer in separate rows at short window heights and browser zoom levels.
 - [x] Keep the mobile admin drawer brand, scrollable navigation, account controls, and public-site action in separate non-overlapping rows at iPhone SE heights.
 - [x] Make the phone calendar Create Reservation action a full, readable row.
+- [x] Make each employee's work history independently expandable, filterable, and sortable.
+  - Note: History opens on the current month by default, can be filtered by year/month, compensation type, and task, and can be ordered by date, duration, or cost. The selected period's hours, labour cost, and session count appear above the entries. Month/year menus use descending years with December through January beneath each year; Expenses uses the same ordering.
+- [x] Archive and restore former employees without deleting their records.
+  - Note: Archived employees live in a separate collapsed list, retain their complete work history, and can still receive occasional manually entered sessions after leaving regular employment. An active work timer must be stopped before archival. The demonstration seed includes Ana as an archived seasonal substitute with preserved 2025 and 2026 sessions.
 - [x] Make the admin installable as a PWA for owners and employees.
   - Note: Added a standalone admin manifest, 180/192/512 px house-mark icons, maskable icon support, a deliberately admin-only static cache strategy, offline shell fallback, safe-area layout, install/update controls, and automated integrity checks. Installation requires HTTPS in production; iPhone/iPad installation continues through Safari's Add to Home Screen action because iOS does not expose the custom browser install prompt.
 
@@ -202,7 +206,7 @@ The prototype is suitable for owner review and workflow testing. It is not suita
 - [x] Base, seasonal, date-specific, group, percentage, fixed-value, and configurable gift-code management with `dd/mm/yyyy` entry and native date-picker buttons.
 - [x] Services catalogue with enablement and pricing.
 - [x] Expenses with notes, filters, add/edit/remove, and complete visible history.
-- [x] Employee profiles, normal compensation mode, job rates/costs, work history, voluntary work, active timer task editing, and manual time.
+- [x] Employee profiles, normal compensation mode, job rates/costs, expandable filtered work history with period totals, voluntary work, active timer task editing, manual time, and reversible employee archival.
 - [x] Localised message templates driven by `public/locales/messages.json`, editable drafts, email/WhatsApp/copy shortcuts, source-aware wording, payment breakdowns, and Google review links.
 - [x] Statistics for reservations, guests, revenue, expenses, labour, profit, periods, comparisons, and scoped CSV exports.
 - [x] Lightweight audit, unsaved-change warning, stable IDs, demo export/restore, and broad validation.

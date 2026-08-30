@@ -610,7 +610,8 @@ export function createInitialAdminState(now = new Date()) {
     { id: 'EMP-MARLENE', userId: 'user-owner-marlene', name: 'Marlene', role: 'owner', active: true, hourlyRates: [{ from: '2026-01-01', rate: 0 }], permissionsProfile: 'owner', compensationDefault: 'free' },
     { id: 'EMP-ANDRE', userId: 'user-dev-andre', name: 'André', role: 'dev', active: true, hourlyRates: [{ from: '2026-01-01', rate: 0 }], permissionsProfile: 'dev', compensationDefault: 'free' },
     { id: 'EMP-DULCE', userId: 'user-employee-dulce', name: 'Dulce', role: 'employee', active: true, hourlyRates: [{ from: '2026-01-01', rate: 7 }, { from: '2026-08-01', rate: 8 }], permissionsProfile: 'employee', compensationDefault: 'paid' },
-    { id: 'EMP-FABIO', userId: 'user-employee-fabio', name: 'Fábio', role: 'employee', active: true, hourlyRates: [{ from: '2026-01-01', rate: 7.5 }], permissionsProfile: 'employee', compensationDefault: 'voluntary' }
+    { id: 'EMP-FABIO', userId: 'user-employee-fabio', name: 'Fábio', role: 'employee', active: true, hourlyRates: [{ from: '2026-01-01', rate: 7.5 }], permissionsProfile: 'employee', compensationDefault: 'voluntary' },
+    { id: 'EMP-ANA', userId: '', name: 'Ana', role: 'employee', active: false, archivedAt: '2025-11-30T18:00:00.000Z', archivedBy: 'user-owner-jorge', hourlyRates: [{ from: '2025-01-01', rate: 7 }], permissionsProfile: 'employee', compensationDefault: 'paid' }
   ];
 
   const workSession = (sequence, employeeId, offset, startTime, endTime, options = {}) => ({
@@ -642,7 +643,9 @@ export function createInitialAdminState(now = new Date()) {
     workSession(13, 'EMP-DULCE', -105, '08:30', '14:30', { rateSnapshot: 7, compensationType: 'paid', tasks: ['clean', 'checkin', 'shopping'] }),
     workSession(14, 'EMP-FABIO', -180, '09:30', '13:00', { compensationType: 'voluntary', tasks: ['maintenance', 'shopping'] }),
     workSession(15, 'EMP-MARLENE', -240, '14:00', '17:45', { tasks: ['checkin', 'bureaucracy'] }),
-    workSession(16, 'EMP-DULCE', -370, '08:00', '14:00', { rateSnapshot: 7, compensationType: 'paid', tasks: ['clean', 'checkout'] })
+    workSession(16, 'EMP-DULCE', -370, '08:00', '14:00', { rateSnapshot: 7, compensationType: 'paid', tasks: ['clean', 'checkout'] }),
+    workSession(17, 'EMP-ANA', -70, '09:00', '14:30', { rateSnapshot: 7, compensationType: 'paid', tasks: ['clean', 'checkin'], notes: 'Reforço sazonal para substituir a Dulce.' }),
+    workSession(18, 'EMP-ANA', -390, '08:30', '14:00', { rateSnapshot: 7, compensationType: 'paid', tasks: ['clean', 'checkout'], notes: 'Último período como funcionária regular.' })
   ];
 
   const expense = (sequence, offset, category, description, amount, notes = '') => ({ id: id('EXP', sequence, offset), date: dateAt(offset), category, description, amount, notes });

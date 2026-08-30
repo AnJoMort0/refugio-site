@@ -170,9 +170,10 @@ try {
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
 
-  if (args.click) {
+  for (const clickKey of ['click', 'click2', 'click3']) {
+    if (!args[clickKey]) continue;
     await command('Runtime.evaluate', {
-      expression: `document.querySelector(${JSON.stringify(String(args.click))})?.click()`
+      expression: `document.querySelector(${JSON.stringify(String(args[clickKey]))})?.click()`
     });
     await new Promise((resolve) => setTimeout(resolve, 500));
   }

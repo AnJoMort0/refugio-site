@@ -685,6 +685,75 @@
   gap: 0.85rem;
 }
 
+.admin-employee-history {
+  display: grid;
+  border-block: 1px solid rgba(90, 75, 63, 0.12);
+}
+
+.admin-employee-history-toggle {
+  width: 100%;
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-charcoal-earth);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-employee-history-toggle > span {
+  min-width: 0;
+  display: grid;
+  gap: 0.12rem;
+}
+
+.admin-employee-history-toggle strong {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+}
+
+.admin-employee-history-toggle small {
+  color: rgba(43, 38, 34, 0.62);
+}
+
+.admin-employee-history-body {
+  display: grid;
+  gap: 1rem;
+  padding: 0.25rem 0 1rem;
+}
+
+.admin-employee-history-filters {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+}
+
+.admin-employee-history-totals {
+  margin: 0;
+}
+
+.admin-employee-archive-actions {
+  padding-top: 0.25rem;
+}
+
+.admin-record.is-archived {
+  background: rgba(246, 244, 240, 0.72);
+}
+
+.admin-archived-employees {
+  margin-top: 1rem;
+  border-block: 1px solid rgba(90, 75, 63, 0.12);
+}
+
+.admin-archived-employees-body {
+  display: grid;
+  gap: 0.85rem;
+  padding: 0.25rem 0 1rem;
+}
+
 .admin-section-heading {
   display: flex;
   justify-content: space-between;
@@ -1782,6 +1851,15 @@ form.is-dirty::before {
 
   .admin-filter-bar > .button {
     min-height: 2.75rem;
+  }
+
+  .admin-employee-history-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-employee-history-filters > .admin-field,
+  .admin-employee-history-filters > .button {
+    grid-column: 1 / -1;
   }
 
   .admin-list-disclosure > summary {
