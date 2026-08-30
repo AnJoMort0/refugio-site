@@ -2,13 +2,13 @@
 
 Last reviewed: 2026-08-30
 
-This guide starts from zero: no domain, no hosting account, no command-line setup, and no previous deployment experience. Follow it in order. Keep [`deployment.md`](./deployment.md) open as the technical companion; that document explains the architecture, while this one explains what to click, type, check, and record.
+This guide starts from the **owner-approved static prototype already hosted on GitHub Pages** and takes it to a real production system. It assumes no production domain, Cloudflare backend, database, authentication, or deployment experience yet. Follow it in order. Keep [`deployment.md`](./deployment.md) open as the technical companion; that document explains the architecture, while this one explains what to click, type, check, and record.
 
 ## 1. Read this before publishing anything
 
-The repository currently contains a polished browser prototype. It is suitable for testing screens and workflows, but it is **not yet a production reservation system**.
+The owners have already approved the current browser prototype through its static GitHub Pages deployment. That approval is the starting point for this guide, so **do not create another private review deployment just to review the same prototype again**.
 
-The current prototype stores admin data and demo login state in each browser's `localStorage`. That means:
+The approved prototype is still **not a production reservation system**. It stores admin data and demo login state in each browser's `localStorage`. That means:
 
 - another computer does not automatically see the same reservations;
 - clearing browser storage removes that browser's prototype data;
@@ -16,12 +16,12 @@ The current prototype stores admin data and demo login state in each browser's `
 - client-side permissions do not protect real personal or financial data;
 - submitting a form simulates the workflow locally instead of reliably storing and emailing it on a server.
 
-There are therefore two separate deployments:
+The remaining path has two phases:
 
-1. **Private review deployment:** puts the current prototype online so owners can review it. Do not enter real guest, identity, payment, employment, or financial data.
-2. **Production deployment:** first adds the server, database, authentication, email, file storage, backups, and legal content described below, then launches the real public site.
+1. **Production implementation and staging validation:** keep the approved interface, replace the browser-only storage/security boundaries with the Worker API, D1, Access, Resend, R2 where needed, Turnstile, backups, and other production controls; then test that implementation in a separate staging environment using fake data.
+2. **Production launch:** only after staging passes the production test checklist, deploy the production environment, connect the final domain, and introduce real business data in a controlled way.
 
-Do not skip directly from the prototype to accepting real bookings.
+The existing GitHub Pages prototype may remain available as the approved visual/workflow reference while implementation is underway, but keep it demo-only. Do not connect it to production secrets or databases, and do not enter real guest, identity, payment, employment, or financial data there.
 
 ## 2. Recommended low-cost setup
 
@@ -64,6 +64,7 @@ Cloudflare account email:
 Cloudflare account ID:
 GitHub account/organisation:
 GitHub repository URL:
+Approved GitHub Pages prototype URL:
 Production Worker name:
 Staging Worker name:
 Production D1 name and ID:
@@ -213,103 +214,47 @@ npm run dev
 
 Open the URL printed by the command. Keep this terminal open while testing. Press `Ctrl+C` to stop the server.
 
-## 8. Put the source code in GitHub
+## 8. Verify the existing GitHub repository and ownership
 
-### 8.1 Create the account and repository
+Because the approved prototype is already hosted with GitHub Pages, there should already be a GitHub repository. **Do not create a second repository simply for this deployment.** First make sure the existing repository and account ownership are suitable for production development.
 
-1. Create an owner-controlled [GitHub account](https://github.com/signup), or preferably a small GitHub organisation owned by the business.
-2. Enable two-factor authentication.
-3. In GitHub, select **New repository**.
-4. Name it `refugio-site`.
-5. Choose **Private** because the repository contains business workflow details.
-6. Do not initialise it with a README, `.gitignore`, or licence if this local folder is already a Git repository.
-7. Create the repository and copy its HTTPS URL.
+### 8.1 Confirm ownership and repository safety
 
-### 8.2 Connect the existing folder
+1. Open the GitHub repository that currently publishes the approved GitHub Pages prototype.
+2. Confirm the repository is owned by an owner-controlled account or, preferably, an organisation controlled by the business. A developer's personal account must not be the sole long-term owner.
+3. Enable two-factor authentication for every account with write or administration access.
+4. Record the repository URL and the current GitHub Pages prototype URL in the deployment record.
+5. Review the repository and Git history for `.env`, `.dev.vars`, API keys, database exports, real guest data, attachments, or other secrets/private data before backend work begins.
+6. If the repository is public because it currently serves GitHub Pages, remember that **all committed code and history are public**. Never rely on repository privacy to protect secrets. Consider moving ongoing production development to an owner-controlled private repository if the chosen GitHub plan/workflow supports that, but do not break the approved Pages reference until the production replacement is ready.
+7. Demo passwords or seed credentials visible in the prototype must never become production credentials.
 
-First inspect the current state:
-
-```powershell
-git status
-git remote -v
-```
-
-If no `origin` remote exists, add the URL copied from GitHub:
-
-```powershell
-git remote add origin https://github.com/YOUR-ACCOUNT/refugio-site.git
-```
-
-If `origin` already points somewhere else, stop and verify ownership before changing it.
-
-Commit the reviewed files:
-
-```powershell
-git add .
-git status
-git commit -m "Prepare O Refugio prototype for deployment"
-git branch -M main
-git push -u origin main
-```
-
-Review `git status` before every commit. Never commit `.dev.vars`, `.env`, API keys, database exports, contact attachments, or real guest data. GitHub's [repository guide](https://docs.github.com/en/get-started/start-your-journey/creating-a-repository-for-your-project-on-github) explains the account and repository screens.
-
-## 9. Deploy the current prototype for private review
-
-This stage does not make the system production-ready. Use only fake data.
-
-### 9.1 Log Wrangler into Cloudflare
+### 8.2 Confirm the local folder points to that repository
 
 From the project folder, run:
 
 ```powershell
-npx wrangler login
+git status
+git remote -v
+git branch --show-current
 ```
 
-A browser opens. Sign in to the owner-controlled Cloudflare account and approve Wrangler. Then return to PowerShell.
+Confirm `origin` is the expected owner-controlled repository before pushing anything. If it points somewhere unexpected, stop and verify ownership rather than replacing it blindly.
 
-### 9.2 Check the deployment configuration
-
-The existing `wrangler.toml` tells Cloudflare to serve `public/` and use `404.html` for unknown pages:
-
-```toml
-name = "alojamento-rural-site"
-compatibility_date = "2026-04-15"
-
-[assets]
-directory = "./public"
-not_found_handling = "404-page"
-```
-
-For a private review copy, change the Worker name only if that name is already taken in the Cloudflare account. Do **not** change `compatibility_date` just because it looks old. Compatibility dates intentionally opt into runtime behavior changes; advance the date only as a reviewed code change and retest the site.
-
-### 9.3 Deploy
-
-Run:
+Before beginning production changes, create a working branch and run the existing checks:
 
 ```powershell
+git switch -c production/backend-foundation
+npm ci
 npm run check
-npx wrangler deploy
 ```
 
-Wrangler prints a `workers.dev` URL. Open it and verify:
+Commit reviewed changes normally. Before every commit, inspect `git status`. Never commit `.dev.vars`, `.env`, API keys, database exports, contact attachments, or real guest data.
 
-- `/index.html` loads;
-- language switching works;
-- `/admin.html` loads only demo data;
-- `/not-a-real-page.html` shows the custom 404 page;
-- phone and desktop layouts do not scroll sideways;
-- the installed admin PWA opens its static shell.
+GitHub's [repository security guidance](https://docs.github.com/en/code-security/getting-started/securing-your-repository) is a useful companion when preparing the existing repository for production work.
 
-Do not advertise this URL or enter real data. The official [Workers Static Assets guide](https://developers.cloudflare.com/workers/static-assets/get-started/) confirms that `npx wrangler deploy` publishes the project.
+## 9. Production implementation checkpoint
 
-### 9.4 Optional owner-only review hostname
-
-After the domain is active, create `review.YOUR_DOMAIN` as a Worker Custom Domain and put Cloudflare Access in front of it. Allow only the owners' and developer's exact email addresses. This is safer than sharing an unprotected review URL.
-
-## 10. Production implementation checkpoint
-
-The next steps require development work in this repository. Creating Cloudflare resources alone will not connect the existing browser prototype to them.
+Owner approval of the prototype is already complete. The next milestone is therefore **implementation**, not another visual review deployment. Creating Cloudflare resources alone will not connect the existing browser prototype to them; the production boundaries below must be built in the repository and tested.
 
 Do not continue to production launch until all of these are implemented and reviewed:
 
@@ -330,11 +275,23 @@ Do not continue to production launch until all of these are implemented and revi
 
 The target tables and API routes are listed in [`deployment.md`](./deployment.md). Treat completion of this checkpoint as a development milestone with tests, not as a dashboard setting.
 
-## 11. Create separate staging and production resources
 
-Only do this when the Worker/API code and migrations exist.
+## 10. Create separate staging and production resources
 
-### 11.1 Choose data location, then create D1 databases
+Only do this when the Worker/API code and migrations exist. The approved GitHub Pages prototype does not need its own Cloudflare Worker; these resources are for the new staging and production system.
+
+### 10.1 Log Wrangler into the owner-controlled Cloudflare account
+
+From the project folder, run:
+
+```powershell
+npx wrangler login
+npx wrangler --version
+```
+
+A browser opens. Sign in to the owner-controlled Cloudflare account and approve Wrangler. Return to PowerShell and confirm the Wrangler version prints successfully. Do this before creating staging or production resources.
+
+### 10.2 Choose data location, then create D1 databases
 
 Make this decision **before** creating D1 or R2. A location hint such as Western Europe is best-effort placement. An EU jurisdiction is a data-residency restriction and cannot be added or changed after the resource is created. EU jurisdiction may be useful if the business/legal review wants D1/R2 data guaranteed to stay within the EU, but GDPR does not automatically mean every system must use EU-only storage. This setting covers those resources only; separately review Worker request processing/logs, Cloudflare Access, email, analytics, and any other providers.
 
@@ -373,7 +330,7 @@ npx wrangler d1 migrations apply refugio-production --remote
 
 Always apply and test on staging first. Cloudflare's [D1 getting-started guide](https://developers.cloudflare.com/d1/get-started/) and [migration reference](https://developers.cloudflare.com/d1/reference/migrations/) are the command source of truth.
 
-### 11.2 Create private R2 buckets
+### 10.3 Create private R2 buckets
 
 If you chose a Western Europe location hint:
 
@@ -391,7 +348,7 @@ npx wrangler r2 bucket create refugio-production-private --jurisdiction eu
 
 Add separate R2 bindings for staging and production, including `jurisdiction = "eu"` in the Wrangler R2 binding when using an EU-jurisdiction bucket. Keep both buckets private and leave the public `r2.dev` URL disabled for sensitive content. Direct browser uploads may use short-lived S3 presigned `PUT` URLs, but those require an R2 CORS policy for the exact site origin and must be treated as bearer tokens. A browser must never receive a permanent public URL for an attachment or identity document. See the official [R2 CLI guide](https://developers.cloudflare.com/r2/get-started/cli/), [data-location guide](https://developers.cloudflare.com/r2/reference/data-location/), and [presigned-URL guide](https://developers.cloudflare.com/r2/api/s3/presigned-urls/).
 
-### 11.3 Configure environments
+### 10.4 Configure environments
 
 Use at least `staging` and `production` Wrangler environments. Wrangler bindings and `vars` are **non-inheritable**, so do not define a D1/R2 binding only at the top level and assume named environments will receive it. Each environment needs its own:
 
@@ -414,7 +371,7 @@ refugio-production-private
 
 Use fake guests and a recipient allow-list in staging.
 
-## 12. Protect the admin with Cloudflare Access
+## 11. Protect the admin with Cloudflare Access
 
 For the simplest bootstrap, email one-time PIN can be used as the primary Cloudflare Access login. New Zero Trust organisations no longer add OTP automatically, so enable it explicitly if you choose it. For production admin access, also require Cloudflare Access independent MFA (TOTP, a WebAuthn security key, or device biometrics), especially for owner/dev accounts. Each person must still have an individual identity.
 
@@ -433,11 +390,11 @@ For the simplest bootstrap, email one-time PIN can be used as the primary Cloudf
 
 Cloudflare documents [one-time PIN login](https://developers.cloudflare.com/cloudflare-one/integrations/identity-providers/one-time-pin/) and [Access applications](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/). Access is the outer gate; D1 role checks remain mandatory inside the API.
 
-## 13. Configure incoming and outgoing email
+## 12. Configure incoming and outgoing email
 
 Incoming mail and transactional sending are different services.
 
-### 13.1 Receive replies
+### 12.1 Receive replies
 
 The cheapest setup can route addresses such as `reservas@YOUR_DOMAIN` and `contacto@YOUR_DOMAIN` to an existing owner mailbox.
 
@@ -449,7 +406,7 @@ The cheapest setup can route addresses such as `reservas@YOUR_DOMAIN` and `conta
 
 Cloudflare Email Routing is forwarding, not a normal outbound mailbox. Replying from the destination mailbox will normally send **from that destination address**, not automatically from `reservas@YOUR_DOMAIN`. Use a mailbox/SMTP provider (or a correctly configured “send as” feature backed by an SMTP service) if staff need to write manual replies from the custom-domain address, need a shared inbox/calendar, or need mailbox storage.
 
-### 13.2 Send transactional messages with Resend
+### 12.2 Send transactional messages with Resend
 
 1. Create the owner-controlled Resend account.
 2. Add a sending subdomain such as `updates.YOUR_DOMAIN`; isolating transactional sending protects the main domain's reputation.
@@ -472,7 +429,7 @@ npx wrangler secret put RESEND_API_KEY --env production
 
 Resend's official guides cover [domain verification](https://resend.com/docs/dashboard/domains/introduction) and [sending email](https://resend.com/docs/api-reference/emails/send-email). Cloudflare's [secrets documentation](https://developers.cloudflare.com/workers/configuration/secrets/) explains encrypted Worker secrets.
 
-## 14. Add Turnstile to public forms
+## 13. Add Turnstile to public forms
 
 1. In Cloudflare, open **Turnstile**.
 2. Create one widget for staging and one for production.
@@ -493,7 +450,7 @@ npx wrangler secret put TURNSTILE_SECRET_KEY --env production
 
 The browser widget alone is not protection. Server validation is mandatory; tokens expire after five minutes and are single-use. Follow the official [Turnstile setup](https://developers.cloudflare.com/turnstile/get-started/) and [Siteverify validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/) guides.
 
-## 15. Add payment-hold automation
+## 14. Add payment-hold automation
 
 The server must hold an accepted website request for 48 hours, then release it if payment is not received. D1 uses auto-commit; design this with conditional/idempotent writes or `batch()`/database triggers rather than assuming an application-controlled `BEGIN`/`COMMIT` transaction.
 
@@ -509,7 +466,11 @@ The server must hold an accepted website request for 48 hours, then release it i
 
 Use Cloudflare's [Cron Trigger guide](https://developers.cloudflare.com/workers/configuration/cron-triggers/) for the current configuration syntax.
 
-## 16. Deploy and test staging
+## 15. Deploy and test staging
+
+This staging deployment is **not another prototype approval round**. It exists to test the newly implemented server, database, authentication, email, permissions, files, migrations, and production configuration without risking real data.
+
+Before the first staging deployment, confirm the Worker/static-assets configuration has been updated from the browser-only prototype so `/api/*` is handled by the Worker while the approved static interface continues to be served as assets.
 
 Deploy staging first:
 
@@ -544,9 +505,9 @@ Use a staging hostname such as `staging.YOUR_DOMAIN`, protected by Access. Compl
 
 Fix staging failures before touching production data.
 
-## 17. Prepare production data
+## 16. Prepare production data
 
-1. Obtain owner approval for all public text, prices, rules, cancellation terms, contact details, images, partners, and map links.
+1. Reconfirm the **production values** for public text, prices, rules, cancellation terms, contact details, images, partners, and map links. The earlier prototype approval confirms the interface/workflow direction, but launch still requires the actual production content and legal wording to be current.
 2. Obtain appropriate Portuguese legal/privacy review for personal data, identity data, employment data, cookies, direct marketing, cancellation, complaints, and retention.
 3. Replace every placeholder in `site-config.js` and owner-approved content files.
 4. Create production users from verified individual emails. Do not migrate demo passwords.
@@ -557,7 +518,7 @@ Fix staging failures before touching production data.
 9. Keep an encrypted export of the source data and an import report.
 10. Only then import into production.
 
-## 18. Connect the production domain
+## 17. Connect the production domain
 
 After production passes the staging checklist:
 
@@ -578,7 +539,7 @@ In Cloudflare:
 
 Cloudflare's [Custom Domains guide](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/) explains that Cloudflare creates DNS and certificates for the Worker hostname. Do not delete unrelated MX, SPF, DKIM, or DMARC records when adding the website.
 
-## 19. Configure automatic deployments
+## 18. Configure automatic deployments
 
 Once manual production deployment is understood and tested, connect GitHub to Cloudflare Workers Builds.
 
@@ -591,16 +552,16 @@ For the beginner setup, automate production first and keep staging deployments m
 5. Set the build command to run the required project checks (for example `npm run check`, plus any real build command if the project later has one).
 6. Set the production deploy command to `npx wrangler deploy --env production`.
 7. Initially leave **non-production branch builds disabled** on the production Worker. Continue deploying staging manually with `npx wrangler deploy --env staging` after local checks.
-8. Make a harmless approved change, merge it to `main`, and verify that the build deploys only the production environment and uses the production bindings.
+8. Make a harmless tested change, merge it to `main`, and verify that the build deploys only the production environment and uses the production bindings.
 9. If you later want automatic staging/PR previews, follow Cloudflare's Wrangler-environments advanced setup and connect/configure the **staging environment Worker separately**. Use commands with `--env staging` (for example `npx wrangler versions upload --env staging` for preview uploads), and verify that preview builds cannot reach production D1/R2.
 
 Cloudflare's [GitHub integration](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/) and [Workers Builds advanced setup](https://developers.cloudflare.com/workers/ci-cd/builds/advanced-setups/) are the source of truth. Bindings and secrets must still be configured per environment.
 
-## 20. Backups and recovery
+## 19. Backups and recovery
 
 D1 Time Travel is automatic, but it is not the only backup. As of this review, the recovery window is 7 days on Workers Free and 30 days on Workers Paid.
 
-### 20.1 Regular export
+### 19.1 Regular export
 
 From a controlled computer, create an encrypted backup location outside the repository. Export production D1 with a dated filename:
 
@@ -610,7 +571,7 @@ npx wrangler d1 export refugio-production --remote --output "D:\RefugioBackups\r
 
 Never put this file in Git, email, or an unencrypted shared folder. It contains personal and business data.
 
-### 20.2 Restore drill
+### 19.2 Restore drill
 
 At least quarterly:
 
@@ -623,7 +584,7 @@ At least quarterly:
 
 For an incident within the available window, D1 [Time Travel](https://developers.cloudflare.com/d1/reference/time-travel/) can restore to a point in time. A production Time Travel restore overwrites the database, so record the current bookmark and obtain owner approval before using it.
 
-## 21. Install the admin PWA
+## 20. Install the admin PWA
 
 Only install the production admin after Access and the server-side API are working.
 
@@ -645,7 +606,7 @@ Only install the production admin after Access and the server-side API are worki
 
 The service worker caches only the static admin shell. It must never cache API responses, guest records, attachments, credentials, or secrets.
 
-## 22. Launch-day sequence
+## 21. Launch-day sequence
 
 1. Freeze content and code changes except launch fixes.
 2. Run `npm run check`.
@@ -662,7 +623,7 @@ The service worker caches only the static admin shell. It must never cache API r
 13. Verify Search Console/analytics only after consent and privacy decisions are complete.
 14. Record the deployed commit ID and launch time.
 
-## 23. Routine updates after launch
+## 22. Routine updates after launch
 
 For every normal change:
 
@@ -673,7 +634,7 @@ npm run check
 npm run dev
 ```
 
-Test locally, commit, push, review the staging preview, and merge only after approval. For a database change, create a migration and apply it to staging before production. Never edit production tables manually without a recorded, reviewed reason.
+Test locally, commit, push, validate the change in staging, and merge only after the required code/business review. For a database change, create a migration and apply it to staging before production. Never edit production tables manually without a recorded, reviewed reason.
 
 Monthly:
 
@@ -699,7 +660,7 @@ Yearly:
 - review account owners and emergency contacts;
 - review whether the free tiers and architecture still fit actual traffic.
 
-## 24. Stop and get help when
+## 23. Stop and get help when
 
 Do not improvise around these failures:
 

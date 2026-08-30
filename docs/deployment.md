@@ -4,9 +4,9 @@ Last reviewed: 2026-08-30
 
 ## Purpose
 
-The current project is a browser-only prototype. It demonstrates the intended public, guest, owner, and employee workflows, but its `localStorage` data, demo login, and client-side permissions are not a security boundary.
+The current project is an **owner-approved browser-only prototype already published in static GitHub Pages form**. It demonstrates the intended public, guest, owner, and employee workflows, but its `localStorage` data, demo login, and client-side permissions are not a security boundary.
 
-This document describes the lowest-cost practical route to a real website while preserving the existing UI and replacing infrastructure in controlled stages.
+The design/workflow review stage is therefore complete. This document starts from that approved prototype and describes the lowest-cost practical route to a real production system while preserving the existing UI and replacing infrastructure in controlled stages. A separate private prototype-review deployment is not required.
 
 ## Recommended low-cost stack
 
@@ -79,7 +79,7 @@ Keep the existing page controllers and replace their storage boundaries:
 - Booking and contact forms POST JSON or `multipart/form-data` to `/api/forms/*`.
 - Seed data remains available only in local/demo mode and is never deployed as live business state.
 
-This allows the interface to remain recognisable while persistence and security move server-side.
+This allows the already-approved interface to remain recognisable while persistence and security move server-side. The existing GitHub Pages build may remain available as a demo/reference during implementation, but it must stay disconnected from production secrets, databases, and real personal/business data.
 
 ## Recommended D1 model
 
@@ -217,6 +217,8 @@ Keep a generic no-token QR page useful for non-personal property information.
 
 ## Static deployment configuration
 
+The approved GitHub Pages deployment is only the static prototype/reference. The production target is Cloudflare Workers so the same static interface and the new API can share the required production boundary. There is no need to reproduce the current prototype on a separate private Worker first.
+
 `wrangler.toml` uses the `public/` directory as Worker static assets and `not_found_handling = "404-page"`. Once API code exists, add a Worker entry point. For explicit API-first routing, give the assets a binding and set `run_worker_first = ["/api/*"]`; the Worker can then handle `/api/*` while other requests continue to use static assets. Do not advance `compatibility_date` merely because the calendar moved: update it deliberately and test the resulting runtime changes.
 
 Before creating D1 or R2, make the data-residency decision. If the legal/privacy decision is to guarantee EU storage/processing for these resources, create them with `--jurisdiction eu`; jurisdiction cannot be added or changed later. A location such as `weur` is only a best-effort placement hint, not a residency guarantee. D1/R2 jurisdiction does not by itself make the entire application EU-only: separately review where Worker request processing, logs, Access identity data, email delivery, analytics, and any other providers process data.
@@ -264,11 +266,12 @@ The manifest follows the current [W3C Web Application Manifest specification](ht
 
 ## Environments
 
-- Local: demo seed or local D1, fake recipients, no real personal data.
-- Preview: separate D1/R2, Access restricted to the project team, test mail domain/recipient allow-list.
-- Production: production domain, production D1/R2, final Access policy, real mail DNS, monitoring, and backups.
+- Approved GitHub Pages prototype/reference: static demo only; no production credentials, D1/R2 bindings, real guest data, or production admin authentication. This is not a production environment and does not need to be redeployed for owner review.
+- Local development: demo seed or local D1, fake recipients, no real personal data.
+- Staging: the new production-capable code with separate D1/R2, Access restricted to the project team, fake data, and a test-mail recipient allow-list. Its purpose is technical/operational validation, not re-approval of the already accepted prototype UI.
+- Production: production domain, production D1/R2, final Access policy, real mail DNS, monitoring, backups, and real business data.
 
-Do not point preview deployments at production data.
+Never point the GitHub Pages prototype, local development, or staging at production data or production secrets.
 
 ## Backups, audit, and portability
 
@@ -297,38 +300,51 @@ Use request/correlation IDs from form submission through email and audit records
 
 ## Migration order
 
-### Stage 1: owner-approved static site
+### Starting point: approved static prototype — already complete
 
-- Replace contact/social/host/Wi-Fi and partner placeholders.
-- Complete content/legal review and final images.
-- Deploy static assets behind the final domain.
-- Verify production 404, redirects, accessibility, and performance.
+- Owners have approved the current UI and intended workflows through the GitHub Pages prototype.
+- Keep that deployment as a demo/reference only while production work is underway.
+- Do not spend time creating a second private prototype-review deployment.
+- Prototype approval does **not** replace the later production-content, legal, security, data-migration, and staging checks.
 
-### Stage 2: public submissions and mail
+### Stage 1: production foundations, public submissions, and mail
 
-- Add D1 migrations and public form APIs.
-- Add Turnstile and idempotency.
-- Send/store transactional mail status.
+- Confirm final production contacts, prices, rules, placeholders, images, and legally reviewed public/privacy/marketing wording before launch.
+- Add the Worker entry point and environment-specific bindings.
+- Add D1 migrations and public read/form APIs.
+- Add server validation, Turnstile, request limits, and idempotency.
+- Send/store transactional mail status only after persistence succeeds.
 - Populate website requests and marketing consent server-side.
+- Deploy these changes to staging with fake data and test them there.
 
-### Stage 3: secure admin persistence
+### Stage 2: secure admin persistence
 
-- Add Access and D1 user/role mapping.
-- Replace `admin-store.js` with API calls by module.
+- Add Cloudflare Access and D1 user/role mapping.
+- Replace `admin-store.js` with authenticated API calls by module.
 - Migrate reservations/pricing/services first, then expenses/staff/work/reports.
 - Move audit generation server-side.
+- Test owner/employee/dev role boundaries and account deactivation in staging.
 
-### Stage 4: guest links and private files
+### Stage 3: guest links and private files
 
 - Add stay-token issuance/revocation.
-- Replace guest provider with the minimal API.
+- Replace the guest provider with the minimal API.
 - Add private R2 uploads only if the business confirms the need.
+- Test token isolation, expiry, file authorisation, retention, and failure paths in staging.
 
-### Stage 5: automation and hardening
+### Stage 4: automation, recovery, and hardening
 
 - Add 48-hour expiry/reminder Cron.
 - Add queues/retries where delivery risk justifies them.
-- Complete backup/restore tests, retention jobs, monitoring, and incident notes.
+- Complete backup/export and restore drills, retention jobs, monitoring, and incident notes.
+- Run the full staging acceptance checklist with production-like configuration and fake data.
+
+### Stage 5: controlled production cutover
+
+- Prepare/import production data only after the staging checks pass.
+- Deploy the production Worker and attach the final domain.
+- Verify Access, forms, mail, availability, audit, guest links, backups, redirects, and the PWA using controlled launch tests.
+- Retire or clearly label the old GitHub Pages prototype once the production site is confirmed stable so visitors cannot confuse the demo with the live system.
 
 ## Launch checklist
 
@@ -342,6 +358,7 @@ Use request/correlation IDs from form submission through email and audit records
 - [ ] Marketing consent appears privately and withdrawal suppresses future sends.
 - [ ] Guest tokens are unguessable, minimal, expiring, and revocable.
 - [ ] D1/R2 location or jurisdiction was chosen deliberately before resource creation, and any EU-residency requirement is documented.
-- [ ] Backups can be restored into a clean preview environment.
+- [ ] Backups can be restored into a clean staging/restore-drill environment.
 - [ ] Mobile and desktop workflows tested with production configuration.
 - [ ] Real-data seed/export files and secrets are absent from the public bundle and Git history.
+- [ ] The old GitHub Pages prototype is removed, redirected, access-limited, or clearly labelled so it cannot be mistaken for the live production system.
