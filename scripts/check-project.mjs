@@ -370,6 +370,7 @@ async function checkSharedUtilities() {
   const dateUtilities = await import(pathToFileURL(path.join(PUBLIC_DIRECTORY, 'js', 'utils', 'date.js')));
   const phoneUtilities = await import(pathToFileURL(path.join(PUBLIC_DIRECTORY, 'js', 'utils', 'phone.js')));
   const countryUtilities = await import(pathToFileURL(path.join(PUBLIC_DIRECTORY, 'js', 'utils', 'countries.js')));
+  const giftUtilities = await import(pathToFileURL(path.join(PUBLIC_DIRECTORY, 'js', 'services', 'discount-gifts.js')));
   const sampleDate = dateUtilities.parseDateKey('2026-08-20');
 
   if (dateUtilities.formatDateKey(dateUtilities.addDays(sampleDate, 1)) !== '2026-08-21') {
@@ -392,6 +393,30 @@ async function checkSharedUtilities() {
   }
   if (!countryUtilities.isCompleteAddress({ street: 'Rua Exemplo 1', postalCode: '4550-518', city: 'Pedorido', countryCode: 'PT' })) {
     reportError('Shared address validation rejected a complete address.');
+  }
+
+  const accommodationGift = giftUtilities.calculateGiftRewardDiscount(
+    { guests: 2, nights: 1 },
+    { nightGuestRates: [[62.5, 62.5], [75, 75]], bikeDayPrice: 5 }
+  );
+  if (accommodationGift.amount !== 125) {
+    reportError('Gift discount calculation did not apply one free night for two people to the least expensive eligible night.');
+  }
+
+  const singleGuestGift = giftUtilities.calculateGiftRewardDiscount(
+    { guests: 1, nights: 1 },
+    { nightGuestRates: [[125]], bikeDayPrice: 5 }
+  );
+  if (singleGuestGift.amount !== 125) {
+    reportError('Gift discount calculation did not cover the complete two-adult minimum charge assigned to one actual adult.');
+  }
+
+  const bikeGift = giftUtilities.calculateGiftRewardDiscount(
+    { bikes: 1, bikeDays: 1 },
+    { nightGuestRates: [], bikeCount: 2, bikeRentalDays: 3, bikeDayPrice: 5 }
+  );
+  if (bikeGift.amount !== 5) {
+    reportError('Gift discount calculation did not apply one free bicycle day.');
   }
 }
 
@@ -421,6 +446,14 @@ async function checkAdminModel() {
   checkCoverage('guest languages', ['pt', 'fr', 'en', 'es'], state.reservations.map((reservation) => reservation.preferredLanguage));
   checkCoverage('website request statuses', ['new', 'accepted', 'rejected'], state.websiteRequests.map((request) => request.status));
   checkCoverage('work compensation types', ['paid', 'free', 'voluntary'], state.workSessions.map((session) => session.compensationType));
+
+  const giftDiscounts = state.pricing.discounts.filter((discount) => discount.type === 'gift');
+  if (!giftDiscounts.some((discount) => discount.gift?.guests && discount.gift?.nights)) {
+    reportError('Admin seed is missing an accommodation gift code.');
+  }
+  if (!giftDiscounts.some((discount) => discount.gift?.bikes && discount.gift?.bikeDays)) {
+    reportError('Admin seed is missing a bicycle gift code.');
+  }
 
   if (!state.reservations.some((reservation) => reservation.securityDepositPaid === true)) {
     reportError('Admin seed is missing a reservation with the security deposit marked as received.');

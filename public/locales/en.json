@@ -410,6 +410,7 @@
       "discountCodeLabel": "Discount code",
       "discountCodePlaceholder": "Enter your discount code here",
       "discountCodeApplied": "Code {code} applied: -{amount}",
+      "discountCodeGiftApplied": "Code {code} applied: gift worth {amount}",
       "commentsLabel": "Comments or special requests",
       "commentsPlaceholder": "E.g. unusual arrival times, requests, questions about access...",
       "marketingOptInLabel": "I would like to receive news, offers and discounts from O Refúgio",

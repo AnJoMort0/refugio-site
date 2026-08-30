@@ -722,7 +722,8 @@ export function createInitialAdminState(now = new Date()) {
       discounts: [
         { id: 'DISC-VERAO10', title: 'Campanha de verão', code: 'VERAO10', type: 'percentage', percentage: 10, amount: 0, maxUses: 20, usedCount: 6, startDate: dateAt(-60), endDate: dateAt(60), appliesTo: 'accommodation', active: true },
         { id: 'DISC-REGRESSO10', title: 'Hóspede repetente', code: 'REGRESSO10', type: 'percentage', percentage: 10, amount: 0, maxUses: 0, usedCount: 3, startDate: '', endDate: '', appliesTo: 'accommodation', active: true },
-        { id: 'DISC-BICICLETAS5', title: 'Oferta bicicletas', code: 'BIKES5', type: 'amount', percentage: 0, amount: 5, maxUses: 12, usedCount: 4, startDate: '', endDate: dateAt(90), appliesTo: 'services', active: true },
+        { id: 'DISC-PRESENTE-NOITE', title: 'Presente de uma noite', code: 'PRESENTE1', type: 'gift', percentage: 0, amount: 0, gift: { guests: 2, nights: 1, bikes: 0, bikeDays: 0 }, maxUses: 5, usedCount: 1, startDate: '', endDate: '', appliesTo: 'accommodation', active: true },
+        { id: 'DISC-BICICLETAS5', title: 'Oferta de bicicleta', code: 'BIKEGIFT', type: 'gift', percentage: 0, amount: 0, gift: { guests: 0, nights: 0, bikes: 1, bikeDays: 1 }, maxUses: 12, usedCount: 4, startDate: '', endDate: dateAt(90), appliesTo: 'services', active: true },
         { id: 'DISC-INVERNO25', title: 'Reserva de inverno', code: 'INVERNO25', type: 'amount', percentage: 0, amount: 25, maxUses: 0, usedCount: 0, startDate: '2026-10-01', endDate: '2027-03-31', appliesTo: 'both', active: true },
         { id: 'DISC-ARQUIVADO', title: 'Campanha encerrada', code: 'PRIMAVERA15', type: 'percentage', percentage: 15, amount: 0, maxUses: 10, usedCount: 10, startDate: dateAt(-180), endDate: dateAt(-120), appliesTo: 'accommodation', active: false }
       ]

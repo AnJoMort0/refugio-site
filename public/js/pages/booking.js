@@ -1,5 +1,6 @@
 import { getActiveLanguage, getCurrentDictionary, getNestedValue } from '../services/i18n.js';
 import { getEffectivePricesForDate, getLimitedTimePriceComparison } from '../services/pricing-promotions.js';
+import { calculateGiftRewardDiscount, hasGiftReward, normalizeGiftReward } from '../services/discount-gifts.js';
 import { addDays, diffCalendarDays as diffNights, formatDateKey, parseDateKey } from '../utils/date.js';
 import { renderCountrySelect, resolveCountryCode } from '../utils/countries.js';
 import { isValidPhoneNumber } from '../utils/phone.js';
@@ -75,12 +76,20 @@ function getStayDateKeys(checkIn, checkOut) {
   return eachDate(start, end).map(formatDateKey);
 }
 
-function buildStayValue({ nights, adults, children, checkIn = '', checkOut = '' }) {
+function getStayPriceRows({ nights, checkIn = '', checkOut = '' }) {
   const dateKeys = getStayDateKeys(checkIn, checkOut);
   if (dateKeys.length) {
-    return dateKeys.reduce((total, dateKey) => total + getNightlyAccommodationValue(dateKey, adults, children), 0);
+    return dateKeys.map((dateKey) => getNightlyPrices(dateKey));
   }
-  return nights > 0 ? nights * getNightlyAccommodationValue(checkIn, adults, children) : 0;
+
+  return Array.from({ length: Math.max(0, nights) }, () => getNightlyPrices(checkIn));
+}
+
+function buildStayValue({ nights, adults, children, checkIn = '', checkOut = '' }) {
+  return getStayPriceRows({ nights, checkIn, checkOut }).reduce(
+    (total, prices) => total + (getPaidAdultCount(adults) * prices.adultPerNight) + (Math.max(0, children) * prices.childPerNight),
+    0
+  );
 }
 
 function formatRateRange(values) {
@@ -122,7 +131,8 @@ function isDiscountAvailableForDate(discount, checkIn) {
   return true;
 }
 
-function getDiscountCodeResult(code, { checkIn, stayValue, bikeValue }) {
+function getDiscountCodeResult(code, context) {
+  const { checkIn, stayValue, bikeValue } = context;
   const normalizedCode = normalizeDiscountCode(code);
   if (!normalizedCode) {
     return { code: '', valid: false, pending: false, amount: 0, reason: 'empty' };
@@ -145,11 +155,31 @@ function getDiscountCodeResult(code, { checkIn, stayValue, bikeValue }) {
     : appliesTo === 'both'
       ? stayValue + bikeValue
       : stayValue;
-  const discountType = discount.type || (Number(discount.amount || 0) > 0 ? 'amount' : 'percentage');
-  const rawAmount = discountType === 'amount'
-    ? Number(discount.amount || 0)
-    : Math.round(discountBase * (Number(discount.percentage || 0) / 100));
-  const amount = Math.min(discountBase, Math.max(0, rawAmount));
+  const discountType = discount.type || (hasGiftReward(discount.gift)
+    ? 'gift'
+    : Number(discount.amount || 0) > 0 ? 'amount' : 'percentage');
+  const gift = normalizeGiftReward(discount.gift);
+  const giftResult = discountType === 'gift'
+    ? calculateGiftRewardDiscount(gift, {
+        nightGuestRates: context.stayPriceRows.map((prices) => [
+          ...Array.from(
+            { length: Math.max(0, context.adults) },
+            () => (getPaidAdultCount(context.adults) * prices.adultPerNight) / Math.max(1, context.adults)
+          ),
+          ...Array.from({ length: Math.max(0, context.children) }, () => prices.childPerNight)
+        ]),
+        bikeCount: context.bikeCount,
+        bikeRentalDays: context.bikeRentalDays,
+        bikeDayPrice: PRICE_CONFIG.bikePerDay
+      })
+    : null;
+  const rawAmount = discountType === 'gift'
+    ? giftResult.amount
+    : discountType === 'amount'
+      ? Number(discount.amount || 0)
+      : Math.round(discountBase * (Number(discount.percentage || 0) / 100));
+  const amountBase = discountType === 'gift' ? stayValue + bikeValue : discountBase;
+  const amount = Math.min(amountBase, Math.max(0, rawAmount));
 
   if (amount <= 0) {
     return { code: normalizedCode, valid: false, pending: false, amount: 0, reason: 'notApplicable' };
@@ -163,15 +193,27 @@ function getDiscountCodeResult(code, { checkIn, stayValue, bikeValue }) {
     title: discount.title || normalizedCode,
     type: discountType,
     percentage: Number(discount.percentage || 0),
-    appliesTo
+    appliesTo,
+    gift: discountType === 'gift' ? gift : undefined,
+    giftApplied: giftResult?.applied
   };
 }
 
-function buildReservationBreakdown({ nights, adults, children, includeDeposit, bikeDays = 0, checkIn = '', checkOut = '', discountCode = '' }) {
+function buildReservationBreakdown({ nights, adults, children, includeDeposit, bikeDays = 0, bikeCount = 0, bikeRentalDays = 0, checkIn = '', checkOut = '', discountCode = '' }) {
+  const stayPriceRows = getStayPriceRows({ nights, checkIn, checkOut });
   const stayValue = buildStayValue({ nights, adults, children, checkIn, checkOut });
   const bikeValue = bikeDays * PRICE_CONFIG.bikePerDay;
   const depositValue = includeDeposit ? PRICE_CONFIG.securityDeposit : 0;
-  const discount = getDiscountCodeResult(discountCode, { checkIn, stayValue, bikeValue });
+  const discount = getDiscountCodeResult(discountCode, {
+    checkIn,
+    stayValue,
+    bikeValue,
+    adults,
+    children,
+    stayPriceRows,
+    bikeCount,
+    bikeRentalDays
+  });
   const discountAmount = discount.valid ? discount.amount : 0;
 
   return {
@@ -243,6 +285,13 @@ async function saveWebsiteRequestToAdminPrototype(request) {
       };
     } else {
       state.websiteRequests.unshift(request);
+      const appliedCode = normalizeDiscountCode(request.pricing?.discountCode);
+      const appliedDiscount = state.pricing?.discounts?.find(
+        (discount) => normalizeDiscountCode(discount.code) === appliedCode
+      );
+      if (appliedDiscount) {
+        appliedDiscount.usedCount = Number(appliedDiscount.usedCount || 0) + 1;
+      }
     }
 
     addWebsiteRequestAudit(state, request.id);
@@ -594,7 +643,10 @@ export async function initBookingPage() {
 
   function getDiscountStatusMessage(discount) {
     if (discount.valid) {
-      return getText('bookingPage.form.discountCodeApplied')
+      const messageKey = discount.type === 'gift'
+        ? 'bookingPage.form.discountCodeGiftApplied'
+        : 'bookingPage.form.discountCodeApplied';
+      return getText(messageKey)
         .replace('{code}', discount.code)
         .replace('{amount}', formatCurrency(discount.amount));
     }
@@ -682,6 +734,8 @@ export async function initBookingPage() {
       children,
       includeDeposit,
       bikeDays,
+      bikeCount: bikeSelection.bikes,
+      bikeRentalDays: bikeSelection.rentalDays,
       checkIn: checkinInput.value,
       checkOut: checkoutInput.value,
       discountCode: discountCodeInput?.value || ''
@@ -1238,12 +1292,15 @@ export async function initBookingPage() {
       return message;
     }
 
+    const validationBikeSelection = getBikeSelection();
     const discountBreakdown = buildReservationBreakdown({
       nights: diffNights(checkinInput.value, checkoutInput.value),
       adults,
       children: getGuestCounts().children,
       includeDeposit: Boolean(depositPrepayInput?.checked),
-      bikeDays: getBikeSelection().units,
+      bikeDays: validationBikeSelection.units,
+      bikeCount: validationBikeSelection.bikes,
+      bikeRentalDays: validationBikeSelection.rentalDays,
       checkIn: checkinInput.value,
       checkOut: checkoutInput.value,
       discountCode: discountCodeInput?.value || ''
@@ -1526,6 +1583,8 @@ export async function initBookingPage() {
       children,
       includeDeposit,
       bikeDays,
+      bikeCount,
+      bikeRentalDays,
       checkIn: checkinInput.value,
       checkOut: checkoutInput.value,
       discountCode: discountCodeInput?.value || ''
@@ -1593,6 +1652,7 @@ export async function initBookingPage() {
       params.set('discount_code', totalBreakdown.discount.code);
       params.set('discount_amount', String(totalBreakdown.discount.amount));
       params.set('discount_title', totalBreakdown.discount.title || totalBreakdown.discount.code);
+      params.set('discount_kind', totalBreakdown.discount.type);
     }
 
     childAges.forEach((age) => params.append('child_age', String(age)));
@@ -1641,6 +1701,9 @@ export async function initBookingPage() {
       pricing: totalBreakdown.discount.valid ? {
         discountCode: totalBreakdown.discount.code,
         discountTitle: totalBreakdown.discount.title || totalBreakdown.discount.code,
+        discountBenefitType: totalBreakdown.discount.type,
+        discountGift: totalBreakdown.discount.gift,
+        discountGiftApplied: totalBreakdown.discount.giftApplied,
         discountType: 'amount',
         discountPercent: 0,
         discountAmount: totalBreakdown.discount.amount

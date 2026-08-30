@@ -9,6 +9,11 @@ import {
 import { createAdminRepository } from './admin-store.js';
 import { initCustomSelects } from '../ui/custom-selects.js';
 import {
+  getIncompleteGiftRewardParts,
+  hasGiftReward,
+  normalizeGiftReward
+} from '../services/discount-gifts.js';
+import {
   formatAddress,
   getCountryName,
   getCountryOptions,
@@ -680,7 +685,10 @@ function getRequestDiscountText(request) {
   const code = request.pricing?.discountCode || '';
   const amount = Number(request.pricing?.discountAmount || 0);
   if (!code && !amount) return '';
-  return `${code || 'Desconto'} · -${renderMoney(amount)}`;
+  const giftText = request.pricing?.discountBenefitType === 'gift'
+    ? renderGiftRewardText(request.pricing.discountGiftApplied || request.pricing.discountGift)
+    : '';
+  return [code || 'Desconto', giftText, `-${renderMoney(amount)}`].filter(Boolean).join(' · ');
 }
 
 function getBedPreferenceText(reservation) {
@@ -905,14 +913,34 @@ function confirmDiscardUnsavedChanges() {
 
 function updateTypedDiscountField(form) {
   const input = form.querySelector('[data-discount-value-input], [data-reservation-discount-value-input]');
-  if (!(input instanceof HTMLInputElement)) return;
-
   const type = form.querySelector('select[name="discountType"], select[name="type"]')?.value || 'percentage';
-  input.placeholder = type === 'amount' ? 'Valor em euros' : 'Percentagem';
-  if (type === 'percentage') {
-    input.setAttribute('max', '100');
-  } else {
-    input.removeAttribute('max');
+  const isGift = type === 'gift';
+
+  if (input instanceof HTMLInputElement) {
+    input.disabled = isGift;
+    input.closest('[data-cash-discount-field]')?.toggleAttribute('hidden', isGift);
+    input.placeholder = type === 'amount' ? 'Valor em euros' : 'Percentagem';
+    if (type === 'percentage') {
+      input.setAttribute('max', '100');
+    } else {
+      input.removeAttribute('max');
+    }
+  }
+
+  if (!form.matches('[data-form="discount"]')) return;
+
+  const appliesTo = form.querySelector('select[name="appliesTo"]');
+  if (appliesTo instanceof HTMLSelectElement) {
+    appliesTo.disabled = isGift;
+    appliesTo.closest('[data-cash-discount-field]')?.toggleAttribute('hidden', isGift);
+  }
+
+  const giftFields = form.querySelector('[data-gift-discount-fields]');
+  if (giftFields instanceof HTMLElement) {
+    giftFields.hidden = !isGift;
+    giftFields.querySelectorAll('input').forEach((giftInput) => {
+      giftInput.disabled = !isGift;
+    });
   }
 }
 
@@ -2162,34 +2190,28 @@ function renderServiceEditor(service = null) {
   return `
     <form class="admin-form-grid admin-subform" data-form="service">
       <input name="serviceId" type="hidden" value="${escapeHtml(service?.id || '')}" />
-      <label class="admin-field">
-        <span>Nome</span>
-        <input name="name" type="text" value="${escapeHtml(service?.name || '')}" required />
-      </label>
-      <label class="admin-field">
-        <span>Preço</span>
-        <input name="price" type="number" min="0" step="0.01" value="${Number(service?.price || 0)}" required />
-      </label>
-      <label class="admin-field">
-        <span>Unidade</span>
-        <input name="unit" type="text" value="${escapeHtml(service?.unit || '')}" placeholder="Ex.: pessoa / dia" required />
-      </label>
-      <label class="admin-field admin-field-full">
-        <span>Descrição</span>
-        <input name="description" type="text" value="${escapeHtml(service?.description || '')}" />
-      </label>
-      <label class="admin-checkbox">
-        <input name="enabled" type="checkbox" ${service?.enabled === false ? '' : 'checked'} />
-        <span>Serviço ativo</span>
-      </label>
-      <label class="admin-checkbox">
-        <input name="showOnBooking" type="checkbox" ${service?.showOnBooking === false ? '' : 'checked'} />
-        <span>Mostrar na reserva</span>
-      </label>
-      <label class="admin-checkbox">
-        <input name="showOnGuestStay" type="checkbox" ${service?.showOnGuestStay === false ? '' : 'checked'} />
-        <span>Mostrar na área do hóspede</span>
-      </label>
+      <fieldset class="admin-form-section">
+        <legend>Identificação do serviço</legend>
+        <div class="admin-form-section-grid">
+          <label class="admin-field"><span>Nome</span><input name="name" type="text" value="${escapeHtml(service?.name || '')}" required /></label>
+          <label class="admin-field admin-field-wide"><span>Descrição</span><input name="description" type="text" value="${escapeHtml(service?.description || '')}" /></label>
+        </div>
+      </fieldset>
+      <fieldset class="admin-form-section">
+        <legend>Preço</legend>
+        <div class="admin-form-section-grid">
+          <label class="admin-field"><span>Preço</span><input name="price" type="number" min="0" step="0.01" value="${Number(service?.price || 0)}" required /></label>
+          <label class="admin-field"><span>Unidade de cobrança</span><input name="unit" type="text" value="${escapeHtml(service?.unit || '')}" placeholder="Ex.: pessoa / dia" required /></label>
+        </div>
+      </fieldset>
+      <fieldset class="admin-form-section">
+        <legend>Disponibilidade</legend>
+        <div class="admin-form-section-grid">
+          <label class="admin-checkbox admin-checkbox-compact"><input name="enabled" type="checkbox" ${service?.enabled === false ? '' : 'checked'} /><span>Serviço ativo</span></label>
+          <label class="admin-checkbox admin-checkbox-compact"><input name="showOnBooking" type="checkbox" ${service?.showOnBooking === false ? '' : 'checked'} /><span>Mostrar na reserva</span></label>
+          <label class="admin-checkbox admin-checkbox-compact"><input name="showOnGuestStay" type="checkbox" ${service?.showOnGuestStay === false ? '' : 'checked'} /><span>Mostrar na área do hóspede</span></label>
+        </div>
+      </fieldset>
       <div class="admin-form-actions">
         <button class="button button-primary" type="submit">${icon(isExisting ? 'check' : 'plus')} ${isExisting ? 'Guardar serviço' : 'Adicionar serviço'}</button>
       </div>
@@ -2293,43 +2315,34 @@ function renderSeasonForm() {
     <details class="admin-editor-disclosure"${editingSeason ? ' open' : ''}>
       <summary>${icon(editingSeason ? 'edit' : 'plus')} ${editingSeason ? 'Editar época' : 'Adicionar época'}</summary>
       <form class="admin-form-grid admin-subform" data-form="season">
-      <input name="seasonId" type="hidden" value="${escapeHtml(editingSeason?.id || '')}" />
-      <label class="admin-field">
-        <span>Nome da época</span>
-        <input name="title" type="text" value="${escapeHtml(editingSeason?.title || '')}" placeholder="Ex.: Verão, Natal, Páscoa" required />
-      </label>
-      <label class="admin-field">
-        <span>Tipo</span>
-        <select name="kind">
-          ${renderOption('recurring', 'Época anual sem ano', kind)}
-          ${renderOption('dated', 'Override com data completa', kind)}
-        </select>
-      </label>
-      <label class="admin-field">
-        <span>Início</span>
-        ${renderAdminDateControl({ name: 'startDate', value: startValue, placeholder: 'dd/mm ou dd/mm/aaaa', pattern: getAdminFlexibleDateInputPattern(), required: true })}
-      </label>
-      <label class="admin-field">
-        <span>Fim</span>
-        ${renderAdminDateControl({ name: 'endDate', value: endValue, placeholder: 'dd/mm ou dd/mm/aaaa', pattern: getAdminFlexibleDateInputPattern(), required: true })}
-      </label>
-      <label class="admin-field">
-        <span>Preço adulto/noite</span>
-        <input name="adultNight" type="number" min="0" step="0.01" value="${Number(editingSeason?.adultNight ?? state.pricing.adultNight)}" required />
-      </label>
-      <p class="admin-form-note">A cobrança mínima de adultos vem do preço base: ${state.pricing.minimumPaidAdults || 2} adulto(s).</p>
-      <label class="admin-field">
-        <span>Criança/noite</span>
-        <input name="childNight" type="number" min="0" step="0.01" value="${Number(editingSeason?.childNight ?? state.pricing.childNight)}" required />
-      </label>
-      <label class="admin-field">
-        <span>Notas</span>
-        <input name="notes" type="text" value="${escapeHtml(editingSeason?.notes || '')}" />
-      </label>
-      <div class="admin-form-actions">
-        <button class="button admin-secondary-button" type="submit">${editingSeason ? `${icon('check')} Guardar época` : `${icon('plus')} Adicionar época`}</button>
-        ${editingSeason ? '<button class="button admin-secondary-button" type="button" data-action="cancel-season-edit">Cancelar edição</button>' : ''}
-      </div>
+        <input name="seasonId" type="hidden" value="${escapeHtml(editingSeason?.id || '')}" />
+        <fieldset class="admin-form-section">
+          <legend>Época e calendário</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field"><span>Nome da época</span><input name="title" type="text" value="${escapeHtml(editingSeason?.title || '')}" placeholder="Ex.: Verão, Natal, Páscoa" required /></label>
+            <label class="admin-field"><span>Tipo</span><select name="kind">${renderOption('recurring', 'Época anual sem ano', kind)}${renderOption('dated', 'Datas específicas com ano', kind)}</select></label>
+            <label class="admin-field"><span>Início</span>${renderAdminDateControl({ name: 'startDate', value: startValue, placeholder: 'dd/mm ou dd/mm/aaaa', pattern: getAdminFlexibleDateInputPattern(), required: true })}</label>
+            <label class="admin-field"><span>Fim</span>${renderAdminDateControl({ name: 'endDate', value: endValue, placeholder: 'dd/mm ou dd/mm/aaaa', pattern: getAdminFlexibleDateInputPattern(), required: true })}</label>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Valores por noite</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field"><span>Preço adulto/noite</span><input name="adultNight" type="number" min="0" step="0.01" value="${Number(editingSeason?.adultNight ?? state.pricing.adultNight)}" required /></label>
+            <label class="admin-field"><span>Preço criança/noite</span><input name="childNight" type="number" min="0" step="0.01" value="${Number(editingSeason?.childNight ?? state.pricing.childNight)}" required /></label>
+            <p class="admin-form-guidance">A cobrança mínima continua a vir do preço base: ${state.pricing.minimumPaidAdults || 2} adulto(s).</p>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Notas internas</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field admin-field-full"><span>Notas</span><input name="notes" type="text" value="${escapeHtml(editingSeason?.notes || '')}" /></label>
+          </div>
+        </fieldset>
+        <div class="admin-form-actions">
+          <button class="button admin-secondary-button" type="submit">${editingSeason ? `${icon('check')} Guardar época` : `${icon('plus')} Adicionar época`}</button>
+          ${editingSeason ? '<button class="button admin-secondary-button" type="button" data-action="cancel-season-edit">Cancelar edição</button>' : ''}
+        </div>
       </form>
     </details>
   `;
@@ -2451,10 +2464,39 @@ function getActivePricingRule() {
 }
 
 function getDiscountType(discount) {
+  if (discount.type === 'gift' || hasGiftReward(discount.gift)) return 'gift';
   return discount.type || (Number(discount.amount || 0) > 0 ? 'amount' : 'percentage');
 }
 
+function pluralizeCount(count, singular, plural) {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
+function renderGiftRewardText(value) {
+  const gift = normalizeGiftReward(value);
+  const parts = [];
+
+  if (gift.guests && gift.nights) {
+    parts.push(`${pluralizeCount(gift.nights, 'noite', 'noites')} × ${pluralizeCount(gift.guests, 'pessoa', 'pessoas')}`);
+  }
+  if (gift.bikes && gift.bikeDays) {
+    parts.push(`${pluralizeCount(gift.bikes, 'bicicleta', 'bicicletas')} × ${pluralizeCount(gift.bikeDays, 'dia', 'dias')}`);
+  }
+
+  return parts.join(' + ') || 'Oferta por configurar';
+}
+
+function getDiscountAppliesToText(discount) {
+  if (getDiscountType(discount) === 'gift') return renderGiftRewardText(discount.gift);
+  return {
+    accommodation: 'Alojamento',
+    services: 'Serviços',
+    both: 'Alojamento e serviços'
+  }[discount.appliesTo || 'accommodation'];
+}
+
 function renderDiscountValue(discount) {
+  if (getDiscountType(discount) === 'gift') return 'Oferta';
   return getDiscountType(discount) === 'amount'
     ? renderMoney(discount.amount)
     : `${Number(discount.percentage || 0)}%`;
@@ -2508,6 +2550,7 @@ function renderDiscountList() {
           <div class="admin-list-disclosure-body">
             <dl class="admin-record-details">
               <div><dt>Código</dt><dd><code>${escapeHtml(discount.code || '-')}</code></dd></div>
+              <div><dt>Benefício</dt><dd>${escapeHtml(getDiscountAppliesToText(discount))}</dd></div>
               <div><dt>Usos</dt><dd>${renderDiscountUses(discount)}</dd></div>
             </dl>
             ${can(currentUser, 'pricing:write') ? `
@@ -2526,65 +2569,97 @@ function renderDiscountList() {
 function renderDiscountForm() {
   const editingDiscount = state.pricing.discounts.find((discount) => discount.id === ui.editingDiscountId);
   const discountType = editingDiscount ? getDiscountType(editingDiscount) : 'percentage';
+  const gift = normalizeGiftReward(editingDiscount?.gift);
   const discountValue = discountType === 'amount'
     ? Number(editingDiscount?.amount || 0)
     : Number(editingDiscount?.percentage || 10);
+  const isGift = discountType === 'gift';
 
   return `
     <details class="admin-editor-disclosure"${editingDiscount ? ' open' : ''}>
       <summary>${icon(editingDiscount ? 'edit' : 'plus')} ${editingDiscount ? 'Editar desconto' : 'Adicionar desconto'}</summary>
       <form class="admin-form-grid admin-subform" data-form="discount">
-      <input name="discountId" type="hidden" value="${escapeHtml(editingDiscount?.id || '')}" />
-      <label class="admin-field">
-        <span>Nome</span>
-        <input name="title" type="text" value="${escapeHtml(editingDiscount?.title || '')}" required />
-      </label>
-      <label class="admin-field">
-        <span>Código</span>
-        <span class="admin-input-action">
-          <input name="code" type="text" value="${escapeHtml(editingDiscount?.code || '')}" placeholder="Ex.: REFUGIO10" />
-          <button class="admin-icon-button admin-inline-icon-button" type="button" data-action="generate-discount-code" title="Gerar código aleatório" aria-label="Gerar código aleatório">${icon('dice')}</button>
-        </span>
-      </label>
-      <label class="admin-field">
-        <span>Início</span>
-        ${renderAdminDateControl({ name: 'startDate', value: formatDateInputValue(editingDiscount?.startDate || ''), placeholder: 'Sem limite' })}
-      </label>
-      <label class="admin-field">
-        <span>Fim</span>
-        ${renderAdminDateControl({ name: 'endDate', value: formatDateInputValue(editingDiscount?.endDate || ''), placeholder: 'Sem limite' })}
-      </label>
-      <label class="admin-field">
-        <span>Tipo</span>
-        <select name="type">
-          ${renderOption('percentage', 'Percentagem', discountType)}
-          ${renderOption('amount', 'Valor fixo', discountType)}
-        </select>
-      </label>
-      <label class="admin-field">
-        <span>Valor do desconto</span>
-        <input name="discountValue" type="number" min="0" ${discountType === 'percentage' ? 'max="100"' : ''} step="1" value="${discountValue}" data-discount-value-input placeholder="${discountType === 'amount' ? 'Valor em euros' : 'Percentagem'}" />
-      </label>
-      <label class="admin-field">
-        <span>Máximo de usos</span>
-        <input name="maxUses" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(formatMaxUsesInputValue(editingDiscount?.maxUses || 0))}" data-max-uses-input />
-      </label>
-      <label class="admin-field">
-        <span>Aplica-se a</span>
-        <select name="appliesTo">
-          ${renderOption('accommodation', 'Alojamento', editingDiscount?.appliesTo || 'accommodation')}
-          ${renderOption('services', 'Serviços', editingDiscount?.appliesTo || 'accommodation')}
-          ${renderOption('both', 'Alojamento e serviços', editingDiscount?.appliesTo || 'accommodation')}
-        </select>
-      </label>
-      <label class="admin-checkbox">
-        <input name="active" type="checkbox" ${editingDiscount?.active === false ? '' : 'checked'} />
-        <span>Desconto ativo</span>
-      </label>
-      <div class="admin-form-actions">
-        <button class="button button-primary" type="submit">${editingDiscount ? `${icon('check')} Guardar desconto` : `${icon('plus')} Adicionar desconto`}</button>
-        ${editingDiscount ? `<button class="button admin-secondary-button" type="button" data-action="cancel-discount-edit">Cancelar edição</button>` : ''}
-      </div>
+        <input name="discountId" type="hidden" value="${escapeHtml(editingDiscount?.id || '')}" />
+        <fieldset class="admin-form-section">
+          <legend>Código e identificação</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field">
+              <span>Nome interno</span>
+              <input name="title" type="text" value="${escapeHtml(editingDiscount?.title || '')}" placeholder="Ex.: Presente de aniversário" required />
+            </label>
+            <label class="admin-field">
+              <span>Código para o hóspede</span>
+              <span class="admin-input-action">
+                <input name="code" type="text" value="${escapeHtml(editingDiscount?.code || '')}" placeholder="Ex.: PRESENTE" />
+                <button class="admin-icon-button admin-inline-icon-button" type="button" data-action="generate-discount-code" title="Gerar código aleatório" aria-label="Gerar código aleatório">${icon('dice')}</button>
+              </span>
+            </label>
+            <label class="admin-checkbox admin-checkbox-compact">
+              <input name="active" type="checkbox" ${editingDiscount?.active === false ? '' : 'checked'} />
+              <span>Código ativo</span>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Benefício</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field">
+              <span>Tipo de benefício</span>
+              <select name="type">
+                ${renderOption('percentage', 'Percentagem', discountType)}
+                ${renderOption('amount', 'Valor fixo', discountType)}
+                ${renderOption('gift', 'Oferta de alojamento ou serviço', discountType)}
+              </select>
+            </label>
+            <label class="admin-field" data-cash-discount-field${isGift ? ' hidden' : ''}>
+              <span>Valor do desconto</span>
+              <input name="discountValue" type="number" min="0" ${discountType === 'percentage' ? 'max="100"' : ''} step="1" value="${discountValue}" data-discount-value-input placeholder="${discountType === 'amount' ? 'Valor em euros' : 'Percentagem'}"${isGift ? ' disabled' : ''} />
+            </label>
+            <label class="admin-field" data-cash-discount-field${isGift ? ' hidden' : ''}>
+              <span>Aplica-se a</span>
+              <select name="appliesTo"${isGift ? ' disabled' : ''}>
+                ${renderOption('accommodation', 'Alojamento', editingDiscount?.appliesTo || 'accommodation')}
+                ${renderOption('services', 'Serviços', editingDiscount?.appliesTo || 'accommodation')}
+                ${renderOption('both', 'Alojamento e serviços', editingDiscount?.appliesTo || 'accommodation')}
+              </select>
+            </label>
+            <div class="admin-gift-fields admin-field-full" data-gift-discount-fields${isGift ? '' : ' hidden'}>
+              <p class="admin-form-guidance">Pode combinar várias ofertas no mesmo código. Deixe a quantidade e a duração a zero para não oferecer esse elemento.</p>
+              <h3>Alojamento</h3>
+              <div class="admin-form-section-grid">
+                <label class="admin-field"><span>Pessoas abrangidas por noite</span><input name="giftGuests" type="number" min="0" max="${state.property.occupancyLimit}" step="1" value="${gift.guests}"${isGift ? '' : ' disabled'} /></label>
+                <label class="admin-field"><span>Noites oferecidas</span><input name="giftNights" type="number" min="0" max="365" step="1" value="${gift.nights}"${isGift ? '' : ' disabled'} /></label>
+              </div>
+              <h3>Bicicletas</h3>
+              <div class="admin-form-section-grid">
+                <label class="admin-field"><span>Bicicletas oferecidas</span><input name="giftBikes" type="number" min="0" max="${state.property.occupancyLimit}" step="1" value="${gift.bikes}"${isGift ? '' : ' disabled'} /></label>
+                <label class="admin-field"><span>Dias oferecidos por bicicleta</span><input name="giftBikeDays" type="number" min="0" max="365" step="1" value="${gift.bikeDays}"${isGift ? '' : ' disabled'} /></label>
+              </div>
+              <p class="admin-form-guidance">Se a estadia tiver preços diferentes, a oferta desconta primeiro as noites elegíveis de menor valor. Nunca oferece mais pessoas, noites, bicicletas ou dias do que os pedidos.</p>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Validade e utilização</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field">
+              <span>Início</span>
+              ${renderAdminDateControl({ name: 'startDate', value: formatDateInputValue(editingDiscount?.startDate || ''), placeholder: 'Sem limite' })}
+            </label>
+            <label class="admin-field">
+              <span>Fim</span>
+              ${renderAdminDateControl({ name: 'endDate', value: formatDateInputValue(editingDiscount?.endDate || ''), placeholder: 'Sem limite' })}
+            </label>
+            <label class="admin-field">
+              <span>Máximo de utilizações</span>
+              <input name="maxUses" type="text" inputmode="numeric" autocomplete="off" value="${escapeHtml(formatMaxUsesInputValue(editingDiscount?.maxUses || 0))}" data-max-uses-input />
+            </label>
+          </div>
+        </fieldset>
+        <div class="admin-form-actions">
+          <button class="button button-primary" type="submit">${editingDiscount ? `${icon('check')} Guardar desconto` : `${icon('plus')} Adicionar desconto`}</button>
+          ${editingDiscount ? `<button class="button admin-secondary-button" type="button" data-action="cancel-discount-edit">Cancelar edição</button>` : ''}
+        </div>
       </form>
     </details>
   `;
@@ -2696,31 +2771,26 @@ function renderExpenseForm() {
     <details class="admin-editor-disclosure"${editingExpense ? ' open' : ''}>
       <summary>${icon(editingExpense ? 'edit' : 'plus')} ${editingExpense ? 'Editar despesa' : 'Adicionar despesa'}</summary>
       <form class="admin-form-grid admin-subform" data-form="expense">
-      <input name="expenseId" type="hidden" value="${escapeHtml(editingExpense?.id || '')}" />
-      <label class="admin-field">
-        <span>Data</span>
-        ${renderAdminDateControl({ name: 'date', value: formatDateInputValue(editingExpense?.date || formatDateKey(new Date())), required: true })}
-      </label>
-      <label class="admin-field">
-        <span>Categoria</span>
-        <select name="category">${Object.entries(EXPENSE_LABELS).map(([value, label]) => renderOption(value, label, editingExpense?.category || 'outros')).join('')}</select>
-      </label>
-      <label class="admin-field">
-        <span>Valor</span>
-        <input name="amount" type="number" min="0" step="0.01" value="${Number(editingExpense?.amount || 0)}" required />
-      </label>
-      <label class="admin-field admin-field-full">
-        <span>Descrição</span>
-        <input name="description" type="text" value="${escapeHtml(editingExpense?.description || '')}" required />
-      </label>
-      <label class="admin-field admin-field-full">
-        <span>Notas</span>
-        <textarea name="notes" rows="3">${escapeHtml(editingExpense?.notes || '')}</textarea>
-      </label>
-      <div class="admin-form-actions">
-        <button class="button admin-secondary-button" type="submit">${editingExpense ? `${icon('check')} Guardar despesa` : `${icon('plus')} Adicionar despesa`}</button>
-        ${editingExpense ? '<button class="button admin-secondary-button" type="button" data-action="cancel-expense-edit">Cancelar edição</button>' : ''}
-      </div>
+        <input name="expenseId" type="hidden" value="${escapeHtml(editingExpense?.id || '')}" />
+        <fieldset class="admin-form-section">
+          <legend>Registo da despesa</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field"><span>Data</span>${renderAdminDateControl({ name: 'date', value: formatDateInputValue(editingExpense?.date || formatDateKey(new Date())), required: true })}</label>
+            <label class="admin-field"><span>Categoria</span><select name="category">${Object.entries(EXPENSE_LABELS).map(([value, label]) => renderOption(value, label, editingExpense?.category || 'outros')).join('')}</select></label>
+            <label class="admin-field"><span>Valor</span><input name="amount" type="number" min="0" step="0.01" value="${Number(editingExpense?.amount || 0)}" required /></label>
+            <label class="admin-field admin-field-full"><span>Descrição</span><input name="description" type="text" value="${escapeHtml(editingExpense?.description || '')}" required /></label>
+          </div>
+        </fieldset>
+        <fieldset class="admin-form-section">
+          <legend>Notas adicionais</legend>
+          <div class="admin-form-section-grid">
+            <label class="admin-field admin-field-full"><span>Notas</span><textarea name="notes" rows="3">${escapeHtml(editingExpense?.notes || '')}</textarea></label>
+          </div>
+        </fieldset>
+        <div class="admin-form-actions">
+          <button class="button admin-secondary-button" type="submit">${editingExpense ? `${icon('check')} Guardar despesa` : `${icon('plus')} Adicionar despesa`}</button>
+          ${editingExpense ? '<button class="button admin-secondary-button" type="button" data-action="cancel-expense-edit">Cancelar edição</button>' : ''}
+        </div>
       </form>
     </details>
   `;
@@ -3818,6 +3888,10 @@ function buildReservationFromForm(form) {
   const guestIdentityDocumentType = String(data.get('identityDocumentType') || '').trim();
   const guestIdentityDocumentNumber = String(data.get('identityDocumentNumber') || '').trim();
   const websiteRequestId = String(data.get('websiteRequestId') || '').trim();
+  const linkedWebsiteRequest = websiteRequestId
+    ? state.websiteRequests.find((request) => request.id === websiteRequestId)
+    : null;
+  const sourceDiscountPricing = existingReservation?.pricing || linkedWebsiteRequest?.pricing || {};
   const preferredLanguage = String(data.get('preferredLanguage') || 'pt');
   const status = String(data.get('status') || 'awaiting_payment');
   const checkInTime = normalizeAdminTime(data.get('checkInTime') || state.property.defaultCheckInTime, 'Hora de check-in');
@@ -3875,6 +3949,10 @@ function buildReservationFromForm(form) {
       discountPercent: discountType === 'percentage' ? Math.min(100, discountValue) : 0,
       discountAmount: discountType === 'amount' ? discountValue : 0,
       discountCode: String(data.get('discountCode') || '').trim(),
+      discountTitle: sourceDiscountPricing.discountTitle || '',
+      discountBenefitType: sourceDiscountPricing.discountBenefitType || '',
+      discountGift: sourceDiscountPricing.discountGift,
+      discountGiftApplied: sourceDiscountPricing.discountGiftApplied,
       depositIncluded: data.get('depositIncluded') === 'on'
     },
     extras: {
@@ -4301,10 +4379,18 @@ async function handleDiscountSubmit(form) {
   const data = new FormData(form);
   const startDate = parseOptionalAdminDateInput(data.get('startDate'), 'Início do desconto');
   const endDate = parseOptionalAdminDateInput(data.get('endDate'), 'Fim do desconto');
-  const type = String(data.get('type') || 'percentage');
+  const type = ['percentage', 'amount', 'gift'].includes(String(data.get('type')))
+    ? String(data.get('type'))
+    : 'percentage';
   const discountValue = Math.max(0, Number(data.get('discountValue') || 0));
   const percentage = type === 'percentage' ? Math.min(100, discountValue) : 0;
   const amount = type === 'amount' ? discountValue : 0;
+  const gift = normalizeGiftReward({
+    guests: data.get('giftGuests'),
+    nights: data.get('giftNights'),
+    bikes: data.get('giftBikes'),
+    bikeDays: data.get('giftBikeDays')
+  });
 
   if (startDate && endDate && parseDateKey(endDate) < parseDateKey(startDate)) {
     throw new Error('A data final do desconto não pode ser anterior ao início.');
@@ -4318,28 +4404,57 @@ async function handleDiscountSubmit(form) {
     throw new Error('Indique um valor fixo de desconto superior a 0.');
   }
 
+  if (type === 'gift') {
+    const incompleteParts = getIncompleteGiftRewardParts(gift);
+    if (incompleteParts.length) {
+      throw new Error('Cada oferta precisa da quantidade de pessoas ou bicicletas e do respetivo número de noites ou dias.');
+    }
+    if (!hasGiftReward(gift)) {
+      throw new Error('Configure pelo menos uma oferta de alojamento ou bicicletas.');
+    }
+  }
+
   const discountId = String(data.get('discountId') || '');
+  const code = String(data.get('code') || createDiscountCode()).trim().toUpperCase();
+  const duplicateCode = state.pricing.discounts.find(
+    (candidate) => candidate.id !== discountId && String(candidate.code || '').trim().toUpperCase() === code
+  );
+  if (duplicateCode) {
+    throw new Error('Já existe outro desconto com este código.');
+  }
   const discount = state.pricing.discounts.find((candidate) => candidate.id === discountId) || {
     id: makeId('DISC', state.pricing.discounts),
     usedCount: 0
   };
 
+  const giftHasAccommodation = Boolean(gift.guests && gift.nights);
+  const giftHasServices = Boolean(gift.bikes && gift.bikeDays);
+  const giftAppliesTo = giftHasAccommodation && giftHasServices
+    ? 'both'
+    : giftHasServices ? 'services' : 'accommodation';
+
   Object.assign(discount, {
     title: String(data.get('title') || '').trim(),
-    code: String(data.get('code') || createDiscountCode()).trim().toUpperCase(),
+    code,
     type,
     percentage,
     amount,
+    gift: type === 'gift' ? gift : undefined,
     maxUses: parseMaxUsesInputValue(data.get('maxUses')),
     startDate,
     endDate,
-    appliesTo: String(data.get('appliesTo') || 'accommodation'),
+    appliesTo: type === 'gift' ? giftAppliesTo : String(data.get('appliesTo') || 'accommodation'),
     active: data.get('active') === 'on'
   });
 
   if (!discountId) state.pricing.discounts.push(discount);
   ui.editingDiscountId = '';
-  addAudit(state, currentUser, discountId ? 'Desconto atualizado' : 'Desconto criado', 'pricing', discount.id);
+  addAudit(state, currentUser, discountId ? 'Desconto atualizado' : 'Desconto criado', 'pricing', discount.id, {
+    title: discount.title,
+    code: discount.code,
+    benefit: getDiscountAppliesToText(discount),
+    period: renderDiscountPeriod(discount)
+  });
   await persist(discountId ? 'Desconto atualizado.' : 'Desconto criado.');
 }
 

@@ -161,6 +161,10 @@ The prototype is suitable for owner review and workflow testing. It is not suita
 - [x] Resolve overlapping current pricing rules into exactly one `Ativa hoje` rule, with lower-priority current rules labelled `Sobreposta hoje` and all others `Inativa`.
 - [x] Keep Pricing/Discount disclosure titles, values or statuses, and expand controls aligned in a stable mobile grid.
 - [x] Keep disclosure actions padded inside Pricing cards, including the automatically added bottom close action.
+- [x] Extend discount codes with configurable gifts as well as percentage and fixed-value reductions.
+  - Note: A code can offer any number of nights for any number of people, independently of adult/child status, any number of bicycles for any number of days, or both benefits together. Gifts are capped by the actual request, use the least expensive eligible nights when nightly prices vary, preserve the one-adult minimum-charge rule, and are recorded on website requests with their calculated euro value.
+- [x] Organise dense admin editors into named groups matching the reservation editor.
+  - Note: Discount codes now separate identity, benefit, and validity; seasonal prices separate calendar, values, and notes; services separate identity, price, and availability; and expenses separate the core record from additional notes. Small forms remain compact.
 - [x] Show all Expenses and combine month/year periods in one filter.
 - [x] Regenerate message drafts immediately when reservation, template, or no-reservation language changes.
 - [x] Put report exports in their relevant Statistics sections and apply current filters.
@@ -195,7 +199,7 @@ The prototype is suitable for owner review and workflow testing. It is not suita
 - [x] Reservation creation/editing, grouped contact/language/identity/caução/payment data, source including Abritel, conflicts, extra guests, cancellation/restoration, and past reservations.
 - [x] Require a structured guest postal address in public booking requests and owner reservation creation/editing, with a locally searchable ISO country list; show the address in request/reservation details and replace nationality reporting with country of residence.
 - [x] Website request inbox/history, request-to-reservation conversion, deposit choice, conflicts, and local booking-form ingestion.
-- [x] Base, seasonal, date-specific, group, and code discount management with `dd/mm/yyyy` entry and native date-picker buttons.
+- [x] Base, seasonal, date-specific, group, percentage, fixed-value, and configurable gift-code management with `dd/mm/yyyy` entry and native date-picker buttons.
 - [x] Services catalogue with enablement and pricing.
 - [x] Expenses with notes, filters, add/edit/remove, and complete visible history.
 - [x] Employee profiles, normal compensation mode, job rates/costs, work history, voluntary work, active timer task editing, and manual time.

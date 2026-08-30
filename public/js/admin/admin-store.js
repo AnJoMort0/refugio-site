@@ -1,5 +1,6 @@
 import { ADMIN_DATA_VERSION, createInitialAdminState } from './admin-seed.js';
 import { normalizeAddress } from '../utils/countries.js';
+import { normalizeGiftReward } from '../services/discount-gifts.js';
 
 const STORAGE_KEY = 'refugio-admin-prototype-state-v1';
 
@@ -21,6 +22,14 @@ function isValidState(value) {
 function normalizeState(value) {
   const state = clone(value);
   state.services = Array.isArray(state.services) ? state.services : [];
+  state.pricing ||= {};
+  state.pricing.discounts = Array.isArray(state.pricing?.discounts)
+    ? state.pricing.discounts.map((discount) => (
+        discount.type === 'gift'
+          ? { ...discount, gift: normalizeGiftReward(discount.gift) }
+          : discount
+      ))
+    : [];
   state.guests = state.guests.map((guest) => {
     const { nationality, ...guestData } = guest;
     return {

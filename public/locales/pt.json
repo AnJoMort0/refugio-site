@@ -410,6 +410,7 @@
       "discountCodeLabel": "Código de desconto",
       "discountCodePlaceholder": "Insira o seu código de desconto aqui",
       "discountCodeApplied": "Código {code} aplicado: -{amount}",
+      "discountCodeGiftApplied": "Código {code} aplicado: oferta equivalente a {amount}",
       "commentsLabel": "Comentários ou pedidos especiais",
       "commentsPlaceholder": "Ex.: horários extraordinários de chegada, pedidos, dúvida sobre acessos...",
       "marketingOptInLabel": "Quero receber novidades, ofertas e descontos do Refúgio",
